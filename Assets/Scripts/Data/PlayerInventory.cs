@@ -19,4 +19,11 @@ public class PlayerInventory : MonoBehaviour
 
     [ContextMenu("테스트: 0번 형판 획득")]
     void TestAddPlate0() => AddPlate(0);
+
+    public void LoadPlateData(bool[] data)
+    {
+        hasPlate = data;
+        Debug.Log($"[PlayerInventory] 형판 데이터 불러옴: {string.Join(",", hasPlate)}");
+    }
+
 }

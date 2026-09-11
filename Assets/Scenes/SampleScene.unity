@@ -259,6 +259,7 @@ GameObject:
   - component: {fileID: 390427307}
   - component: {fileID: 390427309}
   - component: {fileID: 390427310}
+  - component: {fileID: 390427311}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -331,7 +332,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5982b3a7c1f69884b83988627d79e68b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CubeFaceManager
-  currentFace: 0
+  front: 0
+  right: 1
+  back: 2
+  left: 3
+  up: 4
+  down: 5
   playerInventory: {fileID: 390427308}
   cubeFaceState: {fileID: 390427307}
 --- !u!114 &390427310
@@ -347,6 +353,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CubeSealManager
   cubeFaceState: {fileID: 390427307}
+--- !u!114 &390427311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 390427304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1952a8d868c21b64f81d1d7f66341a78, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SaveManager
+  playerInventory: {fileID: 390427308}
+  cubeFaceState: {fileID: 390427307}
+  cubeSealManager: {fileID: 390427310}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

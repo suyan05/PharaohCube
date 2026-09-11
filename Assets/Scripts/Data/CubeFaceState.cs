@@ -44,4 +44,11 @@ public class CubeFaceState : MonoBehaviour
         for (int i = 0; i < faceActivated.Length; i++)
             ActivateFace(i);
     }
+
+    public void LoadFaceData(bool[] data)
+    {
+        faceActivated = data;
+        Debug.Log($"[CubeFaceState] 면 활성화 데이터 불러옴: {string.Join(",", faceActivated)}");
+    }
+
 }
