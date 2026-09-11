@@ -27,7 +27,15 @@ public class CubeSealManager : MonoBehaviour
     {
         SetSealUnlocked(true);
         Debug.Log("[CubeSealManager] 6개 면 전부 활성화 확인 → 최종 봉인 퍼즐 오픈 요청");
-        // TODO(강태호): FinalPuzzleUI.Open() 연결 예정
+        // TODO(강태호)작업 완료: 최종 봉인 UI 오픈 연결
+        if (FinalPuzzleUI.Instance != null)
+        {
+            FinalPuzzleUI.Instance.Open();
+        }
+        else
+        {
+            Debug.LogWarning("[CubeSealManager] FinalPuzzleUI 인스턴스를 찾을 수 없습니다!");
+        }
     }
 
     // 저장된 데이터를 불러올 때 사용 (이벤트 재발생 없이 값만 설정)
