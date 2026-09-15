@@ -6042,6 +6042,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2400404435410420340, guid: dbcdd0739643d6f42863c85d3df4a440, type: 3}
+      propertyPath: fadeImage
+      value: 
+      objectReference: {fileID: 7738390405990538720}
     - target: {fileID: 7125111154796171879, guid: dbcdd0739643d6f42863c85d3df4a440, type: 3}
       propertyPath: m_Name
       value: FadePanel
@@ -6051,6 +6055,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dbcdd0739643d6f42863c85d3df4a440, type: 3}
+--- !u!114 &7738390405990538720 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5233472016621142811, guid: dbcdd0739643d6f42863c85d3df4a440, type: 3}
+  m_PrefabInstance: {fileID: 7738390405990538719}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!224 &8080693529317651674 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 1128546967259215603, guid: dbcdd0739643d6f42863c85d3df4a440, type: 3}

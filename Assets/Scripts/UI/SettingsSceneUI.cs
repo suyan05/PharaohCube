@@ -6,6 +6,8 @@ using TMPro;
 
 public class SettingsSceneUI : MonoBehaviour
 {
+    public static string previousSceneName = "MainMenu";
+
     [Header("Audio Sliders")]
     [SerializeField] private Slider sliderBGM;
     [SerializeField] private Slider sliderSFX;
@@ -21,7 +23,7 @@ public class SettingsSceneUI : MonoBehaviour
     [SerializeField] private Button btnBack;
 
     [Header("Target Scene")]
-    [SerializeField] private string mainMenuSceneName = "MainMenu"; // 복귀할 메인 화면 이름
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private const string BGMKey = "Setting_BGM";
     private const string SFXKey = "Setting_SFX";
@@ -33,12 +35,6 @@ public class SettingsSceneUI : MonoBehaviour
 
     private void Start()
     {
-        // 씬 시작 시 화면 페이드 인
-        if (FadeController.Instance != null)
-        {
-            FadeController.Instance.FadeIn();
-        }
-
         InitResolutions();
         LoadSettings();
         BindEvents();
@@ -46,18 +42,23 @@ public class SettingsSceneUI : MonoBehaviour
 
     private void BindEvents()
     {
-        btnBack.onClick.AddListener(OnBackClicked);
+        if (btnBack != null)
+        {
+            btnBack.onClick.RemoveAllListeners();
+            btnBack.onClick.AddListener(OnBackClicked);
+        }
 
-        sliderBGM.onValueChanged.AddListener(OnBGMChanged);
-        sliderSFX.onValueChanged.AddListener(OnSFXChanged);
-        dropdownQuality.onValueChanged.AddListener(OnQualityChanged);
-        dropdownResolution.onValueChanged.AddListener(OnResolutionChanged);
-        dropdownLanguage.onValueChanged.AddListener(OnLanguageChanged);
+        if (sliderBGM != null) sliderBGM.onValueChanged.AddListener(OnBGMChanged);
+        if (sliderSFX != null) sliderSFX.onValueChanged.AddListener(OnSFXChanged);
+        if (dropdownQuality != null) dropdownQuality.onValueChanged.AddListener(OnQualityChanged);
+        if (dropdownResolution != null) dropdownResolution.onValueChanged.AddListener(OnResolutionChanged);
+        if (dropdownLanguage != null) dropdownLanguage.onValueChanged.AddListener(OnLanguageChanged);
     }
 
-    // 모니터 해상도 목록을 드롭다운에 채움
     private void InitResolutions()
     {
+        if (dropdownResolution == null) return;
+
         availableResolutions = Screen.resolutions;
         dropdownResolution.ClearOptions();
 
@@ -83,10 +84,10 @@ public class SettingsSceneUI : MonoBehaviour
 
     private void LoadSettings()
     {
-        sliderBGM.value = PlayerPrefs.GetFloat(BGMKey, 0.8f);
-        sliderSFX.value = PlayerPrefs.GetFloat(SFXKey, 0.8f);
-        dropdownQuality.value = PlayerPrefs.GetInt(QualityKey, QualitySettings.GetQualityLevel());
-        dropdownLanguage.value = PlayerPrefs.GetInt(LanguageKey, 0); // 0: 한국어, 1: 영어 , 2 : 기타 언어
+        if (sliderBGM != null) sliderBGM.value = PlayerPrefs.GetFloat(BGMKey, 0.8f);
+        if (sliderSFX != null) sliderSFX.value = PlayerPrefs.GetFloat(SFXKey, 0.8f);
+        if (dropdownQuality != null) dropdownQuality.value = PlayerPrefs.GetInt(QualityKey, QualitySettings.GetQualityLevel());
+        if (dropdownLanguage != null) dropdownLanguage.value = PlayerPrefs.GetInt(LanguageKey, 0);
     }
 
     private void OnBGMChanged(float val) => PlayerPrefs.SetFloat(BGMKey, val);
@@ -100,6 +101,7 @@ public class SettingsSceneUI : MonoBehaviour
 
     private void OnResolutionChanged(int index)
     {
+        if (availableResolutions == null || index >= availableResolutions.Length) return;
         Resolution res = availableResolutions[index];
         Screen.SetResolution(res.width, res.height, FullScreenMode.FullScreenWindow);
         PlayerPrefs.SetInt(ResolutionKey, index);
@@ -108,24 +110,17 @@ public class SettingsSceneUI : MonoBehaviour
     private void OnLanguageChanged(int index)
     {
         PlayerPrefs.SetInt(LanguageKey, index);
-        Debug.Log($"[SettingsSceneUI] 언어 변경됨: {(index == 0 ? "한국어" : "English")}");
     }
 
     private void OnBackClicked()
     {
         PlayerPrefs.Save();
+        Time.timeScale = 1f;
 
-        // 뒤로가기 클릭 시 페이드 아웃 후 메인 메뉴로 복귀
-        if (FadeController.Instance != null)
-        {
-            FadeController.Instance.FadeOut(() =>
-            {
-                SceneManager.LoadScene(mainMenuSceneName);
-            });
-        }
-        else
-        {
-            SceneManager.LoadScene(mainMenuSceneName);
-        }
+        string targetScene = string.IsNullOrEmpty(previousSceneName) || previousSceneName == "Settings"
+                             ? mainMenuSceneName
+                             : previousSceneName;
+
+        SceneManager.LoadScene(targetScene);
     }
 }

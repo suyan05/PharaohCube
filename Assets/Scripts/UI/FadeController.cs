@@ -1,85 +1,117 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class FadeController : MonoBehaviour
 {
     public static FadeController Instance { get; private set; }
 
-    [Header("UI Reference")]
-    [SerializeField] private CanvasGroup fadeCanvasGroup;
-
-    [Header("Settings")]
-    [SerializeField] private float fadeDuration = 3f; // 기준 3초
+    [SerializeField] private Image fadeImage;
+    [SerializeField] private float fadeDuration = 0.8f;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            // 씬이 바뀌어도 파괴되지 않고 유지되도록 설정
-            DontDestroyOnLoad(gameObject.transform.root.gameObject);
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
-    }
-    private void Update()
-    {
-        // 키보드 F1을 누르면 페이드 아웃, F2를 누르면 페이드 인
-        if (Input.GetKeyDown(KeyCode.F1))
+
+        if (fadeImage == null)
         {
-            FadeOut(() => Debug.Log("페이드 아웃 완료"));
+            fadeImage = GetComponent<Image>();
+            if (fadeImage == null) fadeImage = GetComponentInChildren<Image>();
         }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            FadeIn(() => Debug.Log("페이드 인 완료"));
-        }
-    }
-    // 화면이 점점 어두워짐
-    public void FadeOut(Action onComplete = null)
-    {
-        StopAllCoroutines();
-        StartCoroutine(FadeRoutine(0f, 1f, onComplete, true));
     }
 
-    // 화면이 점점 밝아짐
+    private void Start()
+    {
+        FadeIn();
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Time.timeScale = 1f;
+        FadeIn();
+    }
+
     public void FadeIn(Action onComplete = null)
     {
+        gameObject.SetActive(true);
         StopAllCoroutines();
-        StartCoroutine(FadeRoutine(1f, 0f, onComplete, false));
+        StartCoroutine(FadeRoutine(1f, 0f, onComplete));
     }
 
-    private IEnumerator FadeRoutine(float startAlpha, float endAlpha, Action onComplete, bool isFadeOut)
+    public void FadeOut(Action onComplete = null)
     {
-        // 페이드 진행 중에는 마우스 클릭 차단
-        fadeCanvasGroup.blocksRaycasts = true;
+        gameObject.SetActive(true);
+        StopAllCoroutines();
+        StartCoroutine(FadeRoutine(0f, 1f, onComplete));
+    }
+
+    public void FadeOutAndLoadScene(string sceneName)
+    {
+        Time.timeScale = 1f;
+        FadeOut(() =>
+        {
+            SceneManager.LoadScene(sceneName);
+        });
+    }
+
+    private IEnumerator FadeRoutine(float startAlpha, float endAlpha, Action onComplete)
+    {
+        if (fadeImage == null)
+        {
+            onComplete?.Invoke();
+            yield break;
+        }
+
+        gameObject.SetActive(true);
+        fadeImage.enabled = true;
+        fadeImage.raycastTarget = (endAlpha > 0.5f);
+
         float elapsed = 0f;
+        Color color = fadeImage.color;
 
         while (elapsed < fadeDuration)
         {
             elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / fadeDuration);
-
-            // 문서 명세 곡선 적용
-            float curveT = isFadeOut
-                ? Mathf.SmoothStep(0f, 1f, t)
-                : Mathf.Sin(t * Mathf.PI * 0.5f);
-
-            fadeCanvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, curveT);
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            color.a = Mathf.Lerp(startAlpha, endAlpha, smoothT);
+            fadeImage.color = color;
             yield return null;
         }
 
-        fadeCanvasGroup.alpha = endAlpha;
-        // 완전히 어두워진 상태가 아니면 입력 차단 해제
-        fadeCanvasGroup.blocksRaycasts = (endAlpha > 0.9f);
+        color.a = endAlpha;
+        fadeImage.color = color;
+
+        if (endAlpha <= 0f)
+        {
+            fadeImage.raycastTarget = false;
+            fadeImage.enabled = false;
+        }
+
         onComplete?.Invoke();
     }
-
-    [ContextMenu("테스트: 페이드 아웃")]
-    private void TestFadeOut() => FadeOut(() => Debug.Log("페이드 아웃 완료"));
-
-    [ContextMenu("테스트: 페이드 인")]
-    private void TestFadeIn() => FadeIn(() => Debug.Log("페이드 인 완료"));
 }
