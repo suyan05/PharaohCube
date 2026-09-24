@@ -16,11 +16,13 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // 자식이어도 동작하도록, 최상위 부모(Managers)를 통째로 유지
+            DontDestroyOnLoad(transform.root.gameObject);
         }
         else
         {
-            Destroy(gameObject);
+            // 다른 씬에 또 있는 중복 Managers는 제거
+            Destroy(transform.root.gameObject);
         }
     }
 
@@ -37,8 +39,6 @@ public class GameManager : MonoBehaviour
         OnFlagChanged?.Invoke(flagId);
     }
 
-    /* HasFlag<string> 플래그는 켜져있나 아닌가 만 중요하고 
-     순서는 필요 없으니, 중복 방지 조회가 빠른 HashSet로 지정.*/
     public bool HasFlag(string flagId)
     {
         return activeFlags.Contains(flagId);
