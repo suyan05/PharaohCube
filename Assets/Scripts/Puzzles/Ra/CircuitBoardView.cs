@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -12,11 +13,14 @@ public class CircuitBoardView : MonoBehaviour
     [SerializeField] private float cellSize = 60f;
     [SerializeField] private float beamWidth = 10f;
 
+    // 칸이 클릭되면 (칸 좌표, 우클릭 여부) 전달
+    public event Action<Vector2Int, bool> OnCellClicked;
+
     // 기획서 11번 아트 가이드 색상
     private Color floorColor, obstacleColor, slotColor, prismSocketColor, prismOnColor;
     private Color beamOrange, beamBlue, mirrorColor, fragmentColor, gridColor;
 
-    private RectTransform tileLayer, beamLayer, pieceLayer, goalLayer;
+    private RectTransform tileLayer, beamLayer, pieceLayer, goalLayer, clickLayer;
 
     private int Cols => CircuitBoardPuzzle.MaxX - CircuitBoardPuzzle.MinX + 1; // 7
     private int Rows => CircuitBoardPuzzle.MaxY - CircuitBoardPuzzle.MinY + 1; // 9
@@ -27,13 +31,15 @@ public class CircuitBoardView : MonoBehaviour
 
         boardRoot.sizeDelta = new Vector2(Cols * cellSize, Rows * cellSize);
 
-        // 그리는 순서 = 레이어 순서 (아래 → 위)
+        // 그리는 순서 = 레이어 순서 (아래 → 위). 클릭 레이어가 맨 위
         tileLayer = CreateLayer("TileLayer");
         beamLayer = CreateLayer("BeamLayer");
         pieceLayer = CreateLayer("PieceLayer");
         goalLayer = CreateLayer("GoalLayer");
+        clickLayer = CreateLayer("ClickLayer");
 
         BuildTiles();
+        BuildClickAreas();
 
         puzzle.OnBoardChanged += Refresh;
         Refresh();
@@ -46,16 +52,16 @@ public class CircuitBoardView : MonoBehaviour
 
     private void SetupColors()
     {
-        floorColor = Hex("#E8D9B8");                                        // 사암 바닥
-        gridColor = Hex("#4A3423");                                         // 짙은 갈색 (칸 사이 선)
-        obstacleColor = Hex("#6B5438");                                     // 장애물 (갈색)
-        slotColor = Hex("#C9A66B");                                         // 빈 슬롯 (사암 벽색)
+        floorColor = Hex("#E8D9B8"); // 사암 바닥
+        gridColor = Hex("#4A3423"); // 짙은 갈색 (칸 사이 선)
+        obstacleColor = Hex("#6B5438"); // 장애물 (갈색)
+        slotColor = Hex("#C9A66B"); // 빈 슬롯 (사암 벽색)
         prismSocketColor = Hex("#7846A0"); prismSocketColor.a = 0.35f;
-        prismOnColor = Hex("#7846A0");                                      // 프리즘 보라
-        beamOrange = Hex("#E07A3F");                                        // 주황 빛
-        beamBlue = Hex("#3E7BD6");                                          // 밤빛 파랑
-        mirrorColor = Hex("#1E3A5F");                                       // 초기 거울 A, B (라피스 블루)
-        fragmentColor = Hex("#E8B23A");                                     // 거울 조각 ①②③ (금색)
+        prismOnColor = Hex("#7846A0"); // 프리즘 보라
+        beamOrange = Hex("#E07A3F"); // 주황 빛
+        beamBlue = Hex("#3E7BD6"); // 밤빛 파랑
+        mirrorColor = Hex("#1E3A5F"); // 초기 거울 A, B (라피스 블루)
+        fragmentColor = Hex("#E8B23A"); // 거울 조각 ①②③ (금색)
     }
 
     // ================= 고정 요소 (한 번만 그림) =================
@@ -87,6 +93,29 @@ public class CircuitBoardView : MonoBehaviour
         // 광원 (1,4)
         CreateRect(tileLayer, "Source", TileToPos(CircuitBoardPuzzle.Source),
             new Vector2(cellSize * 0.5f, cellSize * 0.5f), beamOrange);
+    }
+
+    // 클릭 가능한 칸: 슬롯 5개 + 프리즘 소켓 1개
+    private void BuildClickAreas()
+    {
+        for (int x = CircuitBoardPuzzle.MinX; x <= CircuitBoardPuzzle.MaxX; x++)
+        {
+            for (int y = CircuitBoardPuzzle.MinY; y <= CircuitBoardPuzzle.MaxY; y++)
+            {
+                Vector2Int tile = new Vector2Int(x, y);
+                bool clickable = CircuitBoardPuzzle.IsSlot(tile) || tile == CircuitBoardPuzzle.PrismTile;
+                if (!clickable) continue;
+
+                // 투명한 이미지 (투명해도 클릭은 받음)
+                Image img = CreateRect(clickLayer, $"Click_{x}_{y}", TileToPos(tile),
+                    new Vector2(cellSize, cellSize), new Color(1, 1, 1, 0));
+                img.raycastTarget = true;
+
+                var click = img.gameObject.AddComponent<BoardCellClick>();
+                click.tile = tile;
+                click.onClick = (t, right) => OnCellClicked?.Invoke(t, right);
+            }
+        }
     }
 
     // ================= 바뀌는 요소 (보드 바뀔 때마다 다시 그림) =================
@@ -144,7 +173,7 @@ public class CircuitBoardView : MonoBehaviour
         Vector2 mid = (a + b) / 2f;
         Vector2 diff = b - a;
 
-        // 빔은 항상 가로, 세로라서 회전 없이 직사각형으로 충분
+        // 빔은 항상 가로 또는 세로라서 회전 없이 직사각형으로 충분
         Vector2 size = Mathf.Abs(diff.x) > Mathf.Abs(diff.y)
             ? new Vector2(Mathf.Abs(diff.x) + beamWidth, beamWidth)
             : new Vector2(beamWidth, Mathf.Abs(diff.y) + beamWidth);
@@ -195,7 +224,7 @@ public class CircuitBoardView : MonoBehaviour
     }
 
     // ================= 도우미 함수 =================
-    // 보드 좌표 (x, y) → 화면 위치 (보드 중앙이 0,0) 변환임
+    // 보드 좌표 (x, y) → 화면 위치 (보드 중앙이 0,0)
     private Vector2 TileToPos(Vector2Int tile)
     {
         float px = (tile.x - CircuitBoardPuzzle.MinX - (Cols - 1) / 2f) * cellSize;
@@ -228,7 +257,7 @@ public class CircuitBoardView : MonoBehaviour
 
         var img = go.GetComponent<Image>();
         img.color = color;
-        img.raycastTarget = false; // 클릭은 다음 단계에서 따로 처리
+        img.raycastTarget = false; // 기본은 클릭 안 받음 (클릭 영역만 따로 켬)
         return img;
     }
 
