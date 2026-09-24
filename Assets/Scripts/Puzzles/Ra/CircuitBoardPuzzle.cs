@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -11,7 +12,7 @@ public enum MirrorType
 public class CircuitBoardPuzzle : PuzzleBase
 {
     // ================= 보드 데이터 (기획서 5.1 / 10.2) =================
-    private const int MinX = 1, MaxX = 7, MinY = 4, MaxY = 12;
+    public const int MinX = 1, MaxX = 7, MinY = 4, MaxY = 12;
 
     private static readonly Vector2Int SourceTile = new Vector2Int(1, 4);
     private static readonly Vector2Int SourceDir = Vector2Int.up; // 북쪽
@@ -60,10 +61,10 @@ public class CircuitBoardPuzzle : PuzzleBase
 
     private static readonly StageGoal[] Stages =
     {
-        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun,      "G1 새벽"),
-        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2 정오"),
-        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass,     "G3 황혼"),
-        new StageGoal('N', 4, true,  "F_RA_CIRCUIT_4", null,                 "G4 밤(파랑)")
+        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun,      "G1"),
+        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2"),
+        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass,     "G3"),
+        new StageGoal('N', 4, true,  "F_RA_CIRCUIT_4", null,                 "G4")
     };
 
     // ================= 현재 보드 상태 =================
@@ -85,12 +86,46 @@ public class CircuitBoardPuzzle : PuzzleBase
     private int exitX;
     private bool beamBlue;
 
-    public int CurrentStage => currentStage;
-    public IReadOnlyList<Vector2Int> BeamPath => beamPath; // 나중에 화면 표시용
+    // 보드가 바뀔 때마다 알림 (화면 다시 그리기용)
+    public event Action OnBoardChanged;
 
+    // ================= 화면(View)에서 읽는 용도 =================
+    public int CurrentStage => currentStage;
+    public IReadOnlyList<Vector2Int> BeamPath => beamPath;
+    public bool BeamExited => beamExited;
+    public char ExitEdge => exitEdge;
+    public int ExitX => exitX;
+    public bool BeamBlue => beamBlue;
+    public bool PrismOn => prismOn;
+
+    public static Vector2Int Source => SourceTile;
+    public static Vector2Int PrismTile => PrismSocket;
+    public static bool IsObstacle(Vector2Int tile) => Obstacles.Contains(tile);
+    public static bool IsSlot(Vector2Int tile) => SlotTiles.Contains(tile);
+
+    public int GoalCount => Stages.Length;
+
+    public void GetGoal(int index, out char edge, out int x, out bool needBlue, out string flag, out string label)
+    {
+        StageGoal g = Stages[index];
+        edge = g.edge; x = g.x; needBlue = g.needBlue; flag = g.flag; label = g.label;
+    }
+
+    public List<(Vector2Int tile, string id, MirrorType type)> GetPieces()
+    {
+        var list = new List<(Vector2Int, string, MirrorType)>();
+        foreach (var pair in pieces)
+        {
+            list.Add((pair.Key, pair.Value.id, pair.Value.type));
+        }
+        return list;
+    }
+
+    // ================= 초기화 =================
     private void Awake()
     {
         SetupInitialBoard();
+        TraceBeam(); // 화면에 처음부터 빔이 보이도록 계산만 해둠 (클리어 판정은 Open 때)
     }
 
     private void SetupInitialBoard()
@@ -120,6 +155,8 @@ public class CircuitBoardPuzzle : PuzzleBase
             CompleteStage();
         }
         // 오답 개념 없음 (기획서 5.3) → 실패 처리/리셋 안 함
+
+        OnBoardChanged?.Invoke();
     }
 
     protected override bool Validate()
