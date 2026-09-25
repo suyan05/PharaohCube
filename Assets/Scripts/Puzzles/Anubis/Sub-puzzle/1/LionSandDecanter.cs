@@ -120,4 +120,7 @@ public class LionSandDecanter : MonoBehaviour
         if (textJar5L != null) textJar5L.text = $"자칼 단지 (5L)\n<b>{curB} / {maxB} L</b>";
         if (textJar3L != null) textJar3L.text = $"원숭이 단지 (3L)\n<b>{curC} / {maxC} L</b>";
     }
+
+    // 정답 순서
+    // 8L ➔ 5L 붓기 > 5L ➔ 3L 붓기 > 3L ➔ 8L 붓기 > 5L ➔ 3L 붓기 > 8L ➔ 5L 붓기 > 5L ➔ 3L 붓기 > 3L ➔ 8L 붓기
 }
