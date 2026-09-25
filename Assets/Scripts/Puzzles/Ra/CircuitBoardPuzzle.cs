@@ -42,29 +42,34 @@ public class CircuitBoardPuzzle : PuzzleBase
     public const string MirrorA = "MIRROR_A";
     public const string MirrorB = "MIRROR_B";
 
-    // ================= 단계 목표 (기획서 4.2 / 5.3) =================
+    // ================= 단계 목표 (기획서 4.2 / 5.3 / 10.2) =================
     private class StageGoal
     {
-        public char edge;      // 'S' = 남변, 'N' = 북변
-        public int x;          // 빛이 빠져나가는 x 좌표
-        public bool needBlue;  // true면 파란빛만 인정
-        public string flag;    // 점등 시 켤 플래그
-        public string reward;  // 지급 아이템 (없으면 null)
+        public char edge;          // 'S' = 남변, 'N' = 북변
+        public int x;              // 빛이 빠져나가는 x 좌표
+        public bool needBlue;      // true면 파란빛만 인정
+        public string flag;        // 점등 시 켤 플래그
+        public string reward;      // 지급 아이템 (없으면 null)
         public string label;
+        public Vector2Int needTile;  // 필요한 조각이 있어야 할 자리
+        public string needPiece;     // 필요한 조각 ID (없으면 null)
 
-        public StageGoal(char edge, int x, bool needBlue, string flag, string reward, string label)
+        public StageGoal(char edge, int x, bool needBlue, string flag, string reward, string label,
+                         Vector2Int needTile, string needPiece)
         {
             this.edge = edge; this.x = x; this.needBlue = needBlue;
             this.flag = flag; this.reward = reward; this.label = label;
+            this.needTile = needTile; this.needPiece = needPiece;
         }
     }
 
+    // 기획서 10.2 "need": 1단계 없음 / FRAG_1@S1 / FRAG_2@S2 / FRAG_3@S3 + 프리즘(파란빛으로 판정)
     private static readonly StageGoal[] Stages =
     {
-        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun,      "G1"),
-        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2"),
-        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass,     "G3"),
-        new StageGoal('N', 4, true,  "F_RA_CIRCUIT_4", null,                 "G4")
+        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun,      "G1", Vector2Int.zero, null),
+        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2", TileS1, ItemIds.Frag1),
+        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass,     "G3", TileS2, ItemIds.Frag2),
+        new StageGoal('N', 4, true,  "F_RA_CIRCUIT_4", null,                 "G4", TileS3, ItemIds.Frag3)
     };
 
     // ================= 현재 보드 상태 =================
@@ -154,12 +159,23 @@ public class CircuitBoardPuzzle : PuzzleBase
         {
             CompleteStage();
         }
+        else if (BeamReachesGoal() && !HasRequiredPiece())
+        {
+            // 빛은 닿았지만 필요한 조각이 아님 (예: 거울 B로 대신 도달)
+            Debug.Log("[P2] 빛은 닿았지만 문양이 반응하지 않는다. 다른 조각이 필요한 것 같다.");
+        }
         // 오답 개념 없음 (기획서 5.3) → 실패 처리/리셋 안 함
 
         OnBoardChanged?.Invoke();
     }
 
     protected override bool Validate()
+    {
+        return BeamReachesGoal() && HasRequiredPiece();
+    }
+
+    // 현재 단계 목표에 올바른 색의 빛이 닿았는지
+    private bool BeamReachesGoal()
     {
         if (currentStage >= Stages.Length) return false;
         if (!beamExited) return false;
@@ -168,6 +184,18 @@ public class CircuitBoardPuzzle : PuzzleBase
         return exitEdge == goal.edge
             && exitX == goal.x
             && beamBlue == goal.needBlue;
+    }
+
+    // 현재 단계에 필요한 조각이 정해진 자리에 있는지 (기획서 10.2 need)
+    private bool HasRequiredPiece()
+    {
+        if (currentStage >= Stages.Length) return false;
+
+        StageGoal goal = Stages[currentStage];
+        if (goal.needPiece == null) return true; // 1단계는 조건 없음
+
+        return pieces.TryGetValue(goal.needTile, out Piece piece)
+            && piece.id == goal.needPiece;
     }
 
     private void CompleteStage()
@@ -275,7 +303,7 @@ public class CircuitBoardPuzzle : PuzzleBase
         Debug.Log(sb.ToString());
     }
 
-    // ================= 플레이어 조작 (나중에 클릭 UI에서 호출) =================
+    // ================= 플레이어 조작 (클릭 UI에서 호출) =================
     public void RotatePiece(Vector2Int tile)
     {
         if (!pieces.TryGetValue(tile, out Piece piece))
