@@ -9,6 +9,7 @@ public class AnubisUIDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     [Header("아이템 설정")]
     public string itemName = "유물";
     public float weightValue = 1.0f;
+    public bool isHeart = false; // [추가] 심장 여부 체크
 
     private RectTransform rectTransform;
     private Canvas canvas;
@@ -69,10 +70,24 @@ public class AnubisUIDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         }
         else
         {
-            transform.SetParent(originalParent);
-            rectTransform.anchoredPosition = originalAnchoredPos;
-            rectTransform.localRotation = Quaternion.identity;
+            ReturnToOriginalSlot();
         }
+    }
+
+    // [추가] 오답 시 또는 놓쳤을 때 원래 슬롯으로 복귀하는 함수
+    public void ReturnToOriginalSlot()
+    {
+        if (dropRoutine != null) StopCoroutine(dropRoutine);
+
+        if (CurrentPan != null)
+        {
+            CurrentPan.RemoveItem(this);
+            CurrentPan = null;
+        }
+
+        transform.SetParent(originalParent);
+        rectTransform.anchoredPosition = originalAnchoredPos;
+        rectTransform.localRotation = Quaternion.identity;
     }
 
     private AnubisUIScalePan GetHoveredPan(Vector2 mouseScreenPos)

@@ -7,6 +7,9 @@ public class AnubisUIScalePan : MonoBehaviour, IDropHandler
 {
     private readonly List<AnubisUIDragItem> items = new List<AnubisUIDragItem>();
 
+    // [추가] 외부에서 접시 위의 아이템 목록을 읽을 수 있게 함
+    public List<AnubisUIDragItem> Items => items;
+
     public float TotalWeight { get; private set; } = 0f;
     public event Action OnWeightChanged;
 
