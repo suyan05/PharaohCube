@@ -5,29 +5,36 @@ using TMPro;
 
 public class AnubisLeverPuzzle : MonoBehaviour
 {
-    [Header("시각 연출 UI")]
-    [SerializeField] private RectTransform leverBar;            // 기울어질 지렛대 막대
-    [SerializeField] private TMP_Text textDistanceDisplay;      // 걸이 위치 표시 (1~4칸)
-    [SerializeField] private TMP_Text textWeightCountDisplay;   // 추 개수 표시 (1~3개)
-    [SerializeField] private TMP_Text textHintNotice;           // 상단 안내 (수식 은폐)
-    [SerializeField] private TMP_Text textFeedbackNotice;       // 판정 피드백 (기울어짐 경고)
+    [Header("시각 그래픽 요소")]
+    [SerializeField] private RectTransform leverBar;          // 기울어지는 지렛대 본체
+    [SerializeField] private RectTransform rightHookAnchor;   // 이동하는 우측 걸쇠
+    [SerializeField] private GameObject[] obsidianWeights;    // 매달리는 흑요석 추 3개
+
+    [Header("UI 텍스트")]
+    [SerializeField] private TMP_Text textDistanceDisplay;
+    [SerializeField] private TMP_Text textWeightCountDisplay;
+    [SerializeField] private TMP_Text textHintNotice;
+    [SerializeField] private TMP_Text textFeedbackNotice;
 
     [Header("조작 버튼")]
-    [SerializeField] private Button btnDistMinus;               // 거리 감소 (<)
-    [SerializeField] private Button btnDistPlus;                // 거리 증가 (>)
-    [SerializeField] private Button btnCountMinus;              // 추 개수 감소 (-)
-    [SerializeField] private Button btnCountPlus;               // 추 개수 증가 (+)
-    [SerializeField] private Button btnCheckBalance;            // 고정핀 해제 (판정 레버)
-    [SerializeField] private Button btnClose;                   // 나가기 버튼
+    [SerializeField] private Button btnDistMinus;
+    [SerializeField] private Button btnDistPlus;
+    [SerializeField] private Button btnCountMinus;
+    [SerializeField] private Button btnCountPlus;
+    [SerializeField] private Button btnCheckBalance;
+    [SerializeField] private Button btnClose;
 
     [Header("성공 패널")]
     [SerializeField] private GameObject successNotice;
 
-    private readonly float leftTorque = 4f;
+    // 좌측: 심장 4kg x 150px = 토크 600
+    private readonly float leftTorque = 4f * 150f;
     private readonly float singleWeightMass = 2f;
 
     private int currentDistance = 1;
     private int currentWeightCount = 1;
+
+    private readonly float[] distanceXPositions = { 75f, 150f, 225f, 300f };
 
     private bool isCleared = false;
     private bool isTesting = false;
@@ -50,50 +57,49 @@ public class AnubisLeverPuzzle : MonoBehaviour
             textHintNotice.text = "<b>[아누비스의 지렛대 천칭]</b>\n흑요석 추의 개수와 걸이 위치를 조절하여 좌측 심장과 완벽한 회전 평형을 이루십시오.";
         }
 
-        if (leverBar != null) leverBar.localRotation = Quaternion.identity;
-
-        UpdateUI();
+        UpdateVisuals();
     }
 
     private void OnEnable()
     {
         ClearFeedback();
-        if (leverBar != null && !isCleared) leverBar.localRotation = Quaternion.identity;
+        if (leverBar != null && !isCleared)
+            leverBar.localRotation = Quaternion.identity;
     }
 
     private void ChangeDistance(int delta)
     {
         if (isCleared || isTesting) return;
         ClearFeedback();
+
         currentDistance = Mathf.Clamp(currentDistance + delta, 1, 4);
-        UpdateUI();
+        UpdateVisuals();
     }
 
     private void ChangeWeightCount(int delta)
     {
         if (isCleared || isTesting) return;
         ClearFeedback();
+
         currentWeightCount = Mathf.Clamp(currentWeightCount + delta, 1, 3);
-        UpdateUI();
+        UpdateVisuals();
     }
 
     private void CheckLeverBalance()
     {
         if (isCleared || isTesting) return;
 
-        float rightTorque = (singleWeightMass * currentWeightCount) * currentDistance;
+        float currentDistX = distanceXPositions[currentDistance - 1];
+        float rightTorque = (singleWeightMass * currentWeightCount) * currentDistX;
         float diff = rightTorque - leftTorque;
 
-        // 정답 조건: 토크가 4로 일치할 때
-        // (1) 추 2개 x 1칸 = 4
-        // (2) 추 1개 x 2칸 = 4
+        // 정답 조건: 토크가 600으로 일치 (추 2개 x 2칸(150px))
         if (Mathf.Approximately(leftTorque, rightTorque))
         {
             isCleared = true;
             ClearFeedback();
 
             if (leverBar != null) leverBar.localRotation = Quaternion.identity;
-
             if (successNotice != null) successNotice.SetActive(true);
 
             if (AnubisNotebookManager.Instance != null)
@@ -104,14 +110,31 @@ public class AnubisLeverPuzzle : MonoBehaviour
         }
         else
         {
-            float tiltAngle = Mathf.Clamp(-diff * 5f, -18f, 18f);
-            if (leverBar != null) leverBar.localRotation = Quaternion.Euler(0f, 0f, tiltAngle);
+            float targetAngle = Mathf.Clamp(-diff * 0.03f, -15f, 15f);
+            StartCoroutine(TiltAnimationRoutine(targetAngle));
 
             string failMsg = (diff < 0)
-                ? "<color=#FF4444>불균형: 좌측 심장의 무게가 더 무거워 지렛대가 왼쪽으로 곤두박질칩니다!</color>"
+                ? "<color=#FF4444>불균형: 좌측 심장의 무게가 더 무거워 지렛대가 왼쪽으로 기울어집니다!</color>"
                 : "<color=#FF4444>불균형: 우측 흑요석의 회전력이 과도하여 지렛대가 오른쪽으로 처박힙니다!</color>";
 
             ShowFeedback(failMsg);
+        }
+    }
+
+    private IEnumerator TiltAnimationRoutine(float targetAngle)
+    {
+        if (leverBar == null) yield break;
+
+        float duration = 0.35f;
+        float elapsed = 0f;
+        Quaternion startRot = leverBar.localRotation;
+        Quaternion endRot = Quaternion.Euler(0, 0, targetAngle);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            leverBar.localRotation = Quaternion.Slerp(startRot, endRot, elapsed / duration);
+            yield return null;
         }
     }
 
@@ -129,8 +152,20 @@ public class AnubisLeverPuzzle : MonoBehaviour
         yield return new WaitForSeconds(2.0f);
 
         if (textFeedbackNotice != null) textFeedbackNotice.text = "";
+
         if (leverBar != null && !isCleared)
+        {
+            float duration = 0.3f;
+            float elapsed = 0f;
+            Quaternion startRot = leverBar.localRotation;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                leverBar.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, elapsed / duration);
+                yield return null;
+            }
             leverBar.localRotation = Quaternion.identity;
+        }
 
         isTesting = false;
     }
@@ -146,8 +181,23 @@ public class AnubisLeverPuzzle : MonoBehaviour
         isTesting = false;
     }
 
-    private void UpdateUI()
+    private void UpdateVisuals()
     {
+        if (rightHookAnchor != null)
+        {
+            float targetX = distanceXPositions[currentDistance - 1];
+            rightHookAnchor.anchoredPosition = new Vector2(targetX, 0f);
+        }
+
+        if (obsidianWeights != null)
+        {
+            for (int i = 0; i < obsidianWeights.Length; i++)
+            {
+                if (obsidianWeights[i] != null)
+                    obsidianWeights[i].SetActive(i < currentWeightCount);
+            }
+        }
+
         if (textDistanceDisplay != null)
             textDistanceDisplay.text = $"걸이 위치\n<b>{currentDistance} 칸</b>";
 
