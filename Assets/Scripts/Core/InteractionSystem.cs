@@ -10,6 +10,9 @@ public class InteractionSystem : MonoBehaviour
 
     private IInteractable currentTarget;
 
+    // 화면 안내용: 지금 가까이 있는 대상의 안내 문구 (없으면 null)
+    public string CurrentPrompt => currentTarget != null ? currentTarget.GetPrompt() : null;
+
     private void Update()
     {
         FindNearestTarget();

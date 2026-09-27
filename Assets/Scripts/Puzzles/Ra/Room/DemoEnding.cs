@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // 데모 엔딩 (기획서 8)
-// P5 클리어 -> 형판 등록 -> 북문 -> 중앙방(큐브 면 0 장착) -> 시현 데모 종료
+// P5 클리어 -> 형판 등록 -> 북문 -> 중앙방(큐브 면 0 장착) -> 시현 데모 종료 -> 다음 방
 public class DemoEnding : MonoBehaviour
 {
     public const string DemoEndFlag = "F_RA_DEMO_END";
@@ -17,6 +18,9 @@ public class DemoEnding : MonoBehaviour
     [SerializeField] private PlayerInventory playerInventory;
     [SerializeField] private CubeFaceManager cubeFaceManager;
 
+    [Header("다음 방 (Build Settings의 씬 이름과 똑같이)")]
+    [SerializeField] private string nextSceneName = "Puzzle_Test_Anubis";
+
     [Header("연출 시간 (기획서 8 / 10.3)")]
     [SerializeField] private float fadeTime = 0.8f;
     [SerializeField] private float mountTime = 2.0f;
@@ -28,12 +32,14 @@ public class DemoEnding : MonoBehaviour
     private Image blackCover;
     private Text statusText;
     private Text endText;
+    private Text nextHintText;
     private Font font;
 
     private Color darkBrown, gold, paper, sand, lapis, bgColor;
 
     private bool playing;
     private bool mounted;
+    private bool waitingNext;
 
     private void Start()
     {
@@ -57,6 +63,18 @@ public class DemoEnding : MonoBehaviour
     private void OnDestroy()
     {
         if (p5 != null) p5.OnSuccess -= HandleP5Cleared;
+    }
+
+    private void Update()
+    {
+        if (!waitingNext) return;
+
+        // 시현 데모 종료 화면에서 Space / Enter / 클릭 -> 다음 방
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return) || Input.GetMouseButtonDown(0))
+        {
+            waitingNext = false;
+            LoadNextScene();
+        }
     }
 
     // ================= P5 클리어 -> 형판 등록 =================
@@ -92,6 +110,7 @@ public class DemoEnding : MonoBehaviour
         endingPanel.SetActive(true);
         roomRoot.SetActive(true);
         endText.gameObject.SetActive(false);
+        nextHintText.gameObject.SetActive(false);
         SetAlpha(blackCover, 0f);
         statusText.text = "태양 형판을 큐브의 첫 면에 장착하라.";
 
@@ -148,7 +167,7 @@ public class DemoEnding : MonoBehaviour
         }
     }
 
-    // 장착 연출 (금빛 펄스 2초) -> 데모 종료 플래그 -> 페이드 아웃
+    // 장착 연출 (금빛 펄스 2초) -> 데모 종료 플래그 -> 페이드 아웃 -> 다음 방 안내
     private IEnumerator MountRoutine()
     {
         statusText.text = "태양 형판 장착!";
@@ -178,6 +197,30 @@ public class DemoEnding : MonoBehaviour
 
         endText.gameObject.SetActive(true);
         Debug.Log("[Ending] 시현 데모 종료");
+
+        // 방금 누른 클릭이 바로 다음 방으로 넘어가지 않게 잠깐 대기
+        yield return new WaitForSeconds(1f);
+
+        nextHintText.gameObject.SetActive(true);
+        waitingNext = true;
+    }
+
+    private void LoadNextScene()
+    {
+        if (string.IsNullOrEmpty(nextSceneName))
+        {
+            Debug.LogWarning("[Ending] 다음 씬 이름이 비어 있음");
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(nextSceneName))
+        {
+            Debug.LogWarning($"[Ending] '{nextSceneName}' 씬이 Build Settings에 없음");
+            return;
+        }
+
+        Debug.Log($"[Ending] 다음 방으로 이동: {nextSceneName}");
+        SceneManager.LoadScene(nextSceneName);
     }
 
     // ================= 화면 만들기 =================
@@ -215,7 +258,8 @@ public class DemoEnding : MonoBehaviour
         blackCover.color = Color.black;
         blackCover.raycastTarget = false;
 
-        endText = CreateText(root, "시현 데모 종료", 64, Vector2.zero, new Vector2(1200, 120), gold);
+        endText = CreateText(root, "시현 데모 종료", 64, new Vector2(0, 40), new Vector2(1200, 120), gold);
+        nextHintText = CreateText(root, "Space / 클릭: 다음 방으로", 28, new Vector2(0, -80), new Vector2(1200, 50), sand);
     }
 
     // ================= 도우미 함수 =================
