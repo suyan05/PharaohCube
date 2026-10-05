@@ -9,6 +9,8 @@ public static class HorusItemIds
     public const string SealFalcon = "ITEM_SEAL_FALCON";      // 매 인장 (H2-3 보상 -> H4 사용)
     public const string StarFrag3 = "HO_STAR_FRAG_3";         // 별 조각 3 (H4 보상 -> 성도 D3)
 
+    public const string PlateHorus = "PLATE_HORUS";           // 호루스 형판 (H5 보상 -> 큐브 장착). F5 목록 제외
+
     public static readonly string[] All =
     {
         Feather, StarFrag1, SilverThread, StarFrag2, MoonEye, SealFalcon, StarFrag3
