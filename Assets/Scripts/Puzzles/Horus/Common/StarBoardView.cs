@@ -26,8 +26,11 @@ public class StarBoardView : MonoBehaviour
 
     [Header("»ö")]
     [SerializeField] private Color normalColor = new Color(0.91f, 0.70f, 0.23f);
-    [SerializeField] private Color darkColor = new Color(0.25f, 0.27f, 0.33f);
-    [SerializeField] private Color cloudColor = new Color(0.29f, 0.31f, 0.35f, 0.6f);
+    [SerializeField] private Color darkColor = new Color(0.35f, 0.39f, 0.47f);
+    [SerializeField] private Color cloudColor = new Color(0.05f, 0.08f, 0.14f, 1f);
+
+    public event Action OnBuilt;
+    public bool IsBuilt { get; private set; }
 
     private readonly Dictionary<Vector2Int, StarPoint> points = new Dictionary<Vector2Int, StarPoint>();
 
@@ -51,11 +54,18 @@ public class StarBoardView : MonoBehaviour
                 for (int c = 1; c <= cols; c++) CreateStar(new Vector2Int(c, r));
             }
             drawer.RegisterStars(points.Values);
+            IsBuilt = true;
+            OnBuilt?.Invoke();
         }
         catch (Exception e)
         {
             Debug.LogError($"[StarBoardView] Build ¿À·ù: {e}");
         }
+    }
+
+    public bool TryGetStar(Vector2Int coord, out StarPoint star)
+    {
+        return points.TryGetValue(coord, out star);
     }
 
     private void CreateStar(Vector2Int coord)
@@ -107,6 +117,7 @@ public class StarBoardView : MonoBehaviour
 
     private void ClearStars()
     {
+        IsBuilt = false;
         for (int i = starContainer.childCount - 1; i >= 0; i--)
         {
             Destroy(starContainer.GetChild(i).gameObject);
