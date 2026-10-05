@@ -24,6 +24,7 @@ public class StarLineDrawer : MonoBehaviour
     public event Action<string> OnSegmentAdded;
     public event Action<List<string>> OnStrokeEnded;
     public event Action<string> OnRejected;
+    public event Action<StarPoint> OnBlockedStarPressed; // ≤®¡¯ ∫∞/∏‘±∏∏ß¿ª ¥≠∑∂¿ª ∂ß (∫∞ ¡∂∞¢ ª¿‘øÎ)
 
     public int StrokeCount => strokeEdges.Count;
     public IReadOnlyCollection<string> DrawnEdges => usedEdges;
@@ -81,7 +82,9 @@ public class StarLineDrawer : MonoBehaviour
             lastRejectKey = null;
             if (!start.IsPassable)
             {
-                Reject(ReasonFor(start), "start" + start.Coord);
+                // ∆€¡Ò¿Ã ∫∞ ¡∂∞¢¿ª ≥¢øˆ ∫∞¿ª ƒ” ±‚»∏∏¶ ∏’¿˙ ¡‹
+                OnBlockedStarPressed?.Invoke(start);
+                if (!start.IsPassable) Reject(ReasonFor(start), "start" + start.Coord);
                 return;
             }
             currentStar = start;

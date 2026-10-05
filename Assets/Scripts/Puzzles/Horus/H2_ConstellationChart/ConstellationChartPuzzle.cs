@@ -13,8 +13,17 @@ public class ConstellationStage
     public bool tutorial = false;
     public string clearFlag = "";
     public string clearMessage = "";
+    public string rewardItem = "";
     public List<Vector2Int> needSockets = new List<Vector2Int>();
     public List<string> edges = new List<string>();
+}
+
+// 꺼진 별 자리와 거기 끼울 별 조각 아이템
+[Serializable]
+public class StarSocket
+{
+    public Vector2Int coord;
+    public string fragmentItem = "";
 }
 
 // H2 매의 성도: 4단계 성좌를 차례로 완성하는 허브 퍼즐 (기획서 5장)
@@ -31,6 +40,9 @@ public class ConstellationChartPuzzle : PuzzleBase
     [Header("선 색")]
     [SerializeField] private Color goldColor = new Color(0.91f, 0.70f, 0.23f);
     [SerializeField] private Color silverColor = new Color(0.79f, 0.83f, 0.88f);
+
+    [Header("꺼진 별 자리와 별 조각 (기획서 4.1)")]
+    [SerializeField] private List<StarSocket> sockets = DefaultSockets();
 
     [Header("단계 데이터 (기획서 8.2)")]
     [SerializeField] private List<ConstellationStage> stages = DefaultStages();
@@ -82,11 +94,13 @@ public class ConstellationChartPuzzle : PuzzleBase
         {
             drawer.OnStrokeEnded += HandleStroke;
             drawer.OnRejected += Message;
+            drawer.OnBlockedStarPressed += HandleBlockedStar;
             board.OnBuilt += ApplyStageVisuals;
             return;
         }
         drawer.OnStrokeEnded -= HandleStroke;
         drawer.OnRejected -= Message;
+        drawer.OnBlockedStarPressed -= HandleBlockedStar;
         board.OnBuilt -= ApplyStageVisuals;
     }
 
@@ -166,6 +180,7 @@ public class ConstellationChartPuzzle : PuzzleBase
         drawer.SetInputEnabled(false);
         ConstellationStage done = Current;
         if (!string.IsNullOrEmpty(done.clearFlag)) GameManager.Instance.SetFlag(done.clearFlag);
+        GrantReward(done.rewardItem);
         Message(done.clearMessage);
         OnStageCleared?.Invoke(stageIndex);
         yield return new WaitForSeconds(1.5f);
@@ -193,6 +208,17 @@ public class ConstellationChartPuzzle : PuzzleBase
         busy = false;
     }
 
+    private void GrantReward(string itemId)
+    {
+        if (string.IsNullOrEmpty(itemId)) return;
+        if (ItemInventory.Instance == null)
+        {
+            Debug.LogWarning($"[성도] ItemInventory가 없어 보상 지급 실패: {itemId}");
+            return;
+        }
+        ItemInventory.Instance.Grant(itemId);
+    }
+
     private void ApplyStageVisuals()
     {
         try
@@ -217,8 +243,14 @@ public class ConstellationChartPuzzle : PuzzleBase
 
     private string StartMessage()
     {
-        if (MissingSocketCount() > 0) return "꺼진 별이 있다 - 별 조각을 끼워야 그릴 수 있다";
+        if (MissingSocketCount() > 0)
+        {
+            return HasFragmentForMissing()
+                ? "별 조각을 가지고 있다 - 꺼진 별을 눌러 끼워 보자"
+                : "꺼진 별이 있다 - 별 조각을 끼워야 그릴 수 있다";
+        }
         if (Current.requireSilver && !IsMoonEyeMounted()) return "은빛 선이 필요하다 - 달의 눈을 장착하자";
+        if (Current.maxStrokes > 1) return $"이번 성좌는 한 번에 그릴 수 없다. 손을 떼고 {Current.maxStrokes}번까지 나눠 그려도 된다.";
         if (Current.tutorial) return "빛나는 별에서 시작해서, 흐린 선을 손 떼지 말고 한 번에 따라 그려 보세요.";
         return "흐린 선을 따라 성좌를 그려 보자. 어디서 시작할지가 중요하다.";
     }
@@ -230,10 +262,45 @@ public class ConstellationChartPuzzle : PuzzleBase
         return missing;
     }
 
+    private bool HasFragmentForMissing()
+    {
+        if (ItemInventory.Instance == null) return false;
+        foreach (Vector2Int c in Current.needSockets)
+        {
+            if (litSockets.Contains(c)) continue;
+            StarSocket socket = FindSocket(c);
+            if (socket != null && ItemInventory.Instance.Has(socket.fragmentItem)) return true;
+        }
+        return false;
+    }
+
+    private StarSocket FindSocket(Vector2Int coord)
+    {
+        foreach (StarSocket s in sockets) if (s.coord == coord) return s;
+        return null;
+    }
+
     // ================= 외부 호출 =================
     private void HandleStroke(List<string> stroke)
     {
         Submit();
+    }
+
+    // 꺼진 별을 눌렀을 때: 맞는 별 조각이 있으면 사용해서 켬
+    private void HandleBlockedStar(StarPoint star)
+    {
+        try
+        {
+            if (star == null || star.State != StarState.Dark) return;
+            StarSocket socket = FindSocket(star.Coord);
+            if (socket == null || ItemInventory.Instance == null) return;
+            if (!ItemInventory.Instance.Consume(socket.fragmentItem)) return;
+            InsertFragment(star.Coord);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[성도] 별 조각 삽입 오류: {e}");
+        }
     }
 
     public void Undo()
@@ -242,7 +309,7 @@ public class ConstellationChartPuzzle : PuzzleBase
         drawer.UndoLastStroke();
     }
 
-    // 별 조각을 꺼진 별에 끼움 (나중에 아이템 시스템과 연결)
+    // 꺼진 별을 켬 (아이템 사용은 HandleBlockedStar에서, 치트는 바로 호출)
     public bool InsertFragment(Vector2Int coord)
     {
         if (litSockets.Contains(coord)) return false;
@@ -288,28 +355,38 @@ public class ConstellationChartPuzzle : PuzzleBase
     [ContextMenu("힌트: 시작 별 표시")]
     private void CheatStartHint() => ShowStartHint();
 
-    // ================= 기본 단계 데이터 (기획서 5.2) =================
+    // ================= 기본 데이터 (기획서 4.1 / 5.2) =================
+    private static List<StarSocket> DefaultSockets()
+    {
+        return new List<StarSocket>
+        {
+            new StarSocket { coord = new Vector2Int(3, 5), fragmentItem = HorusItemIds.StarFrag1 },
+            new StarSocket { coord = new Vector2Int(3, 3), fragmentItem = HorusItemIds.StarFrag2 },
+            new StarSocket { coord = new Vector2Int(5, 1), fragmentItem = HorusItemIds.StarFrag3 }
+        };
+    }
+
     private static List<ConstellationStage> DefaultStages()
     {
         return new List<ConstellationStage>
         {
             MakeStage("메스케티우", 1, false, true, "F_HO_CHART_1", "메스케티우 완성! 매의 깃털을 얻었다",
-                new Vector2Int[0],
+                HorusItemIds.Feather, new Vector2Int[0],
                 new[] { "1,5-1,4", "1,4-2,4", "2,4-2,5", "2,5-1,5", "2,5-3,4", "3,4-4,4", "4,4-5,3" }),
             MakeStage("사흐", 1, false, false, "F_HO_CHART_2", "사흐 완성! 은빛 실을 얻었다",
-                new[] { new Vector2Int(3, 5) },
+                HorusItemIds.SilverThread, new[] { new Vector2Int(3, 5) },
                 new[] { "2,5-3,5", "3,5-4,5", "2,5-2,4", "4,5-4,4", "2,4-3,4", "3,4-4,4", "2,4-2,3", "2,3-3,2", "3,2-4,3", "4,3-4,4" }),
             MakeStage("소프데트", 1, false, false, "F_HO_CHART_3", "소프데트 완성! 매 인장을 얻었다",
-                new[] { new Vector2Int(3, 5), new Vector2Int(3, 3) },
+                HorusItemIds.SealFalcon, new[] { new Vector2Int(3, 5), new Vector2Int(3, 3) },
                 new[] { "3,5-4,4", "4,4-5,3", "5,3-4,2", "4,2-3,1", "3,1-2,2", "2,2-1,3", "1,3-2,4", "2,4-3,5", "3,5-3,4", "3,4-3,3", "3,3-3,2", "3,2-3,1" }),
             MakeStage("우자트", 3, true, false, "F_HO_CHART_4", "우자트 완성! 성좌 4개가 모두 빛난다",
-                new[] { new Vector2Int(3, 3), new Vector2Int(5, 1) },
+                "", new[] { new Vector2Int(3, 3), new Vector2Int(5, 1) },
                 new[] { "1,3-2,4", "2,4-3,4", "3,4-4,4", "4,4-5,3", "5,3-4,2", "4,2-3,2", "3,2-2,2", "2,2-1,3", "3,4-3,3", "3,3-3,2", "2,2-2,1", "4,2-5,1" })
         };
     }
 
     private static ConstellationStage MakeStage(string name, int strokes, bool silver, bool tutorial,
-        string flag, string message, Vector2Int[] sockets, string[] edges)
+        string flag, string message, string reward, Vector2Int[] needSockets, string[] edges)
     {
         return new ConstellationStage
         {
@@ -319,7 +396,8 @@ public class ConstellationChartPuzzle : PuzzleBase
             tutorial = tutorial,
             clearFlag = flag,
             clearMessage = message,
-            needSockets = new List<Vector2Int>(sockets),
+            rewardItem = reward,
+            needSockets = new List<Vector2Int>(needSockets),
             edges = new List<string>(edges)
         };
     }

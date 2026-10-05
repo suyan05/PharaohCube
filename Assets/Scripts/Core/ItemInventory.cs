@@ -6,12 +6,12 @@ using UnityEngine;
 public static class ItemIds
 {
     public const string LensSun = "ITEM_LENS_SUN";      // 주황 렌즈 '태양의 눈' (P2-1 보상)
-    public const string Frag1 = "FRAG_1";             // 거울 조각 ① (P1 보상)
+    public const string Frag1 = "FRAG_1";             // 거울 조각 (1) (P1 보상)
     public const string PigmentNight = "ITEM_PIGMENT_NIGHT"; // 청색 안료 '밤의 먹물' (P2-2 보상)
-    public const string Frag2 = "FRAG_2";             // 거울 조각 ② (P3 보상)
+    public const string Frag2 = "FRAG_2";             // 거울 조각 (2) (P3 보상)
     public const string Prism = "PRISM";              // 프리즘 (P3 보상)
     public const string KeyBrass = "ITEM_KEY_BRASS";     // 황동 열쇠 (P2-3 보상)
-    public const string Frag3 = "FRAG_3";             // 거울 조각 ③ (P4 보상)
+    public const string Frag3 = "FRAG_3";             // 거울 조각 (3) (P4 보상)
 
     public static readonly string[] All =
     {
@@ -87,7 +87,11 @@ public class ItemInventory : MonoBehaviour
         {
             Grant(id);
         }
-        Debug.Log("[Item] 치트: 아이템 전량 지급");
+        foreach (var id in HorusItemIds.All)
+        {
+            Grant(id);
+        }
+        Debug.Log("[Item] 치트: 아이템 전량 지급 (라 + 호루스)");
     }
 
     [ContextMenu("테스트: 주황 렌즈 지급")]
@@ -106,8 +110,8 @@ public class ItemInventory : MonoBehaviour
         }
     }
 }
-/*HashSet 을 ㅎ쓴 이유 :
- 기획서 아이템은 전부 1개씩만 존재. 거울 조각도 회로판에 꽂으면 인벤토리에서 ㅂㅂ(Consume),
+/*HashSet 을 쓴 이유 :
+ 기획서 아이템은 전부 1개씩만 존재. 거울 조각도 회로판에 꽂으면 인벤토리에서 빠지고(Consume),
 다시 회수하면 돌아오는(Grant) 구조라서 있다/없다만 알면 충분
 
  ItemIds를 따로 둔 이유 :
