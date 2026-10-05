@@ -28,6 +28,7 @@ public class GameMessageUI : MonoBehaviour
     private GameObject promptBox;
     private Text promptText;
     private Font font;
+    private string lastPuzzleMessage;
 
     private Color boxColor, paper, gold;
 
@@ -43,7 +44,28 @@ public class GameMessageUI : MonoBehaviour
         { "FRAG_3",             "거울 조각 3" },
         { "MIRROR_A",           "거울 A" },
         { "MIRROR_B",           "거울 B" },
-        { "PLATE_RA",           "태양 형판" }
+        { "PLATE_RA",           "태양 형판" },
+        // 호루스의 방
+        { "ITEM_FEATHER",       "매의 깃털" },
+        { "HO_STAR_FRAG_1",     "별 조각 1" },
+        { "ITEM_SILVER_THREAD", "은빛 실" },
+        { "HO_STAR_FRAG_2",     "별 조각 2" },
+        { "ITEM_MOON_EYE",      "달의 눈" },
+        { "ITEM_SEAL_FALCON",   "매 인장" },
+        { "HO_STAR_FRAG_3",     "별 조각 3" },
+        { "PLATE_HORUS",        "호루스 형판" }
+    };
+
+    // 호루스 퍼즐 로그 머리말 (이 말머리로 시작하면 아래 규칙에 따라 토스트)
+    private static readonly string[] HorusTags =
+    {
+        "[성도] ", "[날개] ", "[우자트] ", "[별길 봉인] ", "[하늘] ", "[달의 눈] ", "[호루스 북문] "
+    };
+
+    // 위 말머리 중에서도 이 말이 들어간 것만 화면에 띄움 (조작 안내는 퍼즐 화면에 이미 있음)
+    private static readonly string[] HorusKeywords =
+    {
+        "완성", "얻었다", "획득", "장착", "풀렸다", "열렸다", "되었다", "끼웠다", "털어냈다", "드러났다", "필요"
     };
 
     private void Awake()
@@ -94,7 +116,7 @@ public class GameMessageUI : MonoBehaviour
     {
         if (type != LogType.Log) return;
 
-        // 노트 1~6
+        // 노트 1~7
         if (msg.StartsWith("[노트"))
         {
             AddToast(msg, noteTime, true);
@@ -110,30 +132,67 @@ public class GameMessageUI : MonoBehaviour
             return;
         }
 
-        // 북문
+        // 북문 (라의 방)
         if (msg.StartsWith("[Door] "))
         {
             AddToast(msg.Substring("[Door] ".Length), toastTime, false);
             return;
         }
 
-        // 회로판 점등 / 안내
+        // 회로판 점등 / 안내 (라의 방)
         if (msg.StartsWith("[P2]"))
         {
-            if (msg.Contains("점등!"))
-            {
-                int g = msg.IndexOf("G");
-                if (g >= 0) AddToast(msg.Substring(g), toastTime, true);
-            }
-            else if (msg.Contains("빛은 닿았지만"))
-            {
-                AddToast("빛은 닿았지만 문양이 반응하지 않는다. 다른 조각이 필요한 것 같다.", toastTime, false);
-            }
-            else if (msg.Contains("4문양 전부 점등"))
-            {
-                AddToast("4문양 전부 점등 - 태양 제단이 깨어났다", toastTime, true);
-            }
+            HandleCircuitLog(msg);
+            return;
         }
+
+        HandleHorusLog(msg);
+    }
+
+    private void HandleCircuitLog(string msg)
+    {
+        if (msg.Contains("점등!"))
+        {
+            int g = msg.IndexOf("G");
+            if (g >= 0) AddToast(msg.Substring(g), toastTime, true);
+        }
+        else if (msg.Contains("빛은 닿았지만"))
+        {
+            AddToast("빛은 닿았지만 문양이 반응하지 않는다. 다른 조각이 필요한 것 같다.", toastTime, false);
+        }
+        else if (msg.Contains("4문양 전부 점등"))
+        {
+            AddToast("4문양 전부 점등 - 태양 제단이 깨어났다", toastTime, true);
+        }
+    }
+
+    // 호루스 퍼즐 메시지: 중요한 것만 골라서 토스트
+    private void HandleHorusLog(string msg)
+    {
+        string body = StripHorusTag(msg);
+        if (body == null || !ContainsKeyword(body)) return;
+        if (body == lastPuzzleMessage) return; // 같은 안내가 연달아 뜨는 것 방지
+        lastPuzzleMessage = body;
+        bool highlight = body.Contains("완성") || body.Contains("얻었다") || body.Contains("되었다");
+        AddToast(body, toastTime, highlight);
+    }
+
+    private string StripHorusTag(string msg)
+    {
+        foreach (string tag in HorusTags)
+        {
+            if (msg.StartsWith(tag)) return msg.Substring(tag.Length).Trim();
+        }
+        return null;
+    }
+
+    private bool ContainsKeyword(string body)
+    {
+        foreach (string word in HorusKeywords)
+        {
+            if (body.Contains(word)) return true;
+        }
+        return false;
     }
 
     private void AddToast(string text, float time, bool highlight)
