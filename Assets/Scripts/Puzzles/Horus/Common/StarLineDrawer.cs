@@ -156,8 +156,7 @@ public class StarLineDrawer : MonoBehaviour
     {
         RectTransform line = Instantiate(linePrefab, lineContainer);
         line.gameObject.SetActive(true);
-        Image img = line.GetComponent<Image>();
-        if (img != null) img.color = lineColor;
+        SetImageColor(line.gameObject, lineColor);
         DrawLine(line, ScreenPos(from.Rect), ScreenPos(to.Rect));
         usedEdges.Add(key);
         currentEdges.Add(key);
@@ -215,6 +214,46 @@ public class StarLineDrawer : MonoBehaviour
         usedEdges.Clear();
     }
 
+    // 지정한 선들만 색을 바꿈 (예: 틀린 선을 빨갛게)
+    public void TintEdges(IEnumerable<string> keys, Color color)
+    {
+        if (keys == null) return;
+        var set = new HashSet<string>(keys);
+        for (int s = 0; s < strokeEdges.Count; s++)
+        {
+            for (int i = 0; i < strokeEdges[s].Count; i++)
+            {
+                if (set.Contains(strokeEdges[s][i])) SetImageColor(strokeLines[s][i], color);
+            }
+        }
+    }
+
+    // 지정한 선들만 지움 (나머지 선은 유지)
+    public void RemoveEdges(IEnumerable<string> keys)
+    {
+        if (keys == null) return;
+        var set = new HashSet<string>(keys);
+        for (int s = strokeEdges.Count - 1; s >= 0; s--)
+        {
+            RemoveFromStroke(strokeEdges[s], strokeLines[s], set);
+            if (strokeEdges[s].Count > 0) continue;
+            strokeEdges.RemoveAt(s);
+            strokeLines.RemoveAt(s);
+        }
+    }
+
+    private void RemoveFromStroke(List<string> edges, List<GameObject> lines, HashSet<string> set)
+    {
+        for (int i = edges.Count - 1; i >= 0; i--)
+        {
+            if (!set.Contains(edges[i])) continue;
+            usedEdges.Remove(edges[i]);
+            if (lines[i] != null) Destroy(lines[i]);
+            edges.RemoveAt(i);
+            lines.RemoveAt(i);
+        }
+    }
+
     private void RemoveStroke(List<string> edges, List<GameObject> lines)
     {
         if (edges != null)
@@ -225,6 +264,13 @@ public class StarLineDrawer : MonoBehaviour
         {
             foreach (GameObject go in lines) if (go != null) Destroy(go);
         }
+    }
+
+    private void SetImageColor(GameObject go, Color color)
+    {
+        if (go == null) return;
+        Image img = go.GetComponent<Image>();
+        if (img != null) img.color = color;
     }
 
     private string ReasonFor(StarPoint star)
@@ -239,7 +285,7 @@ public class StarLineDrawer : MonoBehaviour
     {
         if (key == lastRejectKey) return;
         lastRejectKey = key;
-        Debug.Log($"[성도] {reason}");
+        Debug.Log($"[별 잇기] {reason}");
         OnRejected?.Invoke(reason);
     }
 

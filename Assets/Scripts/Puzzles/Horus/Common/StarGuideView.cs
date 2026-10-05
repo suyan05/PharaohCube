@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 목표 성좌를 흐린 선으로 깔고, 시작 별을 깜빡여 주는 안내 (튜토리얼 / 힌트 공용)
+// 판 위에 선 묶음(레이어)을 깔고, 시작 별을 깜빡여 주는 안내 (튜토리얼 / 고정선 / 힌트 공용)
 public class StarGuideView : MonoBehaviour
 {
     [Header("참조")]
@@ -11,7 +11,7 @@ public class StarGuideView : MonoBehaviour
     [SerializeField] private RectTransform guideContainer;
     [SerializeField] private RectTransform linePrefab;
 
-    [Header("흐린 선")]
+    [Header("기본 흐린 선")]
     [SerializeField] private Color guideColor = new Color(1f, 1f, 1f, 0.25f);
     [SerializeField] private float guideWidth = 6f;
 
@@ -21,38 +21,65 @@ public class StarGuideView : MonoBehaviour
     [SerializeField] private float markerSize = 60f;
     [SerializeField] private float pulseSpeed = 3f;
 
-    private readonly List<GameObject> guideLines = new List<GameObject>();
+    private const string GuideLayer = "guide";
+
+    private readonly Dictionary<string, List<GameObject>> layers = new Dictionary<string, List<GameObject>>();
     private readonly List<Image> markers = new List<Image>();
 
+    // 기본 흐린 선 (H2 목표 성좌)
     public void ShowGuide(IEnumerable<string> edgeKeys)
+    {
+        ShowLayer(GuideLayer, edgeKeys, guideColor, guideWidth);
+    }
+
+    public void HideGuide()
+    {
+        HideLayer(GuideLayer);
+    }
+
+    // 이름 붙인 선 묶음 표시 (예: "fixed" 고정선, "axis" 대칭축 힌트)
+    public void ShowLayer(string layer, IEnumerable<string> edgeKeys, Color color, float width)
     {
         try
         {
-            HideGuide();
+            HideLayer(layer);
             if (!CheckRefs() || edgeKeys == null) return;
-            foreach (string key in edgeKeys) CreateGuideLine(key);
+            var created = new List<GameObject>();
+            foreach (string key in edgeKeys)
+            {
+                GameObject go = CreateLine(key, color, width);
+                if (go != null) created.Add(go);
+            }
+            layers[layer] = created;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[StarGuideView] ShowGuide 오류: {e}");
+            Debug.LogError($"[StarGuideView] ShowLayer({layer}) 오류: {e}");
         }
     }
 
-    private void CreateGuideLine(string key)
+    public void HideLayer(string layer)
     {
-        if (!StarGraph.TryParseEdge(key, out Vector2Int a, out Vector2Int b)) return;
-        if (!board.TryGetStar(a, out StarPoint sa) || !board.TryGetStar(b, out StarPoint sb)) return;
+        if (!layers.TryGetValue(layer, out List<GameObject> list)) return;
+        foreach (GameObject go in list) if (go != null) Destroy(go);
+        layers.Remove(layer);
+    }
+
+    private GameObject CreateLine(string key, Color color, float width)
+    {
+        if (!StarGraph.TryParseEdge(key, out Vector2Int a, out Vector2Int b)) return null;
+        if (!board.TryGetStar(a, out StarPoint sa) || !board.TryGetStar(b, out StarPoint sb)) return null;
         RectTransform line = Instantiate(linePrefab, guideContainer);
         line.gameObject.SetActive(true);
-        line.sizeDelta = new Vector2(line.sizeDelta.x, guideWidth);
+        line.sizeDelta = new Vector2(line.sizeDelta.x, width);
         Image img = line.GetComponent<Image>();
         if (img != null)
         {
-            img.color = guideColor;
+            img.color = color;
             img.raycastTarget = false;
         }
         PlaceLine(line, LocalOf(sa.Rect), LocalOf(sb.Rect));
-        guideLines.Add(line.gameObject);
+        return line.gameObject;
     }
 
     public void ShowStartMarkers(IEnumerable<Vector2Int> coords)
@@ -84,12 +111,6 @@ public class StarGuideView : MonoBehaviour
         markers.Add(img);
     }
 
-    public void HideGuide()
-    {
-        foreach (GameObject go in guideLines) if (go != null) Destroy(go);
-        guideLines.Clear();
-    }
-
     public void HideStartMarkers()
     {
         foreach (Image img in markers) if (img != null) Destroy(img.gameObject);
@@ -98,7 +119,8 @@ public class StarGuideView : MonoBehaviour
 
     public void HideAll()
     {
-        HideGuide();
+        var names = new List<string>(layers.Keys);
+        foreach (string layer in names) HideLayer(layer);
         HideStartMarkers();
     }
 
