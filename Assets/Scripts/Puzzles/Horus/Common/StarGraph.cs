@@ -60,6 +60,25 @@ public static class StarGraph
         return set;
     }
 
+    // 한 획에서 그은 선 순서 -> 지나간 별 순서. 선이 1개뿐이면 방향을 알 수 없어서 null
+    public static List<Vector2Int> PathFromEdges(IList<string> orderedEdges)
+    {
+        if (orderedEdges == null || orderedEdges.Count < 2) return null;
+        if (!TryParseEdge(orderedEdges[0], out Vector2Int a, out Vector2Int b)) return null;
+        if (!TryParseEdge(orderedEdges[1], out Vector2Int c, out Vector2Int d)) return null;
+        Vector2Int current = (a == c || a == d) ? b : a;
+        var path = new List<Vector2Int> { current };
+        foreach (string edge in orderedEdges)
+        {
+            if (!TryParseEdge(edge, out Vector2Int p, out Vector2Int q)) return null;
+            if (p == current) current = q;
+            else if (q == current) current = p;
+            else return null;
+            path.Add(current);
+        }
+        return path;
+    }
+
     // 선이 홀수 개 모이는 별 = 한붓그리기를 시작할 수 있는 별 (힌트용)
     public static List<Vector2Int> OddDegreeStars(HashSet<string> edgeKeys)
     {

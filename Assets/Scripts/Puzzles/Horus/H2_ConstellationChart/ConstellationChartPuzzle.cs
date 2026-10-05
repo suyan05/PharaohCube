@@ -155,8 +155,10 @@ public class ConstellationChartPuzzle : PuzzleBase
     }
 
     // 실패 시 0.3초 뒤 내가 그린 선만 지움 (단계 진행도는 유지)
+    // Unity 에디터가 자동으로 부르는 Reset과 이름이 같아서, 게임 중이 아닐 땐 아무것도 안 함
     public override void Reset()
     {
+        if (!Application.isPlaying || drawer == null) return;
         base.Reset();
         if (isActiveAndEnabled) StartCoroutine(ClearAfterFlash());
         else drawer.ClearAll();
