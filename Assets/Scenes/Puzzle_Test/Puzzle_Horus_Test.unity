@@ -431,6 +431,110 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 59514700}
   m_CullTransparentMesh: 1
+--- !u!1 &190487461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 190487463}
+  - component: {fileID: 190487462}
+  m_Layer: 0
+  m_Name: HorusObjectiveGuide
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &190487462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190487461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 201ca0fcc9bd5514ba7605aa94c5cf4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HorusObjectiveGuide
+  allPaths:
+  - {fileID: 1886979146}
+  - {fileID: 217740918}
+  - {fileID: 209911994}
+  - {fileID: 559717092}
+  - {fileID: 559717092}
+  - {fileID: 685704785}
+  allTargets:
+  - {fileID: 965710341}
+  - {fileID: 1741483747}
+  - {fileID: 679922296}
+  - {fileID: 1331461133}
+  - {fileID: 1525564321}
+  steps:
+  - doneFlag: F_HO_CHART_1
+    objective: "\uB3D9\uCABD \uBCBD\uC758 \uC131\uB3C4\uD310\uC5D0\uC11C \uCCAB \uC131\uC88C\uB97C
+      \uADF8\uB9AC\uC790"
+    pathToLight: {fileID: 217740918}
+    target: {fileID: 965710341}
+  - doneFlag: F_HO_H1_DONE
+    objective: "\uB9E4\uC758 \uAE43\uD138\uB85C \uC11C\uCABD \uAD00\uCE21\uB300\uC758
+      \uBA3C\uC9C0\uB97C \uD138\uC5B4\uB0B4\uC790"
+    pathToLight: {fileID: 209911994}
+    target: {fileID: 1741483747}
+  - doneFlag: F_HO_CHART_2
+    objective: "\uBCC4 \uC870\uAC01\uC744 \uC131\uB3C4\uD310\uC758 \uAEBC\uC9C4 \uBCC4\uC5D0
+      \uB07C\uC6B0\uACE0 \uB2E4\uC74C \uC131\uC88C\uB97C \uADF8\uB9AC\uC790"
+    pathToLight: {fileID: 217740918}
+    target: {fileID: 965710341}
+  - doneFlag: F_HO_H3_DONE
+    objective: "\uBE5B \uC2E4\uB85C \uB0A8\uC11C\uCABD \uC11D\uD0C1\uC758 \uC6B0\uC790\uD2B8\uB97C
+      \uBCF5\uC6D0\uD558\uC790"
+    pathToLight: {fileID: 559717092}
+    target: {fileID: 679922296}
+  - doneFlag: F_HO_CHART_3
+    objective: "\uB2EC\uC758 \uB208\uC744 \uC7A5\uCC29\uB300\uC5D0 \uC62C\uB9AC\uACE0
+      \uC131\uB3C4\uD310\uC73C\uB85C \uB3CC\uC544\uAC00\uC790"
+    pathToLight: {fileID: 217740918}
+    target: {fileID: 965710341}
+  - doneFlag: F_HO_H4_DONE
+    objective: "\uB9E4 \uC778\uC7A5\uC73C\uB85C \uB0A8\uB3D9\uCABD \uBC14\uB2E5 \uBCC4\uD310\uC758
+      \uBD09\uC778\uC744 \uD480\uC790"
+    pathToLight: {fileID: 685704785}
+    target: {fileID: 1331461133}
+  - doneFlag: F_HO_CHART_4
+    objective: "\uB9C8\uC9C0\uB9C9 \uC131\uC88C \uC6B0\uC790\uD2B8\uB97C \uC131\uB3C4\uD310\uC5D0
+      \uADF8\uB9AC\uC790"
+    pathToLight: {fileID: 217740918}
+    target: {fileID: 965710341}
+  - doneFlag: F_HO_H5_DONE
+    objective: "\uBD81\uCABD \uC81C\uB2E8\uC5D0\uC11C \uD558\uB298\uC758 \uC21C\uC11C\uB97C
+      \uB418\uCC3E\uC790"
+    pathToLight: {fileID: 1886979146}
+    target: {fileID: 1525564321}
+  pathDim: {r: 0.12, g: 0.18, b: 0.31, a: 1}
+  pathLit: {r: 0.24, g: 0.48, b: 0.84, a: 1}
+  targetLocked: {r: 0.28, g: 0.22, b: 0.26, a: 1}
+  pulseSpeed: 2.2
+  fontSize: 30
+  hudOffset: {x: 0, y: -40}
+--- !u!4 &190487463
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 190487461}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &209911992
 GameObject:
   m_ObjectHideFlags: 0
@@ -7210,3 +7314,4 @@ SceneRoots:
   - {fileID: 1899778150}
   - {fileID: 1472595421}
   - {fileID: 1691256577}
+  - {fileID: 190487463}
