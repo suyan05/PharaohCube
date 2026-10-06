@@ -14,11 +14,12 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     private static readonly string[] PieceIds =
     {
         ItemIds.Frag1, ItemIds.Frag2, ItemIds.Frag3,
-        CircuitBoardPuzzle.MirrorA, CircuitBoardPuzzle.MirrorB
+        CircuitBoardPuzzle.MirrorA, CircuitBoardPuzzle.MirrorB,
+        ItemIds.Prism
     };
     private static readonly string[] PieceLabels =
     {
-        "조각 1", "조각 2", "조각 3", "거울 A", "거울 B"
+        "조각 1", "조각 2", "조각 3", "거울 A", "거울 B", "프리즘"
     };
 
     private readonly Dictionary<string, Image> pieceButtons = new Dictionary<string, Image>();
@@ -186,11 +187,11 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     {
         if (!isOpen) return;
 
-        // 프리즘 소켓
+        // 프리즘 소켓: 우클릭은 회수, 좌클릭은 다른 슬롯처럼 선택한 조각 삽입
         if (tile == CircuitBoardPuzzle.PrismTile)
         {
             if (rightClick) puzzle.RemovePrism();
-            else puzzle.InsertPrism();
+            else TryInsertSelected(tile);
             return;
         }
 
@@ -215,7 +216,20 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
             return;
         }
 
-        puzzle.InsertPiece(tile, selectedPieceId, MirrorType.Slash); // '/'로 넣고, 클릭으로 회전
+        if (selectedPieceId == ItemIds.Prism)
+        {
+            if (tile != CircuitBoardPuzzle.PrismTile)
+            {
+                statusText.text = "프리즘은 보라색 소켓에만 끼울 수 있다.";
+                return;
+            }
+            puzzle.InsertPrism();
+        }
+        else
+        {
+            puzzle.InsertPiece(tile, selectedPieceId, MirrorType.Slash); // '/'로 넣고, 클릭으로 회전
+        }
+
         statusText.text = "";
         // 삽입되면 인벤토리에서 빠지면서 RefreshPieceBar가 선택을 자동 해제함
     }
