@@ -15,11 +15,11 @@ public class BastetClawPatternPuzzle : PuzzleBase
         public bool isBlank;
         public int fixedValue = 0;
         public int targetValue = 0;
-        public int currentValue = 0;
+        public int currentValue = 0; 
     }
 
-    [Header("상단 벽화 발톱 슬롯 (총 6칸)")]
-    [SerializeField] private PatternSlot[] patternSlots = new PatternSlot[6];
+    [Header("4x3 벽화 발톱 슬롯 (총 12칸: 4열 x 3행)")]
+    [SerializeField] private PatternSlot[] patternSlots = new PatternSlot[12];
 
     [Header("하단 후보 문양 버튼 (1: /, 2: //, 3: ///)")]
     [SerializeField] private Button[] candidateButtons = new Button[3];
@@ -32,17 +32,18 @@ public class BastetClawPatternPuzzle : PuzzleBase
     [SerializeField] private Button btnReset;
     [SerializeField] private Button btnClose;
 
+    // 슬래시(/) 기반 발톱 긁힘 문양 표기
     private readonly string[] clawSymbols = { "?", "/", "//", "///" };
 
     private int selectedBlankSlotIndex = -1;
-    private bool isCleared = false;
     private bool isChecking = false;
 
-    private readonly Color colSlotFixed = new Color(0.25f, 0.2f, 0.32f, 1f);
-    private readonly Color colSlotBlank = new Color(0.18f, 0.14f, 0.24f, 1f);
-    private readonly Color colSlotSelected = new Color(0.7f, 0.4f, 0.95f, 1f);
-    private readonly Color colWrong = new Color(0.9f, 0.25f, 0.25f, 1f);
-    private readonly Color colGold = new Color(1f, 0.85f, 0.2f, 1f);
+    // 테마 색상
+    private readonly Color colSlotFixed = new Color(0.25f, 0.2f, 0.32f, 1f);     // 고정 슬롯
+    private readonly Color colSlotBlank = new Color(0.18f, 0.14f, 0.24f, 1f);     // 빈칸 기본
+    private readonly Color colSlotSelected = new Color(0.7f, 0.4f, 0.95f, 1f);   // 선택된 빈칸
+    private readonly Color colWrong = new Color(0.9f, 0.25f, 0.25f, 1f);         // 오답 붉은색
+    private readonly Color colGold = new Color(1f, 0.85f, 0.2f, 1f);             // 정답 황금빛
 
     private void Awake()
     {
@@ -95,7 +96,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         UpdateSlotVisuals();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = $"{index + 1}번 빈칸을 선택했습니다. 하단에서 알맞은 문양을 고르십시오.";
+            textStatusNotice.text = $"{index + 1}번 빈칸을 선택했습니다. 하단 후보에서 알맞은 문양을 고르십시오.";
     }
 
     private void OnCandidateClicked(int value)
@@ -157,7 +158,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
             if (patternSlots[i].isBlank && patternSlots[i].currentValue == 0)
             {
                 if (textStatusNotice != null)
-                    textStatusNotice.text = "<color=#FFA726>모든 빈칸(?)을 채운 뒤 확인하십시오.</color>";
+                    textStatusNotice.text = "<color=#FFA726>5개의 빈칸(?)을 모두 채운 후 확인하십시오.</color>";
                 return;
             }
         }
@@ -188,7 +189,6 @@ public class BastetClawPatternPuzzle : PuzzleBase
     protected override void OnSuccessInternal()
     {
         base.OnSuccessInternal();
-        isCleared = true;
 
         for (int i = 0; i < patternSlots.Length; i++)
         {
@@ -199,7 +199,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         }
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<color=#FFD700>발톱 문양이 완전한 왕복 반복 주기를 이룹니다! (메인 반복 규칙 획득)</color>";
+            textStatusNotice.text = "<color=#FFD700>4x3 벽화의 좌우 대칭과 세로 순환이 완성되었습니다! (메인 반복 규칙 획득)</color>";
 
         if (successNotice != null) successNotice.SetActive(true);
     }
@@ -209,7 +209,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         isChecking = true;
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<color=#FF4444>반복 규칙이 어긋났습니다! 앞뒤 문양의 흐름을 다시 살펴보십시오.</color>";
+            textStatusNotice.text = "<color=#FF4444>가로 대칭 또는 세로 순환 규칙이 어긋난 빈칸이 있습니다!</color>";
 
         for (int i = 0; i < patternSlots.Length; i++)
         {
@@ -223,6 +223,10 @@ public class BastetClawPatternPuzzle : PuzzleBase
         yield return new WaitForSeconds(0.7f);
 
         UpdateSlotVisuals();
+
+        if (textStatusNotice != null)
+            textStatusNotice.text = "행별 좌우 대칭과 열별 변화 규칙을 다시 분석하십시오.";
+
         isChecking = false;
     }
 
@@ -242,28 +246,33 @@ public class BastetClawPatternPuzzle : PuzzleBase
         UpdateSlotVisuals();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "빈칸이 초기화되었습니다. 흐름에 맞는 문양을 넣으십시오.";
+            textStatusNotice.text = "빈칸이 초기화되었습니다.";
     }
 
     public override void Reset()
     {
         base.Reset();
 
-        int[] fullPattern = { 1, 2, 3, 2, 1, 2, 3, 2, 1, 2, 3, 2 };
-        HashSet<int> blankIndices = new HashSet<int> { 1, 3, 6, 8, 10 };
+        int[] fullGridPattern = {
+            1, 2, 2, 1,
+            2, 3, 3, 2,
+            3, 1, 1, 3
+        };
+
+        HashSet<int> blankIndices = new HashSet<int> { 1, 4, 6, 9, 11 };
 
         for (int i = 0; i < patternSlots.Length; i++)
         {
             if (blankIndices.Contains(i))
             {
                 patternSlots[i].isBlank = true;
-                patternSlots[i].targetValue = fullPattern[i];
+                patternSlots[i].targetValue = fullGridPattern[i];
                 patternSlots[i].currentValue = 0;
             }
             else
             {
                 patternSlots[i].isBlank = false;
-                patternSlots[i].fixedValue = fullPattern[i];
+                patternSlots[i].fixedValue = fullGridPattern[i];
             }
         }
 
@@ -271,7 +280,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         UpdateSlotVisuals();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "벽면의 발톱 자국에서 반복 규칙을 찾아 5개의 빈칸(?)을 모두 채우십시오.";
+            textStatusNotice.text = "가로 대칭과 세로 순환 규칙을 분석하여 5개의 빈칸(?)을 채우십시오.";
     }
 
     public void ClosePuzzle()
