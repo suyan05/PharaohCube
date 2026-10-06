@@ -6,9 +6,9 @@ using TMPro;
 
 public class BastetFootprintPuzzle : PuzzleBase
 {
-    [Header("4x4 타일 그리드 버튼 (16개)")]
-    [SerializeField] private Button[] gridTiles = new Button[16];
-    [SerializeField] private Image[] tileGlowImages = new Image[16];
+    [Header("5x5 타일 그리드 버튼 (25개)")]
+    [SerializeField] private Button[] gridTiles = new Button[25];
+    [SerializeField] private Image[] tileGlowImages = new Image[25];
 
     [Header("UI 안내 및 제어")]
     [SerializeField] private GameObject puzzleUIRoot;
@@ -17,15 +17,16 @@ public class BastetFootprintPuzzle : PuzzleBase
     [SerializeField] private Button btnReplayPath;
     [SerializeField] private Button btnClose;
 
-    private readonly int[] correctPath = { 1, 5, 6, 10, 11 };
+    private readonly int[] correctPath = { 2, 7, 12, 13, 8, 7, 6, 11, 16 };
     private int currentStep = 0;
 
     private bool isPlayingSequence = false;
     private Coroutine sequenceCoroutine;
 
-    private readonly Color colDefault = new Color(0.18f, 0.16f, 0.22f, 1f);
-    private readonly Color colPurple = new Color(0.72f, 0.38f, 0.95f, 1f);
-    private readonly Color colWrong = new Color(0.9f, 0.2f, 0.2f, 1f);
+    private readonly Color colDefault = new Color(0.18f, 0.14f, 0.24f, 1f);
+    private readonly Color colPurple = new Color(0.75f, 0.42f, 0.95f, 1f);
+    private readonly Color colStartEnd = new Color(0.35f, 0.9f, 0.95f, 1f);
+    private readonly Color colWrong = new Color(0.9f, 0.22f, 0.22f, 1f);
     private readonly Color colGold = new Color(1f, 0.85f, 0.2f, 1f);
 
     private void Awake()
@@ -74,28 +75,30 @@ public class BastetFootprintPuzzle : PuzzleBase
         ResetTileColors();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<color=#BB86FC>고양이의 발자국을 관찰하십시오...</color>";
+            textStatusNotice.text = "<color=#BB86FC>발자국의 경로를 관찰하십시오... (중복 이동 주의)</color>";
 
         yield return new WaitForSeconds(0.4f);
 
         for (int i = 0; i < correctPath.Length; i++)
         {
             int tileIndex = correctPath[i];
-            if (tileGlowImages[tileIndex] != null)
-                tileGlowImages[tileIndex].color = colPurple;
+            bool isBoundary = (i == 0 || i == correctPath.Length - 1);
 
-            yield return new WaitForSeconds(0.55f);
+            if (tileGlowImages[tileIndex] != null)
+                tileGlowImages[tileIndex].color = isBoundary ? colStartEnd : colPurple;
+
+            yield return new WaitForSeconds(0.38f);
 
             if (tileGlowImages[tileIndex] != null)
                 tileGlowImages[tileIndex].color = colDefault;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.12f);
         }
 
         ResetTileColors();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "기억한 발자국 순서대로 타일을 누르십시오. (0 / 5)";
+            textStatusNotice.text = $"기억한 발자국 경로를 순서대로 밟으십시오. (0 / {correctPath.Length})";
 
         isPlayingSequence = false;
     }
@@ -106,8 +109,9 @@ public class BastetFootprintPuzzle : PuzzleBase
 
         if (clickedIndex == correctPath[currentStep])
         {
+            bool isBoundary = (currentStep == 0 || currentStep == correctPath.Length - 1);
             if (tileGlowImages[clickedIndex] != null)
-                tileGlowImages[clickedIndex].color = colPurple;
+                tileGlowImages[clickedIndex].color = isBoundary ? colStartEnd : colPurple;
 
             currentStep++;
 
@@ -144,7 +148,8 @@ public class BastetFootprintPuzzle : PuzzleBase
 
     protected override void OnSuccessInternal()
     {
-        base.OnSuccessInternal(); 
+        base.OnSuccessInternal();
+
         for (int i = 0; i < correctPath.Length; i++)
         {
             int tileIdx = correctPath[i];
@@ -153,7 +158,7 @@ public class BastetFootprintPuzzle : PuzzleBase
         }
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<color=#FFD700>발자국 경로 복원 완료!</color>";
+            textStatusNotice.text = "<color=#FFD700>발자국 경로 복원 완료! (첫 번째 패턴 기록)</color>";
 
         if (successNotice != null) successNotice.SetActive(true);
     }
@@ -163,12 +168,12 @@ public class BastetFootprintPuzzle : PuzzleBase
         isPlayingSequence = true;
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<color=#FF4444>발자국이 흐트러졌습니다!</color>";
+            textStatusNotice.text = "<color=#FF4444>발자국 경로가 어긋났습니다!</color>";
 
         if (tileGlowImages[wrongIndex] != null)
             tileGlowImages[wrongIndex].color = colWrong;
 
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.6f);
 
         OnFailInternal();
         PlayPathSequence();
