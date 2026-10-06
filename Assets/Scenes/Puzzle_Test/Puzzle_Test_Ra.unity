@@ -750,6 +750,7 @@ GameObject:
   - component: {fileID: 275252240}
   - component: {fileID: 275252239}
   - component: {fileID: 275252238}
+  - component: {fileID: 275252241}
   m_Layer: 0
   m_Name: OBJ_005_ShadowDial
   m_TagString: Untagged
@@ -912,6 +913,44 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &275252241
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 275252236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecccd1b3813b684d90e39f439d405bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaObjectiveGuide
+  steps:
+  - doneFlag: F_RA_CIRCUIT_1
+    objective: "\uC11C\uCABD \uBCBD\uC758 \uBE5B \uD68C\uB85C\uB97C \uC870\uC0AC\uD558\uC790"
+  - doneFlag: F_RA_P1_DONE
+    objective: "\uC8FC\uD669 \uB80C\uC988\uB97C \uB4E4\uACE0 \uB3D9\uCABD \uADF8\uB9BC\uC790
+      \uB2E4\uC774\uC5BC\uB85C \uAC00\uC790"
+  - doneFlag: F_RA_CIRCUIT_2
+    objective: "\uAC70\uC6B8 \uC870\uAC01 1\uC744 \uB4E4\uACE0 \uD68C\uB85C\uD310
+      \uBE48 \uC2AC\uB86F\uC5D0 \uB07C\uC6B0\uC790"
+  - doneFlag: F_RA_P3_DONE
+    objective: "\uCCAD\uC0C9 \uC548\uB8CC\uB97C \uB4E4\uACE0 \uB0A8\uB3D9\uCABD \uC77C\uC2DD
+      \uC11D\uD0C1\uC73C\uB85C \uAC00\uC790"
+  - doneFlag: F_RA_CIRCUIT_3
+    objective: "\uAC70\uC6B8 \uC870\uAC01 2\uC640 \uD504\uB9AC\uC998\uC744 \uB4E4\uACE0
+      \uD68C\uB85C\uD310\uC73C\uB85C \uB3CC\uC544\uAC00\uC790"
+  - doneFlag: F_RA_P4_DONE
+    objective: "\uD669\uB3D9 \uC5F4\uC1E0\uB97C \uB4E4\uACE0 \uB0A8\uC11C\uCABD \uCE74\uB4DC
+      \uBCA4\uCE58\uB85C \uAC00\uC790"
+  - doneFlag: F_RA_CIRCUIT_4
+    objective: "\uAC70\uC6B8 \uC870\uAC01 3\uC744 \uB4E4\uACE0 \uD68C\uB85C\uD310
+      \uB9C8\uC9C0\uB9C9 \uC2AC\uB86F\uC5D0 \uB07C\uC6B0\uC790"
+  - doneFlag: F_RA_P5_DONE
+    objective: "\uBD81\uCABD \uD0DC\uC591 \uC81C\uB2E8\uC5D0\uC11C \uD558\uB8E8\uC758
+      \uC21C\uD658\uC744 \uC644\uC131\uD558\uC790"
+  fontSize: 30
+  hudOffset: {x: 0, y: -40}
 --- !u!1 &378069800
 GameObject:
   m_ObjectHideFlags: 0
@@ -4244,6 +4283,37 @@ Transform:
   - {fileID: 2035000889}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2069634726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2069634727}
+  m_Layer: 0
+  m_Name: RaObjectiveGuide
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2069634727
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069634726}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12, y: 12.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2666884712467322245
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4316,3 +4386,4 @@ SceneRoots:
   - {fileID: 1705994367}
   - {fileID: 919613783}
   - {fileID: 1928032443}
+  - {fileID: 2069634727}
