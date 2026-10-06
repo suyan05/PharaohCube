@@ -1,2 +1,27 @@
 fileFormatVersion: 2
 guid: cc30c400e6839ae4a876abc9743189eb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - puzzle: {instanceID: 0}
+  - overlayPanel: {instanceID: 0}
+  - clockFaceSprite: {fileID: 5687143023179634822, guid: 11efce6511d9dd345ad1dcaa43eea6cb, type: 3}
+  - obeliskSprite: {fileID: -7428565742440482322, guid: b52241ceb79c1394fa56710d00b2ac93, type: 3}
+  - shadowHandSprite: {fileID: -4756028443593143600, guid: 34f1479bac93b63469a4e6229db65a8a, type: 3}
+  - noonSprite: {fileID: -2975506961095938054, guid: 290e7c21014c3e44d88fd440cdfe9dd4, type: 3}
+  - nightSprite: {fileID: -7954753313157245522, guid: 2292ab9df22794140aa3131f9e230c43, type: 3}
+  - dawnSprite: {fileID: 7248196742253567109, guid: e4342cdde27fd434ebb594967ea0d7dd, type: 3}
+  - duskSprite: {fileID: -8660367416592716896, guid: 270ab8264f086f74db356783ce0f6175, type: 3}
+  - symbolInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
+  - lensInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
+  - lensActiveSprite: {fileID: -6636515049411582802, guid: c3fd058ceab9d3749a753663ec5ccbd2, type: 3}
+  - slotEmptySprite: {fileID: 4930128069097709916, guid: 841c3569f2fb4a742b3f345edac92180, type: 3}
+  - slotFilledSprite: {fileID: -6781667267809604314, guid: ccac8002da460ae48813841efcedd379, type: 3}
+  - slotSuccessSprite: {fileID: -8707624878413137709, guid: 7c53bb37560819c4683ac9631fda7d4e, type: 3}
+  - slotFailSprite: {fileID: 7295818033174590540, guid: 1d6e06f6bf8505a43a05bd08cc8aeeaf, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

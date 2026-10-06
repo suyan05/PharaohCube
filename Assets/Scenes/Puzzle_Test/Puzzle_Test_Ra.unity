@@ -171,6 +171,24 @@ MonoBehaviour:
   boardRoot: {fileID: 9429617}
   cellSize: 60
   beamWidth: 10
+  boardBackgroundSprite: {fileID: 0}
+  floorSprite: {fileID: 0}
+  obstacleSprite: {fileID: 4160635012330822537, guid: 9bb9b7c23e82bbf40a92fa3788a810df, type: 3}
+  slotSprite: {fileID: 0}
+  mirrorSlashSprite: {fileID: 5137821743614343772, guid: 72189f24d47d25942ad68674111e8d1a, type: 3}
+  mirrorBackslashSprite: {fileID: -1280981565647164955, guid: 7df608d218e05834f9998b2f38b4e788, type: 3}
+  fragmentSlashSprite: {fileID: -8000762474201923706, guid: f7f17884f5e4c5c419935a5bad6e2a69, type: 3}
+  fragmentBackslashSprite: {fileID: 0}
+  prismSocketSprite: {fileID: 0}
+  prismOnSprite: {fileID: 0}
+  goalSprites:
+  - {fileID: 2868631469896157066, guid: e16f1b9207718fa4b8e73489d7122676, type: 3}
+  - {fileID: -4275960163741682313, guid: d5f63024769b21a44b89cabec24ef87f, type: 3}
+  - {fileID: 8972324038871703400, guid: 52ae19315d76ad6478a90b5a1c7f2259, type: 3}
+  - {fileID: 3388688953234466077, guid: 471434e8df5b5fd47977f03154105cd2, type: 3}
+  sourceSprite: {fileID: 0}
+  pieceScale: 1
+  goalScale: 0.9
 --- !u!1 &24222495
 GameObject:
   m_ObjectHideFlags: 0
@@ -768,6 +786,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShadowClockStation
   puzzle: {fileID: 1426306677}
   overlayPanel: {fileID: 1275574720}
+  clockFaceSprite: {fileID: 5687143023179634822, guid: 11efce6511d9dd345ad1dcaa43eea6cb, type: 3}
+  obeliskSprite: {fileID: -7428565742440482322, guid: b52241ceb79c1394fa56710d00b2ac93, type: 3}
+  shadowHandSprite: {fileID: -4756028443593143600, guid: 34f1479bac93b63469a4e6229db65a8a, type: 3}
+  noonSprite: {fileID: -2975506961095938054, guid: 290e7c21014c3e44d88fd440cdfe9dd4, type: 3}
+  nightSprite: {fileID: -7954753313157245522, guid: 2292ab9df22794140aa3131f9e230c43, type: 3}
+  dawnSprite: {fileID: 7248196742253567109, guid: e4342cdde27fd434ebb594967ea0d7dd, type: 3}
+  duskSprite: {fileID: -8660367416592716896, guid: 270ab8264f086f74db356783ce0f6175, type: 3}
+  symbolInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
+  lensInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
+  lensActiveSprite: {fileID: -6636515049411582802, guid: c3fd058ceab9d3749a753663ec5ccbd2, type: 3}
+  slotEmptySprite: {fileID: 4930128069097709916, guid: 841c3569f2fb4a742b3f345edac92180, type: 3}
+  slotFilledSprite: {fileID: -6781667267809604314, guid: ccac8002da460ae48813841efcedd379, type: 3}
+  slotSuccessSprite: {fileID: -8707624878413137709, guid: 7c53bb37560819c4683ac9631fda7d4e, type: 3}
+  slotFailSprite: {fileID: 7295818033174590540, guid: 1d6e06f6bf8505a43a05bd08cc8aeeaf, type: 3}
+  symbolSize: {x: 200, y: 120}
+  dialSize: {x: 320, y: 320}
+  handSize: {x: 14, y: 135}
+  slotSize: {x: 180, y: 90}
+  lensSize: {x: 70, y: 70}
+  lensPos: {x: 0, y: 420}
+  showSymbolLabels: 1
 --- !u!61 &275252239
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1270,6 +1309,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SunCycleStation
   puzzle: {fileID: 2035000890}
   overlayPanel: {fileID: 629945095}
+  risingSprite: {fileID: 2986095105091660353, guid: 33cf20a598f9ff748920cdb14870b793, type: 3}
+  noonSprite: {fileID: -7980957029099225931, guid: 545c6b3d5f4cf8c479d5467cad6704f3, type: 3}
+  settingSprite: {fileID: -7308942844234922036, guid: 49e5b9fc87e81984896354577c23e551, type: 3}
+  nightSprite: {fileID: -2006241440363181014, guid: 377d2bd725cbecb4e96ce568b1b86314, type: 3}
+  boatSprite: {fileID: 3502715887467967171, guid: 52a0d3e2304455f4ca3d957fc456052c, type: 3}
+  returnSprite: {fileID: -766422060036826523, guid: f6d4f23c6c4ee514985858370e9fa0bf, type: 3}
+  centerPlateSprite: {fileID: -520978082890504463, guid: d38e5654af848224da04afb7203a511d, type: 3}
+  centerPlateLitSprite: {fileID: 0}
+  slotEmptySprite: {fileID: 0}
+  slotFilledSprite: {fileID: 0}
+  backgroundSprite: {fileID: 0}
+  backButtonSprite: {fileID: 0}
+  buttonSize: {x: 190, y: 90}
+  slotSize: {x: 200, y: 80}
+  centerPlateSize: {x: 600, y: 600}
+  backgroundSize: {x: 600, y: 600}
+  showButtonLabels: 1
 --- !u!61 &479149380
 BoxCollider2D:
   m_ObjectHideFlags: 0
