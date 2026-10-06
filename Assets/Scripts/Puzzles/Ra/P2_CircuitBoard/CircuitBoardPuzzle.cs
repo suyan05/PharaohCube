@@ -143,10 +143,27 @@ public class CircuitBoardPuzzle : PuzzleBase
     }
 
     // ================= PuzzleBase 구현 =================
+    // 튜토리얼(거울 돌려보기)을 한 번 봤는지 저장하는 플래그
+    private const string TutorialSeenFlag = "F_RA_P2_TUTORIAL_SEEN";
+    public event Action<int> OnTutorialProgress; // 지금까지 누른 횟수 (0~4) 전달
+
+    public bool TutorialDone => GameManager.Instance.HasFlag(TutorialSeenFlag);
+    private int tutorialClicks;
+
+    // ================= PuzzleBase 구현 =================
     public override void Open()
     {
         base.Open();
-        Submit(); // 1단계는 초기 배치 그대로 G1에 닿는 '관찰 단계'
+
+        if (TutorialDone)
+        {
+            Submit(); // 이미 조작법을 배웠으면 기존처럼 즉시 1단계 관찰 클리어
+        }
+        else
+        {
+            Debug.Log("[P2] 거울을 클릭해서 돌려 보자. 한 바퀴 돌리면 원래 모양으로 돌아온다.");
+            OnTutorialProgress?.Invoke(0);
+        }
     }
 
     // 조작할 때마다 호출: 빔 다시 계산 → 목표 닿으면 단계 클리어
@@ -314,6 +331,23 @@ public class CircuitBoardPuzzle : PuzzleBase
 
         piece.type = piece.type == MirrorType.Slash ? MirrorType.Backslash : MirrorType.Slash;
         Debug.Log($"[P2] ({tile.x},{tile.y}) 회전 → {(piece.type == MirrorType.Slash ? "/" : "\\")}");
+
+        if (!TutorialDone)
+        {
+            tutorialClicks++;
+            OnTutorialProgress?.Invoke(tutorialClicks);
+
+            if (tutorialClicks < 4)
+            {
+                OnBoardChanged?.Invoke(); // 빛 경로만 갱신, 아직 클리어 판정은 안 함
+                return;
+            }
+
+            // 4번째 클릭으로 원위치 = 튜토리얼 완료
+            GameManager.Instance.SetFlag(TutorialSeenFlag);
+            Debug.Log("[P2] 빛이 다시 새벽 문양에 닿았다! 거울을 돌려 길을 바꾸는 방법을 익혔다.");
+        }
+
         Submit();
     }
 

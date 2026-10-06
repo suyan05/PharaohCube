@@ -44,6 +44,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
         overlayPanel.SetActive(false);
 
         view.OnCellClicked += HandleCellClick;
+        puzzle.OnTutorialProgress += HandleTutorialProgress;
         ItemInventory.Instance.OnItemGranted += OnInventoryChanged;
         ItemInventory.Instance.OnItemConsumed += OnInventoryChanged;
     }
@@ -51,6 +52,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     private void OnDestroy()
     {
         if (view != null) view.OnCellClicked -= HandleCellClick;
+        if (puzzle != null) puzzle.OnTutorialProgress -= HandleTutorialProgress;
         if (ItemInventory.Instance != null)
         {
             ItemInventory.Instance.OnItemGranted -= OnInventoryChanged;
@@ -69,7 +71,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     // ================= IInteractable =================
     public string GetPrompt()
     {
-        return isOpen ? "E: 회로판 닫기" : "E: 회로판 조사";
+        return isOpen ? "E: 회로판 닫기" : "E: P2 회로판 조사";
     }
 
     public void Interact(GameObject player)
@@ -95,7 +97,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
         RefreshPieceBar();
         statusText.text = "";
 
-        puzzle.Open(); // 처음 열 때 1단계(관찰) 자동 클리어
+        puzzle.Open(); // 튜토리얼 미완료면 안내만, 완료면 1단계(관찰) 자동 클리어
         Debug.Log("[P2] 회로판 열림");
     }
 
@@ -164,6 +166,19 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
             pair.Value.gameObject.SetActive(owned); // 가진 조각만 보이게
             pair.Value.color = pair.Key == selectedPieceId ? gold : paper;
         }
+    }
+
+    // ================= 튜토리얼 안내 =================
+    private void HandleTutorialProgress(int clicks)
+    {
+        if (puzzle.TutorialDone)
+        {
+            statusText.text = "";
+            return;
+        }
+        statusText.text = clicks == 0
+            ? "거울을 클릭해서 돌려 보자. (한 바퀴 돌리면 원래대로 돌아온다)"
+            : $"{clicks}/4 회전 - 계속 클릭해서 원래 방향으로 돌려 보자";
     }
 
     // ================= 보드 클릭 처리 =================
