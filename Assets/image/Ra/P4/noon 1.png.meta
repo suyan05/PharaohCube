@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 6b179f80ee146b74991c52fc185b408e
+guid: 6e9da2302e9e03742bdf00fe7800a9db
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5896977608706933151
-    second: P3-3_0
+      213: -2975506961095938054
+    second: noon_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +24,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 1
+  isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: P3-3_0
+      name: noon_0
       rect:
         serializedVersion: 2
-        x: 1260
-        y: 1460
-        width: 710
-        height: 720
+        x: 0
+        y: 19
+        width: 1000
+        height: 1613
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 16e3790cb1ab92ea0800000000000000
-      internalID: -5896977608706933151
+      spriteID: affac2d0f20e4b6d0800000000000000
+      internalID: -2975506961095938054
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      P3-3_0: -5896977608706933151
+      noon_0: -2975506961095938054
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
