@@ -5822,7 +5822,7 @@ GameObject:
   - component: {fileID: 422565333}
   - component: {fileID: 422565336}
   - component: {fileID: 422565335}
-  - component: {fileID: 422565334}
+  - component: {fileID: 422565337}
   m_Layer: 0
   m_Name: OBJ_009_CardBench
   m_TagString: Untagged
@@ -5845,20 +5845,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1686719086}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &422565334
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 422565332}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6aa3110562c64d24cb750f83314e2a42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DayCycleStation
-  puzzle: {fileID: 970893812}
-  overlayPanel: {fileID: 1590413983}
 --- !u!61 &422565335
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5964,6 +5950,32 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &422565337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422565332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29ddb457fc0fb1540969924bed64ba1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DayCycleArtStation
+  puzzle: {fileID: 970893812}
+  overlayPanel: {fileID: 1590413983}
+  spriteFolder: Assets/image/Ra/P4
+  slotFrameSprite: {fileID: 0}
+  versoSprite: {fileID: -6695753113692380490, guid: 0772eaaacdfafc040844cc047c37fa31, type: 3}
+  sealLineSprite: {fileID: -4870542015795471593, guid: fd75be2706c91ea4d9f7489aa921d520, type: 3}
+  sealSprite: {fileID: -4350246913137973463, guid: 0e0043eb4348cb849b048013c5fe201c, type: 3}
+  dawnSprite: {fileID: 7248196742253567109, guid: 7b3576cead4043e44a489d9700683433, type: 3}
+  noonSprite: {fileID: -2975506961095938054, guid: 3f69ffb71b35ef54da39d6e8ee943c59, type: 3}
+  duskSprite: {fileID: -8660367416592716896, guid: 68e03154566929a4691b2674c1c89a2e, type: 3}
+  nightSprite: {fileID: -7954753313157245522, guid: d1abdf1c8965eb14787d1995b0a970c1, type: 3}
+  showMuralHint: 1
+  showNameLabel: 1
+  hideWhileOpen: []
 --- !u!1 &435486422
 GameObject:
   m_ObjectHideFlags: 0
@@ -6987,7 +6999,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PuzzleClearReaction
   puzzle: {fileID: 140190497}
   targetRenderer: {fileID: 0}
-  activeSprite: {fileID: -5780567522746398819, guid: 4596206b10bb99943a9e0cb13fb556c3, type: 3}
+  activeSprite: {fileID: 0}
   clearedFlag: F_RA_P3_DONE
   onCleared:
     m_PersistentCalls:
