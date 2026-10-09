@@ -1000,6 +1000,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShadowClockStation
   puzzle: {fileID: 1426306677}
   overlayPanel: {fileID: 1275574720}
+  useClockFaceArt: 0
   clockFaceSprite: {fileID: 5687143023179634822, guid: 11efce6511d9dd345ad1dcaa43eea6cb, type: 3}
   obeliskSprite: {fileID: -7428565742440482322, guid: b52241ceb79c1394fa56710d00b2ac93, type: 3}
   shadowHandSprite: {fileID: -4756028443593143600, guid: 34f1479bac93b63469a4e6229db65a8a, type: 3}
@@ -1008,19 +1009,24 @@ MonoBehaviour:
   dawnSprite: {fileID: 7248196742253567109, guid: e4342cdde27fd434ebb594967ea0d7dd, type: 3}
   duskSprite: {fileID: -8660367416592716896, guid: 270ab8264f086f74db356783ce0f6175, type: 3}
   symbolInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
-  lensInactiveSprite: {fileID: -6300594927631368995, guid: 759028f804d47b246857af607cda1bc7, type: 3}
+  lensInactiveSprite: {fileID: -5213589720276085118, guid: 9e24f8b725cd7a3438ca1959c3e2272d, type: 3}
   lensActiveSprite: {fileID: -6636515049411582802, guid: c3fd058ceab9d3749a753663ec5ccbd2, type: 3}
   slotEmptySprite: {fileID: 4930128069097709916, guid: 841c3569f2fb4a742b3f345edac92180, type: 3}
+  useSlotStateSprites: 0
   slotFilledSprite: {fileID: -6781667267809604314, guid: ccac8002da460ae48813841efcedd379, type: 3}
   slotSuccessSprite: {fileID: -8707624878413137709, guid: 7c53bb37560819c4683ac9631fda7d4e, type: 3}
   slotFailSprite: {fileID: 7295818033174590540, guid: 1d6e06f6bf8505a43a05bd08cc8aeeaf, type: 3}
-  symbolSize: {x: 200, y: 120}
-  dialSize: {x: 320, y: 320}
-  handSize: {x: 14, y: 135}
-  slotSize: {x: 180, y: 90}
-  lensSize: {x: 70, y: 70}
-  lensPos: {x: 0, y: 420}
+  symbolSize: {x: 130, y: 160}
+  dialSize: {x: 300, y: 300}
+  handSize: {x: 18, y: 135}
+  slotSize: {x: 200, y: 70}
+  lensSize: {x: 120, y: 120}
+  lensPos: {x: 290, y: -20}
+  obeliskSize: {x: 64, y: 64}
   showSymbolLabels: 1
+  backdropColor: {r: 0, g: 0, b: 0, a: 0.8}
+  hideWhileOpen:
+  - {fileID: 970893810}
 --- !u!61 &275252239
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -6062,6 +6068,7 @@ GameObject:
   - component: {fileID: 466089585}
   - component: {fileID: 466089587}
   - component: {fileID: 466089586}
+  - component: {fileID: 466089588}
   m_Layer: 5
   m_Name: P3_Overlay
   m_TagString: Untagged
@@ -6128,6 +6135,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 466089584}
   m_CullTransparentMesh: 1
+--- !u!114 &466089588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 466089584}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d4a22b6ff0fa646b53e2f7229f0101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleOverlayTheme
+  theme: {fileID: 0}
+  applyFont: 1
+  addBackdrop: 1
+  titleFontSizeMin: 40
 --- !u!1 &479149377
 GameObject:
   m_ObjectHideFlags: 0
@@ -6705,6 +6728,7 @@ GameObject:
   - component: {fileID: 629945096}
   - component: {fileID: 629945098}
   - component: {fileID: 629945097}
+  - component: {fileID: 629945099}
   m_Layer: 5
   m_Name: P5_Overlay
   m_TagString: Untagged
@@ -6769,6 +6793,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 629945095}
   m_CullTransparentMesh: 1
+--- !u!114 &629945099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 629945095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d4a22b6ff0fa646b53e2f7229f0101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleOverlayTheme
+  theme: {fileID: 0}
+  applyFont: 1
+  addBackdrop: 1
+  titleFontSizeMin: 40
 --- !u!1 &666380098
 GameObject:
   m_ObjectHideFlags: 0
@@ -6780,6 +6820,7 @@ GameObject:
   - component: {fileID: 666380099}
   - component: {fileID: 666380101}
   - component: {fileID: 666380100}
+  - component: {fileID: 666380102}
   m_Layer: 5
   m_Name: P2_Overlay
   m_TagString: Untagged
@@ -6845,6 +6886,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 666380098}
   m_CullTransparentMesh: 1
+--- !u!114 &666380102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 666380098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d4a22b6ff0fa646b53e2f7229f0101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleOverlayTheme
+  theme: {fileID: 0}
+  applyFont: 1
+  addBackdrop: 1
+  titleFontSizeMin: 40
 --- !u!1 &675036619
 GameObject:
   m_ObjectHideFlags: 0
@@ -8099,7 +8156,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 50
   m_TargetDisplay: 0
 --- !u!224 &919613783
 RectTransform:
@@ -8470,6 +8527,7 @@ GameObject:
   - component: {fileID: 1275574721}
   - component: {fileID: 1275574723}
   - component: {fileID: 1275574722}
+  - component: {fileID: 1275574724}
   m_Layer: 5
   m_Name: P1_Overlay
   m_TagString: Untagged
@@ -8534,6 +8592,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1275574720}
   m_CullTransparentMesh: 1
+--- !u!114 &1275574724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1275574720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d4a22b6ff0fa646b53e2f7229f0101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleOverlayTheme
+  theme: {fileID: 0}
+  applyFont: 1
+  addBackdrop: 0
+  titleFontSizeMin: 40
 --- !u!1 &1311806948
 GameObject:
   m_ObjectHideFlags: 0
@@ -8719,6 +8793,7 @@ GameObject:
   - component: {fileID: 1590413984}
   - component: {fileID: 1590413986}
   - component: {fileID: 1590413985}
+  - component: {fileID: 1590413987}
   m_Layer: 5
   m_Name: P4_Overlay
   m_TagString: Untagged
@@ -8783,6 +8858,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590413983}
   m_CullTransparentMesh: 1
+--- !u!114 &1590413987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1590413983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7d4a22b6ff0fa646b53e2f7229f0101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleOverlayTheme
+  theme: {fileID: 0}
+  applyFont: 1
+  addBackdrop: 1
+  titleFontSizeMin: 40
 --- !u!1 &1635257660
 GameObject:
   m_ObjectHideFlags: 0
@@ -11551,6 +11642,8 @@ MonoBehaviour:
   toastTime: 2.5
   noteTime: 6
   maxToasts: 4
+  maxPendingToasts: 8
+  minReshowTime: 1.5
 --- !u!4 &1701591171
 Transform:
   m_ObjectHideFlags: 0

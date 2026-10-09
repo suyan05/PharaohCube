@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,6 +7,7 @@ using UnityEngine.UI;
 // - 하단 가운데: 상호작용 안내 (E: 비석 읽기 등)
 // - 오른쪽 위: 알림 토스트 (노트, 아이템 획득, 회로 점등, 문)
 // 기존 Debug.Log 중 플레이어가 봐야 하는 것만 골라서 화면에 띄움
+// 퍼즐 오버레이가 열려 있는 동안 토스트는 대기열에 모아뒀다가 닫힌 뒤에 띄움 (퍼즐 화면 가림 방지)
 public class GameMessageUI : MonoBehaviour
 {
     [Header("연결 (둘 다 Player 오브젝트)")]
@@ -17,13 +19,27 @@ public class GameMessageUI : MonoBehaviour
     [SerializeField] private float noteTime = 6f;   // 노트는 읽을 시간이 필요해서 길게
     [SerializeField] private int maxToasts = 4;     // 한 번에 보이는 최대 개수
 
+    [Header("퍼즐 중 대기열")]
+    [SerializeField] private int maxPendingToasts = 8;   // 퍼즐 중에 모아둘 최대 개수
+    [SerializeField] private float minReshowTime = 1.5f; // 퍼즐 열 때 대기열로 옮긴 알림의 최소 표시 시간
+
     private class Toast
     {
         public GameObject go;
         public float remain;
+        public string text;
+        public bool highlight;
+    }
+
+    private struct PendingToast
+    {
+        public string text;
+        public float time;
+        public bool highlight;
     }
 
     private readonly List<Toast> toasts = new List<Toast>();
+    private readonly List<PendingToast> pending = new List<PendingToast>();
     private RectTransform toastRoot;
     private GameObject promptBox;
     private Text promptText;
@@ -73,7 +89,7 @@ public class GameMessageUI : MonoBehaviour
         boxColor = new Color(0.1f, 0.07f, 0.04f, 0.85f);
         ColorUtility.TryParseHtmlString("#F6F1E7", out paper);
         ColorUtility.TryParseHtmlString("#E8B23A", out gold);
-        font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        font = PuzzleUITheme.GetBodyFont();
 
         BuildCanvas();
     }
@@ -81,11 +97,13 @@ public class GameMessageUI : MonoBehaviour
     private void OnEnable()
     {
         Application.logMessageReceived += HandleLog;
+        PuzzleOverlayFocus.OnFocusChanged += HandleFocusChanged;
     }
 
     private void OnDisable()
     {
         Application.logMessageReceived -= HandleLog;
+        PuzzleOverlayFocus.OnFocusChanged -= HandleFocusChanged;
     }
 
     private void Update()
@@ -109,6 +127,48 @@ public class GameMessageUI : MonoBehaviour
             }
         }
         LayoutToasts();
+    }
+
+    // ================= 퍼즐 열림/닫힘 =================
+    private void HandleFocusChanged(bool puzzleOpen)
+    {
+        try
+        {
+            if (puzzleOpen) MoveShownToastsToPending();
+            else FlushPending();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[GameMessageUI] 퍼즐 열림/닫힘 처리 오류: {e}");
+        }
+    }
+
+    // 퍼즐을 여는 순간 떠 있던 알림은 닫은 뒤에 다시 보여줌
+    private void MoveShownToastsToPending()
+    {
+        foreach (Toast t in toasts)
+        {
+            QueueToast(t.text, Mathf.Max(t.remain, minReshowTime), t.highlight);
+            Destroy(t.go);
+        }
+        toasts.Clear();
+    }
+
+    private void FlushPending()
+    {
+        var copy = new List<PendingToast>(pending);
+        pending.Clear();
+
+        foreach (PendingToast p in copy)
+        {
+            ShowToast(p.text, p.time, p.highlight);
+        }
+    }
+
+    private void QueueToast(string text, float time, bool highlight)
+    {
+        if (pending.Count >= maxPendingToasts) pending.RemoveAt(0); // 너무 많으면 오래된 것부터 버림
+        pending.Add(new PendingToast { text = text, time = time, highlight = highlight });
     }
 
     // ================= 로그 -> 화면 메시지 =================
@@ -195,7 +255,18 @@ public class GameMessageUI : MonoBehaviour
         return false;
     }
 
+    // 퍼즐이 열려 있으면 대기열로, 아니면 바로 표시
     private void AddToast(string text, float time, bool highlight)
+    {
+        if (PuzzleOverlayFocus.IsActive)
+        {
+            QueueToast(text, time, highlight);
+            return;
+        }
+        ShowToast(text, time, highlight);
+    }
+
+    private void ShowToast(string text, float time, bool highlight)
     {
         // 너무 많으면 가장 오래된 것부터 제거
         if (toasts.Count >= maxToasts)
@@ -204,6 +275,13 @@ public class GameMessageUI : MonoBehaviour
             toasts.RemoveAt(0);
         }
 
+        GameObject box = CreateToastBox(text, highlight);
+        toasts.Add(new Toast { go = box, remain = time, text = text, highlight = highlight });
+        LayoutToasts();
+    }
+
+    private GameObject CreateToastBox(string text, bool highlight)
+    {
         var box = new GameObject("Toast", typeof(RectTransform), typeof(Image));
         var rt = box.GetComponent<RectTransform>();
         rt.SetParent(toastRoot, false);
@@ -221,9 +299,7 @@ public class GameMessageUI : MonoBehaviour
         trt.anchorMax = Vector2.one;
         trt.offsetMin = new Vector2(16, 6);
         trt.offsetMax = new Vector2(-16, -6);
-
-        toasts.Add(new Toast { go = box, remain = time });
-        LayoutToasts();
+        return box;
     }
 
     // 최신 토스트가 맨 위
@@ -253,8 +329,13 @@ public class GameMessageUI : MonoBehaviour
         scaler.referenceResolution = new Vector2(1920, 1080);
 
         RectTransform root = canvasGo.GetComponent<RectTransform>();
+        BuildToastRoot(root);
+        BuildPromptBox(root);
+    }
 
-        // 토스트 영역 (오른쪽 위)
+    // 토스트 영역 (오른쪽 위)
+    private void BuildToastRoot(RectTransform root)
+    {
         var toastGo = new GameObject("ToastRoot", typeof(RectTransform));
         toastRoot = toastGo.GetComponent<RectTransform>();
         toastRoot.SetParent(root, false);
@@ -262,8 +343,11 @@ public class GameMessageUI : MonoBehaviour
         toastRoot.pivot = new Vector2(1f, 1f);
         toastRoot.anchoredPosition = new Vector2(-30, -90);
         toastRoot.sizeDelta = new Vector2(480, 500);
+    }
 
-        // 상호작용 안내 (하단 가운데)
+    // 상호작용 안내 (하단 가운데)
+    private void BuildPromptBox(RectTransform root)
+    {
         promptBox = new GameObject("PromptBox", typeof(RectTransform), typeof(Image));
         var prt = promptBox.GetComponent<RectTransform>();
         prt.SetParent(root, false);

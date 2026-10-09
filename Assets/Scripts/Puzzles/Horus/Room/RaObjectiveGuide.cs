@@ -14,6 +14,7 @@ public class RaObjectiveStep
     public string objective = "";
 }
 
+// 퍼즐 오버레이가 열려 있는 동안은 목표 문구를 숨김 (퍼즐 제목 가림 방지)
 public class RaObjectiveGuide : MonoBehaviour
 {
     [Header("진행 단계 (위에서부터 순서대로)")]
@@ -23,14 +24,19 @@ public class RaObjectiveGuide : MonoBehaviour
     [SerializeField] private int fontSize = 30;
     [SerializeField] private Vector2 hudOffset = new Vector2(0f, -40f);
 
+    private GameObject objectiveBox;
     private Text objectiveText;
     private bool subscribed;
+    private bool focusSubscribed;
 
     private void Start()
     {
         try
         {
             BuildHud();
+            PuzzleOverlayFocus.OnFocusChanged += HandleFocus;
+            focusSubscribed = true;
+
             if (GameManager.Instance == null)
             {
                 Debug.LogError("[목표 안내] GameManager가 없음");
@@ -49,11 +55,17 @@ public class RaObjectiveGuide : MonoBehaviour
     private void OnDestroy()
     {
         if (subscribed && GameManager.Instance != null) GameManager.Instance.OnFlagChanged -= HandleFlag;
+        if (focusSubscribed) PuzzleOverlayFocus.OnFocusChanged -= HandleFocus;
     }
 
     private void HandleFlag(string flag)
     {
         Refresh();
+    }
+
+    private void HandleFocus(bool puzzleOpen)
+    {
+        UpdateBoxVisible();
     }
 
     // 아직 안 끝난 첫 단계를 현재 목표로 삼음
@@ -63,11 +75,21 @@ public class RaObjectiveGuide : MonoBehaviour
         {
             RaObjectiveStep current = FindCurrentStep();
             objectiveText.text = current != null ? $"목표: {current.objective}" : "";
+            UpdateBoxVisible();
         }
         catch (Exception e)
         {
             Debug.LogError($"[목표 안내] 갱신 오류: {e}");
         }
+    }
+
+    // 퍼즐이 열려 있거나 문구가 비어 있으면 띠째로 숨김
+    private void UpdateBoxVisible()
+    {
+        if (objectiveBox == null || objectiveText == null) return;
+
+        bool hasText = !string.IsNullOrEmpty(objectiveText.text);
+        objectiveBox.SetActive(hasText && !PuzzleOverlayFocus.IsActive);
     }
 
     private RaObjectiveStep FindCurrentStep()
@@ -88,6 +110,13 @@ public class RaObjectiveGuide : MonoBehaviour
     // ================= HUD =================
     private void BuildHud()
     {
+        RectTransform root = BuildCanvas();
+        RectTransform box = BuildBox(root);
+        objectiveText = BuildText(box);
+    }
+
+    private RectTransform BuildCanvas()
+    {
         var canvasGo = new GameObject("RaObjectiveCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
         canvasGo.transform.SetParent(transform, false);
 
@@ -99,19 +128,27 @@ public class RaObjectiveGuide : MonoBehaviour
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
 
-        RectTransform root = canvasGo.GetComponent<RectTransform>();
+        return canvasGo.GetComponent<RectTransform>();
+    }
 
-        var boxGo = new GameObject("ObjectiveBox", typeof(RectTransform), typeof(Image));
-        var box = boxGo.GetComponent<RectTransform>();
+    private RectTransform BuildBox(RectTransform root)
+    {
+        objectiveBox = new GameObject("ObjectiveBox", typeof(RectTransform), typeof(Image));
+        var box = objectiveBox.GetComponent<RectTransform>();
         box.SetParent(root, false);
         box.anchorMin = box.anchorMax = new Vector2(0.5f, 1f);
         box.pivot = new Vector2(0.5f, 1f);
         box.anchoredPosition = hudOffset;
         box.sizeDelta = new Vector2(900f, 62f);
-        Image boxImage = boxGo.GetComponent<Image>();
+
+        Image boxImage = objectiveBox.GetComponent<Image>();
         boxImage.color = new Color(0.1f, 0.07f, 0.04f, 0.8f);
         boxImage.raycastTarget = false;
+        return box;
+    }
 
+    private Text BuildText(RectTransform box)
+    {
         var textGo = new GameObject("Text", typeof(RectTransform), typeof(Text));
         var rt = textGo.GetComponent<RectTransform>();
         rt.SetParent(box, false);
@@ -120,12 +157,13 @@ public class RaObjectiveGuide : MonoBehaviour
         rt.offsetMin = new Vector2(20f, 0f);
         rt.offsetMax = new Vector2(-20f, 0f);
 
-        objectiveText = textGo.GetComponent<Text>();
-        objectiveText.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        objectiveText.fontSize = fontSize;
-        objectiveText.color = Hex("#E8B23A");
-        objectiveText.alignment = TextAnchor.MiddleCenter;
-        objectiveText.raycastTarget = false;
+        Text t = textGo.GetComponent<Text>();
+        t.font = PuzzleUITheme.GetBodyFont();
+        t.fontSize = fontSize;
+        t.color = Hex("#E8B23A");
+        t.alignment = TextAnchor.MiddleCenter;
+        t.raycastTarget = false;
+        return t;
     }
 
     private static Color Hex(string hex)
