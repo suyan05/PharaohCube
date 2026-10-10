@@ -14,12 +14,24 @@ public abstract class PuzzleBase : MonoBehaviour
     public event Action OnSuccess;
     public event Action OnFail;
 
+    // 낮/밤 데이터를 쓰는 퍼즐은 이 두 값을 데이터에서 가져오도록 override 함
+    // (override 안 하면 기존처럼 Inspector 값 사용 -> 호루스 퍼즐 등 기존 퍼즐은 그대로 동작)
+    protected virtual string RequiredFlag => requiredFlag;
+    protected virtual string ClearFlag => clearFlag;
+
+    // 진입 조건을 만족하는지 (자식 퍼즐이 Open 안에서 확인용)
+    public bool CanEnter()
+    {
+        string need = RequiredFlag;
+        return string.IsNullOrEmpty(need) || IsFlagOn(need);
+    }
+
     // 퍼즐이 열릴 때 (방에 진입하거나, 상호작용 시작할 때) 호출
     public virtual void Open()
     {
-        if (!string.IsNullOrEmpty(requiredFlag) && !GameManager.Instance.HasFlag(requiredFlag))
+        if (!CanEnter())
         {
-            Debug.Log($"[{name}] 진입 조건 미충족: {requiredFlag} 필요");
+            Debug.Log($"[{name}] 진입 조건 미충족: {RequiredFlag} 필요");
             return;
         }
 
@@ -36,9 +48,11 @@ public abstract class PuzzleBase : MonoBehaviour
     {
         IsCleared = true;
 
-        if (!string.IsNullOrEmpty(clearFlag))
+        string flag = ClearFlag;
+        if (!string.IsNullOrEmpty(flag))
         {
-            GameManager.Instance.SetFlag(clearFlag);
+            if (GameManager.Instance != null) GameManager.Instance.SetFlag(flag);
+            else Debug.LogWarning($"[{name}] GameManager가 없어서 플래그 {flag}를 못 켬");
         }
 
         Debug.Log($"[{name}] 성공!");
@@ -57,6 +71,17 @@ public abstract class PuzzleBase : MonoBehaviour
     {
         Debug.Log($"[{name}] 리셋됨");
     }
+
+    // 낮 -> 밤처럼 같은 퍼즐을 처음부터 다시 쓸 때 클리어 상태를 되돌림
+    protected void ResetClearedState()
+    {
+        IsCleared = false;
+    }
+
+    protected static bool IsFlagOn(string flag)
+    {
+        return GameManager.Instance != null && GameManager.Instance.HasFlag(flag);
+    }
 }
-/*Submit(), Validate()는 abstract(추상 함수)로 만ㄷ러서, 각 퍼즐이
+/*Submit(), Validate()는 abstract(추상 함수)로 만들어서, 각 퍼즐이
  자기만의 방식으로 반드시 구현하게 강제성을 줌.*/
