@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 313a7946809d50f46856ab7987b65811
+guid: 528111e5b2c476d49803974c80055fb2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2526932031500574500
-    second: P3-1 (2)_0
+      213: -3127430231603745939
+    second: Anubis_floor_5_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,12 +46,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 1800
+  spritePixelsToUnits: 24
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: P3-1 (2)_0
+      name: Anubis_floor_5_0
       rect:
         serializedVersion: 2
-        x: 203
-        y: 458
-        width: 4194
-        height: 6023
+        x: 0
+        y: 0
+        width: 24
+        height: 24
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: cd02ad2a4b88eecd0800000000000000
-      internalID: -2526932031500574500
+      spriteID: d6be07136c22994d0800000000000000
+      internalID: -3127430231603745939
       vertices: []
       indices: 
       edges: []
@@ -138,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      P3-1 (2)_0: -2526932031500574500
+      Anubis_floor_5_0: -3127430231603745939
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
