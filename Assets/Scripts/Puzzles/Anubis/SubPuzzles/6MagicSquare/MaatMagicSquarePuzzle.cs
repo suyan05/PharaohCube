@@ -1,8 +1,10 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+
+// 42인의 제약 마방진 (서브퍼즐 4). 3x3 합 15 맞추기
+// 패널 루트에 부착
 
 public class MaatMagicSquarePuzzle : MonoBehaviour
 {
@@ -18,9 +20,9 @@ public class MaatMagicSquarePuzzle : MonoBehaviour
     [SerializeField] private TMP_Text[] lineSumTexts = new TMP_Text[8];
 
     [Header("시스템 버튼 및 알림 패널")]
-    [SerializeField] private Button btnCheckSolution; // 봉인 해제 판정
-    [SerializeField] private Button btnClearBoard;    // 보드 비우기
-    [SerializeField] private Button btnClose;         // 나가기
+    [SerializeField] private Button btnCheckSolution;                           // 봉인 해제 판정
+    [SerializeField] private Button btnClearBoard;                              // 보드 비우기
+    [SerializeField] private Button btnClose;                                   // 나가기
     [SerializeField] private GameObject successNotice;
     [SerializeField] private TMP_Text textFeedbackNotice;
     [SerializeField] private TMP_Text textHintNotice;
@@ -33,7 +35,7 @@ public class MaatMagicSquarePuzzle : MonoBehaviour
     private const int CENTER_INDEX = 4;
     private const int CENTER_VALUE = 5;
 
-    private const int SETH_INDEX = 0;  
+    private const int SETH_INDEX = 0;
     private const int SETH_REQUIRED = 8;
     private const int HORUS_INDEX = 8;
     private const int HORUS_REQUIRED = 2;
@@ -157,9 +159,12 @@ public class MaatMagicSquarePuzzle : MonoBehaviour
 
             if (AnubisNotebookManager.Instance != null)
             {
-                AnubisNotebookManager.Instance.UnlockClue(5,
-                    "마아트의 42인 심판관 앞에 설 때, 거짓을 고하지 않은 자의 심장(H)과 깃털(F)만이 4kg의 절대 평형(H = F)을 이루리라.");
+                AnubisNotebookManager.Instance.UnlockClue(3,
+                    "청동의 그릇(B)은 흙의 단지(C) 다섯 개의 무게와 같도다. (B = 5C)");
             }
+
+            if (ItemInventory.Instance != null)
+                ItemInventory.Instance.Grant(AnubisItemIds.BronzeBowl);
         }
         else
         {
@@ -196,7 +201,6 @@ public class MaatMagicSquarePuzzle : MonoBehaviour
             }
         }
 
-        // 라인 합계 텍스트 갱신 (가로 3, 세로 3, 대각선 2)
         if (lineSumTexts != null && lineSumTexts.Length >= 8)
         {
             int r0 = boardValues[0] + boardValues[1] + boardValues[2];

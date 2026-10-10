@@ -3,12 +3,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// 사자의 모래 분배기 (서브퍼즐 1). 8L/5L/3L 용기로 정확히 4L 만들기
+// 패널 루트에 부착. 닫기 버튼이 패널을 꺼도 AnubisAltarStation이 감지함
 public class LionSandDecanter : MonoBehaviour
 {
+    // 용기 최대 용량
     private readonly int maxA = 8;
     private readonly int maxB = 5;
     private readonly int maxC = 3;
 
+    // 현재 용량
     private int curA = 8;
     private int curB = 0;
     private int curC = 0;
@@ -39,9 +43,9 @@ public class LionSandDecanter : MonoBehaviour
     [SerializeField] private GameObject successNotice;
     [SerializeField] private TMP_Text textSuccessNotice;
 
-    private int selectedJar = -1;                                   // -1: 미선택, 0: 8L, 1: 5L, 2: 3L
+    private int selectedJar = -1;   // -1: 미선택, 0: 8L, 1: 5L, 2: 3L
     private bool isCleared = false;
-    private bool isPouring = false;                                 // 모래가 쏟아지는 연출 중 조작 차단
+    private bool isPouring = false;
 
     private void Start()
     {
@@ -122,6 +126,7 @@ public class LionSandDecanter : MonoBehaviour
 
     private void CheckClearCondition()
     {
+        // 정답: 8L 단지 4L + 5L 단지 4L
         if (curA == 4 && curB == 4)
         {
             isCleared = true;
@@ -132,6 +137,9 @@ public class LionSandDecanter : MonoBehaviour
                 AnubisNotebookManager.Instance.UnlockClue(0,
                     "가장 비천한 흙의 단지(C)에 태양의 황금(A)을 더해야만 심장(H)의 무게를 얻으리라. (C + A = H)");
             }
+
+            if (ItemInventory.Instance != null)
+                ItemInventory.Instance.Grant(AnubisItemIds.GoldJar);
         }
     }
 

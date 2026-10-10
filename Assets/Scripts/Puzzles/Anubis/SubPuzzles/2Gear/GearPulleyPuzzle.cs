@@ -3,13 +3,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// 도르래와 기어비 천칭 (서브퍼즐 2). 기어비 2배 x 도르래 2배 = 총 4배 달성
+// 패널 루트에 부착
 public class GearPulleyPuzzle : MonoBehaviour
 {
     [Header("시각 그래픽 트랜스폼")]
-    [SerializeField] private RectTransform driverGearTransform; // 구동 기어 (회전 및 크기)
-    [SerializeField] private RectTransform drivenGearTransform; // 종동 기어 (회전 및 크기)
-    [SerializeField] private RectTransform relicPlateTransform; // 들어올려질 4kg 유물 석판
-    [SerializeField] private Image imgPulleyIndicator;         // 도르래 상태 그래픽
+    [SerializeField] private RectTransform driverGearTransform;
+    [SerializeField] private RectTransform drivenGearTransform;
+    [SerializeField] private RectTransform relicPlateTransform;
+    [SerializeField] private Image imgPulleyIndicator;
 
     [Header("UI 텍스트")]
     [SerializeField] private TMP_Text textDriverGear;
@@ -151,6 +153,9 @@ public class GearPulleyPuzzle : MonoBehaviour
                 AnubisNotebookManager.Instance.UnlockClue(1,
                     "청동의 그릇(B)과 흙(C)의 무게 합은, 밤의 흑요석(D)과 황금(A)의 합보다 가장 작은 무게 단위(1kg)만큼 무겁도다. ((B + C) - (D + A) = 1)");
             }
+
+            if (ItemInventory.Instance != null)
+                ItemInventory.Instance.Grant(AnubisItemIds.ClayPot);
         }
         else
         {

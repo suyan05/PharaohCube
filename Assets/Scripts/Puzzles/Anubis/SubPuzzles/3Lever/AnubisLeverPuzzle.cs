@@ -3,12 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// 아누비스의 지렛대 천칭 (서브퍼즐 3). 토크(무게 x 거리) 600 맞추기
+// 패널 루트에 부착
 public class AnubisLeverPuzzle : MonoBehaviour
 {
     [Header("시각 그래픽 요소")]
-    [SerializeField] private RectTransform leverBar;          // 기울어지는 지렛대 본체
-    [SerializeField] private RectTransform rightHookAnchor;   // 이동하는 우측 걸쇠
-    [SerializeField] private GameObject[] obsidianWeights;    // 매달리는 흑요석 추 3개
+    [SerializeField] private RectTransform leverBar;
+    [SerializeField] private RectTransform rightHookAnchor;
+    [SerializeField] private GameObject[] obsidianWeights;
 
     [Header("UI 텍스트")]
     [SerializeField] private TMP_Text textDistanceDisplay;
@@ -27,7 +29,6 @@ public class AnubisLeverPuzzle : MonoBehaviour
     [Header("성공 패널")]
     [SerializeField] private GameObject successNotice;
 
-    // 좌측: 심장 4kg x 150px = 토크 600
     private readonly float leftTorque = 4f * 150f;
     private readonly float singleWeightMass = 2f;
 
@@ -107,6 +108,9 @@ public class AnubisLeverPuzzle : MonoBehaviour
                 AnubisNotebookManager.Instance.UnlockClue(2,
                     "망자의 심장(H)은 밤의 흑요석 추(D) 두 개의 무게와 정확히 같도다. (H = 2D)");
             }
+
+            if (ItemInventory.Instance != null)
+                ItemInventory.Instance.Grant(AnubisItemIds.Obsidian);
         }
         else
         {

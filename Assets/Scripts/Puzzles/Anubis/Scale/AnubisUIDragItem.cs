@@ -1,15 +1,16 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
-[RequireComponent(typeof(Image))]
+// 메인 저울에 올리는 유물 아이템. 드래그하면 AnubisUIScalePan 위에 놓을 수 있음
+
 public class AnubisUIDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     [Header("아이템 설정")]
     public string itemName = "유물";
     public float weightValue = 1.0f;
-    public bool isHeart = false; // [추가] 심장 여부 체크
+    public bool isHeart = false;
+    public bool isGold = false;
 
     private RectTransform rectTransform;
     private Canvas canvas;
@@ -24,7 +25,9 @@ public class AnubisUIDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, 
     {
         rectTransform = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
-        canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null) canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
 
     private void Start()
@@ -74,7 +77,7 @@ public class AnubisUIDragItem : MonoBehaviour, IBeginDragHandler, IDragHandler, 
         }
     }
 
-    // [추가] 오답 시 또는 놓쳤을 때 원래 슬롯으로 복귀하는 함수
+    // 오답 시 또는 놓쳤을 때 원래 슬롯으로 복귀
     public void ReturnToOriginalSlot()
     {
         if (dropRoutine != null) StopCoroutine(dropRoutine);
