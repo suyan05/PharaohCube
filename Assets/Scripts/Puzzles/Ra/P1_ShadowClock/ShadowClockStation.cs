@@ -4,23 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// OBJ_005 그림자 다이얼: E키로 P1 오버레이 열기/닫기 + 화면 구성
-// 판정은 ShadowClockPuzzle이 그대로 담당하고, 이 스크립트는 화면만 담당
-// 시계판은 기본으로 코드가 정면 원판을 그림 (비스듬한 Clock face 그림은 맵 오브젝트용)
-// 정면 시계판 그림이 오면 Clock Face Sprite에 넣고 Use Clock Face Art 켜기
+// OBJ_005 그림자 다이얼: E키로 P1 오버레이 열기/닫기 + 화면 구성 (기획서 v4.0 4.1)
+// 판정은 ShadowClockPuzzle이 담당하고, 이 스크립트는 화면만 담당
+// - 다이얼 가운데 오벨리스크 + 지금 문제의 그림자 1개 (긴 그림자 / 발밑 짧은 그림자 / 없음)
+// - 화면 방향: 오른쪽 = 동, 왼쪽 = 서 (다이얼 양옆에 표시)
+// - 아래 칸 4개 = 진행 표시 (맞힌 문제는 시간 이름, 지금 문제는 ?)
+// - 같은 문제 3회 오답이면 해 위치 표시
 public class ShadowClockStation : MonoBehaviour, IInteractable
 {
     // 기본 크기 (우클릭 -> "크기 기본값 적용"으로 씬에 저장된 값을 덮어쓸 수 있음)
     private static readonly Vector2 DefaultSymbolSize = new Vector2(130, 160);
     private static readonly Vector2 DefaultDialSize = new Vector2(300, 300);
-    private static readonly Vector2 DefaultHandSize = new Vector2(18, 135);
+    private static readonly Vector2 DefaultLongShadowSize = new Vector2(130, 26);
+    private static readonly Vector2 DefaultShortShadowSize = new Vector2(84, 52);
+    private static readonly Vector2 DefaultSunSize = new Vector2(56, 56);
     private static readonly Vector2 DefaultSlotSize = new Vector2(200, 70);
     private static readonly Vector2 DefaultLensSize = new Vector2(120, 120);
-    private static readonly Vector2 DefaultLensPos = new Vector2(290, -20);
+    private static readonly Vector2 DefaultLensPos = new Vector2(430, -20);
     private static readonly Vector2 DefaultObeliskSize = new Vector2(64, 64);
 
     private const float WallY = 300f;
     private const float SlotY = -280f;
+    private const float SideLabelGap = 45f;
     private static readonly Vector2 DialPos = new Vector2(0, -20);
 
     [Header("연결")]
@@ -32,7 +37,14 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     [SerializeField] private bool useClockFaceArt = false;
     [SerializeField] private Sprite clockFaceSprite;   // Clock face (정면 그림일 때만 사용)
     [SerializeField] private Sprite obeliskSprite;     // Central Obelisk
-    [SerializeField] private Sprite shadowHandSprite;  // shadow (Use Clock Face Art 켰을 때만 사용)
+
+    [Header("아트 - 그림자 / 해 (비우면 코드로 그림)")]
+    [Tooltip("동쪽(오른쪽)을 향하게 그린 긴 그림자. 서쪽은 좌우 뒤집어서 씀")]
+    [SerializeField] private Sprite shadowLongSprite;
+    [Tooltip("정오: 발밑에 짧게 깔리는 그림자")]
+    [SerializeField] private Sprite shadowShortSprite;
+    [Tooltip("3회 오답 힌트 때 보이는 해 그림")]
+    [SerializeField] private Sprite sunSprite;
 
     [Header("아트 - 벽 기호 (렌즈 장착 전/후)")]
     [SerializeField] private Sprite noonSprite;
@@ -45,7 +57,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     [SerializeField] private Sprite lensInactiveSprite;  // [확인 필요] lens 파일이 맞는지
     [SerializeField] private Sprite lensActiveSprite;    // Lens Activation
 
-    [Header("아트 - 입력 슬롯")]
+    [Header("아트 - 진행 슬롯")]
     [SerializeField] private Sprite slotEmptySprite;     // Slot Board
     [Tooltip("끄면 빈 슬롯 그림 하나로 색만 바꿈 (상태별 그림 비율이 달라서 크기가 변하는 문제 방지)")]
     [SerializeField] private bool useSlotStateSprites = false;
@@ -56,7 +68,9 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     [Header("크기 (우클릭 -> 크기 기본값 적용)")]
     [SerializeField] private Vector2 symbolSize = DefaultSymbolSize;
     [SerializeField] private Vector2 dialSize = DefaultDialSize;
-    [SerializeField] private Vector2 handSize = DefaultHandSize;
+    [SerializeField] private Vector2 longShadowSize = DefaultLongShadowSize;
+    [SerializeField] private Vector2 shortShadowSize = DefaultShortShadowSize;
+    [SerializeField] private Vector2 sunSize = DefaultSunSize;
     [SerializeField] private Vector2 slotSize = DefaultSlotSize;
     [SerializeField] private Vector2 lensSize = DefaultLensSize;
     [SerializeField] private Vector2 lensPos = DefaultLensPos;
@@ -77,7 +91,10 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     private readonly Image[] slotImages = new Image[4];
     private readonly Text[] slotTexts = new Text[4];
     private readonly Dictionary<CanvasGroup, float> hiddenGroups = new Dictionary<CanvasGroup, float>();
-    private RectTransform shadowHand;
+    private Image shadowLong;
+    private Image shadowShort;
+    private Image sunMarker;
+    private Text sunLabel;
     private Image lensImage;
     private Text lensLabel;
     private Text statusText;
@@ -116,21 +133,25 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 
     private void Subscribe()
     {
-        puzzle.OnInputChanged += RefreshSlots;
-        puzzle.OnLensMounted += RefreshSymbols;
+        puzzle.OnQuestionChanged += RefreshAll;
+        puzzle.OnLensMounted += RefreshAll;
+        puzzle.OnCorrect += HandleCorrect;
         puzzle.OnSuccess += HandleSuccess;
         puzzle.OnFail += HandleFail;
         puzzle.OnHint += HandleHint;
+        puzzle.OnPhaseChanged += HandlePhaseChanged;
     }
 
     private void OnDestroy()
     {
         if (puzzle == null) return;
-        puzzle.OnInputChanged -= RefreshSlots;
-        puzzle.OnLensMounted -= RefreshSymbols;
+        puzzle.OnQuestionChanged -= RefreshAll;
+        puzzle.OnLensMounted -= RefreshAll;
+        puzzle.OnCorrect -= HandleCorrect;
         puzzle.OnSuccess -= HandleSuccess;
         puzzle.OnFail -= HandleFail;
         puzzle.OnHint -= HandleHint;
+        puzzle.OnPhaseChanged -= HandlePhaseChanged;
     }
 
     private void Update()
@@ -140,11 +161,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             CloseOverlay();
-            return;
         }
-
-        // 그림자 바늘: 시계 방향 회전 (기본 8초에 한 바퀴)
-        shadowHand.Rotate(0, 0, -360f / puzzle.ShadowPeriod * Time.deltaTime);
     }
 
     private void SetupColors()
@@ -189,15 +206,17 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         overlayPanel.SetActive(true);
         isOpen = true;
 
-        puzzle.Open(); // 여기서 렌즈 자동 장착 시도
+        puzzle.Open(); // 여기서 출제 + 렌즈 자동 장착 시도
 
-        RefreshSymbols();
-        RefreshSlots();
+        RefreshAll();
         statusText.text = GetOpenMessage();
     }
 
     private void CloseOverlay()
     {
+        StopAllCoroutines();
+        flashingRed = false;
+
         overlayPanel.SetActive(false);
         isOpen = false;
         SetOtherUIHidden(false);
@@ -214,9 +233,10 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 
     private string GetOpenMessage()
     {
+        if (!puzzle.CanEnter()) return "다이얼이 아직 반응하지 않는다.";
         if (puzzle.IsCleared) return "이미 해독한 시계다.";
-        if (puzzle.LensMounted) return "주황 렌즈가 벽의 기호를 비춘다.";
-        return "기호가 너무 어둡다. 무언가로 비춰봐야 할 것 같다.";
+        if (!puzzle.LensMounted) return "너무 어두워 아무것도 보이지 않는다.";
+        return "그림자를 보고, 지금이 언제인지 벽의 기호를 골라라.";
     }
 
     // 다른 UI는 끄지 않고 투명하게만 (그쪽 스크립트가 멈추지 않게)
@@ -267,7 +287,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         }
 
         statusText = CreateText(root, "", 28, new Vector2(0, -390), new Vector2(1200, 60), paper);
-        CreateText(root, "기호를 순서대로 클릭  |  E / Esc : 닫기", 22,
+        CreateText(root, "그림자를 보고 지금 시간의 기호를 클릭  |  E / Esc : 닫기", 22,
             new Vector2(0, -450), new Vector2(1200, 40), wallColor);
     }
 
@@ -321,6 +341,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         symbolTexts[index] = CreateText(parent, ShadowClockPuzzle.ToKorean(symbol), 26, pos, size, paper);
     }
 
+    // 원판 -> 동/서 표시 -> 그림자 -> 오벨리스크 -> 해 힌트 순서로 쌓음 (뒤에 만든 게 위에 그려짐)
     private void BuildDial(RectTransform root)
     {
         if (useClockFaceArt && clockFaceSprite != null)
@@ -332,10 +353,13 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
             BuildCodeDial(root);
         }
 
-        BuildShadowHand(root);
+        BuildSideLabels(root);
+        BuildShadows(root);
 
         if (obeliskSprite != null) CreateSprite(root, "Obelisk", DialPos, obeliskSize, obeliskSprite);
         else CreateRect(root, "Obelisk", DialPos, obeliskSize * 0.5f, gold, 45f);
+
+        BuildSunMarker(root);
     }
 
     // 정면 원판: 금테 -> 돌판 -> 눈금 4개 (위/오른쪽/아래/왼쪽)
@@ -355,21 +379,49 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         }
     }
 
-    private void BuildShadowHand(RectTransform root)
+    // 다이얼 양옆 동/서 표시 (기획서 4.1: 탑다운에서 방향 헷갈림 방지)
+    private void BuildSideLabels(RectTransform root)
     {
-        Image hand;
-        if (useClockFaceArt && shadowHandSprite != null)
-        {
-            hand = CreateSprite(root, "ShadowHand", DialPos, handSize, shadowHandSprite);
-        }
-        else
-        {
-            hand = CreateRect(root, "ShadowHand", DialPos, handSize, shadowColor);
-        }
+        float x = dialSize.x * 0.5f + SideLabelGap;
+        BuildSideLabel(root, "동", DialPos + new Vector2(x, 0));
+        BuildSideLabel(root, "서", DialPos + new Vector2(-x, 0));
+    }
 
-        shadowHand = hand.rectTransform;
-        shadowHand.pivot = new Vector2(0.5f, 0f); // 바늘 아래쪽을 축으로 회전
-        shadowHand.anchoredPosition = DialPos;
+    private void BuildSideLabel(RectTransform root, string text, Vector2 pos)
+    {
+        Vector2 size = new Vector2(56, 44);
+        CreateRect(root, $"Side_{text}", pos, size, darkBrown);
+        CreateText(root, text, 30, pos, size, gold);
+    }
+
+    private void BuildShadows(RectTransform root)
+    {
+        // 긴 그림자: 오벨리스크 쪽 끝을 축으로 동쪽을 향함 (서쪽은 좌우 뒤집기)
+        shadowLong = CreatePiece(root, "ShadowLong", DialPos, longShadowSize, shadowLongSprite, shadowColor);
+        shadowLong.preserveAspect = false;
+        shadowLong.rectTransform.pivot = new Vector2(0f, 0.5f);
+        shadowLong.rectTransform.anchoredPosition = DialPos;
+
+        // 짧은 그림자: 발밑에 깔리는 타원
+        Sprite shortSprite = shadowShortSprite != null ? shadowShortSprite : GetCircleSprite();
+        shadowShort = CreateSprite(root, "ShadowShort", DialPos, shortShadowSize, shortSprite);
+        shadowShort.preserveAspect = false;
+        shadowShort.color = shadowShortSprite != null ? Color.white : shadowColor;
+
+        shadowLong.enabled = false;
+        shadowShort.enabled = false;
+    }
+
+    private void BuildSunMarker(RectTransform root)
+    {
+        Sprite sprite = sunSprite != null ? sunSprite : GetCircleSprite();
+        sunMarker = CreateSprite(root, "SunHint", DialPos, sunSize, sprite);
+        sunMarker.color = sunSprite != null ? Color.white : gold;
+
+        sunLabel = CreateText(root, "해", 24, DialPos, new Vector2(200, 30), glow);
+
+        sunMarker.enabled = false;
+        sunLabel.enabled = false;
     }
 
     private void BuildLens(RectTransform root)
@@ -390,15 +442,40 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
             Vector2.zero, slotSize, paper);
     }
 
-    // ================= 입력 / 화면 갱신 =================
+    // ================= 입력 =================
     private void OnSymbolClicked(TimeSymbol symbol)
     {
-        if (!puzzle.LensMounted)
+        try
         {
-            statusText.text = "기호가 너무 어둡다. 무언가로 비춰봐야 할 것 같다.";
-            return;
+            if (puzzle.IsCleared) return;
+
+            if (!puzzle.LensMounted)
+            {
+                statusText.text = "너무 어두워 아무것도 보이지 않는다.";
+                return;
+            }
+            puzzle.PressSymbol(symbol);
         }
-        puzzle.PressSymbol(symbol);
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 기호 클릭 오류: {e}");
+        }
+    }
+
+    // ================= 화면 갱신 =================
+    private void RefreshAll()
+    {
+        try
+        {
+            RefreshSymbols();
+            RefreshShadow();
+            RefreshSun();
+            RefreshSlots();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 화면 갱신 오류: {e}");
+        }
     }
 
     private void RefreshSymbols()
@@ -454,114 +531,165 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         lensImage.color = Color.white;
     }
 
+    // 지금 문제의 그림자 1개 (렌즈 없거나 클리어했으면 숨김)
+    private void RefreshShadow()
+    {
+        ShadowRule rule = puzzle.CurrentRule;
+        bool show = puzzle.LensMounted && !puzzle.IsCleared && rule != null;
+        bool sideways = show && (rule.shadowSide == DialSide.East || rule.shadowSide == DialSide.West);
+        bool isLong = sideways && rule.shadowLength == ShadowLength.Long;
+        bool isShort = show && rule.shadowLength == ShadowLength.Short;
+
+        shadowLong.enabled = isLong;
+        shadowShort.enabled = isShort;
+
+        if (isLong)
+        {
+            float flip = rule.shadowSide == DialSide.West ? -1f : 1f;
+            shadowLong.rectTransform.localScale = new Vector3(flip, 1f, 1f);
+        }
+    }
+
+    // 해 위치 힌트 (같은 문제 3회 오답 후에만)
+    private void RefreshSun()
+    {
+        ShadowRule rule = puzzle.CurrentRule;
+        bool show = puzzle.HintActive && puzzle.LensMounted && !puzzle.IsCleared && rule != null;
+
+        sunMarker.enabled = show && rule.sunSide != DialSide.None;
+        sunLabel.enabled = show;
+        if (!show) return;
+
+        Vector2 pos = SunPosition(rule.sunSide);
+        sunMarker.rectTransform.anchoredPosition = pos;
+        sunLabel.rectTransform.anchoredPosition = pos + new Vector2(0, sunSize.y * 0.5f + 16f);
+        sunLabel.text = rule.sunSide == DialSide.None ? "해가 없다" : "해";
+    }
+
+    // 동/서는 방향 표시 위쪽, 머리 위(또는 없음)는 원판 안쪽 위
+    private Vector2 SunPosition(DialSide side)
+    {
+        float x = dialSize.x * 0.5f + SideLabelGap;
+        switch (side)
+        {
+            case DialSide.East: return DialPos + new Vector2(x, 60f);
+            case DialSide.West: return DialPos + new Vector2(-x, 60f);
+            default: return DialPos + new Vector2(0, dialSize.y * 0.3f);
+        }
+    }
+
     private void RefreshSlots()
     {
-        var inputs = puzzle.Inputs;
-        for (int i = 0; i < 4; i++)
+        int solved = puzzle.SolvedCount;
+        for (int i = 0; i < slotImages.Length; i++)
         {
-            bool filled = i < inputs.Count;
-            slotTexts[i].text = filled ? ShadowClockPuzzle.ToKorean(inputs[i]) : (i + 1).ToString();
+            bool isSolved = i < solved;
+            bool isCurrent = !puzzle.IsCleared && i == solved;
+            slotTexts[i].text = SlotText(i, isSolved, isCurrent);
 
             if (!flashingRed)
             {
-                UpdateSlotVisual(i, filled);
+                UpdateSlotVisual(i, isSolved, isCurrent);
             }
         }
     }
 
-    private void UpdateSlotVisual(int i, bool filled)
+    private string SlotText(int i, bool solved, bool current)
+    {
+        if (solved) return ShadowClockPuzzle.ToKorean(puzzle.QuestionAt(i));
+        return current ? "?" : (i + 1).ToString();
+    }
+
+    private void UpdateSlotVisual(int i, bool solved, bool current)
     {
         // 그림이 없을 때: 밝은 네모 + 진한 글자
         if (slotEmptySprite == null)
         {
-            slotImages[i].color = puzzle.IsCleared ? gold : (filled ? paper : sand);
+            slotImages[i].color = puzzle.IsCleared ? gold : (solved ? paper : (current ? glow : sand));
             slotTexts[i].color = darkBrown;
             return;
         }
 
-        slotTexts[i].color = filled ? paper : dimText;
+        slotTexts[i].color = solved || current ? paper : dimText;
 
         if (useSlotStateSprites)
         {
-            UpdateSlotWithStateSprites(i, filled);
+            UpdateSlotWithStateSprites(i, solved);
             return;
         }
 
         // 빈 슬롯 그림 하나로 색만 바꿈
         slotImages[i].sprite = slotEmptySprite;
         if (puzzle.IsCleared) slotImages[i].color = successTint;
-        else slotImages[i].color = filled ? Color.white : new Color(0.75f, 0.75f, 0.75f, 1f);
+        else if (solved) slotImages[i].color = Color.white;
+        else if (current) slotImages[i].color = new Color(1f, 0.92f, 0.7f, 1f);
+        else slotImages[i].color = new Color(0.75f, 0.75f, 0.75f, 1f);
     }
 
-    private void UpdateSlotWithStateSprites(int i, bool filled)
+    private void UpdateSlotWithStateSprites(int i, bool solved)
     {
         Sprite sprite = slotEmptySprite;
         if (puzzle.IsCleared && slotSuccessSprite != null) sprite = slotSuccessSprite;
-        else if (filled && slotFilledSprite != null) sprite = slotFilledSprite;
+        else if (solved && slotFilledSprite != null) sprite = slotFilledSprite;
 
         slotImages[i].sprite = sprite;
         slotImages[i].color = Color.white;
     }
 
+    // ================= 퍼즐 이벤트 =================
+    private void HandleCorrect(TimeSymbol solved)
+    {
+        statusText.text = $"맞았다. {ShadowClockPuzzle.ToKorean(solved)}의 그림자였다.";
+    }
+
     private void HandleSuccess()
     {
-        statusText.text = "그림자가 멈췄다. 거울 조각 1 획득!";
-        RefreshSlots();
+        statusText.text = puzzle.IsNight
+            ? "그림자가 멈췄다. 저승의 시계가 맞춰졌다."
+            : "그림자가 멈췄다. 거울 조각 1 획득!";
+        RefreshAll();
     }
 
     private void HandleFail()
     {
-        statusText.text = "순서가 맞지 않는다...";
-        if (isActiveAndEnabled) StartCoroutine(FlashSlotsRed());
+        statusText.text = "그 시간이 아니다... 그림자를 다시 보자.";
+        int index = Mathf.Clamp(puzzle.SolvedCount, 0, slotImages.Length - 1);
+        if (isActiveAndEnabled) StartCoroutine(FlashSlotRed(index));
     }
 
     private void HandleHint()
     {
-        statusText.text = "'새벽' 기호가 희미하게 빛난다...";
-        if (isActiveAndEnabled) StartCoroutine(HintGlow());
+        statusText.text = "벽 틈으로 해의 위치가 어렴풋이 보인다...";
+        RefreshAll();
     }
 
-    // 오답: 붉은 플래시 0.3초 (기획서 10.3)
-    private IEnumerator FlashSlotsRed()
+    private void HandlePhaseChanged()
+    {
+        if (!isOpen) return;
+        RefreshAll();
+        statusText.text = GetOpenMessage();
+    }
+
+    // 오답: 지금 칸만 붉은 플래시 0.3초 (기획서 10.3)
+    private IEnumerator FlashSlotRed(int index)
     {
         flashingRed = true;
-        foreach (Image img in slotImages)
+        Image img = slotImages[index];
+
+        if (useSlotStateSprites && slotFailSprite != null)
         {
-            bool useFailArt = useSlotStateSprites && slotFailSprite != null;
-            if (useFailArt) { img.sprite = slotFailSprite; img.color = Color.white; }
-            else img.color = red;
+            img.sprite = slotFailSprite;
+            img.color = Color.white;
+        }
+        else
+        {
+            img.color = red;
         }
 
         yield return new WaitForSeconds(0.3f);
 
         flashingRed = false;
         RefreshSlots();
-    }
-
-    // 힌트: '새벽' 기호 5초 발광 (기획서 6.1 튜닝)
-    private IEnumerator HintGlow()
-    {
-        int index = Array.IndexOf(ShadowClockPuzzle.WallOrder, TimeSymbol.Dawn);
-        bool hasSprite = symbolImages[index].sprite != null;
-        float t = 0f;
-        bool on = false;
-
-        while (t < 5f)
-        {
-            on = !on;
-            if (hasSprite)
-            {
-                symbolImages[index].color = on ? Color.white : new Color(1f, 0.95f, 0.7f, 1f);
-            }
-            else
-            {
-                symbolImages[index].color = on ? glow : gold;
-            }
-            yield return new WaitForSeconds(0.25f);
-            t += 0.25f;
-        }
-
-        RefreshSymbols();
     }
 
     // ================= 도우미 함수 =================
@@ -576,7 +704,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         }
     }
 
-    // 코드로 만드는 원 스프라이트 (정면 원판용, 한 번만 만들어서 재사용)
+    // 코드로 만드는 원 스프라이트 (원판, 짧은 그림자, 해 힌트용, 한 번만 만들어서 재사용)
     private static Sprite GetCircleSprite()
     {
         if (circleSprite != null) return circleSprite;
@@ -673,7 +801,9 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 
             symbolSize = DefaultSymbolSize;
             dialSize = DefaultDialSize;
-            handSize = DefaultHandSize;
+            longShadowSize = DefaultLongShadowSize;
+            shortShadowSize = DefaultShortShadowSize;
+            sunSize = DefaultSunSize;
             slotSize = DefaultSlotSize;
             lensSize = DefaultLensSize;
             lensPos = DefaultLensPos;
