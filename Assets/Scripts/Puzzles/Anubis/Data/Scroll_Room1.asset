@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c548142d81096654bac0213400e13a73, type: 3}
+  m_Name: Scroll_Room1
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisScrollData
+  scrollId: SCROLL_ANUBIS_1
+  title: "\uBAA8\uB798\uC758 \uC11C"
+  pieceCount: 5
+  fullText: "\uB098\uD2B8\uB860\uC758 \uBAA8\uB798\uB294 \uC624\uC9C1 \uD56D\uC544\uB9AC\uC5D0\uC11C
+    \uD56D\uC544\uB9AC\uB85C\uB9CC \uC62E\uACA8\uC9C4\uB2E4.\n\uD55C \uBC88 \uBD93\uAE30
+    \uC2DC\uC791\uD558\uBA74, \uBC1B\uB294 \uD56D\uC544\uB9AC\uAC00 \uAC00\uB4DD
+    \uCC28\uAC70\uB098\n\uBD93\uB294 \uD56D\uC544\uB9AC\uAC00 \uBE4C \uB54C\uAE4C\uC9C0
+    \uBA48\uCD94\uC9C0 \uC54A\uB294\uB2E4.\n\n\uCCAB\uC9F8 \uD56D\uC544\uB9AC\uB294
+    \uC5F4\uB450 \uB418, \uB458\uC9F8\uB294 \uC5EC\uB35F \uB418,\n\uC14B\uC9F8\uB294
+    \uB2E4\uC12F \uB418, \uB137\uC9F8\uB294 \uC138 \uB418\uB97C \uB2F4\uB294\uB2E4.\n\n\uBAA8\uB798\uB294
+    \uCC98\uC74C\uC5D0 \uCCAB\uC9F8 \uD56D\uC544\uB9AC\uC5D0\uB9CC \uAC00\uB4DD \uB2F4\uACA8
+    \uC788\uC73C\uB2C8,\n\uCCAB\uC9F8\xB7\uB458\uC9F8\xB7\uC14B\uC9F8 \uD56D\uC544\uB9AC\uC5D0
+    \uB124 \uB418\uC529 \uB611\uAC19\uC774 \uB098\uB204\uACE0\n\uB9C9\uB0B4\uC778
+    \uB137\uC9F8 \uD56D\uC544\uB9AC\uB294 \uBE44\uC6CC \uB450\uC5B4\uB77C."
+  pieceSprites:
+  - {fileID: 7755982354243125303, guid: 9677ec40696b7134190b146ff4bfdaf5, type: 3}
+  - {fileID: -6235153649762995705, guid: ed1e96d34a4ed4848a3e09137745f604, type: 3}
+  - {fileID: -1717013534435026543, guid: c18de3eaaa7aebb44840edde4327cc00, type: 3}
+  - {fileID: 8626348232849448242, guid: 440c90bf7239e7b43a5c570841bb6746, type: 3}
+  - {fileID: -593277726893008665, guid: 90d99eff4a099904b87138c5dfcd73b7, type: 3}
+  fullSprite: {fileID: 0}
