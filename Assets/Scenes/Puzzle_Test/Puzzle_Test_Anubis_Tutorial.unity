@@ -19729,7 +19729,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 4, y: 2}
   m_EdgeRadius: 0
 --- !u!4 &806915150
 Transform:
@@ -19741,7 +19741,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.1, y: -10.14, z: 0}
-  m_LocalScale: {x: 5.35, y: 1.67, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -34789,6 +34789,7 @@ GameObject:
   - component: {fileID: 1920547895}
   - component: {fileID: 1920547894}
   - component: {fileID: 1920547897}
+  - component: {fileID: 1920547898}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -34864,6 +34865,24 @@ MonoBehaviour:
     \uD1B5\uACFC\uD558\uBA74 \uC9C4\uC9DC \uC2EC\uD310\uC758 \uC2E0\uC804\uC73C\uB85C
     \uAC00\uB294 \uBB38\uC774 \uC5F4\uB9BD\uB2C8\uB2E4."
   startDuration: 6
+--- !u!114 &1920547898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1920547893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02f9c0a719926ad4bb2e9d3c401013f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisCheats
+  solveOpenPuzzleKey: 94
+  grantAllRewardsKey: 95
+  collectAllScrollsKey: 96
+  helpKey: 97
+  enableInReleaseBuild: 0
+  rewardInterval: 0.6
 --- !u!1 &1924458693
 GameObject:
   m_ObjectHideFlags: 0
@@ -37243,6 +37262,6 @@ SceneRoots:
   - {fileID: 620002158}
   - {fileID: 125099995}
   - {fileID: 1132228908}
-  - {fileID: 1920547896}
   - {fileID: 892452658}
   - {fileID: 806915150}
+  - {fileID: 1920547896}
