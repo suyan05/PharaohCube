@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // 아누비스 방 제단 공통 상호작용
-// E키 → 오버레이 패널 열기 + 플레이어 이동 잠금
-// Esc 또는 E키 → 닫기 (패널 내부 닫기 버튼으로 패널이 꺼져도 잠금 자동 해제)
+// E키 → 오버레이 패널 열기 + 플레이어 이동 잠금 / Esc 또는 E키 → 닫기
+// [추가] 같은 오브젝트에 AnubisAltarLock이 있고 잠겨 있으면 퍼즐을 열지 않음
 [RequireComponent(typeof(Collider2D))]
 public class AnubisAltarStation : MonoBehaviour, IInteractable
 {
@@ -18,9 +18,14 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
     private bool isOpen;
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
+    private AnubisAltarLock altarLock; 
+
+    private bool IsLocked => altarLock != null && altarLock.IsLocked; 
 
     private void Start()
     {
+        altarLock = GetComponent<AnubisAltarLock>();
+
         if (overlayPanel == null)
         {
             Debug.LogError($"[{name}] overlayPanel 미연결", this);
@@ -39,22 +44,38 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
             return;
         }
 
-        // 새 Input System 기준 Esc 닫기
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             Close();
     }
 
-    public string GetPrompt() => isOpen ? "E: 닫기" : $"E: {promptName} 조사";
+    public string GetPrompt()
+    {
+        if (isOpen) return "E: 닫기";
+        if (IsLocked) return $"E: {promptName} (봉인됨)";
+        return $"E: {promptName} 조사";
+    }
 
-    // InteractionSystem이 E키로 호출
     public void Interact(GameObject player)
     {
-        if (isOpen) Close();
-        else Open(player);
+        if (isOpen)
+        {
+            Close();
+            return;
+        }
+
+        if (IsLocked)
+        {
+            altarLock.NotifyLocked();
+            return;
+        }
+
+        Open(player);
     }
 
     private void Open(GameObject player)
     {
+        if (overlayPanel == null) return;
+
         playerController = player.GetComponent<PlayerController2D>();
         playerRb = player.GetComponent<Rigidbody2D>();
 
@@ -69,7 +90,7 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
 
     public void Close()
     {
-        overlayPanel.SetActive(false);
+        if (overlayPanel != null) overlayPanel.SetActive(false);
         Unlock();
         Debug.Log($"[{name}] 오버레이 닫힘", this);
     }
@@ -80,7 +101,6 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
         if (playerController != null) playerController.enabled = true;
     }
 
-    // Scene 뷰에서 제단 콜라이더 범위를 노란 상자로 표시
     private void OnDrawGizmos()
     {
         var col = GetComponent<BoxCollider2D>();
