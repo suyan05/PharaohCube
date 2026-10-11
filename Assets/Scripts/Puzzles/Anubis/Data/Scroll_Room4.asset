@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c548142d81096654bac0213400e13a73, type: 3}
+  m_Name: Scroll_Room4
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisScrollData
+  scrollId: SCROLL_ANUBIS_4
+  title: "\uC2EC\uD310\uAD00\uC758  \uC11C"
+  pieceCount: 5
+  fullText: "\uB9C8\uC544\uD2B8\uC758 \uD310 \uC704\uC5D0\uC11C\uB294 \uC2E0\uB4E4\uC758
+    \uBB34\uAC8C\uAC00 \uACE7 \uC218\uC774\uB2C8,\r\n\uADF8 \uC11C\uC5F4\uC744 \uC78A\uC9C0
+    \uB9D0\uB77C.\r\n\r\n\uD0DC\uC591\uC744 \uAD74\uB9AC\uB294 \uC1E0\uB625\uAD6C\uB9AC(\uC2A4\uCE74\uB77C\uBE0C)\uB294
+    \uD558\uB098,\r\n\uD63C\uB3C8\uC758 \uBC40 \uC544\uD3A9\uC740 \uB458, \uC9C0\uD61C\uC758
+    \uB530\uC624\uAE30 \uD1A0\uD2B8\uB294 \uC14B,\r\n\uBC24\uC744 \uC9C0\uD0A4\uB294
+    \uACE0\uC591\uC774 \uBC14\uC2A4\uD14C\uD2B8\uB294 \uB137.\r\n\uC2EC\uD310\uC758
+    \uC790\uCE7C \uC544\uB204\uBE44\uC2A4\uB294 \uB2E4\uC12F\uC774\uB2C8\r\n\uC5B8\uC81C\uB098
+    \uD310\uC758 \uD55C\uAC00\uC6B4\uB370\uC5D0 \uC549\uB294\uB2E4.\r\n\uB098\uC77C\uC758
+    \uC545\uC5B4 \uC18C\uBCA0\uD06C\uB294 \uC5EC\uC12F, \uC804\uC7C1\uC758 \uC0AC\uC790
+    \uC138\uD06C\uBA54\uD2B8\uB294 \uC77C\uACF1,\r\n\uC2EC\uC7A5\uC744 \uC0BC\uD0A4\uB294
+    \uC554\uBB34\uD2B8\uB294 \uC5EC\uB35F, \uD558\uB298\uC758 \uB9E4 \uD638\uB8E8\uC2A4\uB294
+    \uC544\uD649\uC774\uB2E4.\r\n\r\n\uAC00\uB85C \uC138 \uC904, \uC138\uB85C \uC138
+    \uC904, \uB450 \uB300\uAC01\uC120.\r\n\uC5EC\uB35F \uC904 \uBAA8\uB450 \uC2E0\uB4E4\uC758
+    \uC218\uB97C \uB354\uD574 \uC5F4\uB2E4\uC12F\uC774 \uB418\uAC8C \uD558\uB77C."
+  pieceSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  fullSprite: {fileID: 0}
