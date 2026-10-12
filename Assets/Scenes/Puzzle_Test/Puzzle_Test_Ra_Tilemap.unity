@@ -324,8 +324,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CircuitBoardView
   puzzle: {fileID: 378069802}
   boardRoot: {fileID: 9429617}
-  cellSize: 76
-  beamWidth: 12
+  cellSize: 96
+  beamWidth: 14
   boardBackgroundSprite: {fileID: 0}
   floorSprite: {fileID: 0}
   obstacleSprite: {fileID: 4160635012330822537, guid: 9bb9b7c23e82bbf40a92fa3788a810df, type: 3}
@@ -922,6 +922,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &95068949
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 95068950}
+  m_Layer: 0
+  m_Name: Focus_P3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &95068950
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 95068949}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12.85, y: 0.14, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &99261776
 GameObject:
   m_ObjectHideFlags: 0
@@ -8113,7 +8144,7 @@ Transform:
   m_GameObject: {fileID: 479149377}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 7.5, z: 0.5}
+  m_LocalPosition: {x: -2, y: 6.88, z: 0.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9032,6 +9063,37 @@ MonoBehaviour:
   rotateAnimTime: 0.25
   hintColor: {r: 1, g: 0.55, b: 0.55, a: 1}
   lockedColor: {r: 0.55, g: 0.55, b: 0.55, a: 1}
+--- !u!1 &676778865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 676778866}
+  m_Layer: 0
+  m_Name: Focus_P4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &676778866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 676778865}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.93, y: -9.19, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &677720968
 GameObject:
   m_ObjectHideFlags: 0
@@ -9491,6 +9553,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaMirror
   rotateStep: 45
   isRepaired: 1
+--- !u!1 &722716528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 722716529}
+  m_Layer: 0
+  m_Name: Focus_P1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &722716529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 722716528}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 10.45, y: -0.49, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &766199338
 GameObject:
   m_ObjectHideFlags: 0
@@ -11464,6 +11557,37 @@ MonoBehaviour:
   dayData: {fileID: 11400000, guid: a700aa6cc17f8dd4f9ad773d62ccfd36, type: 2}
   nightData: {fileID: 11400000, guid: 5d247eb486997524f96f81b78d77b381, type: 2}
   hintAfterFails: 3
+--- !u!1 &1442230129
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442230130}
+  m_Layer: 0
+  m_Name: Focus_P5
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442230130
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442230129}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.88, y: 7.43, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1443495942
 GameObject:
   m_ObjectHideFlags: 0
@@ -14371,6 +14495,7 @@ MonoBehaviour:
   - zoneName: LightObject_P0
     unlockFlag: 
     unlockMessage: 
+    focusPoint: {fileID: 0}
     turnOn:
     - {fileID: 1001528357}
     - {fileID: 69259032}
@@ -14383,6 +14508,7 @@ MonoBehaviour:
   - zoneName: LightObject_P1
     unlockFlag: F_RA_CIRCUIT_1
     unlockMessage: "\uB3D9\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    focusPoint: {fileID: 722716529}
     turnOn:
     - {fileID: 1245874342}
     turnOff:
@@ -14392,6 +14518,7 @@ MonoBehaviour:
   - zoneName: LightObject_P2
     unlockFlag: 
     unlockMessage: 
+    focusPoint: {fileID: 0}
     turnOn:
     - {fileID: 142549223}
     turnOff: []
@@ -14399,6 +14526,7 @@ MonoBehaviour:
   - zoneName: LightObject_P3
     unlockFlag: F_RA_CIRCUIT_2
     unlockMessage: "\uBD81\uC11C\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    focusPoint: {fileID: 95068950}
     turnOn:
     - {fileID: 324685147}
     turnOff:
@@ -14407,6 +14535,7 @@ MonoBehaviour:
   - zoneName: LightObject_P4
     unlockFlag: F_RA_CIRCUIT_3
     unlockMessage: "\uB0A8\uC11C\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    focusPoint: {fileID: 676778866}
     turnOn:
     - {fileID: 1110025896}
     turnOff:
@@ -14415,6 +14544,7 @@ MonoBehaviour:
   - zoneName: LightObject_P5
     unlockFlag: F_RA_CIRCUIT_4
     unlockMessage: "\uD0DC\uC591\uC758 \uBB38\uC774 \uC5F4\uB838\uB2E4"
+    focusPoint: {fileID: 1442230130}
     turnOn:
     - {fileID: 201900680}
     turnOff:
@@ -14424,6 +14554,9 @@ MonoBehaviour:
   flashMultiplier: 2
   delayAfterClose: 0.4
   gapBetweenZones: 0.6
+  panTime: 0.9
+  holdTime: 1.4
+  returnTime: 0.7
   cameraFollow: {fileID: 0}
   shakeDuration: 0.6
   shakeStrength: 0.12
@@ -17004,3 +17137,7 @@ SceneRoots:
   - {fileID: 1700063118}
   - {fileID: 1647283490}
   - {fileID: 99261777}
+  - {fileID: 722716529}
+  - {fileID: 95068950}
+  - {fileID: 676778866}
+  - {fileID: 1442230130}

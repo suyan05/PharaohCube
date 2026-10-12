@@ -4,10 +4,17 @@ using UnityEngine.UI;
 
 // OBJ_003 회로판: E키로 오버레이 열기/닫기 + 거울 클릭(회전)
 // 조각은 회로판을 열 때 CircuitBoardPuzzle이 정답 칸에 자동으로 끼움 -> 조각 선택 버튼 없음
+// 판을 크게 쓰려고 안내 문구는 판 오른쪽에 세로로 배치
 public class CircuitBoardStation : MonoBehaviour, IInteractable
 {
     // CircuitBoardPuzzle.AdvanceTutorial의 튜토리얼 클릭 수와 같은 값 (거울 한 바퀴 = 4번)
     private const int TutorialClickCount = 4;
+
+    // 판 오른쪽 안내 영역 (1920x1080 기준, 판 가운데가 0,0)
+    private static readonly Vector2 StatusPos = new Vector2(640f, 80f);
+    private static readonly Vector2 StatusSize = new Vector2(520f, 240f);
+    private static readonly Vector2 HelpPos = new Vector2(640f, -150f);
+    private static readonly Vector2 HelpSize = new Vector2(520f, 120f);
 
     [Header("연결")]
     [SerializeField] private CircuitBoardPuzzle puzzle;
@@ -120,15 +127,25 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
         Debug.Log("[P2] 회로판 닫힘");
     }
 
-    // ================= 화면 글자 =================
+    // ================= 화면 글자 (판 오른쪽) =================
     private void BuildTexts()
     {
         RectTransform root = overlayPanel.GetComponent<RectTransform>();
 
-        statusText = CreateText(root, "", 26, new Vector2(0, -470), new Vector2(1400, 40), paper);
+        statusText = CreateSideText(root, "", 28, StatusPos, StatusSize, paper);
+        CreateSideText(root, "거울 클릭: 회전\n깜빡이는 문양에 빛을 보내자\nE / Esc: 닫기",
+            22, HelpPos, HelpSize, sandWall);
+    }
 
-        CreateText(root, "거울 클릭: 회전  |  깜빡이는 문양에 빛을 보내자  |  E / Esc: 닫기",
-            20, new Vector2(0, 490), new Vector2(1600, 32), sandWall);
+    // 줄바꿈되는 왼쪽 정렬 글자
+    private Text CreateSideText(RectTransform root, string text, int fontSize, Vector2 pos, Vector2 size, Color color)
+    {
+        Text t = CreateText(root, text, fontSize, pos, size, color);
+        t.horizontalOverflow = HorizontalWrapMode.Wrap;
+        t.verticalOverflow = VerticalWrapMode.Overflow;
+        t.alignment = TextAnchor.UpperLeft;
+        t.lineSpacing = 1.2f;
+        return t;
     }
 
     // 튜토리얼이 끝난 뒤의 안내 (튜토리얼 중에는 HandleTutorialProgress가 담당)

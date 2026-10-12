@@ -7,7 +7,9 @@ using UnityEngine.Rendering.Universal;
 // 라의 방 "빛의 길" (신전 발굴 지도 v1)
 // - 구역마다 해금 플래그를 정하고, 플래그가 켜지면 그 구역 횃불을 켬
 // - 퍼즐 화면이 열려 있을 때 해금되면 화면을 닫은 뒤에 연출 (닫아야 맵이 보이니까)
-// - 연출 순서: 화면 흔들림(돌문 열리는 느낌) -> 횃불이 번쩍하며 켜짐 -> 오른쪽 위 알림
+// - 연출 순서: 플레이어 잠금 -> 카메라가 그 방으로 이동 -> 흔들림 -> 횃불 번쩍 + 알림
+//              -> 잠깐 보여준 뒤 카메라 복귀 -> 플레이어 잠금 해제
+// - Focus Point가 비어 있으면 카메라 이동 없이 제자리에서 흔들림 + 불만 켬
 // - 해금 전 구역은 어둡게 + Turn Off 오브젝트(잠긴 입구 등)는 켜둠
 // - 씬에 다시 들어왔을 때 이미 켜진 플래그는 연출 없이 바로 복원
 public class RaZoneLighting : MonoBehaviour
@@ -29,6 +31,9 @@ public class RaZoneLighting : MonoBehaviour
 
         [Tooltip("불이 켜질 때 오른쪽 위에 띄울 알림 (비우면 알림 없음)")]
         [TextArea] public string unlockMessage = "";
+
+        [Tooltip("불이 켜질 때 카메라가 비출 곳 (방 가운데 빈 오브젝트). 비우면 카메라 이동 없음")]
+        public Transform focusPoint;
 
         [Tooltip("해금 때 켤 오브젝트 (Spot Light 2D 등)")]
         public GameObject[] turnOn;
@@ -59,6 +64,16 @@ public class RaZoneLighting : MonoBehaviour
     [Tooltip("한 번에 여러 구역이 열릴 때 구역 사이 간격 (초)")]
     [SerializeField] private float gapBetweenZones = 0.6f;
 
+    [Header("연출 - 카메라 이동")]
+    [Tooltip("카메라가 그 방까지 가는 시간 (초)")]
+    [SerializeField] private float panTime = 0.9f;
+
+    [Tooltip("불이 켜진 방을 보여주는 시간 (초)")]
+    [SerializeField] private float holdTime = 1.4f;
+
+    [Tooltip("카메라가 플레이어에게 돌아오는 시간 (초). 끝나면 조작 가능")]
+    [SerializeField] private float returnTime = 0.7f;
+
     [Header("연출 - 화면 흔들림")]
     [Tooltip("비우면 Main Camera에서 자동으로 찾음")]
     [SerializeField] private CameraFollow2D cameraFollow;
@@ -73,6 +88,12 @@ public class RaZoneLighting : MonoBehaviour
     private readonly List<LightZone> waiting = new List<LightZone>();
     private bool playing;
     private bool subscribed;
+
+    // 연출 중 잠근 플레이어
+    private PlayerController2D playerController;
+    private InteractionSystem playerInteraction;
+    private Rigidbody2D playerRb;
+    private bool playerLocked;
 
     // ================= 초기화 =================
     private void Awake()
@@ -97,7 +118,8 @@ public class RaZoneLighting : MonoBehaviour
     private void OnDisable()
     {
         PuzzleOverlayFocus.OnFocusChanged -= HandleFocusChanged;
-        playing = false; // 꺼지면 코루틴도 멈추니까 다시 켜졌을 때 이어서 할 수 있게
+        EndCutscene(); // 꺼지면 코루틴도 멈추니까 카메라와 플레이어를 원래대로
+        playing = false;
     }
 
     private void Start()
@@ -152,7 +174,7 @@ public class RaZoneLighting : MonoBehaviour
 
         Camera main = Camera.main;
         if (main != null) cameraFollow = main.GetComponent<CameraFollow2D>();
-        if (cameraFollow == null) Debug.LogWarning($"[{name}] CameraFollow2D를 못 찾아서 화면 흔들림 없이 진행");
+        if (cameraFollow == null) Debug.LogWarning($"[{name}] CameraFollow2D를 못 찾아서 카메라 연출 없이 진행");
     }
 
     // ================= 플래그 / 퍼즐 화면 =================
@@ -211,15 +233,80 @@ public class RaZoneLighting : MonoBehaviour
         playing = false;
     }
 
-    // 흔들림 시작 -> 흔들림 중간쯤 불이 붙음 -> 알림
+    // (카메라 이동) -> 흔들림 -> 흔들림 중간쯤 불이 붙음 + 알림 -> (보여주고 복귀)
     private IEnumerator PlayUnlock(LightZone zone)
     {
+        bool pan = zone.focusPoint != null && cameraFollow != null;
+        if (pan)
+        {
+            BeginCutscene(zone.focusPoint.position);
+            yield return new WaitForSeconds(panTime);
+        }
+
         Shake();
         yield return new WaitForSeconds(shakeDuration * 0.5f);
 
         LightZoneOn(zone, false);
         ShowMessage(zone);
         Debug.Log($"[{name}] {zone.zoneName} 불 켜짐 ({zone.unlockFlag})");
+
+        if (!pan) yield break;
+
+        yield return new WaitForSeconds(holdTime);
+        if (cameraFollow != null) cameraFollow.ReleaseFocus();
+        yield return new WaitForSeconds(returnTime);
+        EndCutscene();
+    }
+
+    // ================= 연출 중 플레이어 잠금 + 카메라 =================
+    private void BeginCutscene(Vector3 focus)
+    {
+        try
+        {
+            SetPlayerLocked(true);
+            cameraFollow.FocusOn(focus);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 카메라 연출 시작 오류: {e}");
+        }
+    }
+
+    private void EndCutscene()
+    {
+        try
+        {
+            if (cameraFollow != null) cameraFollow.ReleaseFocus();
+            SetPlayerLocked(false);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 카메라 연출 종료 오류: {e}");
+        }
+    }
+
+    // 이동(PlayerController2D)과 E키(InteractionSystem)를 같이 막음
+    private void SetPlayerLocked(bool locked)
+    {
+        if (locked == playerLocked) return;
+        if (locked) FindPlayer();
+
+        if (playerController != null) playerController.enabled = !locked;
+        if (playerInteraction != null) playerInteraction.enabled = !locked;
+        if (locked && playerRb != null) playerRb.linearVelocity = Vector2.zero;
+
+        playerLocked = locked;
+    }
+
+    private void FindPlayer()
+    {
+        if (playerController != null) return;
+
+        playerController = FindAnyObjectByType<PlayerController2D>();
+        if (playerController == null) return;
+
+        playerInteraction = playerController.GetComponent<InteractionSystem>();
+        playerRb = playerController.GetComponent<Rigidbody2D>();
     }
 
     private void Shake()
@@ -354,6 +441,7 @@ public class RaZoneLighting : MonoBehaviour
         if (!CheckPlaying()) return;
 
         StopAllCoroutines();
+        EndCutscene();
         playing = false;
         waiting.Clear();
         DarkenAll();
