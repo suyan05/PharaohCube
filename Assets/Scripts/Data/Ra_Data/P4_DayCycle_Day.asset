@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: P4_DayCycle_Day
   m_EditorClassIdentifier: Assembly-CSharp::DayCyclePuzzleData
   requiredFlag: 
-  clearFlag: 
+  clearFlag: F_RA_P4_DONE
   useItemGate: 1
   grantRewards: 1
   panelOrder: 03000000020000000100000000000000

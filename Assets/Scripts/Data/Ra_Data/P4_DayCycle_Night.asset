@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2f725b004f23f349a702a5b877a9cb5, type: 3}
   m_Name: P4_DayCycle_Night
   m_EditorClassIdentifier: Assembly-CSharp::DayCyclePuzzleData
-  requiredFlag: 
-  clearFlag: 
-  useItemGate: 1
-  grantRewards: 1
+  requiredFlag: F_RA_NIGHT_P3_DONE
+  clearFlag: F_RA_NIGHT_P4_DONE
+  useItemGate: 0
+  grantRewards: 0
   panelOrder: 03000000020000000100000000000000
   randomizePanels: 0
-  reverseAnswer: 0
+  reverseAnswer: 1

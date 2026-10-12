@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CircuitBoardPuzzleData
   requiredFlag: 
   clearFlag: 
-  useItemGate: 1
-  grantRewards: 1
-  startCompleted: 0
+  useItemGate: 0
+  grantRewards: 0
+  startCompleted: 1

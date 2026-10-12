@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17a3814b533e3804d8a812563dd5b9d3, type: 3}
   m_Name: P3_Eclipse_Night
   m_EditorClassIdentifier: Assembly-CSharp::EclipsePuzzleData
-  requiredFlag: 
-  clearFlag: 
-  useItemGate: 1
-  grantRewards: 1
-  rotateClockwise: 1
-  targets: 010000000200000003000000
+  requiredFlag: F_RA_NIGHT_P1_DONE
+  clearFlag: F_RA_NIGHT_P3_DONE
+  useItemGate: 0
+  grantRewards: 0
+  rotateClockwise: 0
+  targets: 030000000100000002000000

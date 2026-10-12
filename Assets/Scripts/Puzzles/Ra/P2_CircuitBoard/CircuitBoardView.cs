@@ -9,9 +9,9 @@ public class CircuitBoardView : MonoBehaviour
     [SerializeField] private CircuitBoardPuzzle puzzle;
     [SerializeField] private RectTransform boardRoot;
 
-    [Header("크기")]
-    [SerializeField] private float cellSize = 60f;
-    [SerializeField] private float beamWidth = 10f;
+    [Header("크기 (씬에 저장된 값이 우선이라 Inspector에서도 바꿔야 함)")]
+    [SerializeField] private float cellSize = 76f;
+    [SerializeField] private float beamWidth = 12f;
 
     [Header("아트 - 보드 (비우면 기존 색 네모로 표시)")]
     [SerializeField] private Sprite boardBackgroundSprite;  // Circuit board
@@ -39,6 +39,11 @@ public class CircuitBoardView : MonoBehaviour
     [SerializeField] private float pieceScale = 1f;
     [SerializeField] private float goalScale = 0.9f;
 
+    [Header("지금 목표 문양 깜빡임")]
+    [SerializeField] private float blinkSpeed = 4f;
+    [Tooltip("깜빡일 때 커지는 정도 (0.12 = 12%)")]
+    [SerializeField] private float blinkScale = 0.12f;
+
     // 칸이 클릭되면 (칸 좌표, 우클릭 여부) 전달
     public event Action<Vector2Int, bool> OnCellClicked;
 
@@ -47,6 +52,10 @@ public class CircuitBoardView : MonoBehaviour
     private Color beamOrange, beamBlue, mirrorColor, fragmentColor, gridColor;
 
     private RectTransform tileLayer, beamLayer, pieceLayer, goalLayer, clickLayer;
+
+    // 지금 깜빡이는 문양 (없으면 null)
+    private Image blinkingGoal;
+    private Color blinkFrom, blinkTo;
 
     private int Cols => CircuitBoardPuzzle.MaxX - CircuitBoardPuzzle.MinX + 1; // 7
     private int Rows => CircuitBoardPuzzle.MaxY - CircuitBoardPuzzle.MinY + 1; // 9
@@ -74,6 +83,16 @@ public class CircuitBoardView : MonoBehaviour
     private void OnDestroy()
     {
         if (puzzle != null) puzzle.OnBoardChanged -= Refresh;
+    }
+
+    // 지금 단계 문양: 어두운 색 <-> 밝은 색으로 깜빡이며 살짝 커졌다 작아짐
+    private void Update()
+    {
+        if (blinkingGoal == null) return;
+
+        float t = (Mathf.Sin(Time.unscaledTime * blinkSpeed) + 1f) * 0.5f;
+        blinkingGoal.color = Color.Lerp(blinkFrom, blinkTo, t);
+        blinkingGoal.rectTransform.localScale = Vector3.one * (1f + blinkScale * t);
     }
 
     private void SetupColors()
@@ -175,13 +194,20 @@ public class CircuitBoardView : MonoBehaviour
     // ================= 바뀌는 요소 (보드 바뀔 때마다 다시 그림) =================
     private void Refresh()
     {
-        ClearLayer(beamLayer);
-        ClearLayer(pieceLayer);
-        ClearLayer(goalLayer);
+        try
+        {
+            ClearLayer(beamLayer);
+            ClearLayer(pieceLayer);
+            ClearLayer(goalLayer);
 
-        DrawBeam();
-        DrawPieces();
-        DrawGoals();
+            DrawBeam();
+            DrawPieces();
+            DrawGoals();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 회로판 다시 그리기 오류: {e}");
+        }
     }
 
     private void DrawBeam()
@@ -257,18 +283,22 @@ public class CircuitBoardView : MonoBehaviour
                 new Vector2(cellSize * 1.1f, 9f), c, angle);
         }
 
-        if (puzzle.PrismOn)
+        DrawPrism();
+    }
+
+    private void DrawPrism()
+    {
+        if (!puzzle.PrismOn) return;
+
+        if (prismOnSprite != null)
         {
-            if (prismOnSprite != null)
-            {
-                CreateSprite(pieceLayer, "Prism", TileToPos(CircuitBoardPuzzle.PrismTile),
-                    new Vector2(cellSize * pieceScale, cellSize * pieceScale), prismOnSprite);
-            }
-            else
-            {
-                CreateRect(pieceLayer, "Prism", TileToPos(CircuitBoardPuzzle.PrismTile),
-                    new Vector2(cellSize * 0.55f, cellSize * 0.55f), prismOnColor, 45f);
-            }
+            CreateSprite(pieceLayer, "Prism", TileToPos(CircuitBoardPuzzle.PrismTile),
+                new Vector2(cellSize * pieceScale, cellSize * pieceScale), prismOnSprite);
+        }
+        else
+        {
+            CreateRect(pieceLayer, "Prism", TileToPos(CircuitBoardPuzzle.PrismTile),
+                new Vector2(cellSize * 0.55f, cellSize * 0.55f), prismOnColor, 45f);
         }
     }
 
@@ -285,31 +315,52 @@ public class CircuitBoardView : MonoBehaviour
 
     private void DrawGoals()
     {
+        blinkingGoal = null;
+
         for (int i = 0; i < puzzle.GoalCount; i++)
         {
             puzzle.GetGoal(i, out char edge, out int x, out bool needBlue, out string flag, out string label);
 
             int y = edge == 'N' ? CircuitBoardPuzzle.MaxY + 1 : CircuitBoardPuzzle.MinY - 1;
             Vector2 pos = TileToPos(new Vector2Int(x, y));
-            Vector2 size = new Vector2(cellSize * goalScale, cellSize * goalScale);
-
             bool lit = GameManager.Instance != null && GameManager.Instance.HasFlag(flag);
-            Sprite sprite = i < goalSprites.Length ? goalSprites[i] : null;
 
-            if (sprite != null)
-            {
-                Image img = CreateSprite(goalLayer, $"Goal_{label}", pos, size, sprite);
-                // 꺼져 있으면 어둡게, 켜지면 원래 색
-                img.color = lit ? Color.white : new Color(0.45f, 0.45f, 0.45f, 0.75f);
-                continue;
-            }
+            Image img = DrawOneGoal(i, pos, needBlue, lit, label);
 
-            Color c = needBlue ? beamBlue : beamOrange;
-            if (!lit) c.a = 0.3f; // 꺼져 있으면 흐리게
-
-            Image fallback = CreateRect(goalLayer, $"Goal_{label}", pos, size, c);
-            CreateLabel(fallback.rectTransform, label);
+            // 아직 안 켜진 "지금 단계" 문양만 깜빡임
+            if (!lit && i == puzzle.CurrentStage && !puzzle.IsLocked) StartBlink(img);
         }
+    }
+
+    // 꺼져 있으면 어둡게(그림) / 흐리게(색 네모), 켜지면 원래 색
+    private Image DrawOneGoal(int index, Vector2 pos, bool needBlue, bool lit, string label)
+    {
+        Vector2 size = new Vector2(cellSize * goalScale, cellSize * goalScale);
+        Sprite sprite = index < goalSprites.Length ? goalSprites[index] : null;
+
+        if (sprite != null)
+        {
+            Image img = CreateSprite(goalLayer, $"Goal_{label}", pos, size, sprite);
+            img.color = lit ? Color.white : new Color(0.45f, 0.45f, 0.45f, 0.75f);
+            return img;
+        }
+
+        Color c = needBlue ? beamBlue : beamOrange;
+        if (!lit) c.a = 0.3f;
+
+        Image fallback = CreateRect(goalLayer, $"Goal_{label}", pos, size, c);
+        CreateLabel(fallback.rectTransform, label);
+        return fallback;
+    }
+
+    private void StartBlink(Image img)
+    {
+        blinkingGoal = img;
+        blinkFrom = img.color;
+
+        Color bright = img.sprite != null ? Color.white : img.color;
+        bright.a = 1f;
+        blinkTo = bright;
     }
 
     // ================= 도우미 함수 =================

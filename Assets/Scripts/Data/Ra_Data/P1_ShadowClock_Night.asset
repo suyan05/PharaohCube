@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ae8daaef7e37bf4eb045fff6f9c781a, type: 3}
   m_Name: P1_ShadowClock_Night
   m_EditorClassIdentifier: Assembly-CSharp::ShadowClockPuzzleData
-  requiredFlag: 
-  clearFlag: 
-  useItemGate: 1
-  grantRewards: 1
+  requiredFlag: F_RA_NIGHT_OPEN
+  clearFlag: F_RA_NIGHT_P1_DONE
+  useItemGate: 0
+  grantRewards: 0
   rules:
   - time: 2
-    shadowSide: 2
+    shadowSide: 1
     shadowLength: 2
     sunSide: 1
   - time: 0
@@ -26,7 +26,7 @@ MonoBehaviour:
     shadowLength: 1
     sunSide: 3
   - time: 3
-    shadowSide: 1
+    shadowSide: 2
     shadowLength: 2
     sunSide: 2
   - time: 1

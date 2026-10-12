@@ -5,27 +5,38 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 // 라의 방 "빛의 길" (신전 발굴 지도 v1)
-// - 구역마다 해금 플래그를 정하고, 플래그가 켜지는 순간 그 구역 횃불을 서서히 켬
-// - 해금 전 구역은 어둡게 (횃불 꺼짐 + 어둠 덮개 켜짐)
-// - 씬에 다시 들어왔을 때 이미 켜진 플래그는 연출 없이 바로 켜진 상태로 복원
+// - 구역마다 해금 플래그를 정하고, 플래그가 켜지면 그 구역 횃불을 켬
+// - 퍼즐 화면이 열려 있을 때 해금되면 화면을 닫은 뒤에 연출 (닫아야 맵이 보이니까)
+// - 연출 순서: 화면 흔들림(돌문 열리는 느낌) -> 횃불이 번쩍하며 켜짐 -> 오른쪽 위 알림
+// - 해금 전 구역은 어둡게 + Turn Off 오브젝트(잠긴 입구 등)는 켜둠
+// - 씬에 다시 들어왔을 때 이미 켜진 플래그는 연출 없이 바로 복원
 public class RaZoneLighting : MonoBehaviour
 {
+    // GameMessageUI가 이 말머리로 시작하는 로그를 오른쪽 위 알림으로 띄움
+    private const string MessageTag = "[Door] ";
+
+    // 번쩍임이 최고 밝기에 닿는 시점 (켜지는 시간 중 35% 지점)
+    private const float FlashPeak = 0.35f;
+
     [Serializable]
     public class LightZone
     {
-        [Tooltip("Inspector에서 알아보기 쉬운 이름 (예: 동쪽 날개 P1)")]
+        [Tooltip("Inspector에서 알아보기 쉬운 이름 (예: LightObject_P1)")]
         public string zoneName = "구역";
 
         [Tooltip("이 플래그가 켜지면 불이 들어옴. 비우면 처음부터 켜짐")]
         public string unlockFlag = "";
 
-        [Tooltip("해금 때 켤 오브젝트 (횃불 묶음 등)")]
+        [Tooltip("불이 켜질 때 오른쪽 위에 띄울 알림 (비우면 알림 없음)")]
+        [TextArea] public string unlockMessage = "";
+
+        [Tooltip("해금 때 켤 오브젝트 (Spot Light 2D 등)")]
         public GameObject[] turnOn;
 
-        [Tooltip("해금 때 끌 오브젝트 (어둠 덮개 등, 없으면 비워도 됨)")]
+        [Tooltip("해금 때 끌 오브젝트 (잠긴 입구, 어둠 덮개 등)")]
         public GameObject[] turnOff;
 
-        [Tooltip("서서히 밝아질 Light2D (turnOn 안에 있는 횃불 빛)")]
+        [Tooltip("서서히 밝아질 Light2D (turnOn에 넣은 빛)")]
         public Light2D[] fadeLights;
 
         [NonSerialized] public bool lit;
@@ -34,12 +45,33 @@ public class RaZoneLighting : MonoBehaviour
     [Header("구역 목록 (위에서부터 해금 순서대로)")]
     [SerializeField] private LightZone[] zones;
 
-    [Header("연출")]
+    [Header("연출 - 횃불")]
     [Tooltip("횃불이 0에서 원래 밝기까지 켜지는 시간 (초)")]
     [SerializeField] private float fadeDuration = 1.2f;
 
+    [Tooltip("켜지는 순간 원래 밝기의 몇 배까지 번쩍일지 (1이면 번쩍임 없음)")]
+    [SerializeField] private float flashMultiplier = 2f;
+
+    [Header("연출 - 타이밍")]
+    [Tooltip("퍼즐 화면을 닫은 뒤 연출이 시작되기까지 기다리는 시간 (초)")]
+    [SerializeField] private float delayAfterClose = 0.4f;
+
+    [Tooltip("한 번에 여러 구역이 열릴 때 구역 사이 간격 (초)")]
+    [SerializeField] private float gapBetweenZones = 0.6f;
+
+    [Header("연출 - 화면 흔들림")]
+    [Tooltip("비우면 Main Camera에서 자동으로 찾음")]
+    [SerializeField] private CameraFollow2D cameraFollow;
+    [SerializeField] private float shakeDuration = 0.6f;
+    [Tooltip("흔들리는 폭 (유닛). 0.1 = 약 3픽셀")]
+    [SerializeField] private float shakeStrength = 0.12f;
+
     // Inspector에 적힌 원래 밝기 (서서히 켤 때 목표값)
     private readonly Dictionary<Light2D, float> targetIntensity = new Dictionary<Light2D, float>();
+
+    // 퍼즐 화면이 닫히길 기다리는 구역
+    private readonly List<LightZone> waiting = new List<LightZone>();
+    private bool playing;
     private bool subscribed;
 
     // ================= 초기화 =================
@@ -49,11 +81,23 @@ public class RaZoneLighting : MonoBehaviour
         {
             CacheIntensities();
             DarkenAll();
+            FindCamera();
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 조명 초기화 오류: {e}");
         }
+    }
+
+    private void OnEnable()
+    {
+        PuzzleOverlayFocus.OnFocusChanged += HandleFocusChanged;
+    }
+
+    private void OnDisable()
+    {
+        PuzzleOverlayFocus.OnFocusChanged -= HandleFocusChanged;
+        playing = false; // 꺼지면 코루틴도 멈추니까 다시 켜졌을 때 이어서 할 수 있게
     }
 
     private void Start()
@@ -102,23 +146,98 @@ public class RaZoneLighting : MonoBehaviour
         }
     }
 
-    // ================= 플래그 =================
+    private void FindCamera()
+    {
+        if (cameraFollow != null) return;
+
+        Camera main = Camera.main;
+        if (main != null) cameraFollow = main.GetComponent<CameraFollow2D>();
+        if (cameraFollow == null) Debug.LogWarning($"[{name}] CameraFollow2D를 못 찾아서 화면 흔들림 없이 진행");
+    }
+
+    // ================= 플래그 / 퍼즐 화면 =================
     private void HandleFlagChanged(string flag)
     {
         try
         {
             foreach (LightZone zone in zones)
             {
-                if (zone == null || zone.unlockFlag != flag) continue;
-
-                LightZoneOn(zone, false);
-                Debug.Log($"[{name}] {zone.zoneName} 불 켜짐 ({flag})");
+                if (zone != null && zone.unlockFlag == flag) RequestUnlock(zone);
             }
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 조명 전환 오류: {e}");
         }
+    }
+
+    // 퍼즐 화면이 열려 있으면 기다렸다가, 닫혀 있으면 바로 연출
+    private void RequestUnlock(LightZone zone)
+    {
+        if (zone.lit || waiting.Contains(zone)) return;
+
+        waiting.Add(zone);
+        Debug.Log($"[{name}] {zone.zoneName} 해금 대기 (퍼즐 화면 닫히면 연출)");
+
+        if (!PuzzleOverlayFocus.IsActive) StartPlayWaiting();
+    }
+
+    private void HandleFocusChanged(bool puzzleOpen)
+    {
+        if (!puzzleOpen && waiting.Count > 0) StartPlayWaiting();
+    }
+
+    private void StartPlayWaiting()
+    {
+        if (playing || !isActiveAndEnabled) return;
+        StartCoroutine(PlayWaiting());
+    }
+
+    private IEnumerator PlayWaiting()
+    {
+        playing = true;
+        yield return new WaitForSeconds(delayAfterClose);
+
+        while (waiting.Count > 0)
+        {
+            if (PuzzleOverlayFocus.IsActive) break; // 다시 퍼즐을 열면 멈췄다가 닫을 때 이어서
+
+            LightZone zone = waiting[0];
+            waiting.RemoveAt(0);
+            yield return PlayUnlock(zone);
+
+            if (waiting.Count > 0) yield return new WaitForSeconds(gapBetweenZones);
+        }
+        playing = false;
+    }
+
+    // 흔들림 시작 -> 흔들림 중간쯤 불이 붙음 -> 알림
+    private IEnumerator PlayUnlock(LightZone zone)
+    {
+        Shake();
+        yield return new WaitForSeconds(shakeDuration * 0.5f);
+
+        LightZoneOn(zone, false);
+        ShowMessage(zone);
+        Debug.Log($"[{name}] {zone.zoneName} 불 켜짐 ({zone.unlockFlag})");
+    }
+
+    private void Shake()
+    {
+        try
+        {
+            if (cameraFollow != null) cameraFollow.Shake(shakeDuration, shakeStrength);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 화면 흔들림 오류: {e}");
+        }
+    }
+
+    private static void ShowMessage(LightZone zone)
+    {
+        if (string.IsNullOrEmpty(zone.unlockMessage)) return;
+        Debug.Log(MessageTag + zone.unlockMessage);
     }
 
     // 이미 켜진 플래그 + 플래그가 빈 구역은 연출 없이 바로 켬
@@ -176,10 +295,18 @@ public class RaZoneLighting : MonoBehaviour
         while (t < fadeDuration)
         {
             t += Time.deltaTime;
-            SetLights(zone, Mathf.Clamp01(t / fadeDuration));
+            SetLights(zone, FlashRatio(Mathf.Clamp01(t / fadeDuration)));
             yield return null;
         }
         SetLights(zone, 1f);
+    }
+
+    // 0 -> 번쩍(flashMultiplier) -> 원래 밝기(1)
+    private float FlashRatio(float progress)
+    {
+        float peak = Mathf.Max(1f, flashMultiplier);
+        if (progress < FlashPeak) return Mathf.Lerp(0f, peak, progress / FlashPeak);
+        return Mathf.Lerp(peak, 1f, (progress - FlashPeak) / (1f - FlashPeak));
     }
 
     // ratio 0 = 꺼짐, 1 = Inspector에 적은 원래 밝기
@@ -206,17 +333,16 @@ public class RaZoneLighting : MonoBehaviour
     }
 
     // ================= 테스트용 (Play 중에만) =================
-    [ContextMenu("테스트: 다음 구역 불만 켜기 (플래그는 안 켬)")]
+    [ContextMenu("테스트: 다음 구역 열기 (연출 포함, 플래그는 안 켬)")]
     private void TestLightNext()
     {
         if (!CheckPlaying()) return;
 
         foreach (LightZone zone in zones)
         {
-            if (zone == null || zone.lit) continue;
+            if (zone == null || zone.lit || waiting.Contains(zone)) continue;
 
-            LightZoneOn(zone, false);
-            Debug.Log($"[{name}] 테스트: {zone.zoneName} 불 켜짐");
+            RequestUnlock(zone);
             return;
         }
         Debug.Log($"[{name}] 테스트: 이미 전부 켜져 있음");
@@ -228,6 +354,8 @@ public class RaZoneLighting : MonoBehaviour
         if (!CheckPlaying()) return;
 
         StopAllCoroutines();
+        playing = false;
+        waiting.Clear();
         DarkenAll();
         RestoreFromFlags();
         Debug.Log($"[{name}] 테스트: 지금 플래그 기준으로 다시 맞춤");

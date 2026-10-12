@@ -1,33 +1,22 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-// OBJ_003 서쪽 벽 회로판: E키로 오버레이 열기/닫기 + 보드 클릭 조작
+// OBJ_003 회로판: E키로 오버레이 열기/닫기 + 거울 클릭(회전)
+// 조각은 회로판을 열 때 CircuitBoardPuzzle이 정답 칸에 자동으로 끼움 -> 조각 선택 버튼 없음
 public class CircuitBoardStation : MonoBehaviour, IInteractable
 {
+    // CircuitBoardPuzzle.AdvanceTutorial의 튜토리얼 클릭 수와 같은 값 (거울 한 바퀴 = 4번)
+    private const int TutorialClickCount = 4;
+
     [Header("연결")]
     [SerializeField] private CircuitBoardPuzzle puzzle;
     [SerializeField] private CircuitBoardView view;
     [SerializeField] private GameObject overlayPanel;
 
-    // B안: 조각 선택 버튼 (표시 순서, 버튼 글자)
-    private static readonly string[] PieceIds =
-    {
-        ItemIds.Frag1, ItemIds.Frag2, ItemIds.Frag3,
-        CircuitBoardPuzzle.MirrorA, CircuitBoardPuzzle.MirrorB,
-        ItemIds.Prism
-    };
-    private static readonly string[] PieceLabels =
-    {
-        "조각 1", "조각 2", "조각 3", "거울 A", "거울 B", "프리즘"
-    };
-
-    private readonly Dictionary<string, Image> pieceButtons = new Dictionary<string, Image>();
-    private string selectedPieceId; // null이면 선택 안 됨
     private Text statusText;
     private Font font;
-
-    private Color gold, paper, darkBrown, sandWall;
+    private Color paper, sandWall;
 
     private bool isOpen;
     private PlayerController2D playerController;
@@ -35,29 +24,43 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        gold = Hex("#E8B23A");
-        paper = Hex("#F6F1E7");
-        darkBrown = Hex("#4A3423");
-        sandWall = Hex("#C9A66B");
-        font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        try
+        {
+            paper = Hex("#F6F1E7");
+            sandWall = Hex("#C9A66B");
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-        BuildPieceBar();
-        overlayPanel.SetActive(false);
+            WarnIfDuplicate();
+            BuildTexts();
+            overlayPanel.SetActive(false);
 
-        view.OnCellClicked += HandleCellClick;
-        puzzle.OnTutorialProgress += HandleTutorialProgress;
-        ItemInventory.Instance.OnItemGranted += OnInventoryChanged;
-        ItemInventory.Instance.OnItemConsumed += OnInventoryChanged;
+            view.OnCellClicked += HandleCellClick;
+            puzzle.OnTutorialProgress += HandleTutorialProgress;
+            puzzle.OnBoardChanged += RefreshStatus;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 회로판 초기화 오류: {e}");
+        }
+    }
+
+    // 같은 회로판 화면을 쓰는 Station이 2개면 안내 문구가 겹치고 클릭이 꼬임
+    private void WarnIfDuplicate()
+    {
+        var all = FindObjectsByType<CircuitBoardStation>(FindObjectsSortMode.None);
+        if (all.Length > 1)
+        {
+            Debug.LogWarning($"[{name}] CircuitBoardStation이 씬에 {all.Length}개 있음 -> 하나만 남겨야 함");
+        }
     }
 
     private void OnDestroy()
     {
         if (view != null) view.OnCellClicked -= HandleCellClick;
-        if (puzzle != null) puzzle.OnTutorialProgress -= HandleTutorialProgress;
-        if (ItemInventory.Instance != null)
+        if (puzzle != null)
         {
-            ItemInventory.Instance.OnItemGranted -= OnInventoryChanged;
-            ItemInventory.Instance.OnItemConsumed -= OnInventoryChanged;
+            puzzle.OnTutorialProgress -= HandleTutorialProgress;
+            puzzle.OnBoardChanged -= RefreshStatus;
         }
     }
 
@@ -72,13 +75,20 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     // ================= IInteractable =================
     public string GetPrompt()
     {
-        return isOpen ? "E: 회로판 닫기" : "E: P2 회로판 조사";
+        return isOpen ? "E: 회로판 닫기" : "E: 태양의 빛 회로판 조사";
     }
 
     public void Interact(GameObject player)
     {
-        if (isOpen) CloseBoard();
-        else OpenBoard(player);
+        try
+        {
+            if (isOpen) CloseBoard();
+            else OpenBoard(player);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 회로판 상호작용 오류: {e}");
+        }
     }
 
     // ================= 열기 / 닫기 =================
@@ -93,12 +103,11 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
         overlayPanel.SetActive(true);
         isOpen = true;
-
-        selectedPieceId = null;
-        RefreshPieceBar();
         statusText.text = "";
 
-        puzzle.Open(); // 튜토리얼 미완료면 안내만, 완료면 1단계(관찰) 자동 클리어
+        // 튜토리얼 미완료면 안내만, 완료면 1단계 자동 클리어 + 가져온 조각 자동 장착
+        puzzle.Open();
+        RefreshStatus();
         Debug.Log("[P2] 회로판 열림");
     }
 
@@ -106,150 +115,85 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     {
         overlayPanel.SetActive(false);
         isOpen = false;
-        selectedPieceId = null;
 
         if (playerController != null) playerController.enabled = true;
         Debug.Log("[P2] 회로판 닫힘");
     }
 
-    // ================= 조각 선택 버튼 줄 (B안) =================
-    private void BuildPieceBar()
+    // ================= 화면 글자 =================
+    private void BuildTexts()
     {
         RectTransform root = overlayPanel.GetComponent<RectTransform>();
 
-        CreateText(root, "보유 조각", 24, new Vector2(0, -385), new Vector2(400, 36), sandWall);
+        statusText = CreateText(root, "", 26, new Vector2(0, -470), new Vector2(1400, 40), paper);
 
-        for (int i = 0; i < PieceIds.Length; i++)
-        {
-            string id = PieceIds[i];
-            float x = -360f + i * 180f;
-
-            Image img = CreateRect(root, $"PieceBtn_{id}", new Vector2(x, -440), new Vector2(160, 60), paper);
-            img.raycastTarget = true;
-
-            Button btn = img.gameObject.AddComponent<Button>();
-            btn.targetGraphic = img;
-            btn.onClick.AddListener(() => OnPieceButtonClicked(id));
-
-            CreateText(img.rectTransform, PieceLabels[i], 26, Vector2.zero, new Vector2(160, 60), darkBrown);
-            pieceButtons[id] = img;
-        }
-
-        statusText = CreateText(root, "", 24, new Vector2(0, -495), new Vector2(1400, 36), paper);
-
-        CreateText(root, "조각 선택 → 빈 슬롯 클릭  |  거울 좌클릭: 회전  |  우클릭: 회수  |  E / Esc: 닫기",
-            20, new Vector2(0, 470), new Vector2(1600, 32), sandWall);
+        CreateText(root, "거울 클릭: 회전  |  깜빡이는 문양에 빛을 보내자  |  E / Esc: 닫기",
+            20, new Vector2(0, 490), new Vector2(1600, 32), sandWall);
     }
 
-    private void OnPieceButtonClicked(string id)
+    // 튜토리얼이 끝난 뒤의 안내 (튜토리얼 중에는 HandleTutorialProgress가 담당)
+    private void RefreshStatus()
     {
-        // 같은 버튼 다시 누르면 선택 취소
-        selectedPieceId = selectedPieceId == id ? null : id;
-        RefreshPieceBar();
+        if (!isOpen || statusText == null) return;
+        if (!puzzle.TutorialDone) return;
+
+        statusText.text = BuildStatusMessage();
     }
 
-    private void OnInventoryChanged(string itemId)
+    private string BuildStatusMessage()
     {
-        RefreshPieceBar();
+        if (puzzle.IsLocked) return "회로판은 이미 파란 빛으로 완성되어 있다.";
+        if (puzzle.IsComplete) return "네 문양이 모두 빛난다. 태양 제단으로 가자.";
+
+        string missing = puzzle.MissingHint();
+        if (missing != null) return missing;
+
+        return puzzle.PieceJustPlaced
+            ? "조각이 제자리에 끼워졌다! 거울을 돌려 깜빡이는 문양에 빛을 보내자."
+            : "거울을 클릭해서 돌려, 깜빡이는 문양에 빛을 보내자.";
     }
 
-    private void RefreshPieceBar()
-    {
-        // 선택한 조각을 더 이상 안 갖고 있으면 선택 해제
-        if (selectedPieceId != null && !ItemInventory.Instance.Has(selectedPieceId))
-        {
-            selectedPieceId = null;
-        }
-
-        foreach (var pair in pieceButtons)
-        {
-            bool owned = ItemInventory.Instance.Has(pair.Key);
-            pair.Value.gameObject.SetActive(owned); // 가진 조각만 보이게
-            pair.Value.color = pair.Key == selectedPieceId ? gold : paper;
-        }
-    }
-
-    // ================= 튜토리얼 안내 =================
+    // 4번째 클릭 알림은 튜토리얼 완료 플래그가 켜지기 "직전"에 와서 TutorialDone이 아직 false임
+    // -> 클릭 수로 완료를 따로 확인해야 "4/4 회전 - 계속 클릭..." 문구가 남지 않음
     private void HandleTutorialProgress(int clicks)
     {
+        if (clicks >= TutorialClickCount)
+        {
+            statusText.text = "빛이 다시 문양에 닿았다! 거울을 돌려 길을 바꾸는 방법을 익혔다.";
+            return;
+        }
+
         if (puzzle.TutorialDone)
         {
             statusText.text = "";
             return;
         }
+
         statusText.text = clicks == 0
             ? "거울을 클릭해서 돌려 보자. (한 바퀴 돌리면 원래대로 돌아온다)"
-            : $"{clicks}/4 회전 - 계속 클릭해서 원래 방향으로 돌려 보자";
+            : $"{clicks}/{TutorialClickCount} 회전 - 계속 클릭해서 원래 방향으로 돌려 보자";
     }
 
     // ================= 보드 클릭 처리 =================
+    // 거울/조각 좌클릭 = 회전. 우클릭, 빈 칸, 프리즘 소켓은 반응 없음 (조각은 자동 장착)
     private void HandleCellClick(Vector2Int tile, bool rightClick)
     {
-        if (!isOpen) return;
+        if (!isOpen || rightClick) return;
+        if (tile == CircuitBoardPuzzle.PrismTile) return;
 
-        // 프리즘 소켓: 우클릭은 회수, 좌클릭은 다른 슬롯처럼 선택한 조각 삽입
-        if (tile == CircuitBoardPuzzle.PrismTile)
+        try
         {
-            if (rightClick) puzzle.RemovePrism();
-            else TryInsertSelected(tile);
-            return;
+            bool hasPiece = puzzle.GetPieces().Exists(p => p.tile == tile);
+            if (hasPiece) puzzle.RotatePiece(tile);
+            else statusText.text = "빈 자리다. 조각은 가져오면 알아서 끼워진다.";
         }
-
-        bool hasPiece = puzzle.GetPieces().Exists(p => p.tile == tile);
-
-        if (hasPiece)
+        catch (Exception e)
         {
-            if (rightClick) puzzle.RemovePiece(tile);  // 우클릭 = 회수
-            else puzzle.RotatePiece(tile);             // 좌클릭 = 회전
+            Debug.LogError($"[{name}] 회로판 클릭 오류: {e}");
         }
-        else if (!rightClick)
-        {
-            TryInsertSelected(tile);                   // 빈 슬롯 좌클릭 = 선택한 조각 삽입
-        }
-    }
-
-    private void TryInsertSelected(Vector2Int tile)
-    {
-        if (selectedPieceId == null)
-        {
-            statusText.text = "먼저 아래에서 넣을 조각을 선택하세요.";
-            return;
-        }
-
-        if (selectedPieceId == ItemIds.Prism)
-        {
-            if (tile != CircuitBoardPuzzle.PrismTile)
-            {
-                statusText.text = "프리즘은 보라색 소켓에만 끼울 수 있다.";
-                return;
-            }
-            puzzle.InsertPrism();
-        }
-        else
-        {
-            puzzle.InsertPiece(tile, selectedPieceId, MirrorType.Slash); // '/'로 넣고, 클릭으로 회전
-        }
-
-        statusText.text = "";
-        // 삽입되면 인벤토리에서 빠지면서 RefreshPieceBar가 선택을 자동 해제함
     }
 
     // ================= 도우미 함수 =================
-    private Image CreateRect(RectTransform parent, string name, Vector2 pos, Vector2 size, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        var rt = go.GetComponent<RectTransform>();
-        rt.SetParent(parent, false);
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-        rt.anchoredPosition = pos;
-        rt.sizeDelta = size;
-
-        var img = go.GetComponent<Image>();
-        img.color = color;
-        img.raycastTarget = false;
-        return img;
-    }
-
     private Text CreateText(RectTransform parent, string text, int fontSize, Vector2 pos, Vector2 size, Color color)
     {
         var go = new GameObject("Text", typeof(RectTransform), typeof(Text));

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: P3_Eclipse_Day
   m_EditorClassIdentifier: Assembly-CSharp::EclipsePuzzleData
   requiredFlag: 
-  clearFlag: 
+  clearFlag: F_RA_P3_DONE
   useItemGate: 1
   grantRewards: 1
   rotateClockwise: 1

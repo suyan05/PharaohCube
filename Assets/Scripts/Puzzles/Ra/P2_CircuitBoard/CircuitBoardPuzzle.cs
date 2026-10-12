@@ -11,6 +11,9 @@ public enum MirrorType
 
 // P2 태양의 빛 회로 (허브) - "거울로 빛의 길 바꾸기"
 // 낮: 4단계 체인 / 밤: 데이터의 startCompleted로 완성 상태(파란 빛)에서 시작하고 조작 잠금
+// 조각 자동 장착: 지금 단계에 필요한 조각을 갖고 있으면 정답 칸에 알아서 끼워짐
+// - 일부러 틀린 방향으로 끼워서 플레이어가 한 번은 돌려야 함
+// - 그 단계에 방해되는 조각(2단계 거울 B, 4단계 조각 2)은 자동으로 빠짐
 public class CircuitBoardPuzzle : RaPhasedPuzzle
 {
     // ================= 보드 데이터 (기획서 4.2) =================
@@ -44,34 +47,46 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
     public const string MirrorA = "MIRROR_A";
     public const string MirrorB = "MIRROR_B";
 
+    private static readonly Vector2Int[] NoClear = new Vector2Int[0];
+
     // ================= 단계 목표 (기획서 3장 / 4.2) =================
     private class StageGoal
     {
         public char edge;          // 'S' = 남변, 'N' = 북변
         public int x;              // 빛이 빠져나가는 x 좌표
-        public bool needBlue;      // true면 파란빛만 인정
+        public bool needBlue;      // true면 파란빛만 인정 (프리즘 필요)
         public string flag;        // 점등 시 켤 플래그
         public string reward;      // 지급 아이템 (없으면 null)
         public string label;
         public Vector2Int needTile;  // 필요한 조각이 있어야 할 자리
         public string needPiece;     // 필요한 조각 ID (없으면 null)
+        public Vector2Int[] clearTiles; // 자동 장착 때 치울 자리 (빛을 가로막는 조각)
+        public string sourceHint;       // 조각이 없을 때 화면에 띄울 안내
 
         public StageGoal(char edge, int x, bool needBlue, string flag, string reward, string label,
-                         Vector2Int needTile, string needPiece)
+                         Vector2Int needTile, string needPiece, Vector2Int[] clearTiles, string sourceHint)
         {
             this.edge = edge; this.x = x; this.needBlue = needBlue;
             this.flag = flag; this.reward = reward; this.label = label;
             this.needTile = needTile; this.needPiece = needPiece;
+            this.clearTiles = clearTiles; this.sourceHint = sourceHint;
         }
     }
 
     // 1단계 조건 없음 / FRAG_1@S1 / FRAG_2@S2 / FRAG_3@S3 + 프리즘(파란빛으로 판정)
     private static readonly StageGoal[] Stages =
     {
-        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun,      "G1", Vector2Int.zero, null),
-        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2", TileS1, ItemIds.Frag1),
-        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass,     "G3", TileS2, ItemIds.Frag2),
-        new StageGoal('N', 4, true,  "F_RA_CIRCUIT_4", null,                 "G4", TileS3, ItemIds.Frag3)
+        new StageGoal('S', 5, false, "F_RA_CIRCUIT_1", ItemIds.LensSun, "G1",
+            Vector2Int.zero, null, NoClear, ""),
+        new StageGoal('N', 6, false, "F_RA_CIRCUIT_2", ItemIds.PigmentNight, "G2",
+            TileS1, ItemIds.Frag1, new[] { TileB },
+            "동쪽 방 그림자 시계에서 거울 조각 1을 찾아오자."),
+        new StageGoal('S', 3, false, "F_RA_CIRCUIT_3", ItemIds.KeyBrass, "G3",
+            TileS2, ItemIds.Frag2, NoClear,
+            "북서쪽 방 일식 석탁에서 거울 조각 2를 찾아오자."),
+        new StageGoal('N', 4, true, "F_RA_CIRCUIT_4", null, "G4",
+            TileS3, ItemIds.Frag3, new[] { TileS2 },
+            "남서쪽 방 카드 벤치에서 거울 조각 3을 찾아오자.")
     };
 
     // ================= 낮/밤 데이터 =================
@@ -110,12 +125,16 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
 
     // ================= 화면(View)에서 읽는 용도 =================
     public int CurrentStage => currentStage;
+    public bool IsComplete => currentStage >= Stages.Length;
     public IReadOnlyList<Vector2Int> BeamPath => beamPath;
     public bool BeamExited => beamExited;
     public char ExitEdge => exitEdge;
     public int ExitX => exitX;
     public bool BeamBlue => beamBlue;
     public bool PrismOn => prismOn;
+
+    // 방금 조각이 자동으로 끼워졌는지 (거울을 돌리면 false)
+    public bool PieceJustPlaced { get; private set; }
 
     public static Vector2Int Source => SourceTile;
     public static Vector2Int PrismTile => PrismSocket;
@@ -140,6 +159,21 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         return list;
     }
 
+    // 지금 단계에 필요한 조각(또는 프리즘)이 아직 없으면 안내 문구, 다 있으면 null
+    public string MissingHint()
+    {
+        if (IsLocked || IsComplete) return null;
+
+        StageGoal g = Stages[currentStage];
+        if (g.needPiece == null) return null;
+
+        bool pieceOk = IsPiecePlaced(g);
+        bool prismOk = !g.needBlue || prismOn;
+        if (pieceOk && prismOk) return null;
+
+        return pieceOk ? "일식 석탁에서 받은 프리즘이 필요하다." : g.sourceHint;
+    }
+
     // ================= 초기화 =================
     private void Awake()
     {
@@ -160,6 +194,7 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         pieces[TileB] = new Piece(MirrorB, MirrorType.Backslash); // B(5,6) = '\'
         prismOn = false;
         currentStage = 0;
+        PieceJustPlaced = false;
     }
 
     // 4단계 정답 배치 그대로 (A '/', (1) S1 '/', (3) S3 '/', 프리즘) -> 북변 x4로 파란 빛
@@ -171,6 +206,7 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         pieces[TileS3] = new Piece(ItemIds.Frag3, MirrorType.Slash);
         prismOn = true;
         currentStage = Stages.Length;
+        PieceJustPlaced = false;
     }
 
     // ================= 튜토리얼 =================
@@ -197,7 +233,8 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
 
         if (TutorialDone)
         {
-            Submit(); // 이미 조작법을 배웠으면 기존처럼 즉시 1단계 관찰 클리어
+            Submit();       // 이미 조작법을 배웠으면 기존처럼 즉시 1단계 관찰 클리어
+            TryAutoPlace(); // 가져온 조각이 있으면 자동 장착
         }
         else
         {
@@ -209,19 +246,26 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
     // 조작할 때마다 호출: 빔 다시 계산 -> 목표 닿으면 단계 클리어
     public override void Submit()
     {
-        TraceBeam();
-        LogBeam();
+        try
+        {
+            TraceBeam();
+            LogBeam();
 
-        if (Validate())
-        {
-            CompleteStage();
+            if (Validate())
+            {
+                CompleteStage();
+            }
+            else if (BeamReachesGoal() && !HasRequiredPiece())
+            {
+                // 빛은 닿았지만 필요한 조각이 아님 (예: 거울 B로 대신 도달)
+                Debug.Log("[P2] 빛은 닿았지만 문양이 반응하지 않는다. 다른 조각이 필요한 것 같다.");
+            }
+            // 오답 개념 없음 (기획서 4.2) -> 실패 처리/리셋 안 함
         }
-        else if (BeamReachesGoal() && !HasRequiredPiece())
+        catch (Exception e)
         {
-            // 빛은 닿았지만 필요한 조각이 아님 (예: 거울 B로 대신 도달)
-            Debug.Log("[P2] 빛은 닿았지만 문양이 반응하지 않는다. 다른 조각이 필요한 것 같다.");
+            Debug.LogError($"[{name}] P2 판정 오류: {e}");
         }
-        // 오답 개념 없음 (기획서 4.2) -> 실패 처리/리셋 안 함
 
         OnBoardChanged?.Invoke();
     }
@@ -251,8 +295,12 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         StageGoal goal = Stages[currentStage];
         if (goal.needPiece == null) return true; // 1단계는 조건 없음
 
-        return pieces.TryGetValue(goal.needTile, out Piece piece)
-            && piece.id == goal.needPiece;
+        return IsPiecePlaced(goal);
+    }
+
+    private bool IsPiecePlaced(StageGoal goal)
+    {
+        return pieces.TryGetValue(goal.needTile, out Piece piece) && piece.id == goal.needPiece;
     }
 
     private void CompleteStage()
@@ -262,18 +310,22 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
 
         if (GameManager.Instance != null) GameManager.Instance.SetFlag(goal.flag);
 
-        if (GrantRewards && !string.IsNullOrEmpty(goal.reward))
+        if (GrantRewards && !string.IsNullOrEmpty(goal.reward) && ItemInventory.Instance != null)
         {
             ItemInventory.Instance.Grant(goal.reward);
         }
 
         currentStage++;
+        PieceJustPlaced = false;
 
         if (currentStage >= Stages.Length)
         {
             Debug.Log("[P2] 4문양 전부 점등 -> P5 제단 개방");
             OnSuccessInternal();
+            return;
         }
+
+        TryAutoPlace(); // 다음 단계 조각을 이미 갖고 있으면 바로 장착
     }
 
     // 낮 -> 밤 전환: 데이터대로 보드를 다시 세팅 (밤이면 완성 상태)
@@ -283,6 +335,90 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         SetupBoardForPhase();
         TraceBeam();
         OnBoardChanged?.Invoke();
+    }
+
+    // ================= 조각 자동 장착 =================
+    // 지금 단계 조각(+프리즘)을 갖고 있으면 정답 칸에 끼움. 바뀐 게 있으면 true
+    private bool TryAutoPlace()
+    {
+        if (IsLocked || IsComplete) return false;
+
+        try
+        {
+            StageGoal g = Stages[currentStage];
+            bool changed = PlaceStagePiece(g);
+            changed |= PlaceStagePrism(g);
+            if (!changed) return false;
+
+            MakeUnsolved(g);
+            TraceBeam();
+            PieceJustPlaced = true;
+            OnBoardChanged?.Invoke();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 조각 자동 장착 오류: {e}");
+            return false;
+        }
+    }
+
+    private bool PlaceStagePiece(StageGoal g)
+    {
+        if (g.needPiece == null || IsPiecePlaced(g)) return false;
+
+        ItemInventory inventory = ItemInventory.Instance;
+        if (inventory == null || !inventory.Has(g.needPiece)) return false;
+
+        ClearBlockers(g);
+        pieces.Remove(g.needTile); // 자리에 다른 조각이 있으면 치움
+        inventory.Consume(g.needPiece);
+
+        pieces[g.needTile] = new Piece(g.needPiece, MirrorType.Backslash);
+        Debug.Log($"[P2] {g.needPiece} 자동 장착 ({g.needTile.x},{g.needTile.y})");
+        return true;
+    }
+
+    private bool PlaceStagePrism(StageGoal g)
+    {
+        if (!g.needBlue || prismOn) return false;
+
+        ItemInventory inventory = ItemInventory.Instance;
+        if (inventory == null || !inventory.Has(ItemIds.Prism)) return false;
+
+        inventory.Consume(ItemIds.Prism);
+        prismOn = true;
+        Debug.Log("[P2] 프리즘 자동 장착 (4,9)");
+        return true;
+    }
+
+    // 빛을 가로막는 조각은 빼서 버림 (인벤토리로 돌려주지 않음 -> 회수 알림이 안 뜸)
+    private void ClearBlockers(StageGoal g)
+    {
+        foreach (Vector2Int tile in g.clearTiles)
+        {
+            if (pieces.Remove(tile))
+            {
+                Debug.Log($"[P2] ({tile.x},{tile.y}) 조각이 빠짐");
+            }
+        }
+    }
+
+    // 끼우자마자 풀려 버리면 플레이어가 할 게 없으니 반대 방향으로 돌려둠
+    private void MakeUnsolved(StageGoal g)
+    {
+        TraceBeam();
+        if (!Validate()) return;
+
+        if (pieces.TryGetValue(g.needTile, out Piece piece))
+        {
+            piece.type = Flip(piece.type);
+        }
+    }
+
+    private static MirrorType Flip(MirrorType type)
+    {
+        return type == MirrorType.Slash ? MirrorType.Backslash : MirrorType.Slash;
     }
 
     // ================= 빔 시뮬레이션 =================
@@ -378,7 +514,8 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
             return;
         }
 
-        piece.type = piece.type == MirrorType.Slash ? MirrorType.Backslash : MirrorType.Slash;
+        piece.type = Flip(piece.type);
+        PieceJustPlaced = false;
         Debug.Log($"[P2] ({tile.x},{tile.y}) 회전 -> {(piece.type == MirrorType.Slash ? "/" : "\\")}");
 
         if (!TutorialDone && !AdvanceTutorial()) return;
@@ -404,6 +541,7 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         return true;
     }
 
+    // 아래 함수들은 자동 장착으로 바뀐 뒤 화면에서는 안 쓰지만, 테스트 메뉴용으로 유지
     public void RemovePiece(Vector2Int tile)
     {
         if (BlockIfLocked()) return;
@@ -499,5 +637,16 @@ public class CircuitBoardPuzzle : RaPhasedPuzzle
         RemovePiece(TileS2);
         InsertPiece(TileS3, ItemIds.Frag3, MirrorType.Slash);
         InsertPrism();
+    }
+
+    [ContextMenu("테스트: 지금 단계 조각 받고 자동 장착")]
+    void TestGrantAndAutoPlace()
+    {
+        if (IsComplete || ItemInventory.Instance == null) return;
+
+        StageGoal g = Stages[currentStage];
+        if (g.needPiece != null) ItemInventory.Instance.Grant(g.needPiece);
+        if (g.needBlue) ItemInventory.Instance.Grant(ItemIds.Prism);
+        TryAutoPlace();
     }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: P5_SunCycle_Day
   m_EditorClassIdentifier: Assembly-CSharp::SunCyclePuzzleData
   requiredFlag: 
-  clearFlag: 
+  clearFlag: F_RA_P5_DONE
   useItemGate: 1
   grantRewards: 1
   wakeFlag: F_RA_CIRCUIT_4
