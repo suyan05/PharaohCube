@@ -11357,7 +11357,7 @@ MonoBehaviour:
   endingPanel: {fileID: 435486422}
   playerInventory: {fileID: 24222499}
   cubeFaceManager: {fileID: 24222496}
-  nextSceneName: Puzzle_Test_Anubis
+  nextSceneName: Puzzle_Test_Anubis_Tutorial
   fadeTime: 0.8
   mountTime: 2
 --- !u!1 &1395267884
