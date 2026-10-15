@@ -18,9 +18,9 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
     private bool isOpen;
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
-    private AnubisAltarLock altarLock; 
+    private AnubisAltarLock altarLock;
 
-    private bool IsLocked => altarLock != null && altarLock.IsLocked; 
+    private bool IsLocked => altarLock != null && altarLock.IsLocked;
 
     private void Start()
     {
@@ -85,6 +85,7 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
 
         isOpen = true;
         overlayPanel.SetActive(true);
+        PuzzleOverlayFocus.Enter(this); 
         Debug.Log($"[{name}] 오버레이 열림", this);
     }
 
@@ -99,6 +100,13 @@ public class AnubisAltarStation : MonoBehaviour, IInteractable
     {
         isOpen = false;
         if (playerController != null) playerController.enabled = true;
+        PuzzleOverlayFocus.Exit(this); 
+    }
+
+   
+    private void OnDisable()
+    {
+        PuzzleOverlayFocus.Exit(this);
     }
 
     private void OnDrawGizmos()

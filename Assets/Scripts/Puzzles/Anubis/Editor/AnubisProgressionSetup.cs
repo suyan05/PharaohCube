@@ -7,18 +7,17 @@ using UnityEngine;
 // - 튜토리얼: A1~A4 열림, A5(메인)만 항상 봉인
 public static class AnubisProgressionSetup
 {
-    private static readonly string[] AltarNames =
+    internal static readonly string[] AltarNames =
     {
         "Altar_A1_Sand", "Altar_A2_Gear", "Altar_A3_Lever", "Altar_A4_MagicSquare", "Altar_A5_Main"
     };
 
-    // 실전: 각 제단을 여는 아이템 
-    private static readonly string[] RealRequired =
+    internal static readonly string[] RealRequired =
     {
         "", AnubisItemIds.GoldJar, AnubisItemIds.ClayPot, AnubisItemIds.Obsidian, AnubisItemIds.BronzeBowl
     };
 
-    private static readonly string[] RealUnlockMessage =
+    internal static readonly string[] RealUnlockMessage =
     {
         "",
         "어딘가에서 불꽃이 피어오릅니다.\n두 번째 시험의 제단이 깨어났습니다.",
@@ -66,7 +65,6 @@ public static class AnubisProgressionSetup
         Debug.Log($"[AnubisProgression] {altarName}: {state}", altar);
     }
 
-    // 비활성 포함 이름으로 찾기. 같은 이름이 여러 개면 경고
     private static GameObject FindByName(string objName)
     {
         GameObject found = null;
