@@ -215,6 +215,8 @@ public class ShadowClockPuzzle : RaPhasedPuzzle
     // 진행은 그대로 두고 지금 문제만 다시 (기획서 4.1 "해당 문제만 다시")
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [Reset 가드] 에디터에서 Unity가 자동으로 부르는 Reset 무시
+
         pendingInput = null;
         base.Reset();
         OnQuestionChanged?.Invoke();

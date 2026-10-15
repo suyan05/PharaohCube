@@ -67,8 +67,12 @@ public abstract class PuzzleBase : MonoBehaviour
     }
 
     // 기본 리셋 동작. 퍼즐마다 다르면 override해서 바꿀 수 있음
+    // [Reset 가드] Unity는 에디터에서 컴포넌트를 붙이거나 우클릭 -> Reset 할 때
+    // 이름이 Reset인 함수를 자동으로 부름 -> Play 중이 아니면 무시
+    // override하는 자식 퍼즐도 첫 줄에 같은 가드를 꼭 넣어야 함 (Unity는 자식 함수를 바로 부르기 때문)
     public virtual void Reset()
     {
+        if (!Application.isPlaying) return;
         Debug.Log($"[{name}] 리셋됨");
     }
 

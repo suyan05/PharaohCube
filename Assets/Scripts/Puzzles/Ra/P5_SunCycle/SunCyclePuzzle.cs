@@ -156,6 +156,8 @@ public class SunCyclePuzzle : RaPhasedPuzzle
 
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [Reset 가드] 에디터에서 Unity가 자동으로 부르는 Reset 무시
+
         inputs.Clear();
         base.Reset();
         OnInputChanged?.Invoke();
