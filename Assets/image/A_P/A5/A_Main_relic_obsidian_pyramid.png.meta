@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3b22209bb67a05b4ea390e11ec3d1286
+guid: 0ea0a8af20ff7d4479d4391da3a9ee38
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6049437081096537043
-    second: A_Main_relic_obsidian_pyramid_0
+      213: 1979175268515244410
+    second: A_Main_relic_obsidian_pyramid (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: A_Main_relic_obsidian_pyramid_0
+      name: A_Main_relic_obsidian_pyramid (1)_0
       rect:
         serializedVersion: 2
-        x: 790
-        y: 240
-        width: 1260
-        height: 1804
+        x: 45
+        y: 12
+        width: 163
+        height: 233
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d2c3a2aa6051c0ca0800000000000000
-      internalID: -6049437081096537043
+      spriteID: a79e61cab61777b10800000000000000
+      internalID: 1979175268515244410
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      A_Main_relic_obsidian_pyramid_0: -6049437081096537043
+      A_Main_relic_obsidian_pyramid (1)_0: 1979175268515244410
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

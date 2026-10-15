@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b640166678281d94faba053f9f4025f3
+guid: bbffa536feb1e0348a196945505212b2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8985670615861282238
-    second: A_Main_relic_gold_jar_0
+      213: 2828578195175077869
+    second: A_Main_relic_gold_jar (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: A_Main_relic_gold_jar_0
+      name: A_Main_relic_gold_jar (1)_0
       rect:
         serializedVersion: 2
-        x: 722
-        y: 255
-        width: 1674
-        height: 1736
+        x: 17
+        y: 11
+        width: 227
+        height: 236
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: eb5c31721d383bc70800000000000000
-      internalID: 8985670615861282238
+      spriteID: de773dec1e0214720800000000000000
+      internalID: 2828578195175077869
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      A_Main_relic_gold_jar_0: 8985670615861282238
+      A_Main_relic_gold_jar (1)_0: 2828578195175077869
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

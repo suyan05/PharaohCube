@@ -103,10 +103,10 @@ TextureImporter:
       name: icon_relic_bronze_bowl_0
       rect:
         serializedVersion: 2
-        x: 969
-        y: 567
-        width: 999
-        height: 797
+        x: 2
+        y: 13
+        width: 126
+        height: 101
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

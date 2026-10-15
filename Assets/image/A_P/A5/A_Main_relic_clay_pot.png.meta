@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: de4fc32c56104b44a897b3dc8a36725e
+guid: 7042e042dd6a5e74eb6b52c2fa1cfbee
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7078190466739758420
-    second: A_Main_relic_clay_pot_0
+      213: 4171181971637091675
+    second: A_Main_relic_clay_pot (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: A_Main_relic_clay_pot_0
+      name: A_Main_relic_clay_pot (1)_0
       rect:
         serializedVersion: 2
-        x: 802
-        y: 310
-        width: 1279
-        height: 1455
+        x: 22
+        y: 7
+        width: 215
+        height: 244
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: caa9b69b54735cd90800000000000000
-      internalID: -7078190466739758420
+      spriteID: b5d31f047e303e930800000000000000
+      internalID: 4171181971637091675
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      A_Main_relic_clay_pot_0: -7078190466739758420
+      A_Main_relic_clay_pot (1)_0: 4171181971637091675
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

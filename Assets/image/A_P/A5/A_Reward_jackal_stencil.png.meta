@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2318aabe54475704fb0b507d10cb9923
+guid: 1064aa28e50451646ae34854a3619a95
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3057890455755704632
-    second: A_Reward_jackal_stencil_0
+      213: 4696866041762745674
+    second: A_Reward_jackal_stencil (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: A_Reward_jackal_stencil_0
+      name: A_Reward_jackal_stencil (1)_0
       rect:
         serializedVersion: 2
-        x: 708
-        y: 156
-        width: 1721
-        height: 1745
+        x: 7
+        y: 0
+        width: 501
+        height: 508
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 83940690b2fcf6a20800000000000000
-      internalID: 3057890455755704632
+      spriteID: a4d0dd8a7ce9e2140800000000000000
+      internalID: 4696866041762745674
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      A_Reward_jackal_stencil_0: 3057890455755704632
+      A_Reward_jackal_stencil (1)_0: 4696866041762745674
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

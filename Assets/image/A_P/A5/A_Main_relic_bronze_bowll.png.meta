@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4c723db58abf5ad4c8cde064dfee7d7f
+guid: 92546f38e50126046b566c250585800b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7955228755752360687
-    second: con_relic_obsidian_weight_0
+      213: -5802417815392546059
+    second: A_Main_relic_bronze_bowl (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: con_relic_obsidian_weight_0
+      name: A_Main_relic_bronze_bowl (1)_0
       rect:
         serializedVersion: 2
-        x: 1147
-        y: 601
-        width: 686
-        height: 973
+        x: 8
+        y: 31
+        width: 239
+        height: 190
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 11568626899599190800000000000000
-      internalID: -7955228755752360687
+      spriteID: 5f2112b4dbba97fa0800000000000000
+      internalID: -5802417815392546059
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      con_relic_obsidian_weight_0: -7955228755752360687
+      A_Main_relic_bronze_bowl (1)_0: -5802417815392546059
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

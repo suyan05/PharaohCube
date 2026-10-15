@@ -103,10 +103,10 @@ TextureImporter:
       name: icon_relic_gold_jar_0
       rect:
         serializedVersion: 2
-        x: 986
-        y: 593
-        width: 1016
-        height: 1051
+        x: 2
+        y: 0
+        width: 126
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

@@ -103,10 +103,10 @@ TextureImporter:
       name: icon_relic_clay_pot_0
       rect:
         serializedVersion: 2
-        x: 1126
-        y: 533
-        width: 707
-        height: 800
+        x: 7
+        y: 0
+        width: 112
+        height: 126
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
