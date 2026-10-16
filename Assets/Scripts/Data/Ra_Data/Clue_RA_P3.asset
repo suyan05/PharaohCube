@@ -20,7 +20,8 @@ MonoBehaviour:
     illustration: {fileID: -5176630757189965155, guid: 0111c9648cbcff645930241814f63ac3, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
-    title: 
-    body: 
+    title: "\uAC1C\uAE30 \uC77C\uC2DD"
+    body: "\uB2EC\uC774 \uD574\uB97C \uC0BC\uD0A4\uBA74, \uC2DC\uAC04\uC740 \uAC70\uAFB8\uB85C
+      \uD750\uB978\uB2E4."
     illustration: {fileID: 0}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}

@@ -22,7 +22,8 @@ MonoBehaviour:
     illustration: {fileID: 0}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
-    title: 
-    body: 
+    title: "\uBC24\uC758 \uADF8\uB9BC\uC790"
+    body: "\uBC24\uC758 \uADF8\uB9BC\uC790\uB294 \uD574\uB97C \uB4F1\uC9C0\uC9C0
+      \uC54A\uB294\uB2E4. \uADF8\uB9AC\uC6B4 \uCABD\uC73C\uB85C \uB215\uB294\uB2E4."
     illustration: {fileID: 0}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}

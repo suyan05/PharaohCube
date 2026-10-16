@@ -820,6 +820,11 @@ MonoBehaviour:
   onRestored:
     m_PersistentCalls:
       m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &89448077
 Transform:
   m_ObjectHideFlags: 0
@@ -1566,6 +1571,63 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &177846634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 177846635}
+  - component: {fileID: 177846636}
+  m_Layer: 5
+  m_Name: HintButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &177846635
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177846634}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1275574721}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &177846636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 177846634}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13369a5fb8195144b84f1c18658f6dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleHintButton
+  provider: {fileID: 1426306677}
+  normalSprite: {fileID: -481022931661711431, guid: 9019abf0896a1da4b8ebf3d63f29dbf8, type: 3}
+  hoverSprite: {fileID: -523204568147764999, guid: f5c7f5696e4ec314793ffc04df52a856, type: 3}
+  disabledSprite: {fileID: 5679467112269812983, guid: b63f157117769e040b9f3652fa6587dc, type: 3}
+  cooldown: 45
+  messageTime: 6
+  buttonPos: {x: 820, y: 420}
+  buttonSize: 96
+  messagePos: {x: 0, y: 395}
 --- !u!1 &190819208
 GameObject:
   m_ObjectHideFlags: 0
@@ -7403,6 +7465,11 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &337490541
 Transform:
   m_ObjectHideFlags: 0
@@ -8157,6 +8224,7 @@ RectTransform:
   m_Children:
   - {fileID: 1204132702}
   - {fileID: 1851223236}
+  - {fileID: 1842239303}
   m_Father: {fileID: 919613783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8712,6 +8780,63 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a89e1c6ae56d3da40ad07dac49f593f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+--- !u!1 &534959767
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 534959768}
+  - component: {fileID: 534959769}
+  m_Layer: 5
+  m_Name: HintButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &534959768
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534959767}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1590413984}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &534959769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534959767}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13369a5fb8195144b84f1c18658f6dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleHintButton
+  provider: {fileID: 970893812}
+  normalSprite: {fileID: -481022931661711431, guid: 9019abf0896a1da4b8ebf3d63f29dbf8, type: 3}
+  hoverSprite: {fileID: -523204568147764999, guid: f5c7f5696e4ec314793ffc04df52a856, type: 3}
+  disabledSprite: {fileID: 5679467112269812983, guid: b63f157117769e040b9f3652fa6587dc, type: 3}
+  cooldown: 45
+  messageTime: 6
+  buttonPos: {x: 820, y: 420}
+  buttonSize: 96
+  messagePos: {x: 0, y: 395}
 --- !u!1 &582842650
 GameObject:
   m_ObjectHideFlags: 0
@@ -9029,7 +9154,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1414017507}
   m_Father: {fileID: 919613783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9345,6 +9471,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onRestored:
+    m_PersistentCalls:
+      m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &675036625
@@ -11131,6 +11262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DayCyclePuzzle
   requiredFlag: 
   clearFlag: F_RA_P4_DONE
+  hintRevealOrder: 00000000
   dayData: {fileID: 11400000, guid: baf9697f89146274d8cc950644f5531f, type: 2}
   nightData: {fileID: 11400000, guid: 8448643d9cf841a4795c0d561bea11c6, type: 2}
 --- !u!1 &986646024
@@ -12076,6 +12208,11 @@ MonoBehaviour:
   onRestored:
     m_PersistentCalls:
       m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1247058481
 Transform:
   m_ObjectHideFlags: 0
@@ -12123,7 +12260,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 177846635}
   m_Father: {fileID: 919613783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -12503,6 +12641,63 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1414017506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1414017507}
+  - component: {fileID: 1414017508}
+  m_Layer: 5
+  m_Name: HintButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1414017507
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414017506}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 629945096}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1414017508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414017506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13369a5fb8195144b84f1c18658f6dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleHintButton
+  provider: {fileID: 2035000890}
+  normalSprite: {fileID: -481022931661711431, guid: 9019abf0896a1da4b8ebf3d63f29dbf8, type: 3}
+  hoverSprite: {fileID: -523204568147764999, guid: f5c7f5696e4ec314793ffc04df52a856, type: 3}
+  disabledSprite: {fileID: 5679467112269812983, guid: b63f157117769e040b9f3652fa6587dc, type: 3}
+  cooldown: 45
+  messageTime: 6
+  buttonPos: {x: 820, y: 420}
+  buttonSize: 96
+  messagePos: {x: 0, y: 395}
 --- !u!1 &1418480403
 GameObject:
   m_ObjectHideFlags: 0
@@ -12540,6 +12735,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onRestored:
+    m_PersistentCalls:
+      m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1418480405
@@ -12934,7 +13134,8 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 534959768}
   m_Father: {fileID: 919613783}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -15704,6 +15905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e1f28f020089cc4fbab78d3c66bd1e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaZoneLighting
+  activeAfterFlag: 
   zones:
   - zoneName: LightObject_P0
     unlockFlag: 
@@ -15851,6 +16053,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onRestored:
+    m_PersistentCalls:
+      m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &1680354721
@@ -16156,6 +16363,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaPhaseDebug
   nightKey: 290
   printKey: 291
+  simulateDayClear: 1
+  dayFlags:
+  - F_RA_INTRO_PLAYED
+  - F_RA_SHRINE_FIRST_TALKED
+  - F_RA_P2_TUTORIAL_SEEN
+  - F_RA_CIRCUIT_1
+  - F_RA_P1_DONE
+  - F_RA_CIRCUIT_2
+  - F_RA_P3_DONE
+  - F_RA_CIRCUIT_3
+  - F_RA_P4_DONE
+  - F_RA_CIRCUIT_4
+  - F_RA_P5_DONE
 --- !u!1 &1715705113
 GameObject:
   m_ObjectHideFlags: 0
@@ -16823,6 +17043,7 @@ MonoBehaviour:
   bobSpeed: 3
   firstTalkedFlag: F_RA_SHRINE_FIRST_TALKED
   dayClearFlag: F_RA_P5_DONE
+  nightTalkedFlag: F_RA_SHRINE_NIGHT_TALKED
   nightClearFlag: F_RA_NIGHT_P5_DONE
   endTalkedFlag: F_RA_SHRINE_END_TALKED
   nightMessage: "\uC2E0\uC804\uC5D0 \uBC24\uC774 \uB0B4\uB824\uC549\uC558\uB2E4.
@@ -16997,6 +17218,63 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1842239302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1842239303}
+  - component: {fileID: 1842239304}
+  m_Layer: 5
+  m_Name: HintButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1842239303
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842239302}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 466089585}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1842239304
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842239302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13369a5fb8195144b84f1c18658f6dce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PuzzleHintButton
+  provider: {fileID: 140190497}
+  normalSprite: {fileID: -481022931661711431, guid: 9019abf0896a1da4b8ebf3d63f29dbf8, type: 3}
+  hoverSprite: {fileID: -523204568147764999, guid: f5c7f5696e4ec314793ffc04df52a856, type: 3}
+  disabledSprite: {fileID: 5679467112269812983, guid: b63f157117769e040b9f3652fa6587dc, type: 3}
+  cooldown: 45
+  messageTime: 6
+  buttonPos: {x: 820, y: 420}
+  buttonSize: 96
+  messagePos: {x: 0, y: 395}
 --- !u!1 &1851223235
 GameObject:
   m_ObjectHideFlags: 0
@@ -17780,6 +18058,7 @@ MonoBehaviour:
   dayData: {fileID: 11400000, guid: 8b4ca50e582b8704ca8712160a091c3c, type: 2}
   nightData: {fileID: 11400000, guid: 626913291e94c734e898e66e15532242, type: 2}
   hintAfterFails: 3
+  hintRevealOrder: 0200000000000000
   dayClearMessage: "\uC81C\uB2E8\uC758 \uD0DC\uC591\uC774 \uBE5B\uB09C\uB2E4. \uC785\uAD6C\uC758
     \uB77C\uC758 \uC131\uC18C\uB85C \uAC00 \uBCF4\uC790."
 --- !u!1 &2043374338
@@ -18224,6 +18503,11 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onRestored:
+    m_PersistentCalls:
+      m_Calls: []
+  revertOnFlag: 
+  clearedFlagAfterRevert: 
+  onReverted:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &2082716322

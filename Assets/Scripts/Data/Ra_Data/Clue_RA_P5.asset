@@ -21,7 +21,9 @@ MonoBehaviour:
     illustration: {fileID: 0}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
-    title: 
-    body: 
+    title: "\uBC24\uC758 \uD56D\uD574"
+    body: "\uBC24\uC758 \uC5EC\uC815\uC740 \uD574\uAC00 \uB215\uB294 \uACF3\uC5D0\uC11C
+      \uC2DC\uC791\uD574 \uAE68\uC5B4\uB098\uB294 \uACF3\uC5D0\uC11C \uB05D\uB09C\uB2E4.
+      \uADF8 \uC0AC\uC774, \uADF8\uB294 \uAC77\uC9C0 \uC54A\uB294\uB2E4."
     illustration: {fileID: 0}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
