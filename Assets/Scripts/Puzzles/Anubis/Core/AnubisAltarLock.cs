@@ -50,6 +50,7 @@ public class AnubisAltarLock : MonoBehaviour
         if (ItemInventory.Instance != null)
         {
             ItemInventory.Instance.OnItemGranted += HandleItemGranted;
+            ItemInventory.Instance.OnItemConsumed += HandleItemConsumed; // [추가] 실패 처벌로 회수되면 다시 잠금
             subscribed = true;
         }
         else if (!string.IsNullOrEmpty(requiredItem))
@@ -64,7 +65,10 @@ public class AnubisAltarLock : MonoBehaviour
     private void OnDestroy()
     {
         if (subscribed && ItemInventory.Instance != null)
+        {
             ItemInventory.Instance.OnItemGranted -= HandleItemGranted;
+            ItemInventory.Instance.OnItemConsumed -= HandleItemConsumed;
+        }
     }
 
     // 아이템을 얻을 때마다 확인
@@ -74,6 +78,15 @@ public class AnubisAltarLock : MonoBehaviour
         unlocked = true;
         ApplyState(true);
         Debug.Log($"[{name}] 해금됨 ({itemId})", this);
+    }
+
+    // [추가] 아이템을 잃었을 때 (메인 저울 실패 처벌) 다시 봉인
+    private void HandleItemConsumed(string itemId)
+    {
+        if (!unlocked || !IsLocked) return;
+        unlocked = false;
+        ApplyState(false);
+        Debug.Log($"[{name}] 다시 봉인됨 ({itemId} 회수)", this);
     }
 
     private void ApplyState(bool announce)

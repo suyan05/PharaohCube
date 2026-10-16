@@ -18,6 +18,11 @@ public class AnubisNotebookManager : MonoBehaviour
     [Header("단서 텍스트 (인덱스 0~6)")]
     [SerializeField] private TMP_Text[] clueSlotTexts;
 
+    [Header("단서 개수 [추가]")]
+    [Tooltip("실제로 쓰는 비문 수 (서브 퍼즐 4개 = 4). 넘는 칸은 수첩에서 숨김")]
+    [Range(1, 7)]
+    [SerializeField] private int clueCount = 4;
+
     private readonly string[] clueData = new string[7];
 
     private void Awake()
@@ -39,8 +44,12 @@ public class AnubisNotebookManager : MonoBehaviour
 
         for (int i = 0; i < clueSlotTexts.Length; i++)
         {
-            if (clueSlotTexts[i] != null)
-                clueSlotTexts[i].text = $"<b>[비문 {i + 1}]</b> 아직 해독되지 않은 고대 상형문자입니다.";
+            if (clueSlotTexts[i] == null) continue;
+
+            // [수정] 서브 퍼즐 수(clueCount)를 넘는 칸은 숨김 (기존 7칸 -> 4칸)
+            bool used = i < clueCount;
+            clueSlotTexts[i].gameObject.SetActive(used);
+            if (used) clueSlotTexts[i].text = $"<b>[비문 {i + 1}]</b> 아직 해독되지 않은 고대 상형문자입니다.";
         }
     }
 
@@ -60,7 +69,7 @@ public class AnubisNotebookManager : MonoBehaviour
 
     public void UnlockClue(int clueIndex, string clueText)
     {
-        if (clueIndex < 0 || clueIndex >= clueSlotTexts.Length) return;
+        if (clueIndex < 0 || clueIndex >= clueSlotTexts.Length || clueIndex >= clueCount) return;
 
         clueData[clueIndex] = clueText;
 

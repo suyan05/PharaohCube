@@ -133,6 +133,7 @@ public class AnubisZoneGuide : MonoBehaviour
 
             RestoreFromInventory();
             ItemInventory.Instance.OnItemGranted += HandleItemGranted;
+            ItemInventory.Instance.OnItemConsumed += HandleItemConsumed; // [추가] 실패 처벌로 회수되면 구역을 다시 어둡게
             subscribed = true;
         }
         catch (Exception e)
@@ -146,6 +147,7 @@ public class AnubisZoneGuide : MonoBehaviour
         if (subscribed && ItemInventory.Instance != null)
         {
             ItemInventory.Instance.OnItemGranted -= HandleItemGranted;
+            ItemInventory.Instance.OnItemConsumed -= HandleItemConsumed;
         }
     }
 
@@ -199,6 +201,20 @@ public class AnubisZoneGuide : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 구역 해금 오류: {e}");
+        }
+    }
+
+    // [추가] 켜져 있던 구역의 아이템을 잃으면 지금 인벤토리 기준으로 다시 맞춤
+    private void HandleItemConsumed(string itemId)
+    {
+        if (zones == null) return;
+        foreach (GuideZone zone in zones)
+        {
+            if (zone != null && zone.lit && zone.unlockItem == itemId)
+            {
+                ResyncWithInventory();
+                return;
+            }
         }
     }
 

@@ -6,8 +6,19 @@ using UnityEngine.UI;
 // 사자의 모래 분배기 - 실전 (서브퍼즐 1)
 // 숫자를 보여주지 않음: 용량과 목표는 1번 방 양피지에서만 알 수 있음
 // 기본값: 12 / 8 / 5 / 3, 시작 12만 가득 → 목표 4, 4, 4, 0 (최소 8번)
-public class SandPuzzleReal : MonoBehaviour
+public class SandPuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVariant
 {
+    // [추가] 변형 1세트 = 항아리 용량, 시작 양, 목표 양 + 그에 맞는 양피지 글
+    [System.Serializable]
+    public class Variant
+    {
+        public int[] capacities;
+        public int[] startAmounts;
+        public int[] goalAmounts;
+        [Tooltip("이 변형의 1번 방 양피지 글. 비우면 양피지 에셋에 적힌 원래 글")]
+        [TextArea(4, 12)] public string scrollText;
+    }
+
     [Header("난이도 (항아리 순서: 왼쪽부터)")]
     [Tooltip("항아리 용량")]
     [SerializeField] private int[] capacities = { 12, 8, 5, 3 };
@@ -15,6 +26,22 @@ public class SandPuzzleReal : MonoBehaviour
     [SerializeField] private int[] startAmounts = { 12, 0, 0, 0 };
     [Tooltip("목표 양 (-1이면 상관없음)")]
     [SerializeField] private int[] goalAmounts = { 4, 4, 4, 0 };
+
+    [Header("변형 세트 [추가] (새 게임마다 무작위, 메인 저울 실패 시 다음 변형)")]
+    [Tooltip("이 퍼즐의 푸는 방법이 적힌 양피지 ID")]
+    [SerializeField] private string scrollId = "SCROLL_ANUBIS_1";
+    [SerializeField]
+    private Variant[] variants =
+    {
+        // 0: 기본 12/8/5/3 -> 4,4,4,0 (최소 8번)
+        new Variant { capacities = new[] { 12, 8, 5, 3 }, startAmounts = new[] { 12, 0, 0, 0 }, goalAmounts = new[] { 4, 4, 4, 0 }, scrollText = "" },
+        // 1: 9/7/4/2 -> 3,3,3,0 (최소 8번)
+        new Variant { capacities = new[] { 9, 7, 4, 2 }, startAmounts = new[] { 9, 0, 0, 0 }, goalAmounts = new[] { 3, 3, 3, 0 },
+            scrollText = "나트론의 모래는 오직 항아리에서 항아리로만 옮겨진다.\n한 번 붓기 시작하면, 받는 항아리가 가득 차거나\n붓는 항아리가 빌 때까지 멈추지 않는다.\n\n첫째 항아리는 아홉 되, 둘째는 일곱 되,\n셋째는 네 되, 넷째는 두 되를 담는다.\n\n모래는 처음에 첫째 항아리에만 가득 담겨 있으니,\n첫째·둘째·셋째 항아리에 세 되씩 똑같이 나누고\n막내인 넷째 항아리는 비워 두어라." },
+        // 2: 10/7/4/3 -> 6,2,2,0 (최소 8번)
+        new Variant { capacities = new[] { 10, 7, 4, 3 }, startAmounts = new[] { 10, 0, 0, 0 }, goalAmounts = new[] { 6, 2, 2, 0 },
+            scrollText = "나트론의 모래는 오직 항아리에서 항아리로만 옮겨진다.\n한 번 붓기 시작하면, 받는 항아리가 가득 차거나\n붓는 항아리가 빌 때까지 멈추지 않는다.\n\n첫째 항아리는 열 되, 둘째는 일곱 되,\n셋째는 네 되, 넷째는 세 되를 담는다.\n\n모래는 처음에 첫째 항아리에만 가득 담겨 있으니,\n첫째 항아리에는 여섯 되를 남기고\n둘째와 셋째에 두 되씩 나누며\n막내인 넷째 항아리는 비워 두어라." }
+    };
 
     [Header("클리어 처리")]
     [Tooltip("사자의 서 단서 슬롯 (-1이면 없음)")]
@@ -146,6 +173,43 @@ public class SandPuzzleReal : MonoBehaviour
     public void ResetPuzzle()
     {
         if (isPouring || isCleared) return;
+        ResetState();
+    }
+
+    // ================= [추가] 변형 =================
+    public int VariantCount => variants != null ? variants.Length : 0;
+    public int CurrentVariant { get; private set; }
+
+    public void ApplyVariant(int index)
+    {
+        if (VariantCount == 0) return;
+        index = Mathf.Clamp(index, 0, VariantCount - 1);
+        Variant v = variants[index];
+
+        // 항아리 UI가 4개라 개수는 그대로 두고 값만 교체
+        if (v.capacities == null || v.capacities.Length != JarCount)
+        {
+            Debug.LogError($"[{name}] 변형 {index}의 항아리 개수가 {JarCount}개가 아님", this);
+            return;
+        }
+        capacities = (int[])v.capacities.Clone();
+        startAmounts = v.startAmounts != null ? (int[])v.startAmounts.Clone() : new int[JarCount];
+        goalAmounts = v.goalAmounts != null ? (int[])v.goalAmounts.Clone() : new int[JarCount];
+        CurrentVariant = index;
+
+        AnubisVariantManager.SetScrollText(scrollId, v.scrollText);
+        if (cur != null && !isCleared) ResetState(); // 이미 열어 본 패널이면 바로 새 문제로
+    }
+
+    // [추가] 메인 저울 실패 처벌: 클리어 상태와 모래를 처음으로 (사자의 서 단서는 유지)
+    public void ResetForRetry()
+    {
+        StopAllCoroutines();
+        isPouring = false;
+        isCleared = false;
+        rewarded = false;
+        if (successNotice != null) successNotice.SetActive(false);
+        if (cur == null) return; // 한 번도 열지 않은 패널이면 Start에서 초기화됨
         ResetState();
     }
 

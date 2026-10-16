@@ -6,8 +6,26 @@ using UnityEngine.UI;
 // 42인의 제약 마방진 - 실전 (서브퍼즐 4)
 // 숫자 대신 이집트 신들의 상징을 배치. 상징 = 숫자 대응표는 4번 방 양피지에만 있음
 // 내부적으로는 숫자(1~9)로 판정: 가로·세로·대각선 8줄의 합이 모두 15면 정답
-public class SymbolSquarePuzzleReal : MonoBehaviour
+public class SymbolSquarePuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVariant
 {
+    // [추가] 변형 1세트 = 미리 채울 칸 + 선택판 순서 (양피지 글은 규칙이 같아서 그대로)
+    [System.Serializable]
+    public class Variant
+    {
+        [Tooltip("0 = 빈칸, 1~9 = 고정칸. 배치: 0 1 2 / 3 4 5 / 6 7 8")]
+        public int[] presetValues;
+        public int[] paletteOrder;
+    }
+
+    // 3x3 마방진 정답 8가지 (회전, 뒤집기)
+    private static readonly int[][] MagicSquares =
+    {
+        new[] { 8, 1, 6, 3, 5, 7, 4, 9, 2 }, new[] { 6, 1, 8, 7, 5, 3, 2, 9, 4 },
+        new[] { 4, 9, 2, 3, 5, 7, 8, 1, 6 }, new[] { 2, 9, 4, 7, 5, 3, 6, 1, 8 },
+        new[] { 8, 3, 4, 1, 5, 9, 6, 7, 2 }, new[] { 4, 3, 8, 9, 5, 1, 2, 7, 6 },
+        new[] { 6, 7, 2, 1, 5, 9, 8, 3, 4 }, new[] { 2, 7, 6, 9, 5, 1, 4, 3, 8 }
+    };
+
     [Header("상징 (인덱스 0 = 숫자 1 ... 인덱스 8 = 숫자 9)")]
     [SerializeField]
     private string[] symbolNames =
@@ -24,6 +42,18 @@ public class SymbolSquarePuzzleReal : MonoBehaviour
     [SerializeField] private int[] paletteOrder = { 6, 1, 8, 3, 5, 9, 2, 7, 4 };
     [TextArea(2, 4)]
     [SerializeField] private string hintText = "<b>[42인의 심판관]</b>\n왼쪽 빈칸을 고른 뒤, 오른쪽에서 신의 상징을 고르십시오.";
+
+    [Header("변형 세트 [추가] (새 게임마다 무작위, 메인 저울 실패 시 다음 변형)")]
+    [SerializeField]
+    private Variant[] variants =
+    {
+        // 0: 기본 - 가운데 자칼(5)만 고정
+        new Variant { presetValues = new[] { 0, 0, 0, 0, 5, 0, 0, 0, 0 }, paletteOrder = new[] { 6, 1, 8, 3, 5, 9, 2, 7, 4 } },
+        // 1: 자칼 + 윗줄 가운데 매(9) 고정 -> 정답: 4 9 2 / 3 5 7 / 8 1 6 또는 2 9 4 / 7 5 3 / 6 1 8
+        new Variant { presetValues = new[] { 0, 9, 0, 0, 5, 0, 0, 0, 0 }, paletteOrder = new[] { 3, 7, 1, 9, 5, 4, 8, 2, 6 } },
+        // 2: 자칼 + 가운뎃줄 오른쪽 스카라브(1) 고정 -> 정답: 4 3 8 / 9 5 1 / 2 7 6 또는 2 7 6 / 9 5 1 / 4 3 8
+        new Variant { presetValues = new[] { 0, 0, 0, 0, 5, 1, 0, 0, 0 }, paletteOrder = new[] { 9, 2, 6, 4, 5, 8, 1, 3, 7 } }
+    };
 
     [Header("클리어 처리")]
     [Tooltip("사자의 서 단서 슬롯 (-1이면 없음)")]
@@ -88,6 +118,7 @@ public class SymbolSquarePuzzleReal : MonoBehaviour
 
         SetupPalette();
         InitBoard();
+        started = true; // [추가]
     }
 
     // 숫자 → 상징 이름 / 그림
@@ -221,6 +252,41 @@ public class SymbolSquarePuzzleReal : MonoBehaviour
         Debug.Log($"[{name}] 클리어! 시도 {attempts}번", this);
     }
 
+    // ================= [추가] 변형 =================
+    public int VariantCount => variants != null ? variants.Length : 0;
+    public int CurrentVariant { get; private set; }
+    private bool started; // Start에서 판을 만든 뒤에만 바로 다시 그림
+
+    public void ApplyVariant(int index)
+    {
+        if (VariantCount == 0) return;
+        index = Mathf.Clamp(index, 0, VariantCount - 1);
+        Variant v = variants[index];
+        if (v.presetValues != null && v.presetValues.Length == 9) presetValues = (int[])v.presetValues.Clone();
+        if (v.paletteOrder != null && v.paletteOrder.Length == 9) paletteOrder = (int[])v.paletteOrder.Clone();
+        CurrentVariant = index;
+
+        if (started && !isCleared)
+        {
+            SetupPalette();
+            InitBoard();
+        }
+    }
+
+    // [추가] 메인 저울 실패 처벌: 판을 처음 배치로 (사자의 서 단서는 유지)
+    public void ResetForRetry()
+    {
+        StopAllCoroutines();
+        feedbackRoutine = null;
+        isCleared = false;
+        rewarded = false;
+        attempts = 0;
+
+        if (successNotice != null) successNotice.SetActive(false);
+        ClearFeedbackNow();
+        InitBoard();
+    }
+
     private void UpdateBoard()
     {
         for (int i = 0; i < 9; i++)
@@ -272,7 +338,15 @@ public class SymbolSquarePuzzleReal : MonoBehaviour
     [ContextMenu("테스트: 정답 배치 (8 1 6 / 3 5 7 / 4 9 2)")]
     private void TestFillAnswer()
     {
-        int[] answer = { 8, 1, 6, 3, 5, 7, 4, 9, 2 };
+        // [수정] 변형마다 고정칸이 달라서, 고정칸과 맞는 정답판을 찾아서 채움
+        int[] answer = null;
+        foreach (int[] sq in MagicSquares)
+        {
+            bool match = true;
+            for (int i = 0; i < 9 && match; i++) if (isFixed[i] && board[i] != sq[i]) match = false;
+            if (match) { answer = sq; break; }
+        }
+        if (answer == null) { Debug.LogWarning($"[{name}] 고정칸과 맞는 정답판이 없음", this); return; }
         for (int i = 0; i < 9; i++) if (!isFixed[i]) board[i] = answer[i];
         UpdateBoard();
         Debug.Log($"[{name}] 정답 배치 완료. '심판' 버튼을 눌러 확인하세요.", this);

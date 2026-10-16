@@ -26,7 +26,13 @@ public class AnubisScrollData : ScriptableObject
     public string ScrollId => scrollId;
     public string Title => title;
     public int PieceCount => Mathf.Max(1, pieceCount);
-    public string FullText => fullText;
+    // [추가] 변형 퍼즐용 런타임 글 (저장되지 않음). 비어 있으면 에셋의 fullText 사용
+    [System.NonSerialized] private string runtimeText;
+
+    public string FullText => string.IsNullOrEmpty(runtimeText) ? fullText : runtimeText;
+
+    // [추가] AnubisVariantManager가 변형에 맞는 글로 바꿀 때 호출 (null = 원래 글)
+    public void SetRuntimeText(string text) => runtimeText = text;
     public Sprite FullSprite => fullSprite;
 
     public Sprite GetPieceSprite(int index) =>

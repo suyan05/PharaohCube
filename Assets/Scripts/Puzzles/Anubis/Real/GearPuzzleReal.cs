@@ -6,8 +6,17 @@ using UnityEngine.UI;
 // 도르래와 황금 기어비 천칭 - 실전 (서브퍼즐 2)
 // 기어 3개(첫 → 가운데 → 마지막) + 도르래 2개, 숫자와 배율 계산식은 숨김
 // 배율 = (마지막 톱니 / 첫 톱니) x 도르래1 x 도르래2  ※ 가운데 바퀴는 방향만 바꿈
-public class GearPuzzleReal : MonoBehaviour
+public class GearPuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVariant
 {
+    // [추가] 변형 1세트 = 목표 배율 + 그에 맞는 양피지 글
+    [System.Serializable]
+    public class Variant
+    {
+        public float targetAdvantage = 6f;
+        [Tooltip("이 변형의 2번 방 양피지 글. 비우면 양피지 에셋에 적힌 원래 글")]
+        [TextArea(4, 12)] public string scrollText;
+    }
+
     [Header("난이도")]
     [Tooltip("톱니 수 선택지 (작은 / 중간 / 큰)")]
     [SerializeField] private int[] teethOptions = { 12, 24, 36 };
@@ -17,6 +26,20 @@ public class GearPuzzleReal : MonoBehaviour
     [SerializeField] private float targetAdvantage = 6f;
     [Tooltip("시작 시 기어 3개의 선택 번호 (0 = 작은 바퀴)")]
     [SerializeField] private int[] startGearIndex = { 0, 0, 0 };
+
+    [Header("변형 세트 [추가] (새 게임마다 무작위, 메인 저울 실패 시 다음 변형)")]
+    [Tooltip("이 퍼즐의 푸는 방법이 적힌 양피지 ID")]
+    [SerializeField] private string scrollId = "SCROLL_ANUBIS_2";
+    [SerializeField]
+    private Variant[] variants =
+    {
+        // 0: 기본 6배 (작은 -> 큰 3배 x 움직 도르래 1개)
+        new Variant { targetAdvantage = 6f, scrollText = "" },
+        // 1: 4배 (작은 -> 중간 2배 x 움직 도르래 1개, 또는 같은 크기 x 움직 도르래 2개)
+        new Variant { targetAdvantage = 4f, scrollText = "태엽의 힘은 오직 첫 바퀴와 마지막 바퀴가 정한다.\n마지막 바퀴의 이가 첫 바퀴보다 많을수록,\n힘은 그 비율만큼 커진다.\n가운데 바퀴는 도는 방향만 바꿀 뿐,\n힘을 더하지도 빼지도 않는다.\n\n작은 바퀴는 열두 개의 이,\n중간 바퀴는 스물네 개, 큰 바퀴는 서른여섯 개의 이를 가졌다.\n\n고정 도르래는 방향만 바꾸고,\n움직 도르래는 하나마다 힘을 두 배로 만든다.\n\n한 근의 추로 네 근의 석관을 들어 올려라.\n힘이 모자라도, 넘쳐도 줄은 버티지 못한다." },
+        // 2: 8배 (작은 -> 중간 2배 x 움직 도르래 2개)
+        new Variant { targetAdvantage = 8f, scrollText = "태엽의 힘은 오직 첫 바퀴와 마지막 바퀴가 정한다.\n마지막 바퀴의 이가 첫 바퀴보다 많을수록,\n힘은 그 비율만큼 커진다.\n가운데 바퀴는 도는 방향만 바꿀 뿐,\n힘을 더하지도 빼지도 않는다.\n\n작은 바퀴는 열두 개의 이,\n중간 바퀴는 스물네 개, 큰 바퀴는 서른여섯 개의 이를 가졌다.\n\n고정 도르래는 방향만 바꾸고,\n움직 도르래는 하나마다 힘을 두 배로 만든다.\n\n한 근의 추로 여덟 근의 석관을 들어 올려라.\n힘이 모자라도, 넘쳐도 줄은 버티지 못한다." }
+    };
 
     [Header("클리어 처리")]
     [Tooltip("사자의 서 단서 슬롯 (-1이면 없음)")]
@@ -192,6 +215,41 @@ public class GearPuzzleReal : MonoBehaviour
         Debug.Log($"[{name}] 클리어! 시도 {attempts}번", this);
     }
 
+    // ================= [추가] 변형 =================
+    public int VariantCount => variants != null ? variants.Length : 0;
+    public int CurrentVariant { get; private set; }
+
+    public void ApplyVariant(int index)
+    {
+        if (VariantCount == 0) return;
+        index = Mathf.Clamp(index, 0, VariantCount - 1);
+        targetAdvantage = variants[index].targetAdvantage;
+        CurrentVariant = index;
+        AnubisVariantManager.SetScrollText(scrollId, variants[index].scrollText);
+    }
+
+    // [추가] 메인 저울 실패 처벌: 기어, 도르래, 석관을 처음으로 (사자의 서 단서는 유지)
+    public void ResetForRetry()
+    {
+        StopAllCoroutines();
+        isOperating = false;
+        isCleared = false;
+        rewarded = false;
+        attempts = 0;
+
+        for (int i = 0; i < 3; i++)
+        {
+            gearIndex[i] = (startGearIndex != null && i < startGearIndex.Length) ? Mathf.Clamp(startGearIndex[i], 0, teethOptions.Length - 1) : 0;
+            if (gearTransforms[i] != null) gearTransforms[i].localRotation = Quaternion.identity;
+        }
+        for (int i = 0; i < 2; i++) pulleyMoving[i] = false;
+
+        if (relicPlate != null) relicPlate.anchoredPosition = relicStartPos;
+        if (successNotice != null) successNotice.SetActive(false);
+        ClearFeedback();
+        UpdateVisuals();
+    }
+
     private void UpdateVisuals()
     {
         for (int i = 0; i < 3; i++)
@@ -214,13 +272,27 @@ public class GearPuzzleReal : MonoBehaviour
     private void SetFeedback(string msg) { if (textFeedback != null) textFeedback.text = msg; }
     private void ClearFeedback() { if (textFeedback != null) textFeedback.text = ""; }
 
-    [ContextMenu("테스트: 정답 상태로 맞추기 (작은 → 큰, 도르래 1개)")]
+    // [추가] 첫 / 마지막 바퀴와 도르래 조합 중 목표 배율이 되는 것을 찾아서 적용
+    private bool FindAnswer()
+    {
+        for (int a = 0; a < teethOptions.Length; a++)
+            for (int c = 0; c < teethOptions.Length; c++)
+                for (int p = 0; p < 4; p++)
+                {
+                    gearIndex[0] = a;
+                    gearIndex[2] = c;
+                    pulleyMoving[0] = (p & 1) != 0;
+                    pulleyMoving[1] = (p & 2) != 0;
+                    if (Mathf.Abs(CurrentAdvantage() - targetAdvantage) < 0.01f) return true;
+                }
+        return false;
+    }
+
+    [ContextMenu("테스트: 정답 상태로 맞추기 (지금 변형의 목표 배율)")]
     private void TestSetAnswer()
     {
-        gearIndex[0] = 0;
-        gearIndex[2] = teethOptions.Length - 1;
-        pulleyMoving[0] = true;
-        pulleyMoving[1] = false;
+        // [수정] 변형마다 목표가 달라서 가능한 조합을 찾아서 맞춤
+        if (!FindAnswer()) Debug.LogWarning($"[{name}] 목표 배율 {targetAdvantage}을 만들 수 있는 조합이 없음", this);
         UpdateVisuals();
         Debug.Log($"[{name}] 현재 배율 {CurrentAdvantage()} (크랭크를 눌러 확인)", this);
     }

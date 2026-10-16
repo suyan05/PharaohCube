@@ -46,6 +46,7 @@ public class AnubisItemGate : MonoBehaviour, IInteractable
             return;
         }
         ItemInventory.Instance.OnItemGranted += HandleItemGranted;
+        ItemInventory.Instance.OnItemConsumed += HandleItemConsumed; // [추가] 실패 처벌로 회수되면 다시 닫힘
         subscribed = true;
         Refresh(false);
     }
@@ -53,10 +54,31 @@ public class AnubisItemGate : MonoBehaviour, IInteractable
     private void OnDestroy()
     {
         if (subscribed && ItemInventory.Instance != null)
+        {
             ItemInventory.Instance.OnItemGranted -= HandleItemGranted;
+            ItemInventory.Instance.OnItemConsumed -= HandleItemConsumed;
+        }
     }
 
     private void HandleItemGranted(string itemId) => Refresh(true);
+
+    // [추가] 보상을 잃어 개수가 모자라면 석문을 다시 닫음
+    private void HandleItemConsumed(string itemId)
+    {
+        if (isOpen && CountOwned() < RequiredCount) Close();
+    }
+
+    private void Close()
+    {
+        isOpen = false;
+        blocker.enabled = true;
+
+        if (closedVisual != null) closedVisual.SetActive(true);
+        else if (sr != null) sr.enabled = true;
+        if (openVisual != null) openVisual.SetActive(false);
+
+        Debug.Log($"[{name}] 석문이 다시 닫힘", this);
+    }
 
     private int CountOwned()
     {

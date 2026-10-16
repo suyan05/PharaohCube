@@ -5013,6 +5013,40 @@ MonoBehaviour:
   - "\uD070 \uBC14\uD034"
   targetAdvantage: 6
   startGearIndex: 000000000000000000000000
+  scrollId: SCROLL_ANUBIS_2
+  variants:
+  - targetAdvantage: 6
+    scrollText: 
+  - targetAdvantage: 4
+    scrollText: "\uD0DC\uC5FD\uC758 \uD798\uC740 \uC624\uC9C1 \uCCAB \uBC14\uD034\uC640
+      \uB9C8\uC9C0\uB9C9 \uBC14\uD034\uAC00 \uC815\uD55C\uB2E4.\n\uB9C8\uC9C0\uB9C9
+      \uBC14\uD034\uC758 \uC774\uAC00 \uCCAB \uBC14\uD034\uBCF4\uB2E4 \uB9CE\uC744\uC218\uB85D,\n\uD798\uC740
+      \uADF8 \uBE44\uC728\uB9CC\uD07C \uCEE4\uC9C4\uB2E4.\n\uAC00\uC6B4\uB370 \uBC14\uD034\uB294
+      \uB3C4\uB294 \uBC29\uD5A5\uB9CC \uBC14\uAFC0 \uBFD0,\n\uD798\uC744 \uB354\uD558\uC9C0\uB3C4
+      \uBE7C\uC9C0\uB3C4 \uC54A\uB294\uB2E4.\n\n\uC791\uC740 \uBC14\uD034\uB294 \uC5F4\uB450
+      \uAC1C\uC758 \uC774,\n\uC911\uAC04 \uBC14\uD034\uB294 \uC2A4\uBB3C\uB124 \uAC1C,
+      \uD070 \uBC14\uD034\uB294 \uC11C\uB978\uC5EC\uC12F \uAC1C\uC758 \uC774\uB97C
+      \uAC00\uC84C\uB2E4.\n\n\uACE0\uC815 \uB3C4\uB974\uB798\uB294 \uBC29\uD5A5\uB9CC
+      \uBC14\uAFB8\uACE0,\n\uC6C0\uC9C1 \uB3C4\uB974\uB798\uB294 \uD558\uB098\uB9C8\uB2E4
+      \uD798\uC744 \uB450 \uBC30\uB85C \uB9CC\uB4E0\uB2E4.\n\n\uD55C \uADFC\uC758
+      \uCD94\uB85C \uB124 \uADFC\uC758 \uC11D\uAD00\uC744 \uB4E4\uC5B4 \uC62C\uB824\uB77C.\n\uD798\uC774
+      \uBAA8\uC790\uB77C\uB3C4, \uB118\uCCD0\uB3C4 \uC904\uC740 \uBC84\uD2F0\uC9C0
+      \uBABB\uD55C\uB2E4."
+  - targetAdvantage: 8
+    scrollText: "\uD0DC\uC5FD\uC758 \uD798\uC740 \uC624\uC9C1 \uCCAB \uBC14\uD034\uC640
+      \uB9C8\uC9C0\uB9C9 \uBC14\uD034\uAC00 \uC815\uD55C\uB2E4.\n\uB9C8\uC9C0\uB9C9
+      \uBC14\uD034\uC758 \uC774\uAC00 \uCCAB \uBC14\uD034\uBCF4\uB2E4 \uB9CE\uC744\uC218\uB85D,\n\uD798\uC740
+      \uADF8 \uBE44\uC728\uB9CC\uD07C \uCEE4\uC9C4\uB2E4.\n\uAC00\uC6B4\uB370 \uBC14\uD034\uB294
+      \uB3C4\uB294 \uBC29\uD5A5\uB9CC \uBC14\uAFC0 \uBFD0,\n\uD798\uC744 \uB354\uD558\uC9C0\uB3C4
+      \uBE7C\uC9C0\uB3C4 \uC54A\uB294\uB2E4.\n\n\uC791\uC740 \uBC14\uD034\uB294 \uC5F4\uB450
+      \uAC1C\uC758 \uC774,\n\uC911\uAC04 \uBC14\uD034\uB294 \uC2A4\uBB3C\uB124 \uAC1C,
+      \uD070 \uBC14\uD034\uB294 \uC11C\uB978\uC5EC\uC12F \uAC1C\uC758 \uC774\uB97C
+      \uAC00\uC84C\uB2E4.\n\n\uACE0\uC815 \uB3C4\uB974\uB798\uB294 \uBC29\uD5A5\uB9CC
+      \uBC14\uAFB8\uACE0,\n\uC6C0\uC9C1 \uB3C4\uB974\uB798\uB294 \uD558\uB098\uB9C8\uB2E4
+      \uD798\uC744 \uB450 \uBC30\uB85C \uB9CC\uB4E0\uB2E4.\n\n\uD55C \uADFC\uC758
+      \uCD94\uB85C \uC5EC\uB35F \uADFC\uC758 \uC11D\uAD00\uC744 \uB4E4\uC5B4 \uC62C\uB824\uB77C.\n\uD798\uC774
+      \uBAA8\uC790\uB77C\uB3C4, \uB118\uCCD0\uB3C4 \uC904\uC740 \uBC84\uD2F0\uC9C0
+      \uBABB\uD55C\uB2E4."
   clueIndex: 1
   clueText: "\uCCAD\uB3D9\uC758 \uADF8\uB987(B)\uACFC \uD759(C)\uC758 \uBB34\uAC8C
     \uD569\uC740, \uBC24\uC758 \uD751\uC694\uC11D(D)\uACFC \uD669\uAE08(A)\uC758
@@ -12499,6 +12533,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 474272586}
   m_CullTransparentMesh: 1
+--- !u!1 &477033302
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 477033304}
+  - component: {fileID: 477033303}
+  - component: {fileID: 477033305}
+  m_Layer: 0
+  m_Name: AnubisJudgmentPenalty
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &477033303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477033302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d00ac9b69ef82614d97858e08a92dd3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisJudgmentPenalty
+  itemsToTakeBack:
+  - ITEM_ANUBIS_BRONZE_BOWL
+  - ITEM_ANUBIS_OBSIDIAN
+  - ITEM_ANUBIS_CLAY_POT
+  - ITEM_ANUBIS_GOLD_JAR
+  mainAltarStation: {fileID: 2129264382}
+  respawnPoint: {fileID: 562571643}
+  cameraFollow: {fileID: 0}
+  penaltyMessage: "\uC554\uBB34\uD2B8\uAC00 \uB124 \uAC1C\uC758 \uBCF4\uBB3C\uC744
+    \uC0BC\uCF30\uC2B5\uB2C8\uB2E4.\n\uC2DC\uD5D8\uC758 \uC81C\uB2E8\uC774 \uB2E4\uC2DC
+    \uBD09\uC778\uB418\uC5C8\uC2B5\uB2C8\uB2E4. \uCCAB \uBC88\uC9F8 \uC2DC\uD5D8\uBD80\uD130
+    \uB2E4\uC2DC \uC2DC\uC791\uD558\uC2ED\uC2DC\uC624."
+  messageTime: 5
+--- !u!4 &477033304
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477033302}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &477033305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477033302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7bcd00ef223be498038cd2ef961d33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisVariantManager
+  randomOnStart: 0
+  penalty: {fileID: 0}
+  changedMessage: "\uC2DC\uD5D8\uC758 \uBB38\uC591\uC774 \uB4A4\uBC14\uB00C\uC5C8\uC2B5\uB2C8\uB2E4.\n\uC591\uD53C\uC9C0\uC758
+    \uAE00\uADC0\uB3C4 \uB2EC\uB77C\uC84C\uC73C\uB2C8 \uB2E4\uC2DC \uC77D\uC5B4 \uBCF4\uC2ED\uC2DC\uC624."
+  messageDelay: 5.2
 --- !u!1 &499282460
 GameObject:
   m_ObjectHideFlags: 0
@@ -16048,6 +16157,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 641380806}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &562571642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 562571643}
+  m_Layer: 0
+  m_Name: Respawn_A1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &562571643
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562571642}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.112973094, y: 7.04, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &594236724
 GameObject:
   m_ObjectHideFlags: 0
@@ -18189,6 +18329,7 @@ MonoBehaviour:
   weightText: {fileID: 850324648}
   clearText: {fileID: 1774825124}
   btnRetry: {fileID: 1148513114}
+  penalty: {fileID: 477033303}
 --- !u!114 &658258367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30419,6 +30560,41 @@ MonoBehaviour:
   capacities: 0c000000080000000500000003000000
   startAmounts: 0c000000000000000000000000000000
   goalAmounts: 04000000040000000400000000000000
+  scrollId: SCROLL_ANUBIS_1
+  variants:
+  - capacities: 0c000000080000000500000003000000
+    startAmounts: 0c000000000000000000000000000000
+    goalAmounts: 04000000040000000400000000000000
+    scrollText: 
+  - capacities: 09000000070000000400000002000000
+    startAmounts: 09000000000000000000000000000000
+    goalAmounts: 03000000030000000300000000000000
+    scrollText: "\uB098\uD2B8\uB860\uC758 \uBAA8\uB798\uB294 \uC624\uC9C1 \uD56D\uC544\uB9AC\uC5D0\uC11C
+      \uD56D\uC544\uB9AC\uB85C\uB9CC \uC62E\uACA8\uC9C4\uB2E4.\n\uD55C \uBC88 \uBD93\uAE30
+      \uC2DC\uC791\uD558\uBA74, \uBC1B\uB294 \uD56D\uC544\uB9AC\uAC00 \uAC00\uB4DD
+      \uCC28\uAC70\uB098\n\uBD93\uB294 \uD56D\uC544\uB9AC\uAC00 \uBE4C \uB54C\uAE4C\uC9C0
+      \uBA48\uCD94\uC9C0 \uC54A\uB294\uB2E4.\n\n\uCCAB\uC9F8 \uD56D\uC544\uB9AC\uB294
+      \uC544\uD649 \uB418, \uB458\uC9F8\uB294 \uC77C\uACF1 \uB418,\n\uC14B\uC9F8\uB294
+      \uB124 \uB418, \uB137\uC9F8\uB294 \uB450 \uB418\uB97C \uB2F4\uB294\uB2E4.\n\n\uBAA8\uB798\uB294
+      \uCC98\uC74C\uC5D0 \uCCAB\uC9F8 \uD56D\uC544\uB9AC\uC5D0\uB9CC \uAC00\uB4DD
+      \uB2F4\uACA8 \uC788\uC73C\uB2C8,\n\uCCAB\uC9F8\xB7\uB458\uC9F8\xB7\uC14B\uC9F8
+      \uD56D\uC544\uB9AC\uC5D0 \uC138 \uB418\uC529 \uB611\uAC19\uC774 \uB098\uB204\uACE0\n\uB9C9\uB0B4\uC778
+      \uB137\uC9F8 \uD56D\uC544\uB9AC\uB294 \uBE44\uC6CC \uB450\uC5B4\uB77C."
+  - capacities: 0a000000070000000400000003000000
+    startAmounts: 0a000000000000000000000000000000
+    goalAmounts: 06000000020000000200000000000000
+    scrollText: "\uB098\uD2B8\uB860\uC758 \uBAA8\uB798\uB294 \uC624\uC9C1 \uD56D\uC544\uB9AC\uC5D0\uC11C
+      \uD56D\uC544\uB9AC\uB85C\uB9CC \uC62E\uACA8\uC9C4\uB2E4.\n\uD55C \uBC88 \uBD93\uAE30
+      \uC2DC\uC791\uD558\uBA74, \uBC1B\uB294 \uD56D\uC544\uB9AC\uAC00 \uAC00\uB4DD
+      \uCC28\uAC70\uB098\n\uBD93\uB294 \uD56D\uC544\uB9AC\uAC00 \uBE4C \uB54C\uAE4C\uC9C0
+      \uBA48\uCD94\uC9C0 \uC54A\uB294\uB2E4.\n\n\uCCAB\uC9F8 \uD56D\uC544\uB9AC\uB294
+      \uC5F4 \uB418, \uB458\uC9F8\uB294 \uC77C\uACF1 \uB418,\n\uC14B\uC9F8\uB294
+      \uB124 \uB418, \uB137\uC9F8\uB294 \uC138 \uB418\uB97C \uB2F4\uB294\uB2E4.\n\n\uBAA8\uB798\uB294
+      \uCC98\uC74C\uC5D0 \uCCAB\uC9F8 \uD56D\uC544\uB9AC\uC5D0\uB9CC \uAC00\uB4DD
+      \uB2F4\uACA8 \uC788\uC73C\uB2C8,\n\uCCAB\uC9F8 \uD56D\uC544\uB9AC\uC5D0\uB294
+      \uC5EC\uC12F \uB418\uB97C \uB0A8\uAE30\uACE0\n\uB458\uC9F8\uC640 \uC14B\uC9F8\uC5D0
+      \uB450 \uB418\uC529 \uB098\uB204\uBA70\n\uB9C9\uB0B4\uC778 \uB137\uC9F8 \uD56D\uC544\uB9AC\uB294
+      \uBE44\uC6CC \uB450\uC5B4\uB77C."
   clueIndex: 0
   clueText: "\uAC00\uC7A5 \uBE44\uCC9C\uD55C \uD759\uC758 \uB2E8\uC9C0(C)\uC5D0 \uD0DC\uC591\uC758
     \uD669\uAE08(A)\uC744 \uB354\uD574\uC57C\uB9CC \uC2EC\uC7A5(H)\uC758 \uBB34\uAC8C\uB97C
@@ -40133,6 +40309,7 @@ MonoBehaviour:
   - {fileID: 965607131}
   - {fileID: 343428536}
   - {fileID: 637960607}
+  clueCount: 4
 --- !u!4 &1920547896
 Transform:
   m_ObjectHideFlags: 0
@@ -40314,6 +40491,13 @@ MonoBehaviour:
   hintText: "<b>[42\uC778\uC758 \uC2EC\uD310\uAD00]</b>\n\uC67C\uCABD \uBE48\uCE78\uC744
     \uACE0\uB978 \uB4A4, \uC624\uB978\uCABD\uC5D0\uC11C \uC2E0\uC758 \uC0C1\uC9D5\uC744
     \uACE0\uB974\uC2ED\uC2DC\uC624."
+  variants:
+  - presetValues: 000000000000000000000000000000000500000000000000000000000000000000000000
+    paletteOrder: 060000000100000008000000030000000500000009000000020000000700000004000000
+  - presetValues: 000000000900000000000000000000000500000000000000000000000000000000000000
+    paletteOrder: 030000000700000001000000090000000500000004000000080000000200000006000000
+  - presetValues: 000000000000000000000000000000000500000001000000000000000000000000000000
+    paletteOrder: 090000000200000006000000040000000500000008000000010000000300000007000000
   clueIndex: 3
   clueText: "\uCCAD\uB3D9\uC758 \uADF8\uB987(B)\uC740 \uD759\uC758 \uB2E8\uC9C0(C)
     \uB2E4\uC12F \uAC1C\uC758 \uBB34\uAC8C\uC640 \uAC19\uB3C4\uB2E4. (B = 5C)"
@@ -43249,6 +43433,32 @@ MonoBehaviour:
   heartMass: 6
   weightMass: 3
   maxWeights: 3
+  scrollId: SCROLL_ANUBIS_3
+  variants:
+  - heartSlot: 3
+    scrollText: 
+  - heartSlot: 4
+    scrollText: "\uC544\uB204\uBE44\uC2A4\uC758 \uC9C0\uB81B\uB300\uB294 \uBB34\uAC8C\uB9CC\uC73C\uB85C
+      \uAE30\uC6B8\uC9C0 \uC54A\uB294\uB2E4.\n\uCD95\uC5D0\uC11C \uBA40\uC5B4\uC9C8\uC218\uB85D
+      \uAC19\uC740 \uBB34\uAC8C\uB3C4\n\uB354 \uD070 \uD798\uC73C\uB85C \uB0B4\uB9AC\uB204\uB978\uB2E4.\n(\uBB34\uAC8C
+      \xD7 \uCD95\uC5D0\uC11C\uC758 \uAC70\uB9AC)\uAC00 \uC591\uCABD\uC5D0\uC11C
+      \uAC19\uC744 \uB54C\n\uBE44\uB85C\uC18C \uC9C0\uB81B\uB300\uB294 \uD3C9\uD615\uC744
+      \uC774\uB8EC\uB2E4.\n\n\uB9DD\uC790\uC758 \uC2EC\uC7A5\uC740 \uC67C\uCABD \uB124
+      \uBC88\uC9F8 \uB208\uAE08\uC5D0 \uAC78\uB824 \uC788\uB2E4.\n\uADF8 \uC2EC\uC7A5\uC758
+      \uBB34\uAC8C\uB294\n\uD751\uC694\uC11D \uCD94 \uB450 \uAC1C\uB97C \uD569\uCE5C
+      \uAC83\uACFC \uAC19\uB2E4.\n\n\uD751\uC694\uC11D \uCD94\uB97C \uBA87 \uAC1C,\n\uBA87
+      \uBC88\uC9F8 \uB208\uAE08\uC5D0 \uAC78\uC5B4\uC57C \uD558\uACA0\uB294\uAC00."
+  - heartSlot: 2
+    scrollText: "\uC544\uB204\uBE44\uC2A4\uC758 \uC9C0\uB81B\uB300\uB294 \uBB34\uAC8C\uB9CC\uC73C\uB85C
+      \uAE30\uC6B8\uC9C0 \uC54A\uB294\uB2E4.\n\uCD95\uC5D0\uC11C \uBA40\uC5B4\uC9C8\uC218\uB85D
+      \uAC19\uC740 \uBB34\uAC8C\uB3C4\n\uB354 \uD070 \uD798\uC73C\uB85C \uB0B4\uB9AC\uB204\uB978\uB2E4.\n(\uBB34\uAC8C
+      \xD7 \uCD95\uC5D0\uC11C\uC758 \uAC70\uB9AC)\uAC00 \uC591\uCABD\uC5D0\uC11C
+      \uAC19\uC744 \uB54C\n\uBE44\uB85C\uC18C \uC9C0\uB81B\uB300\uB294 \uD3C9\uD615\uC744
+      \uC774\uB8EC\uB2E4.\n\n\uB9DD\uC790\uC758 \uC2EC\uC7A5\uC740 \uC67C\uCABD \uB450
+      \uBC88\uC9F8 \uB208\uAE08\uC5D0 \uAC78\uB824 \uC788\uB2E4.\n\uADF8 \uC2EC\uC7A5\uC758
+      \uBB34\uAC8C\uB294\n\uD751\uC694\uC11D \uCD94 \uB450 \uAC1C\uB97C \uD569\uCE5C
+      \uAC83\uACFC \uAC19\uB2E4.\n\n\uD751\uC694\uC11D \uCD94\uB97C \uBA87 \uAC1C,\n\uBA87
+      \uBC88\uC9F8 \uB208\uAE08\uC5D0 \uAC78\uC5B4\uC57C \uD558\uACA0\uB294\uAC00."
   clueIndex: 2
   clueText: "\uB9DD\uC790\uC758 \uC2EC\uC7A5(H)\uC740 \uBC24\uC758 \uD751\uC694\uC11D
     \uCD94(D) \uB450 \uAC1C\uC758 \uBB34\uAC8C\uC640 \uC815\uD655\uD788 \uAC19\uB3C4\uB2E4.
@@ -45178,3 +45388,5 @@ SceneRoots:
   - {fileID: 741868693}
   - {fileID: 1920547896}
   - {fileID: 1988246765}
+  - {fileID: 477033304}
+  - {fileID: 562571643}

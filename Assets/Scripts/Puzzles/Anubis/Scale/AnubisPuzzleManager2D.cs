@@ -9,7 +9,7 @@ using UnityEngine.UI;
 // 아누비스의 심판 (메인 저울). 우측 깃털 7.0kg과 평형 맞추기
 // 좌측 접시에 망자의 심장(4kg) + 황금 단지(3kg), 정확히 2개
 // 패널 루트(Panel_MainScale)에 부착
-public class AnubisPuzzleManager2D : MonoBehaviour
+public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
 {
     [Header("저울 컴포넌트 연결")]
     [SerializeField] private RectTransform scaleBeam;
@@ -31,7 +31,12 @@ public class AnubisPuzzleManager2D : MonoBehaviour
     [SerializeField] private GameObject clearText;         // 성공 텍스트/패널
     [SerializeField] private Button btnRetry;              // 게임오버 시 재도전 버튼
 
+    [Header("실패 처벌 [추가] (비우면 기존처럼 씬 재시작)")]
+    [Tooltip("연결하면 다시 도전 시 씬을 다시 불러오지 않고 보상 회수 + 서브 퍼즐 재잠금")]
+    [SerializeField] private AnubisJudgmentPenalty penalty;
+
     public event Action OnPuzzleCleared;
+    public event Action OnPuzzleFailed; 
 
     private bool isCleared = false;
     private bool isJudging = false;
@@ -47,7 +52,7 @@ public class AnubisPuzzleManager2D : MonoBehaviour
         if (btnRetry != null)
         {
             btnRetry.gameObject.SetActive(false);
-            btnRetry.onClick.AddListener(RestartScene);
+            btnRetry.onClick.AddListener(OnClickRetry);  
         }
 
         if (scaleBeam != null)
@@ -135,16 +140,53 @@ public class AnubisPuzzleManager2D : MonoBehaviour
                 TMP_Text penaltyTxt = ammitPenaltyPanel.GetComponentInChildren<TMP_Text>();
                 if (penaltyTxt != null)
                 {
-                    penaltyTxt.text = "<color=#000000><b>[최후의 심판 실패]</b>\n\n불균형으로 인해 저울이 기울어졌습니다!\n괴수 암무트가 망자의 영혼을 영원히 집어삼켰습니다.\n\n<size=20><color=#FFFFFF>심판의 기회가 소진되었습니다.</color></size></color>";
+                    
+                    penaltyTxt.text = penalty != null
+                        ? "<color=#000000><b>[최후의 심판 실패]</b>\n\n불균형으로 인해 저울이 기울어졌습니다!\n괴수 암무트가 네 개의 보물을 집어삼켰습니다.\n\n<size=20><color=#FFFFFF>다시 도전하면 첫 번째 시험부터 다시 시작합니다.</color></size></color>"
+                        : "<color=#000000><b>[최후의 심판 실패]</b>\n\n불균형으로 인해 저울이 기울어졌습니다!\n괴수 암무트가 망자의 영혼을 영원히 집어삼켰습니다.\n\n<size=20><color=#FFFFFF>심판의 기회가 소진되었습니다.</color></size></color>";
                 }
             }
 
             if (btnRetry != null) btnRetry.gameObject.SetActive(true);
+            OnPuzzleFailed?.Invoke();
 
             Debug.LogWarning("[Anubis Scale] 1회 기회 소진. 암무트에 의해 영혼이 파괴되었습니다.", this);
         }
 
         isJudging = false;
+    }
+
+    
+    private void OnClickRetry()
+    {
+        if (penalty != null) penalty.ApplyPenalty();
+        else RestartScene();
+    }
+
+    
+    public void ResetForRetry()
+    {
+        StopAllCoroutines();
+        isCleared = false;
+        isJudging = false;
+        isGameOver = false;
+
+        ReturnItems(leftPan);
+        ReturnItems(rightPan);
+
+        if (scaleBeam != null) scaleBeam.localRotation = Quaternion.identity;
+        if (ammitPenaltyPanel != null) ammitPenaltyPanel.SetActive(false);
+        if (clearText != null) clearText.SetActive(false);
+        if (btnRetry != null) btnRetry.gameObject.SetActive(false);
+        if (btnJudgeLever != null) btnJudgeLever.interactable = true;
+    }
+
+    private static void ReturnItems(AnubisUIScalePan pan)
+    {
+        if (pan == null) return;
+        var copy = new List<AnubisUIDragItem>(pan.Items);
+        foreach (var item in copy)
+            if (item != null) item.ReturnToOriginalSlot();
     }
 
     public void RestartScene()
