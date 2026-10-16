@@ -179,6 +179,8 @@ public class DayCyclePuzzle : RaPhasedPuzzle
     // 실패해도 배치 유지 (기획서 4.4: 실패 시 배치 유지)
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [Reset 가드] 에디터에서 Unity가 자동으로 부르는 Reset 무시
+
         Debug.Log("[P4] 오답 - 배치는 그대로 유지");
     }
 

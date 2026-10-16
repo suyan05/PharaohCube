@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d20c7fda4e5b9d4da970135c105db1f, type: 3}
+  m_Name: Clue_RA_P4
+  m_EditorClassIdentifier: Assembly-CSharp::ClueData
+  clueId: RA_P4
+  day:
+    title: "\uB0A8\uCABD \uBCBD\uD654 '\uD558\uB8E8\uC758 \uC21C\uC11C'"
+    body: "\uD574\uB294 \uB3D9\uCABD\uC5D0\uC11C \uD0DC\uC5B4\uB098 \uC11C\uCABD\uC5D0
+      \uB215\uB294\uB2E4. \uBCBD\uD654\uAC00 \uB9D0\uD558\uB294 \uC21C\uC11C\uB97C
+      \uAE30\uC5B5\uD558\uB77C."
+    illustration: {fileID: -4684448991114341180, guid: 0fd3d97d5230dc149a5dd131582755da, type: 3}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
+  night:
+    title: 
+    body: 
+    illustration: {fileID: 0}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}

@@ -8,6 +8,7 @@ using UnityEngine.Tilemaps;
 /// - 맵이 화면보다 작은 방향은 맵 중앙에 고정한다.
 /// - Shake()로 화면 흔들림 (따라가는 위치와 따로 계산해서 흔들림이 누적되지 않음)
 /// - FocusOn()으로 다른 곳을 잠깐 비추고, ReleaseFocus()로 플레이어에게 돌아옴
+/// - SetZoom() / ResetZoom()으로 부드럽게 줌 (시작 줌아웃 연출용)
 /// Main Camera에 붙여서 사용.
 /// </summary>
 [RequireComponent(typeof(Camera))]
@@ -24,6 +25,10 @@ public class CameraFollow2D : MonoBehaviour
     [Header("다른 곳 비추기 (FocusOn)")]
     [Tooltip("다른 곳으로 갈 때와 돌아올 때 부드러운 정도. 클수록 천천히 움직임")]
     [SerializeField, Min(0f)] private float focusSmoothTime = 0.35f;
+
+    [Header("줌 (SetZoom / ResetZoom)")]
+    [Tooltip("줌이 바뀔 때 기본 부드러운 정도 (초). 클수록 천천히")]
+    [SerializeField, Min(0.01f)] private float zoomSmoothTime = 0.6f;
 
     [Header("도트 떨림 방지")]
     [SerializeField] private bool snapToPixel = true;
@@ -51,7 +56,16 @@ public class CameraFollow2D : MonoBehaviour
     private Vector3 focusPoint;
     private bool returningFromFocus;
 
+    // 줌 (baseSize = Inspector에 적힌 원래 Size)
+    private float baseSize;
+    private float targetSize;
+    private float zoomVelocity;
+    private float currentZoomSmooth;
+
     public bool IsFocusing => hasFocus;
+    public bool HasMapBounds => hasBounds;
+    public float BaseSize => baseSize;
+    public bool IsZoomSettled => cam != null && Mathf.Abs(cam.orthographicSize - targetSize) < 0.02f;
 
     private void Awake()
     {
@@ -60,6 +74,10 @@ public class CameraFollow2D : MonoBehaviour
         {
             Debug.LogWarning("[CameraFollow2D] 카메라 Projection이 Orthographic이 아닙니다. 2D용으로 바꿔주세요.");
         }
+
+        baseSize = cam.orthographicSize;
+        targetSize = baseSize;
+        currentZoomSmooth = zoomSmoothTime;
         RefreshBounds();
     }
 
@@ -75,6 +93,8 @@ public class CameraFollow2D : MonoBehaviour
 
         try
         {
+            UpdateZoom(); // 줌을 먼저 바꿔야 맵 경계 계산이 새 화면 크기로 됨
+
             Vector3 from = hasFollowPos ? followPos : transform.position;
             Vector3 desired = ClampToMap(GetGoalPosition());
             followPos = Vector3.SmoothDamp(from, desired, ref velocity, CurrentSmoothTime(desired));
@@ -152,6 +172,62 @@ public class CameraFollow2D : MonoBehaviour
         returningFromFocus = true;
     }
 
+    // ================= 줌 =================
+    /// <summary>카메라 Size를 size로 부드럽게 바꿈. smooth가 0 이하면 기본값 사용.</summary>
+    public void SetZoom(float size, float smooth = -1f)
+    {
+        targetSize = Mathf.Max(0.5f, size);
+        currentZoomSmooth = smooth > 0f ? smooth : zoomSmoothTime;
+    }
+
+    /// <summary>Inspector에 적힌 원래 Size로 부드럽게 돌아감.</summary>
+    public void ResetZoom(float smooth = -1f)
+    {
+        SetZoom(baseSize, smooth);
+    }
+
+    /// <summary>애니메이션 없이 목표 Size로 바로 맞춤 (스킵할 때).</summary>
+    public void SnapZoom()
+    {
+        zoomVelocity = 0f;
+        if (cam != null) cam.orthographicSize = targetSize;
+    }
+
+    /// <summary>맵 전체가 화면에 들어오는 Size (맵 경계가 없으면 원래 Size의 2배).</summary>
+    public float GetFitMapSize(float padding)
+    {
+        if (!hasBounds)
+        {
+            Debug.LogWarning("[CameraFollow2D] Bounds Tilemap이 비어 있어서 맵 크기를 모름 -> 원래 Size x2 사용");
+            return baseSize * 2f;
+        }
+
+        float byHeight = mapBounds.extents.y;
+        float byWidth = mapBounds.extents.x / Mathf.Max(0.01f, cam.aspect);
+        return Mathf.Max(byHeight, byWidth) + Mathf.Max(0f, padding);
+    }
+
+    /// <summary>맵 가운데 (맵 경계가 없으면 지금 카메라 위치).</summary>
+    public Vector3 GetMapCenter()
+    {
+        return hasBounds ? mapBounds.center : transform.position;
+    }
+
+    private void UpdateZoom()
+    {
+        float size = cam.orthographicSize;
+        if (Mathf.Approximately(size, targetSize)) return;
+
+        size = Mathf.SmoothDamp(size, targetSize, ref zoomVelocity, currentZoomSmooth);
+        if (Mathf.Abs(size - targetSize) < 0.005f)
+        {
+            size = targetSize;
+            zoomVelocity = 0f;
+        }
+        cam.orthographicSize = size;
+    }
+
+    // ================= 내부 계산 =================
     private Vector3 ShakeOffset()
     {
         if (shakeTime <= 0f) return Vector3.zero;

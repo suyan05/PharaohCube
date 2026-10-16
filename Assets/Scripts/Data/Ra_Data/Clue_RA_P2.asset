@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d20c7fda4e5b9d4da970135c105db1f, type: 3}
+  m_Name: Clue_RA_P2
+  m_EditorClassIdentifier: Assembly-CSharp::ClueData
+  clueId: RA_P2
+  day:
+    title: "\uBE5B\uC758 \uD68C\uB85C"
+    body: "\uBE5B\uC740 \uAC70\uC6B8\uC5D0 \uB2FF\uC73C\uBA74 \uAEBE\uC778\uB2E4.
+      \uD769\uC5B4\uC9C4 \uC870\uAC01\uC744 \uBAA8\uC544 \uB124 \uB54C\uC758 \uBB38\uC591\uC5D0
+      \uBE5B\uC744 \uC774\uC5B4\uB77C."
+    illustration: {fileID: 0}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
+  night:
+    title: 
+    body: 
+    illustration: {fileID: 0}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
