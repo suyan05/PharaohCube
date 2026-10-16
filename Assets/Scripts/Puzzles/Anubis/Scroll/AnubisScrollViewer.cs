@@ -45,6 +45,9 @@ public class AnubisScrollViewer : MonoBehaviour
     private GameObject fullTextBox;
     private TextMeshProUGUI fullText;
     private Image fullImage;
+    private Image fullTextBg; // [추가]
+    private static readonly Color FullTextBgColor = new Color(0.93f, 0.86f, 0.68f, 0.93f);    // [추가] 완성
+    private static readonly Color PartialTextBgColor = new Color(0.93f, 0.86f, 0.68f, 0.78f); // [추가] 일부만 공개
     private readonly Image[] pieceImages = new Image[MaxPieces];
     private readonly TextMeshProUGUI[] pieceLabels = new TextMeshProUGUI[MaxPieces];
 
@@ -155,8 +158,17 @@ public class AnubisScrollViewer : MonoBehaviour
             pieceLabels[i].text = has ? (sprite != null ? "" : $"{i + 1}") : "?";
         }
 
-        fullTextBox.SetActive(complete);
-        if (complete) fullText.text = current.FullText;
+        // [수정] 단계 공개: 일부만 모아도 열린 단계까지 글을 보여 줌 (덜 모았으면 바탕을 비쳐서 조각도 보이게)
+        string revealed = current.GetRevealedText(got, out bool hasMore, out int nextNeed);
+        bool showText = !string.IsNullOrEmpty(revealed);
+        fullTextBox.SetActive(showText);
+        if (showText)
+        {
+            fullText.text = hasMore
+                ? $"{revealed}\n\n<size=80%><color=#8A6A40>조각을 {nextNeed}개 모으면 다음 글이 드러납니다.</color></size>"
+                : revealed;
+            if (fullTextBg != null) fullTextBg.color = hasMore ? PartialTextBgColor : FullTextBgColor;
+        }
 
         bool showFullImage = complete && current.FullSprite != null;
         fullImage.gameObject.SetActive(showFullImage);
@@ -221,6 +233,7 @@ public class AnubisScrollViewer : MonoBehaviour
         // 완성 글
         var textBg = NewImage("FullTextBox", area.transform, Vector2.zero, ParchmentSize - new Vector2(20, 20), new Color(0.93f, 0.86f, 0.68f, 0.93f), false);
         fullTextBox = textBg.gameObject;
+        fullTextBg = textBg; // [추가] 단계 공개 시 바탕 투명도 조절용
         fullText = NewText("Text", textBg.transform, Vector2.zero, ParchmentSize - new Vector2(70, 70), 26, InkColor, TextAlignmentOptions.TopLeft);
         fullText.enableAutoSizing = true;
         fullText.fontSizeMin = 16;

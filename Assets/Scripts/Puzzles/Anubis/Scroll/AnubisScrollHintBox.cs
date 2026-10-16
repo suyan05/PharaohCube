@@ -53,14 +53,22 @@ public class AnubisScrollHintBox : MonoBehaviour
             return;
         }
 
-        if (collection.IsComplete(scroll))
+        // [수정] 단계 공개: 모은 조각 수만큼 글이 드러남
+        int got = collection.GetCount(scroll);
+        string revealed = scroll.GetRevealedText(got, out bool hasMore, out int nextNeed);
+
+        if (!hasMore)
         {
-            text.text = $"<b><color=#7A4A10>[{scroll.Title}]</color></b>\n\n{scroll.FullText}";
+            text.text = $"<b><color=#7A4A10>[{scroll.Title}]</color></b>\n\n{revealed}";
+        }
+        else if (!string.IsNullOrEmpty(revealed))
+        {
+            text.text = $"<b><color=#7A4A10>[{scroll.Title}]</color></b>  <size=80%>조각 {got} / {scroll.PieceCount}</size>\n\n{revealed}" +
+                        $"\n\n<size=85%><color=#8A6A40>조각을 {nextNeed}개 모으면 다음 글이 드러납니다.</color></size>";
         }
         else
         {
-            int got = collection.GetCount(scroll);
-            text.text = $"<b>[{scroll.Title}]</b>\n\n양피지 조각  {got} / {scroll.PieceCount}\n\n<size=85%>이 방 어딘가에 흩어진 조각을 모두 모으면\n이 시험을 푸는 방법이 드러납니다.</size>";
+            text.text = $"<b>[{scroll.Title}]</b>\n\n양피지 조각  {got} / {scroll.PieceCount}\n\n<size=85%>방 바닥에서 <b>빛나는 양피지 조각</b>을 찾아 <b>E</b>로 주우세요.\n조각을 {nextNeed}개 모으면 이 시험을 푸는 방법이 드러나기 시작합니다.</size>";
         }
     }
 

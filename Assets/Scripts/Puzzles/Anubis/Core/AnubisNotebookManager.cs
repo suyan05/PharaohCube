@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -24,6 +25,16 @@ public class AnubisNotebookManager : MonoBehaviour
     [SerializeField] private int clueCount = 4;
 
     private readonly string[] clueData = new string[7];
+
+    // [추가] 비문이 해독될 때 (메인 저울 화면의 사자의 서 판이 받음)
+    public event Action<int, string> OnClueUnlocked;
+
+    // [추가] 실제로 쓰는 비문 수 (4)
+    public int ClueCount => Mathf.Min(clueCount, clueData.Length);
+
+    // [추가] 해독된 비문 글. 아직이면 null
+    public string GetClue(int index) =>
+        (index >= 0 && index < clueData.Length) ? clueData[index] : null;
 
     private void Awake()
     {
@@ -79,5 +90,6 @@ public class AnubisNotebookManager : MonoBehaviour
         }
 
         Debug.Log($"<color=cyan>[사자의 서] 단서 {clueIndex + 1} 해금: {clueText}</color>");
+        OnClueUnlocked?.Invoke(clueIndex, clueText); // [추가]
     }
 }
