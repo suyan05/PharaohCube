@@ -36,6 +36,7 @@ public class EclipsePuzzleData : RaPuzzleData
     private void FillDay()
     {
         SetCommon("", "F_RA_P3_DONE", true, true);
+        SetAutoHint(true);
         rotateClockwise = true;
         targets = new[] { 1, 2, 3 };
         MarkDirty();
@@ -45,6 +46,7 @@ public class EclipsePuzzleData : RaPuzzleData
     private void FillNight()
     {
         SetCommon("F_RA_NIGHT_P1_DONE", "F_RA_NIGHT_P3_DONE", false, false);
+        SetAutoHint(false); // ¹ã: 30ÃÊ ºÓÀº À±°û ¾øÀ½ -> ÈùÆ® ¹öÆ°
         rotateClockwise = false;
         targets = new[] { 3, 1, 2 };
         MarkDirty();

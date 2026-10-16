@@ -12,6 +12,12 @@ using UnityEngine.Rendering.Universal;
 // - Focus Point가 비어 있으면 카메라 이동 없이 제자리에서 흔들림 + 불만 켬
 // - 해금 전 구역은 어둡게 + Turn Off 오브젝트(잠긴 입구 등)는 켜둠
 // - 씬에 다시 들어왔을 때 이미 켜진 플래그는 연출 없이 바로 복원
+//
+// [밤용으로 하나 더 쓰기]
+// - Active After Flag에 F_RA_NIGHT_OPEN을 넣은 RaZoneLighting을 하나 더 만들면
+//   밤이 되는 순간 그 구역들을 전부 끄고, 밤 플래그(F_RA_NIGHT_P1_DONE 등)에 따라 하나씩 다시 켬
+// - 밤 구역은 Turn On / Fade Lights만 채우기 (Turn Off에 낮 잠긴 입구를 넣으면 밤에 길이 다시 막힘)
+// - 해금 플래그가 Active After Flag와 같은 구역은 밤이 되는 순간 연출과 함께 켜짐 (첫 방 안내)
 public class RaZoneLighting : MonoBehaviour
 {
     // GameMessageUI가 이 말머리로 시작하는 로그를 오른쪽 위 알림으로 띄움
@@ -38,7 +44,7 @@ public class RaZoneLighting : MonoBehaviour
         [Tooltip("해금 때 켤 오브젝트 (Spot Light 2D 등)")]
         public GameObject[] turnOn;
 
-        [Tooltip("해금 때 끌 오브젝트 (잠긴 입구, 어둠 덮개 등)")]
+        [Tooltip("해금 때 끌 오브젝트 (잠긴 입구, 어둠 덮개 등). 밤용에서는 비워두기")]
         public GameObject[] turnOff;
 
         [Tooltip("서서히 밝아질 Light2D (turnOn에 넣은 빛)")]
@@ -46,6 +52,10 @@ public class RaZoneLighting : MonoBehaviour
 
         [NonSerialized] public bool lit;
     }
+
+    [Header("단계 (비우면 처음부터 동작 = 낮용)")]
+    [Tooltip("이 플래그가 켜진 뒤부터 동작 (밤용: F_RA_NIGHT_OPEN). 켜지는 순간 아래 구역을 전부 끄고 플래그대로 다시 켬")]
+    [SerializeField] private string activeAfterFlag = "";
 
     [Header("구역 목록 (위에서부터 해금 순서대로)")]
     [SerializeField] private LightZone[] zones;
@@ -88,6 +98,7 @@ public class RaZoneLighting : MonoBehaviour
     private readonly List<LightZone> waiting = new List<LightZone>();
     private bool playing;
     private bool subscribed;
+    private bool phaseStarted;
 
     // 연출 중 잠근 플레이어
     private PlayerController2D playerController;
@@ -95,13 +106,15 @@ public class RaZoneLighting : MonoBehaviour
     private Rigidbody2D playerRb;
     private bool playerLocked;
 
+    private bool IsDayInstance => string.IsNullOrEmpty(activeAfterFlag);
+
     // ================= 초기화 =================
     private void Awake()
     {
         try
         {
             CacheIntensities();
-            DarkenAll();
+            if (IsDayInstance) DarkenAll(); // 밤용은 밤이 될 때까지 아무것도 안 건드림
             FindCamera();
         }
         catch (Exception e)
@@ -126,13 +139,14 @@ public class RaZoneLighting : MonoBehaviour
     {
         try
         {
-            RestoreFromFlags();
-
             if (GameManager.Instance == null)
             {
                 Debug.LogWarning($"[{name}] GameManager가 없어서 플래그로 불을 켤 수 없음");
+                if (IsDayInstance) RestoreFromFlags();
                 return;
             }
+
+            StartPhaseIfReady();
             GameManager.Instance.OnFlagChanged += HandleFlagChanged;
             subscribed = true;
         }
@@ -140,6 +154,23 @@ public class RaZoneLighting : MonoBehaviour
         {
             Debug.LogError($"[{name}] 조명 구독 오류: {e}");
         }
+    }
+
+    // 낮용은 바로, 밤용은 씬에 다시 들어왔을 때 이미 밤이면 연출 없이 바로 맞춤
+    private void StartPhaseIfReady()
+    {
+        if (IsDayInstance)
+        {
+            phaseStarted = true;
+            RestoreFromFlags();
+            return;
+        }
+
+        if (!GameManager.Instance.HasFlag(activeAfterFlag)) return;
+
+        phaseStarted = true;
+        DarkenAll();
+        RestoreFromFlags();
     }
 
     private void OnDestroy()
@@ -182,6 +213,12 @@ public class RaZoneLighting : MonoBehaviour
     {
         try
         {
+            if (!phaseStarted)
+            {
+                if (flag == activeAfterFlag) BeginPhase();
+                return;
+            }
+
             foreach (LightZone zone in zones)
             {
                 if (zone != null && zone.unlockFlag == flag) RequestUnlock(zone);
@@ -190,6 +227,22 @@ public class RaZoneLighting : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 조명 전환 오류: {e}");
+        }
+    }
+
+    // 밤이 되는 순간: 전부 끄고 -> 첫 구역(해금 플래그 = 밤 플래그)은 연출, 이미 열린 구역은 바로 켬
+    private void BeginPhase()
+    {
+        phaseStarted = true;
+        DarkenAll();
+        Debug.Log($"[{name}] {activeAfterFlag} -> 구역 조명 다시 시작");
+
+        foreach (LightZone zone in zones)
+        {
+            if (zone == null || !IsUnlocked(zone)) continue;
+
+            if (zone.unlockFlag == activeAfterFlag) RequestUnlock(zone);
+            else LightZoneOn(zone, true);
         }
     }
 
@@ -439,6 +492,11 @@ public class RaZoneLighting : MonoBehaviour
     private void TestResetToFlags()
     {
         if (!CheckPlaying()) return;
+        if (!phaseStarted)
+        {
+            Debug.Log($"[{name}] 테스트: 아직 {activeAfterFlag} 전이라 동작 안 함");
+            return;
+        }
 
         StopAllCoroutines();
         EndCutscene();

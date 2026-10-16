@@ -39,6 +39,16 @@ public abstract class RaPhasedPuzzle : PuzzleBase
         }
     }
 
+    // 자동 힌트 사용 여부 (낮 = true, 밤 = false). 화면 스크립트도 읽어야 해서 public
+    public bool UseAutoHint
+    {
+        get
+        {
+            RaPuzzleData d = CurrentData;
+            return d == null || d.UseAutoHint;
+        }
+    }
+
     // 데이터에 플래그가 적혀 있으면 데이터 값, 비어 있으면 Inspector 값
     protected override string RequiredFlag
     {

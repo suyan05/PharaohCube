@@ -3,8 +3,15 @@ using UnityEngine;
 
 // P4 동쪽에서 서쪽으로 - "그림자만 보고 읽기" (P1 응용)
 // 벽화 패널 순서, 정답 방향(정순/역순)은 낮/밤 데이터(DayCyclePuzzleData)에서 읽음
-public class DayCyclePuzzle : RaPhasedPuzzle
+// 밤(자동 힌트 꺼짐): 힌트 버튼으로 정답 칸을 정해진 순서대로 하나씩 알려줌 (기본 1번만)
+public class DayCyclePuzzle : RaPhasedPuzzle, IPuzzleHintProvider
 {
+    [Header("힌트 버튼 (밤)")]
+    [Tooltip("힌트를 누를 때마다 알려줄 칸 번호 (0 = 맨 왼쪽). 칸 수 = 힌트 횟수")]
+    [SerializeField] private int[] hintRevealOrder = { 0 };
+
+    private int hintsGiven;
+
     // 데이터가 하나도 없을 때 화면에 보여줄 기본 패널 순서
     private static readonly TimeSymbol[] FallbackPanels =
     {
@@ -184,9 +191,26 @@ public class DayCyclePuzzle : RaPhasedPuzzle
         Debug.Log("[P4] 오답 - 배치는 그대로 유지");
     }
 
+    // ================= 힌트 버튼 (밤) =================
+    public bool HintAvailable => !UseAutoHint && CanEnter() && unsealed && !IsCleared
+                                 && hintRevealOrder != null && hintsGiven < hintRevealOrder.Length;
+
+    public string RequestHint()
+    {
+        if (!HintAvailable) return null;
+
+        int slot = Mathf.Clamp(hintRevealOrder[hintsGiven], 0, SlotCount - 1);
+        hintsGiven++;
+
+        string time = ShadowClockPuzzle.ToKorean(SolutionAt(slot));
+        Debug.Log($"[P4] 힌트: {slot + 1}번째 칸 = {time}");
+        return $"벽화가 희미하게 속삭인다. 왼쪽에서 {slot + 1}번째 자리는 '{time}'.";
+    }
+
     // 낮 -> 밤 전환: 봉인, 벽화, 정답, 카드 배치를 처음부터 다시
     protected override void ApplyPhase()
     {
+        hintsGiven = 0;
         unsealed = false;
         BuildPanelsAndAnswer();
         ShuffleInternal();

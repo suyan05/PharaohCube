@@ -18,10 +18,15 @@ public abstract class RaPuzzleData : ScriptableObject
     [Tooltip("끄면 클리어 보상 아이템과 노트를 주지 않음 (밤 버전용)")]
     [SerializeField] private bool grantRewards = true;
 
+    [Header("공통 - 힌트")]
+    [Tooltip("켜면 오답 횟수/시간에 따라 자동 힌트 (낮). 끄면 자동 힌트 없이 힌트 버튼으로만 (밤)")]
+    [SerializeField] private bool useAutoHint = true;
+
     public string RequiredFlag => requiredFlag;
     public string ClearFlag => clearFlag;
     public bool UseItemGate => useItemGate;
     public bool GrantRewards => grantRewards;
+    public bool UseAutoHint => useAutoHint;
 
     // 자식 데이터의 "기획서 값 채우기" 메뉴에서 공통 값을 한 번에 넣을 때 사용
     protected void SetCommon(string required, string clear, bool itemGate, bool rewards)
@@ -30,6 +35,12 @@ public abstract class RaPuzzleData : ScriptableObject
         clearFlag = clear;
         useItemGate = itemGate;
         grantRewards = rewards;
+    }
+
+    // 자동 힌트 켜기/끄기 (낮 = 켜기, 밤 = 끄기)
+    protected void SetAutoHint(bool value)
+    {
+        useAutoHint = value;
     }
 
     // 에디터에서 메뉴로 값을 바꾼 뒤 저장되게 표시

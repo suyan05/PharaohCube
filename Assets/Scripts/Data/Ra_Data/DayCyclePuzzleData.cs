@@ -65,6 +65,7 @@ public class DayCyclePuzzleData : RaPuzzleData
     private void FillDay()
     {
         SetCommon("", "F_RA_P4_DONE", true, true);
+        SetAutoHint(true);
         panelOrder = (TimeSymbol[])DefaultPanels.Clone();
         randomizePanels = false;
         reverseAnswer = false;
@@ -75,6 +76,7 @@ public class DayCyclePuzzleData : RaPuzzleData
     private void FillNight()
     {
         SetCommon("F_RA_NIGHT_P3_DONE", "F_RA_NIGHT_P4_DONE", false, false);
+        SetAutoHint(false); // ¹ã: ÈùÆ® ¹öÆ°À¸·Î ÇÑ Ä­¸¸ ¾Ë·ÁÁÜ
         panelOrder = (TimeSymbol[])DefaultPanels.Clone();
         randomizePanels = false;
         reverseAnswer = true; // ¹ã Á¤´ä: ¹ã -> È²È¥ -> Á¤¿À -> »õº®

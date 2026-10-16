@@ -18,7 +18,7 @@ public class ShadowRule
 
     public ShadowLength shadowLength;
 
-    [Tooltip("해 위치 (같은 문제 3회 오답 힌트에 표시, Center = 머리 위)")]
+    [Tooltip("해 위치 (힌트에 표시, Center = 머리 위)")]
     public DialSide sunSide;
 
     public ShadowRule() { }
@@ -121,6 +121,7 @@ public class ShadowClockPuzzleData : RaPuzzleData
     private void FillDay()
     {
         SetCommon("", "F_RA_P1_DONE", true, true);
+        SetAutoHint(true);
         rules = CreateDayRules();
         MarkDirty();
     }
@@ -129,6 +130,7 @@ public class ShadowClockPuzzleData : RaPuzzleData
     private void FillNight()
     {
         SetCommon("F_RA_NIGHT_OPEN", "F_RA_NIGHT_P1_DONE", false, false);
+        SetAutoHint(false); // 밤: 3회 오답 자동 힌트 없음 -> 힌트 버튼
         rules = CreateNightRules();
         MarkDirty();
     }

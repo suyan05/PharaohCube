@@ -7,7 +7,7 @@ using UnityEngine.UI;
 [Serializable]
 public class RaObjectiveStep
 {
-    [Tooltip("이 플래그가 켜지면 다음 단계로 넘어감")]
+    [Tooltip("이 플래그가 켜지면 다음 단계로 넘어감 (비우면 끝나지 않는 마지막 단계)")]
     public string doneFlag = "";
 
     [TextArea]
@@ -15,6 +15,7 @@ public class RaObjectiveStep
 }
 
 // 퍼즐 오버레이가 열려 있는 동안은 목표 문구를 숨김 (퍼즐 제목 가림 방지)
+// 단계 목록은 Inspector(씬)에 저장됨 -> 코드 기본값을 바꿨으면 우클릭 -> "기본 단계로 다시 채우기"
 public class RaObjectiveGuide : MonoBehaviour
 {
     [Header("진행 단계 (위에서부터 순서대로)")]
@@ -94,9 +95,11 @@ public class RaObjectiveGuide : MonoBehaviour
 
     private RaObjectiveStep FindCurrentStep()
     {
+        if (steps == null) return null;
+
         foreach (RaObjectiveStep step in steps)
         {
-            if (!HasFlag(step.doneFlag)) return step;
+            if (step != null && !HasFlag(step.doneFlag)) return step;
         }
         return null;
     }
@@ -175,11 +178,42 @@ public class RaObjectiveGuide : MonoBehaviour
     [ContextMenu("현재 목표 다시 계산")]
     private void CheatRefresh() => Refresh();
 
-    // ================= 기본 데이터 (기획서 4.2 플래그 순서) =================
+    // 씬에 저장된 단계 목록을 아래 기본값(낮 + 밤)으로 덮어씀
+    [ContextMenu("기본 단계로 다시 채우기 (낮 + 밤)")]
+    private void ResetToDefaultSteps()
+    {
+        try
+        {
+#if UNITY_EDITOR
+            UnityEditor.Undo.RecordObject(this, "목표 단계 다시 채우기");
+#endif
+            steps = DefaultSteps();
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
+            if (Application.isPlaying && objectiveText != null) Refresh();
+            Debug.Log($"[목표 안내] 기본 단계 {steps.Count}개로 다시 채움 (씬 저장 Ctrl+S 잊지 말기)");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[목표 안내] 기본 단계 채우기 오류: {e}");
+        }
+    }
+
+    // ================= 기본 데이터 (기획서 4.2 플래그 순서 + 밤) =================
     private static List<RaObjectiveStep> DefaultSteps()
+    {
+        var list = new List<RaObjectiveStep>();
+        list.AddRange(DaySteps());
+        list.AddRange(NightSteps());
+        return list;
+    }
+
+    private static List<RaObjectiveStep> DaySteps()
     {
         return new List<RaObjectiveStep>
         {
+            Make("F_RA_SHRINE_FIRST_TALKED", "중앙의 라의 성소를 조사하자"),
             Make("F_RA_CIRCUIT_1", "서쪽 벽의 빛 회로를 조사하자"),
             Make("F_RA_P1_DONE", "주황 렌즈를 들고 동쪽 그림자 다이얼로 가자"),
             Make("F_RA_CIRCUIT_2", "거울 조각 1을 들고 회로판 빈 슬롯에 끼우자"),
@@ -188,6 +222,21 @@ public class RaObjectiveGuide : MonoBehaviour
             Make("F_RA_P4_DONE", "황동 열쇠를 들고 남서쪽 카드 벤치로 가자"),
             Make("F_RA_CIRCUIT_4", "거울 조각 3을 들고 회로판 마지막 슬롯에 끼우자"),
             Make("F_RA_P5_DONE", "북쪽 태양 제단에서 하루의 순환을 완성하자")
+        };
+    }
+
+    // 밤: 성소 -> P1 -> P3 -> P4 -> P5 -> 북쪽 문 (밤 퍼즐은 이 순서로만 열림)
+    private static List<RaObjectiveStep> NightSteps()
+    {
+        return new List<RaObjectiveStep>
+        {
+            Make("F_RA_NIGHT_OPEN", "라의 성소로 돌아가 라와 이야기하자"),
+            Make("F_RA_SHRINE_NIGHT_TALKED", "밤이 내려앉았다. 라의 성소에 다시 말을 걸어 보자"),
+            Make("F_RA_NIGHT_P1_DONE", "푸른 불이 켜진 동쪽 방, 밤의 그림자를 읽자"),
+            Make("F_RA_NIGHT_P3_DONE", "남동쪽 일식 석탁에서 개기 일식을 완성하자"),
+            Make("F_RA_NIGHT_P4_DONE", "남서쪽 카드 벤치에 죽은 왕의 하루를 새기자"),
+            Make("F_RA_NIGHT_P5_DONE", "북쪽 밤의 제단에서 태양의 항해를 완성하자"),
+            Make("", "태양 형판을 들고 북쪽 문으로 나가자")
         };
     }
 

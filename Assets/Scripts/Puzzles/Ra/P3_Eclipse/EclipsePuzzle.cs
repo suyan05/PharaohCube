@@ -3,7 +3,9 @@ using UnityEngine;
 
 // P3 일식 타일 복원 - "회전으로 그림 맞추기"
 // 정답 횟수, 회전 방향은 낮/밤 데이터(EclipsePuzzleData)에서 읽음
-public class EclipsePuzzle : RaPhasedPuzzle
+// - 낮: 30초가 지나면 화면(EclipseArtStation)이 어긋난 원판을 붉게 표시 (자동 힌트)
+// - 밤: 자동 힌트 없음 -> 힌트 버튼을 누르면 "지금" 어긋난 원판이 붉게 빛남 (원판을 돌리면 꺼짐)
+public class EclipsePuzzle : RaPhasedPuzzle, IPuzzleHintProvider
 {
     // 원판 8칸 (0=위, 시계 방향으로 1=오른쪽 위 ~ 7=왼쪽 위)
     public const int SlotCount = 8;
@@ -21,11 +23,14 @@ public class EclipsePuzzle : RaPhasedPuzzle
     // 현재 상태: 시계 방향 기준 누적 회전수 (0~3)
     private readonly int[] states = new int[EclipsePuzzleData.PieceCount];
     private bool pigmentApplied;
+    private bool hintActive;
 
     public event Action OnStateChanged;
     public event Action OnPigmentApplied;
+    public event Action OnHint; // 힌트 버튼으로 붉은 윤곽이 켜짐
 
     public bool PigmentApplied => pigmentApplied;
+    public bool HintActive => hintActive;
 
     private EclipsePuzzleData Data => PickData(dayData, nightData, ref fallbackData);
     protected override RaPuzzleData CurrentData => Data;
@@ -56,6 +61,9 @@ public class EclipsePuzzle : RaPhasedPuzzle
     // 정답까지 시계 방향으로 몇 칸 어긋났는지 (0이면 정답) 화면에서 원판 각도 계산용
     public int GetOffset(int index) => (states[index] - TargetState(index) + 4) % 4;
     public bool IsCorrect(int index) => states[index] == TargetState(index);
+
+    // 화면에서 회전 방향 안내용 (밤 = 반시계)
+    public bool RotateClockwise => Data.RotateClockwise;
 
     // ================= 진입 + 안료 게이트 =================
     public override void Open()
@@ -100,17 +108,38 @@ public class EclipsePuzzle : RaPhasedPuzzle
 
         int step = Data.RotateClockwise ? 1 : 3; // 반시계 90도 = 시계 270도
         states[index] = (states[index] + step) % 4;
+        hintActive = false; // 힌트는 "누른 순간"의 상태만 보여줌 -> 돌리면 꺼짐
         Debug.Log($"[P3] {RotatingLabels[index]} 회전 -> 상태 {states[index]}{(IsCorrect(index) ? " (연결됨!)" : "")}");
         OnStateChanged?.Invoke();
 
         Submit();
     }
 
+    // ================= 힌트 버튼 (밤) =================
+    public bool HintAvailable => !UseAutoHint && CanEnter() && pigmentApplied && !IsCleared && !hintActive;
+
+    public string RequestHint()
+    {
+        if (!HintAvailable) return null;
+
+        hintActive = true;
+        Debug.Log("[P3] 힌트: 어긋난 원판이 붉게 빛남");
+        OnHint?.Invoke();
+        return "어긋난 원판의 윤곽이 붉게 빛난다. 원판을 돌리면 빛이 사라진다.";
+    }
+
     // ================= PuzzleBase 구현 =================
     public override void Submit()
     {
-        // 오답 개념 없음: 다 맞으면 성공, 아니면 아무 일 없음
-        if (Validate()) OnSuccessInternal();
+        try
+        {
+            // 오답 개념 없음: 다 맞으면 성공, 아니면 아무 일 없음
+            if (Validate()) OnSuccessInternal();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] P3 판정 오류: {e}");
+        }
     }
 
     protected override bool Validate()
@@ -124,6 +153,7 @@ public class EclipsePuzzle : RaPhasedPuzzle
 
     protected override void OnSuccessInternal()
     {
+        hintActive = false;
         base.OnSuccessInternal(); // IsCleared + clearFlag (낮 F_RA_P3_DONE / 밤 F_RA_NIGHT_P3_DONE)
 
         if (!GrantRewards) return; // 밤에는 보상 없음 (기획서 6장, 보상 미정)
@@ -137,6 +167,7 @@ public class EclipsePuzzle : RaPhasedPuzzle
     protected override void ApplyPhase()
     {
         pigmentApplied = false;
+        hintActive = false;
         RandomizeStates();
         OnStateChanged?.Invoke();
     }

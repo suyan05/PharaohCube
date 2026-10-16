@@ -6,8 +6,10 @@ using UnityEditor;
 #endif
 
 // OBJ_007 일식 석탁 (아트 버전)
-// E키 -> 오버레이 열기/닫기, 원판 3개를 클릭하면 90도씩 시계 방향 회전
+// E키 -> 오버레이 열기/닫기, 원판 3개를 클릭하면 90도씩 회전 (낮 시계 / 밤 반시계)
 // 정답 판정은 EclipsePuzzle이 그대로 담당하고, 이 스크립트는 화면만 담당
+// - 낮: 30초 지나면 어긋난 원판을 붉게 (자동 힌트)
+// - 밤: 자동 힌트 없음 -> 힌트 버튼(EclipsePuzzle.RequestHint)을 누르면 붉게, 원판을 돌리면 꺼짐
 // 컴포넌트 우클릭 -> "P3 UI 자동 생성"으로 오버레이 안의 UI를 한 번에 만들 수 있음
 public class EclipseArtStation : MonoBehaviour, IInteractable
 {
@@ -52,7 +54,7 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
 
     private float[] currentZ;
     private bool isOpen;
-    private bool hintActive;
+    private bool hintActive; // 낮 자동 힌트 (30초)
     private float hintTimer;
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
@@ -72,14 +74,21 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
             }
 
             overlayPanel.SetActive(false);
-            puzzle.OnStateChanged += RefreshVisuals;
-            puzzle.OnPigmentApplied += HandlePigmentApplied;
-            puzzle.OnSuccess += HandleSuccess;
+            Subscribe();
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 초기화 오류: {e}");
         }
+    }
+
+    private void Subscribe()
+    {
+        puzzle.OnStateChanged += RefreshVisuals;
+        puzzle.OnPigmentApplied += HandlePigmentApplied;
+        puzzle.OnSuccess += HandleSuccess;
+        puzzle.OnHint += HandleButtonHint;
+        puzzle.OnPhaseChanged += HandlePhaseChanged;
     }
 
     private void OnDestroy()
@@ -88,6 +97,8 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
         puzzle.OnStateChanged -= RefreshVisuals;
         puzzle.OnPigmentApplied -= HandlePigmentApplied;
         puzzle.OnSuccess -= HandleSuccess;
+        puzzle.OnHint -= HandleButtonHint;
+        puzzle.OnPhaseChanged -= HandlePhaseChanged;
     }
 
     private bool ValidateRefs()
@@ -166,9 +177,10 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
         }
     }
 
-    // 30초 지나면 어긋난 원판을 붉게 (기획서 6.2)
+    // 낮에만: 30초 지나면 어긋난 원판을 붉게 (기획서 6.2). 밤은 힌트 버튼으로만
     private void UpdateHint()
     {
+        if (!puzzle.UseAutoHint) return;
         if (hintActive || !puzzle.PigmentApplied || puzzle.IsCleared) return;
 
         hintTimer += Time.deltaTime;
@@ -230,6 +242,7 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
     private string GetOpenMessage()
     {
         if (puzzle.IsCleared) return "이미 복원한 원판이다.";
+        if (puzzle.IsNight && puzzle.PigmentApplied) return "달이 해를 삼켰다. 원판이 거꾸로 돈다.";
         if (puzzle.PigmentApplied) return "원판을 돌려 태양 문양을 이어보자.";
         return "밤 문양 조각이 빠져 있다. 무언가로 채워야 할 것 같다.";
     }
@@ -268,23 +281,46 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
         }
     }
 
+    // 낮 자동 힌트(hintActive) 또는 밤 버튼 힌트(puzzle.HintActive)면 어긋난 원판을 붉게
     private Color GetDiskColor(int index)
     {
         if (!puzzle.PigmentApplied) return lockedColor;
-        if (hintActive && !puzzle.IsCorrect(index)) return hintColor;
+
+        bool showHint = hintActive || puzzle.HintActive;
+        if (showHint && !puzzle.IsCorrect(index)) return hintColor;
         return Color.white;
     }
 
     private void HandlePigmentApplied()
     {
-        statusText.text = "청색 안료로 밤 문양을 채웠다. 원판이 움직인다!";
+        statusText.text = puzzle.IsNight
+            ? "달이 해를 삼켰다. 원판이 거꾸로 돈다."
+            : "청색 안료로 밤 문양을 채웠다. 원판이 움직인다!";
         RefreshVisuals();
     }
 
     private void HandleSuccess()
     {
-        statusText.text = "태양 문양이 완성됐다! 거울 조각 2 + 프리즘 획득";
+        statusText.text = puzzle.IsNight
+            ? "개기 일식이 완성됐다. 밤의 태양이 숨을 멈춘다."
+            : "태양 문양이 완성됐다! 거울 조각 2 + 프리즘 획득";
         RefreshVisuals();
+    }
+
+    private void HandleButtonHint()
+    {
+        statusText.text = "어긋난 원판의 윤곽이 붉게 빛난다...";
+        RefreshVisuals();
+    }
+
+    // 낮 -> 밤: 낮 자동 힌트 상태가 밤까지 남지 않게 초기화
+    private void HandlePhaseChanged()
+    {
+        hintActive = false;
+        hintTimer = 0f;
+        if (currentZ != null) SnapDisks();
+        RefreshVisuals();
+        if (isOpen) statusText.text = GetOpenMessage();
     }
 
     // UI에서 z가 마이너스면 시계 방향. 어긋난 횟수만큼 시계 방향으로 돌아가 있음

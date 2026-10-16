@@ -9,7 +9,8 @@ public enum TimeSymbol { Noon, Night, Dawn, Dusk }
 // - 4문제 (새벽/정오/황혼/밤 한 번씩, 순서 랜덤), 전부 맞히면 클리어
 // - 오답이면 같은 문제 다시, 같은 문제를 3번 틀리면 해 위치 힌트 (다음 문제로 가면 초기화)
 // - 낮/밤 판정표는 ShadowClockPuzzleData에서 읽음 (밤 = 그림자가 해를 향함)
-public class ShadowClockPuzzle : RaPhasedPuzzle
+// - 밤(자동 힌트 꺼짐): 3회 오답 힌트 없음 -> 힌트 버튼으로 지금 문제의 해 위치를 봄
+public class ShadowClockPuzzle : RaPhasedPuzzle, IPuzzleHintProvider
 {
     // 동쪽 벽 기호 배치 순서 (화면 왼쪽부터)
     public static readonly TimeSymbol[] WallOrder =
@@ -198,18 +199,35 @@ public class ShadowClockPuzzle : RaPhasedPuzzle
         Debug.Log("[노트 3] 해가 머리 위에 서면 그림자는 발밑에 숨고, 해가 없으면 그림자도 없다.");
     }
 
-    // 오답: 같은 문제 다시. 같은 문제를 hintAfterFails번 틀리면 해 위치 힌트
+    // 오답: 같은 문제 다시. 낮에는 같은 문제를 hintAfterFails번 틀리면 해 위치 힌트
     protected override void OnFailInternal()
     {
         failsOnCurrent++;
         base.OnFailInternal(); // OnFail 이벤트 -> Reset()
 
-        if (failsOnCurrent >= hintAfterFails && !hintActive)
+        if (UseAutoHint && failsOnCurrent >= hintAfterFails && !hintActive)
         {
-            hintActive = true;
-            Debug.Log("[P1] 힌트: 해의 위치가 어렴풋이 보인다");
-            OnHint?.Invoke();
+            ShowSunHint();
         }
+    }
+
+    private void ShowSunHint()
+    {
+        hintActive = true;
+        Debug.Log("[P1] 힌트: 해의 위치가 어렴풋이 보인다");
+        OnHint?.Invoke();
+    }
+
+    // ================= 힌트 버튼 (밤) =================
+    // 문제마다 한 번 (다음 문제로 가면 hintActive가 꺼져서 다시 쓸 수 있음)
+    public bool HintAvailable => !UseAutoHint && CanEnter() && !IsCleared && LensMounted && !hintActive;
+
+    public string RequestHint()
+    {
+        if (!HintAvailable) return null;
+
+        ShowSunHint();
+        return "다이얼 위로 해의 위치가 비친다. 밤의 그림자는 어느 쪽으로 눕는가?";
     }
 
     // 진행은 그대로 두고 지금 문제만 다시 (기획서 4.1 "해당 문제만 다시")

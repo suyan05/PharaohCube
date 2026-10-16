@@ -8,7 +8,8 @@ public enum SunButton { Rising, Noon, Setting, Night, Boat, Return }
 // 정답 순서, 제단이 깨어나는 조건, 형판 지급 여부는 낮/밤 데이터(SunCyclePuzzleData)에서 읽음
 // - 낮 클리어: 형판 없음 -> 라의 성소로 안내 (성소 대화 후 밤 시작)
 // - 밤 클리어: 태양 형판 지급 -> 북쪽 문 개방 (NorthDoor가 F_RA_NIGHT_P5_DONE을 봄)
-public class SunCyclePuzzle : RaPhasedPuzzle
+// - 밤(자동 힌트 꺼짐): 3회 오답 정답 실루엣 없음 -> 힌트 버튼으로 정해진 걸음을 하나씩
+public class SunCyclePuzzle : RaPhasedPuzzle, IPuzzleHintProvider
 {
     public const string CircuitFlag = "F_RA_CIRCUIT_4"; // 낮 기본 개방 조건 (기존 코드 호환용)
     public const string PlateRa = "PLATE_RA";            // 태양 형판
@@ -29,6 +30,11 @@ public class SunCyclePuzzle : RaPhasedPuzzle
 
     [Header("튜닝 (기획서 4.5)")]
     [SerializeField] private int hintAfterFails = 3;
+
+    [Header("힌트 버튼 (밤)")]
+    [Tooltip("힌트를 누를 때마다 알려줄 걸음 번호 (0 = 첫 걸음). 기본: 가운데 3번째 -> 첫 번째")]
+    [SerializeField] private int[] hintRevealOrder = { 2, 0 };
+    private int hintsGiven;
 
     [Header("낮 클리어 안내 (형판을 안 줄 때)")]
     [SerializeField, TextArea] private string dayClearMessage = "제단의 태양이 빛난다. 입구의 라의 성소로 가 보자.";
@@ -173,17 +179,34 @@ public class SunCyclePuzzle : RaPhasedPuzzle
         Debug.Log("[노트 6] 태양의 형판을 큐브의 첫 면에 장착하라.");
     }
 
+    // 낮에만 3회 오답 자동 힌트 (정답 실루엣)
     protected override void OnFailInternal()
     {
         failCount++;
         base.OnFailInternal(); // OnFail 이벤트 -> Reset()
 
-        if (failCount >= hintAfterFails && !hintShown)
+        if (UseAutoHint && failCount >= hintAfterFails && !hintShown)
         {
             hintShown = true;
             Debug.Log("[P5] 힌트: 제단 벽면에 정답 실루엣이 떠오른다");
             OnHint?.Invoke();
         }
+    }
+
+    // ================= 힌트 버튼 (밤) =================
+    public bool HintAvailable => !UseAutoHint && CanEnter() && IsAwake && !IsCleared
+                                 && hintRevealOrder != null && hintsGiven < hintRevealOrder.Length;
+
+    public string RequestHint()
+    {
+        if (!HintAvailable) return null;
+
+        int step = Mathf.Clamp(hintRevealOrder[hintsGiven], 0, AnswerLength - 1);
+        hintsGiven++;
+
+        string button = ToKorean(Data.AnswerAt(step));
+        Debug.Log($"[P5] 힌트: {step + 1}번째 걸음 = {button}");
+        return $"제단 벽면에 글자가 떠오른다. {step + 1}번째 걸음은 '{button}'.";
     }
 
     public override void Reset()
@@ -201,6 +224,7 @@ public class SunCyclePuzzle : RaPhasedPuzzle
         inputs.Clear();
         failCount = 0;
         hintShown = false;
+        hintsGiven = 0;
         OnInputChanged?.Invoke();
     }
 

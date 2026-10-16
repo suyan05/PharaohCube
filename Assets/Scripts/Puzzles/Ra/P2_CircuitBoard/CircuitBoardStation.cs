@@ -5,10 +5,13 @@ using UnityEngine.UI;
 // OBJ_003 회로판: E키로 오버레이 열기/닫기 + 거울 클릭(회전)
 // 조각은 회로판을 열 때 CircuitBoardPuzzle이 정답 칸에 자동으로 끼움 -> 조각 선택 버튼 없음
 // 판을 크게 쓰려고 안내 문구는 판 오른쪽에 세로로 배치
+// 밤: 회로판은 이미 파란 빛으로 완성된 상태 (조작 없음, 보기만)
 public class CircuitBoardStation : MonoBehaviour, IInteractable
 {
     // CircuitBoardPuzzle.AdvanceTutorial의 튜토리얼 클릭 수와 같은 값 (거울 한 바퀴 = 4번)
     private const int TutorialClickCount = 4;
+
+    private const string LockedMessage = "회로판은 이미 밤빛으로 물들어 있다. 더 이상 손댈 곳이 없다.";
 
     // 판 오른쪽 안내 영역 (1920x1080 기준, 판 가운데가 0,0)
     private static readonly Vector2 StatusPos = new Vector2(640f, 80f);
@@ -22,6 +25,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     [SerializeField] private GameObject overlayPanel;
 
     private Text statusText;
+    private Text helpText;
     private Font font;
     private Color paper, sandWall;
 
@@ -114,6 +118,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
         // 튜토리얼 미완료면 안내만, 완료면 1단계 자동 클리어 + 가져온 조각 자동 장착
         puzzle.Open();
+        RefreshHelp();
         RefreshStatus();
         Debug.Log("[P2] 회로판 열림");
     }
@@ -133,8 +138,17 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
         RectTransform root = overlayPanel.GetComponent<RectTransform>();
 
         statusText = CreateSideText(root, "", 28, StatusPos, StatusSize, paper);
-        CreateSideText(root, "거울 클릭: 회전\n깜빡이는 문양에 빛을 보내자\nE / Esc: 닫기",
-            22, HelpPos, HelpSize, sandWall);
+        helpText = CreateSideText(root, "", 22, HelpPos, HelpSize, sandWall);
+        RefreshHelp();
+    }
+
+    // 밤(조작 잠금)에는 거울 조작 안내를 숨김
+    private void RefreshHelp()
+    {
+        if (helpText == null) return;
+        helpText.text = puzzle.IsLocked
+            ? "E / Esc: 닫기"
+            : "거울 클릭: 회전\n깜빡이는 문양에 빛을 보내자\nE / Esc: 닫기";
     }
 
     // 줄바꿈되는 왼쪽 정렬 글자
@@ -159,7 +173,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
     private string BuildStatusMessage()
     {
-        if (puzzle.IsLocked) return "회로판은 이미 파란 빛으로 완성되어 있다.";
+        if (puzzle.IsLocked) return LockedMessage;
         if (puzzle.IsComplete) return "네 문양이 모두 빛난다. 태양 제단으로 가자.";
 
         string missing = puzzle.MissingHint();
@@ -193,9 +207,16 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
     // ================= 보드 클릭 처리 =================
     // 거울/조각 좌클릭 = 회전. 우클릭, 빈 칸, 프리즘 소켓은 반응 없음 (조각은 자동 장착)
+    // 밤(잠금): 어디를 눌러도 완성 안내만
     private void HandleCellClick(Vector2Int tile, bool rightClick)
     {
         if (!isOpen || rightClick) return;
+
+        if (puzzle.IsLocked)
+        {
+            statusText.text = LockedMessage;
+            return;
+        }
         if (tile == CircuitBoardPuzzle.PrismTile) return;
 
         try

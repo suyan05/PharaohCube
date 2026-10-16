@@ -45,6 +45,7 @@ public class SunCyclePuzzleData : RaPuzzleData
     private void FillDay()
     {
         SetCommon("", "F_RA_P5_DONE", true, true);
+        SetAutoHint(true);
         wakeFlag = "F_RA_CIRCUIT_4";
         answer = (SunButton[])DefaultAnswer.Clone(); // (1) -> (2) -> (3) -> (5) -> (6), A안
         grantPlate = false; // 낮은 시련만 통과, 형판은 밤에
@@ -55,6 +56,7 @@ public class SunCyclePuzzleData : RaPuzzleData
     private void FillNight()
     {
         SetCommon("", "F_RA_NIGHT_P5_DONE", false, false);
+        SetAutoHint(false); // 밤: 3회 오답 정답 실루엣 없음 -> 힌트 버튼으로 한 걸음씩
         wakeFlag = "F_RA_NIGHT_P4_DONE";
         answer = new[]
         {

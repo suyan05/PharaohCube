@@ -5,7 +5,7 @@ using UnityEngine;
 // 단계별 대사:
 //   (1) 낮 시련 전          : 짧은 안내 (처음 한 번 듣기 전까지 "!" 표시 - 입구 비석 역할)
 //   (2) 낮 P5 클리어 후     : "!" 표시 -> 시련 통과 대사 -> 끝나면 밤 시작 (F_RA_NIGHT_OPEN)
-//   (3) 밤 진행 중          : 밤 힌트 대사
+//   (3) 밤 진행 중          : 밤 힌트 대사 (처음 한 번 듣기 전까지 "!" 표시)
 //   (4) 밤 P5 클리어 후     : "!" 표시 -> 마무리 대사 (한 번 들으면 "!" 사라짐)
 public class RaShrine : MonoBehaviour, IInteractable
 {
@@ -26,6 +26,8 @@ public class RaShrine : MonoBehaviour, IInteractable
     [Tooltip("처음 대화를 들으면 켜짐 (켜지기 전까지 \"!\" 표시)")]
     [SerializeField] private string firstTalkedFlag = "F_RA_SHRINE_FIRST_TALKED";
     [SerializeField] private string dayClearFlag = "F_RA_P5_DONE";
+    [Tooltip("밤 대사를 처음 들으면 켜짐 (켜지기 전까지 밤에도 \"!\" 표시)")]
+    [SerializeField] private string nightTalkedFlag = "F_RA_SHRINE_NIGHT_TALKED";
     [SerializeField] private string nightClearFlag = "F_RA_NIGHT_P5_DONE";
     [SerializeField] private string endTalkedFlag = "F_RA_SHRINE_END_TALKED";
 
@@ -104,6 +106,7 @@ public class RaShrine : MonoBehaviour, IInteractable
         {
             case Stage.BeforeTrial: return !HasFlag(firstTalkedFlag);
             case Stage.TrialPassed: return true;
+            case Stage.Night: return !HasFlag(nightTalkedFlag);
             case Stage.NightCleared: return !HasFlag(endTalkedFlag);
             default: return false;
         }
@@ -143,7 +146,7 @@ public class RaShrine : MonoBehaviour, IInteractable
         switch (stage)
         {
             case Stage.TrialPassed: dialogue.Play(trialPassedLines, BeginNight); break;
-            case Stage.Night: dialogue.Play(nightLines); break;
+            case Stage.Night: dialogue.Play(nightLines, MarkNightTalked); break;
             case Stage.NightCleared: dialogue.Play(nightClearedLines, MarkEndTalked); break;
             default: dialogue.Play(beforeTrialLines, MarkFirstTalked); break;
         }
@@ -151,8 +154,18 @@ public class RaShrine : MonoBehaviour, IInteractable
 
     private void MarkFirstTalked()
     {
+        SetFlagOnce(firstTalkedFlag);
+    }
+
+    private void MarkNightTalked()
+    {
+        SetFlagOnce(nightTalkedFlag);
+    }
+
+    private static void SetFlagOnce(string flag)
+    {
         GameManager gm = GameManager.Instance;
-        if (gm != null && !gm.HasFlag(firstTalkedFlag)) gm.SetFlag(firstTalkedFlag);
+        if (gm != null && !string.IsNullOrEmpty(flag) && !gm.HasFlag(flag)) gm.SetFlag(flag);
     }
 
     // ================= 밤 시작 =================
@@ -174,8 +187,7 @@ public class RaShrine : MonoBehaviour, IInteractable
 
     private void MarkEndTalked()
     {
-        GameManager gm = GameManager.Instance;
-        if (gm != null && !gm.HasFlag(endTalkedFlag)) gm.SetFlag(endTalkedFlag);
+        SetFlagOnce(endTalkedFlag);
     }
 
     private static bool HasFlag(string flag)
