@@ -18,3 +18,4 @@ MonoBehaviour:
   grantRewards: 0
   wakeFlag: F_RA_NIGHT_P4_DONE
   answer: 0200000004000000030000000500000000000000
+  grantPlate: 1

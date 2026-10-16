@@ -16,6 +16,6 @@ MonoBehaviour:
   clearFlag: F_RA_NIGHT_P4_DONE
   useItemGate: 0
   grantRewards: 0
-  panelOrder: 03000000020000000100000000000000
+  panelOrder: 02000000000000000300000001000000
   randomizePanels: 0
   reverseAnswer: 1

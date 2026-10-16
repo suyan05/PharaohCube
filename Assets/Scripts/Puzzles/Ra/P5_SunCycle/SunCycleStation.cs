@@ -14,8 +14,8 @@ public class SunCycleStation : MonoBehaviour, IInteractable
     [SerializeField] private Sprite risingSprite;   // (1) 떠오르는 태양
     [SerializeField] private Sprite noonSprite;     // (2) 정오
     [SerializeField] private Sprite settingSprite;  // (3) 지는 태양
-    [SerializeField] private Sprite nightSprite;    // (4) 밤
-    [SerializeField] private Sprite boatSprite;     // (5) 태양의 배 [함정]
+    [SerializeField] private Sprite nightSprite;    // (4) 밤 [낮 함정]
+    [SerializeField] private Sprite boatSprite;     // (5) 태양의 배
     [SerializeField] private Sprite returnSprite;   // (6) 재림
 
     [Header("아트 - 중앙 태양판")]
@@ -52,8 +52,8 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         new Vector2(0, 230),      // (2) 정오 - 하늘, 12시
         new Vector2(199, 115),    // (6) 재림 - 2시
         new Vector2(199, -115),   // (1) 떠오르는 태양 - 4시
-        new Vector2(0, -230),     // (5) 태양의 배 - 6시 [함정]
-        new Vector2(-199, -115),  // (4) 밤 - 8시
+        new Vector2(0, -230),     // (5) 태양의 배 - 6시
+        new Vector2(-199, -115),  // (4) 밤 - 8시 [낮 함정]
         new Vector2(-199, 115)    // (3) 지는 태양 - 10시
     };
 
@@ -320,9 +320,12 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         centerPlate.color = puzzle.IsCleared ? gold : dimSun;
     }
 
+    // 낮: 형판 없이 성소로 안내 / 밤: 형판 획득 + 북쪽 문
     private void HandleSuccess()
     {
-        statusText.text = "태양이 다시 떠오른다! 태양 형판 획득 - 북쪽 문이 열린다";
+        statusText.text = puzzle.GivesPlate
+            ? "태양이 다시 떠오른다! 태양 형판 획득 - 북쪽 문이 열린다"
+            : "태양의 하루가 제단에 새겨졌다. 입구의 라의 성소가 빛난다.";
         RefreshAll();
     }
 

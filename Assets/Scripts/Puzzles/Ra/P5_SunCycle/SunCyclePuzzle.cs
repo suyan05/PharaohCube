@@ -5,11 +5,16 @@ using UnityEngine;
 public enum SunButton { Rising, Noon, Setting, Night, Boat, Return }
 
 // P5 태양의 순환 - "종합 + 신화"
-// 정답 순서, 제단이 깨어나는 조건은 낮/밤 데이터(SunCyclePuzzleData)에서 읽음
+// 정답 순서, 제단이 깨어나는 조건, 형판 지급 여부는 낮/밤 데이터(SunCyclePuzzleData)에서 읽음
+// - 낮 클리어: 형판 없음 -> 라의 성소로 안내 (성소 대화 후 밤 시작)
+// - 밤 클리어: 태양 형판 지급 -> 북쪽 문 개방 (NorthDoor가 F_RA_NIGHT_P5_DONE을 봄)
 public class SunCyclePuzzle : RaPhasedPuzzle
 {
     public const string CircuitFlag = "F_RA_CIRCUIT_4"; // 낮 기본 개방 조건 (기존 코드 호환용)
     public const string PlateRa = "PLATE_RA";            // 태양 형판
+
+    // GameMessageUI가 이 말머리로 시작하는 로그를 오른쪽 위 알림으로 띄움
+    private const string MessageTag = "[Door] ";
 
     // 데이터가 하나도 없을 때 쓰는 기본 정답 (낮 A안)
     private static readonly SunButton[] FallbackAnswer =
@@ -24,6 +29,9 @@ public class SunCyclePuzzle : RaPhasedPuzzle
 
     [Header("튜닝 (기획서 4.5)")]
     [SerializeField] private int hintAfterFails = 3;
+
+    [Header("낮 클리어 안내 (형판을 안 줄 때)")]
+    [SerializeField, TextArea] private string dayClearMessage = "제단의 태양이 빛난다. 입구의 라의 성소로 가 보자.";
 
     // 씬에 있는 P5 (화면 스크립트가 static AnswerAt으로 힌트를 그릴 때 사용)
     private static SunCyclePuzzle current;
@@ -42,6 +50,7 @@ public class SunCyclePuzzle : RaPhasedPuzzle
     public bool HintShown => hintShown;
     public IReadOnlyList<SunButton> Inputs => inputs;
     public int AnswerLength => Data.AnswerLength;
+    public bool GivesPlate => Data.GrantPlate;
 
     // 기존 화면 스크립트 호환용 (static 유지)
     public static SunButton AnswerAt(int i)
@@ -116,8 +125,15 @@ public class SunCyclePuzzle : RaPhasedPuzzle
     // ================= PuzzleBase 구현 =================
     public override void Submit()
     {
-        if (Validate()) OnSuccessInternal();
-        else OnFailInternal();
+        try
+        {
+            if (Validate()) OnSuccessInternal();
+            else OnFailInternal();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] P5 판정 오류: {e}");
+        }
     }
 
     protected override bool Validate()
@@ -130,13 +146,29 @@ public class SunCyclePuzzle : RaPhasedPuzzle
         return true;
     }
 
+    // 형판은 데이터의 Grant Plate로만 결정 (낮 = 안내만, 밤 = 형판)
     protected override void OnSuccessInternal()
     {
         base.OnSuccessInternal(); // IsCleared + clearFlag (낮 F_RA_P5_DONE / 밤 F_RA_NIGHT_P5_DONE)
 
-        if (!GrantRewards) return; // 밤에는 보상 없음 (기획서 6장, 보상 미정)
+        if (!Data.GrantPlate)
+        {
+            if (!string.IsNullOrEmpty(dayClearMessage)) Debug.Log(MessageTag + dayClearMessage);
+            return;
+        }
+        GrantPlateReward();
+    }
 
-        ItemInventory.Instance.Grant(PlateRa);
+    private void GrantPlateReward()
+    {
+        ItemInventory inventory = ItemInventory.Instance;
+        if (inventory == null)
+        {
+            Debug.LogWarning($"[{name}] ItemInventory가 없어서 태양 형판을 못 줌");
+            return;
+        }
+
+        inventory.Grant(PlateRa);
         Debug.Log("[P5] 태양 형판(PLATE_RA) 획득 + '태양' 키워드");
         Debug.Log("[노트 6] 태양의 형판을 큐브의 첫 면에 장착하라.");
     }

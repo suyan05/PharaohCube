@@ -18,3 +18,4 @@ MonoBehaviour:
   grantRewards: 1
   wakeFlag: F_RA_CIRCUIT_4
   answer: 0000000001000000020000000400000005000000
+  grantPlate: 0
