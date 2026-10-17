@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d20c7fda4e5b9d4da970135c105db1f, type: 3}
+  m_Name: Clue_ANUBIS_A2
+  m_EditorClassIdentifier: Assembly-CSharp::ClueData
+  clueId: ANUBIS_A2
+  day:
+    title: "\uD0DC\uC5FD\uC758 \uBC29"
+    body: "\uC11D\uAD00\uC740 \uC0AC\uB78C\uC758 \uD798\uB9CC\uC73C\uB85C\uB294 \uB4E4\uC5B4
+      \uC62C\uB9B4 \uC218 \uC5C6\uC5C8\uB2E4.\n\uD1B1\uB2C8\uBC14\uD034\uB294 \uD798\uC744
+      \uBC14\uAFB8\uACE0, \uC6C0\uC9C1 \uB3C4\uB974\uB798\uB294 \uD798\uC744 \uB450
+      \uBC30\uB85C \uB9CC\uB4E0\uB2E4.\n\uD544\uC694\uD55C \uB9CC\uD07C\uB9CC \uD798\uC744
+      \uD0A4\uC6CC\uB77C. \uBAA8\uC790\uB77C\uB3C4 \uB118\uCCD0\uB3C4 \uC904\uC740
+      \uB04A\uC5B4\uC9C4\uB2E4."
+    illustration: {fileID: 0}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
+  night:
+    title: 
+    body: 
+    illustration: {fileID: 0}
+    illustrationTint: {r: 1, g: 1, b: 1, a: 1}

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9b0b5bc49e8f38479076adbb4cae8c5, type: 3}
+  m_Name: Hint_Anubis_A2_Gear
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisHintData
+  hints:
+  - "\uAC00\uC6B4\uB370 \uBC14\uD034\uB294 \uBC29\uD5A5\uB9CC \uBC14\uAFBC\uB2E4.
+    \uD798 = \uB9C8\uC9C0\uB9C9 \uBC14\uD034\uC758 \uC774 \uC218 \xF7 \uCCAB \uBC14\uD034\uC758
+    \uC774 \uC218."
+  - "\uC6C0\uC9C1 \uB3C4\uB974\uB798 \uD558\uB098\uB9C8\uB2E4 \uD798\uC774 2\uBC30\uAC00
+    \uB41C\uB2E4. \uC804\uCCB4 \uD798 = \uD1B1\uB2C8 \uBE44\uC728 \xD7 2 \xD7 2 \u2026"
+  - "12\u219224\uB294 2\uBC30, 12\u219236\uC740 3\uBC30, 24\u219236\uC740 1.5\uBC30.
+    \uBAA9\uD45C \uD798\uC744 \uD1B1\uB2C8 \uBE44\uC728\uACFC \uB3C4\uB974\uB798
+    2\uBC30\uB85C \uB098\uB204\uC5B4 \uB9DE\uCDB0\uB77C."
