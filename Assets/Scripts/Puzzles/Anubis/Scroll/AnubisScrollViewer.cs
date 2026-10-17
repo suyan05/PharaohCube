@@ -66,6 +66,7 @@ public class AnubisScrollViewer : MonoBehaviour
         if (collection == null) return;
         collection.OnPieceCollected += HandlePieceCollected;
         collection.OnScrollCompleted += HandleCompleted;
+        collection.OnCollectionReset += Close; // [추가] 처벌로 조각을 잃으면 창 닫기
     }
 
     private void OnDisable()
@@ -73,6 +74,7 @@ public class AnubisScrollViewer : MonoBehaviour
         if (collection == null) return;
         collection.OnPieceCollected -= HandlePieceCollected;
         collection.OnScrollCompleted -= HandleCompleted;
+        collection.OnCollectionReset -= Close;
     }
 
     private void Update()

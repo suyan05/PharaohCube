@@ -30,6 +30,7 @@ public class AnubisScrollHintBox : MonoBehaviour
         {
             collection.OnPieceCollected += HandlePiece;
             collection.OnScrollCompleted += HandleComplete;
+            collection.OnCollectionReset += Refresh; // [추가] 처벌로 조각을 잃으면 다시 "조각 0 / n"
         }
         Refresh();
     }
@@ -39,6 +40,7 @@ public class AnubisScrollHintBox : MonoBehaviour
         if (collection == null) return;
         collection.OnPieceCollected -= HandlePiece;
         collection.OnScrollCompleted -= HandleComplete;
+        collection.OnCollectionReset -= Refresh;
     }
 
     private void HandlePiece(AnubisScrollData s, int index, int count) { if (s == scroll) Refresh(); }

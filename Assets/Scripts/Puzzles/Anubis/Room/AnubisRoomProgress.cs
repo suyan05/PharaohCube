@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// 메인 저울 통과를 플래그로 남김 (목표 안내, 신상 대화, 힌트 버튼이 이 플래그를 봄)
+// 메인 저울 통과를 플래그로 남김 (목표 안내, 힌트 버튼이 이 플래그를 봄)
 // - AnubisPuzzleManager2D는 플래그를 쓰지 않아서, OnPuzzleCleared 이벤트를 받아 대신 켜 줌
 public class AnubisRoomProgress : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class AnubisRoomProgress : MonoBehaviour
 
     [Header("통과 알림 (비우면 없음)")]
     [TextArea(1, 3)]
-    [SerializeField] private string clearToast = "심판을 통과했다! 아누비스 신상에게 돌아가자.";
+    [SerializeField] private string clearToast = "심판을 통과했다! 영혼이 아알루로 향한다.";
 
     private bool subscribed;
 

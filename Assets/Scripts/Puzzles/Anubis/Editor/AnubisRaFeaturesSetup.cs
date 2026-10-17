@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // 라 방에 있는 방 연출 기능을 아누비스 실전 씬에 한 번에 붙이는 메뉴
-// Tools/Anubis/실전: 라 방 기능 적용 (목표, 신상 대화, 비석, 소지품, 입장 연출, 힌트)
+// Tools/Anubis/실전: 라 방 기능 적용 (목표, 비석, 소지품, 입장 연출, 힌트)
 // - 여러 번 눌러도 이미 있는 것은 새로 만들지 않고 연결만 다시 함 (문구를 고친 .asset은 덮어쓰지 않음)
 // - 라 방 스크립트(RaDialogue, CluePanel, ClueStele, InventoryHUD, RaIntroCutscene, PuzzleHintButton)는 수정 없이 그대로 사용
 public static class AnubisRaFeaturesSetup
@@ -22,7 +22,7 @@ public static class AnubisRaFeaturesSetup
     private const string GameManagerName = "GameManager_AnubisTest";
     private const string HintObjectName = "HintButton";
 
-    [MenuItem("Tools/Anubis/실전: 라 방 기능 적용 (목표, 신상 대화, 비석, 소지품, 입장 연출, 힌트)")]
+    [MenuItem("Tools/Anubis/실전: 라 방 기능 적용 (목표, 비석, 소지품, 입장 연출, 힌트)")]
     public static void Apply()
     {
         var log = new List<string>();
@@ -33,7 +33,7 @@ public static class AnubisRaFeaturesSetup
         CluePanel cluePanel;
         EnsureStoryCanvas(log, out dialogue, out cluePanel);
         GameObject room = EnsureRoomRoot(log, font);
-        EnsureShrine(log, dialogue);
+        RemoveShrineFromPillars(log); // [수정] statue_0은 기둥 장애물이라 신상 대화를 붙이지 않음
         EnsureSteles(log, cluePanel);
         EnsureHintButtons(log);
 
@@ -127,11 +127,18 @@ public static class AnubisRaFeaturesSetup
 
         var guide = GetOrAdd<AnubisObjectiveGuide>(room, log, "목표 안내 띠");
         SetFont(guide, font);
+        // [추가] 씬에 저장된 옛 단계(신상 대화)를 새 단계(입구 비석 읽기)로 교체
+        Undo.RecordObject(guide, "목표 단계 갱신");
+        guide.EditorResetSteps();
+        EditorUtility.SetDirty(guide);
 
         var prompt = GetOrAdd<AnubisPromptUI>(room, log, "아래 안내 문구 (E: …)");
         SetFont(prompt, font);
 
-        GetOrAdd<AnubisRoomProgress>(room, log, "메인 저울 통과 플래그");
+        var progress = GetOrAdd<AnubisRoomProgress>(room, log, "메인 저울 통과 플래그");
+        var pso = new SerializedObject(progress);
+        SetString(pso, "clearToast", "심판을 통과했다! 영혼이 아알루로 향한다."); // [수정] 신상 언급 제거
+        pso.ApplyModifiedPropertiesWithoutUndo();
 
         var hud = GetOrAdd<InventoryHUD>(room, log, "소지품 바");
         FillInventoryEntries(hud);
@@ -139,7 +146,7 @@ public static class AnubisRaFeaturesSetup
         var intro = GetOrAdd<RaIntroCutscene>(room, log, "입장 연출 (맵 줌아웃)");
         var iso = new SerializedObject(intro);
         SetString(iso, "playedFlag", "F_ANUBIS_INTRO_PLAYED");
-        SetString(iso, "overviewMessage", "불이 켜진 구역만 갈 수 있다. 먼저 아누비스 신상에게 가 보자.");
+        SetString(iso, "overviewMessage", "불이 켜진 구역만 갈 수 있다. 먼저 입구의 비석을 읽어 보자.");
         iso.ApplyModifiedPropertiesWithoutUndo();
 
         return room;
@@ -173,32 +180,47 @@ public static class AnubisRaFeaturesSetup
     }
 
     // ================= 4. 아누비스 신상 =================
-    private static void EnsureShrine(List<string> log, RaDialogue dialogue)
+    // [수정] 자동으로 statue_0에 붙이지 않음 (statue_0은 횃불 기둥 장애물)
+    // 지난번 메뉴가 붙인 AnubisShrine과 "!" 말풍선을 기둥에서 지움
+    private static void RemoveShrineFromPillars(List<string> log)
     {
-        AnubisShrine shrine = Object.FindFirstObjectByType<AnubisShrine>(FindObjectsInactive.Include);
-        if (shrine == null)
+        foreach (AnubisShrine shrine in Object.FindObjectsByType<AnubisShrine>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            GameObject target = Selection.activeGameObject != null && Selection.activeGameObject.GetComponent<SpriteRenderer>() != null
-                ? Selection.activeGameObject
-                : GameObject.Find("statue_0");
-            if (target == null)
-            {
-                log.Add("신상: statue_0을 못 찾음 -> 신상 오브젝트를 선택하고 메뉴를 다시 실행");
-                return;
-            }
-            Undo.AddComponent<AnubisShrine>(target);
-            shrine = target.GetComponent<AnubisShrine>();
-            log.Add($"신상: '{target.name}'에 AnubisShrine 붙임");
+            if (!shrine.name.StartsWith("statue_0")) continue; // 일부러 만든 진짜 신상은 건드리지 않음
+
+            GameObject go = shrine.gameObject;
+            Transform bubble = go.transform.Find("NewBubble");
+            if (bubble != null) Undo.DestroyObjectImmediate(bubble.gameObject);
+            Undo.DestroyObjectImmediate(shrine);
+            log.Add($"신상: 기둥 '{go.name}'에서 AnubisShrine과 \"!\" 제거");
+        }
+    }
+
+    // 아누비스 신상 아트가 오면: 신상 오브젝트를 선택하고 이 메뉴 실행
+    [MenuItem("Tools/Anubis/선택한 오브젝트를 아누비스 신상(대화)으로 만들기")]
+    public static void MakeSelectedShrine()
+    {
+        GameObject target = Selection.activeGameObject;
+        if (target == null || target.GetComponent<SpriteRenderer>() == null)
+        {
+            EditorUtility.DisplayDialog("아누비스 신상", "Hierarchy에서 신상 그림(Sprite Renderer가 있는 오브젝트)을 먼저 선택하세요.", "확인");
+            return;
         }
 
-        EnsureCollider(shrine.gameObject);
-        SpriteRenderer bubble = EnsureBubble(shrine.gameObject);
+        AnubisShrine shrine = target.GetComponent<AnubisShrine>();
+        if (shrine == null) shrine = Undo.AddComponent<AnubisShrine>(target);
+
+        EnsureCollider(target);
+        SpriteRenderer bubble = EnsureBubble(target);
 
         var so = new SerializedObject(shrine);
-        SetObject(so, "dialogue", dialogue);
+        SetObject(so, "dialogue", Object.FindFirstObjectByType<RaDialogue>(FindObjectsInactive.Include));
         SetObject(so, "newBubble", bubble);
         SetObject(so, "penalty", Object.FindFirstObjectByType<AnubisJudgmentPenalty>(FindObjectsInactive.Include));
         so.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        Debug.Log($"[라 방 기능 적용] '{target.name}'을 아누비스 신상으로 만듦 (Ctrl+S로 저장)");
     }
 
     // ================= 5. 비석 단서 =================
@@ -207,17 +229,17 @@ public static class AnubisRaFeaturesSetup
         EnsureFolder(ClueFolder);
 
         // (오브젝트 이름, 옆에 둘 제단, 단서 ID, 제목, 본문)
-        var steles = new (string obj, string altar, string id, string title, string body)[]
+        var steles = new (string obj, string altar, string id, string gateItem, string title, string body)[]
         {
-            ("Slate_0", null, "ANUBIS_HALL", "심판의 전당",
+            ("Slate_0", null, "ANUBIS_HALL", "", "심판의 전당",
                 "죽은 자의 심장은 진실의 깃털(마아트)과 함께 저울에 오른다.\n네 개의 시험에서 보물을 얻고, 흩어진 양피지 조각으로 그 무게를 밝혀라.\n모든 보물의 무게는 자연수다."),
-            ("Stele_A1", "Altar_A1_Sand", "ANUBIS_A1", "나트론의 방",
+            ("Stele_A1", "Altar_A1_Sand", "ANUBIS_A1", "", "나트론의 방",
                 "미라를 만들 때 쓰는 신성한 소금, 나트론.\n모래는 항아리에서 항아리로만 옮겨지고, 한 번 붓기 시작하면 멈추지 않는다.\n바닥의 양피지 조각을 모아 규칙을 읽어라."),
-            ("Stele_A2", "Altar_A2_Gear", "ANUBIS_A2", "태엽의 방",
+            ("Stele_A2", "Altar_A2_Gear", "ANUBIS_A2", AnubisItemIds.GoldJar, "태엽의 방",
                 "석관은 사람의 힘만으로는 들어 올릴 수 없었다.\n톱니바퀴는 힘을 바꾸고, 움직 도르래는 힘을 두 배로 만든다.\n필요한 만큼만 힘을 키워라. 모자라도 넘쳐도 줄은 끊어진다."),
-            ("Stele_A3", "Altar_A3_Lever", "ANUBIS_A3", "지렛대의 방",
+            ("Stele_A3", "Altar_A3_Lever", "ANUBIS_A3", AnubisItemIds.ClayPot, "지렛대의 방",
                 "아누비스는 심장을 저울에 달기 전, 먼저 지렛대로 그 무게를 잰다.\n무게만 보지 말고, 축에서 얼마나 떨어져 있는지도 함께 보아라."),
-            ("Stele_A4", "Altar_A4_MagicSquare", "ANUBIS_A4", "42인의 심판관",
+            ("Stele_A4", "Altar_A4_MagicSquare", "ANUBIS_A4", AnubisItemIds.Obsidian, "42인의 심판관",
                 "망자는 42명의 심판관 앞에서 죄가 없음을 고백한다.\n아홉 신의 상징에는 숫자가 숨어 있다.\n가로, 세로, 대각선 어느 쪽으로 더해도 같은 합이 되게 하라.")
         };
 
@@ -238,19 +260,26 @@ public static class AnubisRaFeaturesSetup
                 log.Add($"비석 '{s.obj}' 만듦 ({s.altar} 왼쪽, 위치는 Scene에서 옮기기)");
             }
 
-            ClueStele stele = go.GetComponent<ClueStele>();
-            if (stele == null) stele = Undo.AddComponent<ClueStele>(go);
+            // [수정] 라 방 ClueStele -> AnubisClueStele 로 교체
+            //  ClueStele는 읽음 기록을 GameManager 플래그로 남겨서 처벌 후 "!"를 다시 띄울 수 없음
+            ClueStele oldStele = go.GetComponent<ClueStele>();
+            if (oldStele != null) Undo.DestroyObjectImmediate(oldStele);
+
+            AnubisClueStele stele = go.GetComponent<AnubisClueStele>();
+            if (stele == null) stele = Undo.AddComponent<AnubisClueStele>(go);
 
             EnsureCollider(go);
             SpriteRenderer bubble = EnsureBubble(go);
 
+            // "!" 순서: 입구, A1은 처음부터 / A2~A4는 앞 서브 퍼즐 보상을 얻으면 뜸
             var so = new SerializedObject(stele);
             SetObject(so, "data", data);
             SetObject(so, "panel", panel);
             SetObject(so, "newBubble", bubble);
+            SetString(so, "unlockItemId", s.gateItem);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
-        log.Add($"비석 단서 {steles.Length}개 연결 (문구: {ClueFolder})");
+        log.Add($"비석 단서 {steles.Length}개 연결 + \"!\" 순서 (입구, A1 -> A2 -> A3 -> A4), 처벌 시 다시 \"!\" (문구: {ClueFolder})");
     }
 
     private static GameObject CreateSteleObject(string name, string altarName, GameObject template)

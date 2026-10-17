@@ -249,16 +249,25 @@ public class AnubisObjectiveGuide : MonoBehaviour
     {
         return new List<AnubisObjectiveStep>
         {
-            Make("", FlagShrineFirstTalked, "아누비스 신상에게 말을 걸어 보자"),
+            // [수정] 첫 단계 = 입구 비석 읽기 (ClueStele가 읽으면 F_CLUE_<id>_READ를 켬)
+            Make("", FlagHallSteleRead, "입구의 비석을 읽어 보자"),
             Make(AnubisItemIds.GoldJar, "", "양피지 조각을 모아 A1 모래 제단의 시험을 풀자"),
             Make(AnubisItemIds.ClayPot, "", "열린 A2 톱니 구역에서 도르래 제단을 풀자"),
             Make(AnubisItemIds.Obsidian, "", "A3 레버 구역의 지렛대 제단을 풀자"),
             Make(AnubisItemIds.BronzeBowl, "", "A4 구역에서 42인의 심판관 마방진을 풀자"),
             Make("", FlagMainDone, "심판의 저울(A5)에 깃털과 같은 무게의 보물을 올리자"),
-            Make("", FlagShrineEndTalked, "심판을 통과했다. 아누비스 신상에게 돌아가자"),
-            Make("", "", "아누비스의 시련을 모두 마쳤다")
+            // [수정] 신상 대화 단계 제거 (신상 오브젝트가 아직 없음)
+            Make("", "", "심판을 통과했다. 아누비스의 시련을 모두 마쳤다")
         };
     }
+
+    // [추가] 입구 비석(Clue_ANUBIS_HALL) 읽음 플래그
+    public const string FlagHallSteleRead = "F_CLUE_ANUBIS_HALL_READ";
+
+#if UNITY_EDITOR
+    // [추가] 에디터 세팅 메뉴에서 씬에 저장된 옛 단계를 새 기본값으로 바꿀 때 사용
+    public void EditorResetSteps() => steps = DefaultSteps();
+#endif
 
     public const string FlagShrineEndTalked = "F_ANUBIS_SHRINE_END_TALKED";
 

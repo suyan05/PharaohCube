@@ -5,8 +5,9 @@ using UnityEngine;
 // - 조각 그림이 위아래로 둥실거리고 반짝여서 "주울 수 있는 물건"으로 보이게
 // - 플레이어가 처음으로 조각 근처에 오면 한 번만 안내 문구 (씬 전체에서 1번)
 // - 처음 주울 때 "조각을 모으면 푸는 방법이 드러난다" 안내 (씬 전체에서 1번)
+// [추가] 메인 저울 실패 처벌(IAnubisRetryable) 때 주웠던 조각이 제자리에 다시 나타남
 [RequireComponent(typeof(Collider2D))]
-public class AnubisScrollPiece : MonoBehaviour, IInteractable
+public class AnubisScrollPiece : MonoBehaviour, IAnubisRetryable, IInteractable
 {
     [Header("어떤 양피지의 몇 번 조각인지")]
     [SerializeField] private AnubisScrollData scroll;
@@ -120,6 +121,14 @@ public class AnubisScrollPiece : MonoBehaviour, IInteractable
             AnubisToast.Show(firstPickupMessage, 5f);
         }
         gameObject.SetActive(false);
+    }
+
+    // [추가] 메인 저울 실패 처벌: 주운 조각을 다시 맵에 놓음 (AnubisScrollCollection도 같이 비워짐)
+    public void ResetForRetry()
+    {
+        if (visualTr != null && visualTr != transform) visualTr.localPosition = visualBasePos;
+        if (visual != null) visual.color = visualBaseColor;
+        if (!gameObject.activeSelf) gameObject.SetActive(true);
     }
 
     // Scene 뷰: 조각 위치, 번호, 첫 안내 범위 표시
