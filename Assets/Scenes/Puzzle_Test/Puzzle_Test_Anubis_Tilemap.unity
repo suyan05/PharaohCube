@@ -18999,6 +18999,7 @@ GameObject:
   - component: {fileID: 669338887}
   - component: {fileID: 669338886}
   - component: {fileID: 669338885}
+  - component: {fileID: 669338888}
   m_Layer: 0
   m_Name: statue_0 (1)
   m_TagString: Untagged
@@ -19126,6 +19127,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 872000987}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &669338888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 669338884}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.433
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &672778198
 GameObject:
   m_ObjectHideFlags: 0
@@ -22079,6 +22096,7 @@ GameObject:
   - component: {fileID: 872000987}
   - component: {fileID: 872000986}
   - component: {fileID: 872000985}
+  - component: {fileID: 872000988}
   m_Layer: 0
   m_Name: statue_0
   m_TagString: Untagged
@@ -22207,6 +22225,22 @@ Transform:
   - {fileID: 669338887}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &872000988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 872000984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.433
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &882958661
 GameObject:
   m_ObjectHideFlags: 0
@@ -25588,6 +25622,7 @@ GameObject:
   - component: {fileID: 1080728671}
   - component: {fileID: 1080728670}
   - component: {fileID: 1080728669}
+  - component: {fileID: 1080728672}
   m_Layer: 0
   m_Name: Pillar_0 (1)
   m_TagString: Untagged
@@ -25715,6 +25750,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1676169054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1080728672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1080728668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.25
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &1086857934
 GameObject:
   m_ObjectHideFlags: 0
@@ -28921,6 +28972,7 @@ GameObject:
   - component: {fileID: 1270375254}
   - component: {fileID: 1270375253}
   - component: {fileID: 1270375252}
+  - component: {fileID: 1270375255}
   m_Layer: 0
   m_Name: Pillar_0 (2)
   m_TagString: Untagged
@@ -29048,6 +29100,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1676169054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1270375255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270375251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.25
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &1276778180
 GameObject:
   m_ObjectHideFlags: 0
@@ -31473,6 +31541,7 @@ GameObject:
   - component: {fileID: 1404239736}
   - component: {fileID: 1404239735}
   - component: {fileID: 1404239734}
+  - component: {fileID: 1404239737}
   m_Layer: 0
   m_Name: Pillar_0 (3)
   m_TagString: Untagged
@@ -31600,6 +31669,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1676169054}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1404239737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404239733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.25
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &1407246149
 GameObject:
   m_ObjectHideFlags: 0
@@ -36093,6 +36178,7 @@ GameObject:
   - component: {fileID: 1676169054}
   - component: {fileID: 1676169053}
   - component: {fileID: 1676169052}
+  - component: {fileID: 1676169055}
   m_Layer: 0
   m_Name: Pillar_0
   m_TagString: Untagged
@@ -36223,6 +36309,22 @@ Transform:
   - {fileID: 1404239736}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1676169055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1676169051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afdbc9a7c0d7a64684e4521c3c79659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PillarOcclusion
+  blockHeightRatio: 0.25
+  blockWidthRatio: 0.9
+  fitColliderOnAwake: 1
+  behindOffsetY: 0
 --- !u!1 &1676975373
 GameObject:
   m_ObjectHideFlags: 0

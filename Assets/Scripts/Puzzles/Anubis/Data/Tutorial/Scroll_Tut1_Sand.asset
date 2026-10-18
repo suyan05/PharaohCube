@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c548142d81096654bac0213400e13a73, type: 3}
+  m_Name: Scroll_Tut1_Sand
+  m_EditorClassIdentifier: Assembly-CSharp::AnubisScrollData
+  scrollId: SCROLL_ANUBIS_TUT_1
+  title: "\uBAA8\uB798\uC758 \uC11C (\uC5F0\uC2B5)"
+  pieceCount: 2
+  fullText: "\uB098\uD2B8\uB860\uC758 \uBAA8\uB798\uB294 \uD56D\uC544\uB9AC\uC5D0\uC11C
+    \uD56D\uC544\uB9AC\uB85C\uB9CC \uC62E\uACA8\uC9C4\uB2E4.\n\uD55C \uBC88 \uBD93\uAE30
+    \uC2DC\uC791\uD558\uBA74 \uBC1B\uB294 \uD56D\uC544\uB9AC\uAC00 \uAC00\uB4DD \uCC28\uAC70\uB098\n\uBD93\uB294
+    \uD56D\uC544\uB9AC\uAC00 \uBE4C \uB54C\uAE4C\uC9C0 \uBA48\uCD94\uC9C0 \uC54A\uB294\uB2E4.\n\n\uC5EC\uB35F
+    \uB418 \uD56D\uC544\uB9AC\uC5D0 \uBAA8\uB798\uAC00 \uAC00\uB4DD\uD558\uB2E4.\n\uB2E4\uC12F
+    \uB418\uC640 \uC138 \uB418 \uD56D\uC544\uB9AC\uB97C \uC368\uC11C\n\uC5EC\uB35F
+    \uB418\uC640 \uB2E4\uC12F \uB418 \uD56D\uC544\uB9AC\uC5D0 \uB124 \uB418\uC529
+    \uB098\uB204\uC5B4\uB77C.\n(\uC694\uB839: \uC791\uC740 \uD56D\uC544\uB9AC\uB85C
+    \uB35C\uC5B4 \uB0B4\uACE0, \uB35C\uC5B4 \uB0B8 \uBAA8\uB798\uB97C \uB2E4\uC2DC
+    \uC62E\uACA8\uB77C)"
+  stageCount: 2
+  stagePieceCounts: 
+  pieceSprites:
+  - {fileID: 7755982354243125303, guid: 9677ec40696b7134190b146ff4bfdaf5, type: 3}
+  - {fileID: -6235153649762995705, guid: ed1e96d34a4ed4848a3e09137745f604, type: 3}
+  fullSprite: {fileID: 0}
