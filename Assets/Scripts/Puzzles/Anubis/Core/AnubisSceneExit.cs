@@ -49,8 +49,20 @@ public class AnubisSceneExit : MonoBehaviour
         if (col != null) col.isTrigger = true;
     }
 
+    // [추가] 콜라이더를 Reset하거나 새로 붙이면 Is Trigger가 꺼져서 벽처럼 막히기만 함 -> 실행 시 강제로 켬
+    private void Awake()
+    {
+        var col = GetComponent<Collider2D>();
+        if (col != null && !col.isTrigger)
+        {
+            col.isTrigger = true;
+            Debug.LogWarning($"[{name}] Collider2D의 Is Trigger가 꺼져 있어서 켰음 (Inspector에서도 체크해 두기)", this);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
+        Debug.Log($"[{name}] 닿음: {other.name} (Tag {other.tag})"); // [추가] 출구 감지 확인용
         if (used || !other.CompareTag(playerTag)) return;
 
         if (!Application.CanStreamedLevelBeLoaded(nextSceneName))

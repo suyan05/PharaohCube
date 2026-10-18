@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 
-// 메뉴: Tools/Bastet/튜토리얼 만들기 
+// 메뉴: Tools/Bastet/튜토리얼 만들기 (열린 씬)
 // 지금 열려 있는 임시 맵 씬에 바스테트 튜토리얼을 한 번에 세팅
 //  1) GameManager / Managers(소지품, 토스트, 아래 안내 문구) / EventSystem
 //  2) 튜토리얼 데이터 4개 (Bastet/Data/Tutorial)
@@ -57,6 +57,7 @@ public static class BastetTutorialSetup
     private static void EnsureGameManager(List<string> log)
     {
         if (Object.FindFirstObjectByType<GameManager>(FindObjectsInactive.Include) != null) return;
+        // Managers 안에 넣으면 DontDestroyOnLoad가 Managers 통째로 잡으므로 최상위에 따로
         var go = new GameObject("GameManager_BastetTest");
         Undo.RegisterCreatedObjectUndo(go, "GameManager");
         go.AddComponent<GameManager>();
@@ -113,6 +114,7 @@ public static class BastetTutorialSetup
             es = go.AddComponent<EventSystem>();
             log.Add("EventSystem 만듦");
         }
+        // New Input System용 UI 입력 모듈 (레거시 StandaloneInputModule이면 교체)
         var legacy = es.GetComponent<StandaloneInputModule>();
         if (legacy != null) { Undo.DestroyObjectImmediate(legacy); log.Add("StandaloneInputModule -> InputSystemUIInputModule 교체"); }
         if (es.GetComponent<InputSystemUIInputModule>() == null) Undo.AddComponent<InputSystemUIInputModule>(es.gameObject);
@@ -216,7 +218,7 @@ public static class BastetTutorialSetup
             var puzzle = altar.GetComponent<BastetTutorialPuzzle>();
             if (puzzle == null) puzzle = Undo.AddComponent<BastetTutorialPuzzle>(altar);
             if (altar.GetComponent<BastetTutorialAltar>() == null) Undo.AddComponent<BastetTutorialAltar>(altar);
-            FixSortingLayer(altar, log);
+            FixSortingLayer(altar, log); // [추가] 기존 오브젝트도 Objects 레이어로
 
             Undo.RecordObject(puzzle, "튜토리얼 데이터");
             puzzle.EditorSetup(datas[i], font);
@@ -303,6 +305,8 @@ public static class BastetTutorialSetup
         if (changed) EditorBuildSettings.scenes = scenes.ToArray();
     }
 
+    // ================= 도우미 =================
+    // [추가] 플레이어와 같은 Objects 정렬 레이어 (Default면 바닥 타일맵에 가려짐)
     private const string ObjectLayer = "Objects";
 
     private static void FixSortingLayer(GameObject go, List<string> log)
@@ -323,7 +327,7 @@ public static class BastetTutorialSetup
         var sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
         sr.color = color;
-        sr.sortingLayerName = ObjectLayer;
+        sr.sortingLayerName = ObjectLayer; // [수정] Default 레이어는 Ground/Walls 타일맵 뒤에 그려져 안 보임
         sr.sortingOrder = 5;
         go.AddComponent<BoxCollider2D>();
         return go;
