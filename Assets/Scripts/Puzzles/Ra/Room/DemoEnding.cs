@@ -33,8 +33,9 @@ public class DemoEnding : MonoBehaviour
     [Tooltip("형판이 처음 나타나는 높이 (면 기준 위쪽 거리)")]
     [SerializeField] private float plateDropHeight = 320f;
 
-    [Header("다음 방 (Build Settings의 씬 이름과 똑같이)")]
-    [SerializeField] private string nextSceneName = "Puzzle_Test_Anubis";
+    [Header("다음 방")]
+    [Tooltip("비우면 Build Profiles Scene List의 다음 번호 씬으로 감 (추천). 이름을 적으면 그 씬으로")]
+    [SerializeField] private string nextSceneName = "";
 
     [Header("연출 시간 (기획서 8 / 10.3)")]
     [SerializeField] private float fadeTime = 0.8f;
@@ -305,22 +306,17 @@ public class DemoEnding : MonoBehaviour
         waitingNext = true;
     }
 
+    // 이름이 비었거나 Scene List에 없으면 다음 번호 씬 (라 = 0번 -> 아누비스 튜토리얼 = 1번)
     private void LoadNextScene()
     {
-        if (string.IsNullOrEmpty(nextSceneName))
+        try
         {
-            Debug.LogWarning("[Ending] 다음 씬 이름이 비어 있음");
-            return;
+            SceneFlow.LoadByNameOrNext(nextSceneName);
         }
-
-        if (!Application.CanStreamedLevelBeLoaded(nextSceneName))
+        catch (Exception e)
         {
-            Debug.LogWarning($"[Ending] '{nextSceneName}' 씬이 Build Settings에 없음");
-            return;
+            Debug.LogError($"[Ending] 다음 방 이동 오류: {e}");
         }
-
-        Debug.Log($"[Ending] 다음 방으로 이동: {nextSceneName}");
-        SceneManager.LoadScene(nextSceneName);
     }
 
     // ================= 화면 만들기 =================

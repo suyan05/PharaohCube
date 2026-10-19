@@ -4,12 +4,16 @@ using UnityEngine;
 // - 플레이 중 F9: 밤으로 전환 (Simulate Day Clear가 켜져 있으면 낮을 다 깬 상태로 만든 뒤 밤)
 // - 플레이 중 F10: 지금 낮/밤 출력
 // - 또는 컴포넌트 제목줄 우클릭 메뉴로도 가능
-// 에디터와 개발용 빌드에서만 키가 동작 (정식 빌드에서는 무시)
+// 에디터, 개발용 빌드, 또는 Allow In Build를 켠 빌드에서만 키가 동작
 public class RaPhaseDebug : MonoBehaviour
 {
     [Header("테스트 키")]
     [SerializeField] private KeyCode nightKey = KeyCode.F9;
     [SerializeField] private KeyCode printKey = KeyCode.F10;
+
+    [Header("빌드에서도 쓸지")]
+    [Tooltip("켜면 정식 빌드(Development Build 꺼짐)에서도 F9/F10 동작. 시연용, 최종 제출 전에는 끄기")]
+    [SerializeField] private bool allowInBuild = true;
 
     [Header("밤 전환 전에 낮 진행 플래그를 전부 켤지")]
     [Tooltip("켜면 F9 = 낮 P1~P5, 회로 4단계, 시작 연출, 성소 첫 대화까지 끝난 것으로 처리한 뒤 밤")]
@@ -24,12 +28,14 @@ public class RaPhaseDebug : MonoBehaviour
         "F_RA_CIRCUIT_3", "F_RA_P4_DONE", "F_RA_CIRCUIT_4", "F_RA_P5_DONE"
     };
 
+    private bool KeysAllowed => Application.isEditor || Debug.isDebugBuild || allowInBuild;
+
     private void Update()
     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+        if (!KeysAllowed) return;
+
         if (Input.GetKeyDown(nightKey)) SwitchToNight();
         if (Input.GetKeyDown(printKey)) PrintPhase();
-#endif
     }
 
     [ContextMenu("테스트: 밤으로 전환 (F_RA_NIGHT_OPEN 켜기)")]
