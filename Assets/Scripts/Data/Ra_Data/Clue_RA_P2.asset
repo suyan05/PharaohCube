@@ -18,11 +18,11 @@ MonoBehaviour:
     body: "\uBE5B\uC740 \uAC70\uC6B8\uC5D0 \uB2FF\uC73C\uBA74 \uAEBE\uC778\uB2E4.
       \uD769\uC5B4\uC9C4 \uC870\uAC01\uC744 \uBAA8\uC544 \uB124 \uB54C\uC758 \uBB38\uC591\uC5D0
       \uBE5B\uC744 \uC774\uC5B4\uB77C."
-    illustration: {fileID: 0}
+    illustration: {fileID: 3805299675520588545, guid: 8473d41a600d4824dbf6c21317e5fc52, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: "\uBC24\uBE5B \uD68C\uB85C"
     body: "\uD68C\uB85C\uB294 \uC774\uBBF8 \uBC24\uBE5B\uC73C\uB85C \uBB3C\uB4E4\uC5C8\uB2E4.
       \uBE5B\uC740 \uB354 \uC774\uC0C1 \uAE38\uC744 \uCC3E\uC9C0 \uC54A\uB294\uB2E4."
-    illustration: {fileID: 0}
-    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
+    illustration: {fileID: 3805299675520588545, guid: 8473d41a600d4824dbf6c21317e5fc52, type: 3}
+    illustrationTint: {r: 0.65, g: 0.75, b: 1, a: 1}

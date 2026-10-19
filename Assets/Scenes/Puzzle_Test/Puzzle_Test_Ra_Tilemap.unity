@@ -18534,6 +18534,82 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1700063118}
     m_Modifications:
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: idleFrame
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: interactPerDirection
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: leftFrames.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'upFrames.Array.data[0]'
+      value: 
+      objectReference: {fileID: -8533962960574808602, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'upFrames.Array.data[1]'
+      value: 
+      objectReference: {fileID: -8717975482313926904, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'upFrames.Array.data[2]'
+      value: 
+      objectReference: {fileID: -1761608541376497799, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'downFrames.Array.data[1]'
+      value: 
+      objectReference: {fileID: -7233381385078609286, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'downFrames.Array.data[2]'
+      value: 
+      objectReference: {fileID: 428769192662469898, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'leftFrames.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8338297180362019975, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'leftFrames.Array.data[1]'
+      value: 
+      objectReference: {fileID: -6803488741268343020, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'leftFrames.Array.data[2]'
+      value: 
+      objectReference: {fileID: 6176696409724508548, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: interactFrames.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'rightFrames.Array.data[1]'
+      value: 
+      objectReference: {fileID: -5662007422927484889, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'rightFrames.Array.data[2]'
+      value: 
+      objectReference: {fileID: 4882864879891092273, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'interactFrames.Array.data[0]'
+      value: 
+      objectReference: {fileID: 5296144606944589133, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'interactFrames.Array.data[1]'
+      value: 
+      objectReference: {fileID: -1743461575459359894, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'interactFrames.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2121014247261862624, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'interactFrames.Array.data[3]'
+      value: 
+      objectReference: {fileID: -8584385582617324526, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      propertyPath: 'interactFrames.Array.data[4]'
+      value: 
+      objectReference: {fileID: -8584385582617324526, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
     - target: {fileID: 862387765303063490, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_Interpolate
       value: 1

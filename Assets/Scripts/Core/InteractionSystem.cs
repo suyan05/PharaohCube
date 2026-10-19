@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class InteractionSystem : MonoBehaviour
@@ -13,13 +14,29 @@ public class InteractionSystem : MonoBehaviour
     // 화면 안내용: 지금 가까이 있는 대상의 안내 문구 (없으면 null)
     public string CurrentPrompt => currentTarget != null ? currentTarget.GetPrompt() : null;
 
+    // E키로 무언가를 조사한 순간 (플레이어 조사 동작 애니메이션용)
+    public event Action<IInteractable> OnInteracted;
+
     private void Update()
     {
         FindNearestTarget();
 
         if (currentTarget != null && Input.GetKeyDown(interactKey))
         {
-            currentTarget.Interact(gameObject);
+            TryInteract(currentTarget);
+        }
+    }
+
+    private void TryInteract(IInteractable target)
+    {
+        try
+        {
+            target.Interact(gameObject);
+            OnInteracted?.Invoke(target);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Interaction] 상호작용 오류: {e}");
         }
     }
 

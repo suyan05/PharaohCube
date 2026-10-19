@@ -17,10 +17,10 @@ MonoBehaviour:
     title: "\uC785\uAD6C \uBE44\uC11D"
     body: "\uC5EC\uC12F \uC2E0\uC758 \uC2DC\uD5D8\uC744 \uD1B5\uACFC\uD558\uB77C.
       \uBE5B\uC740 \uBB38\uC744 \uC5F0\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: -2147152464027919154, guid: e5dc45ceac5a86b48b518feedd1a2a36, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: 
     body: 
-    illustration: {fileID: 0}
-    illustrationTint: {r: 1, g: 1, b: 1, a: 1}
+    illustration: {fileID: -2147152464027919154, guid: e5dc45ceac5a86b48b518feedd1a2a36, type: 3}
+    illustrationTint: {r: 0.65, g: 0.75, b: 1, a: 1}

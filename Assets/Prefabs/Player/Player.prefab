@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8185943559987764899}
   - component: {fileID: 5313683744665879520}
   - component: {fileID: 5956254122346468321}
+  - component: {fileID: 116836320368167151}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -195,3 +196,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InteractionSystem
   interactRange: 1.2
   interactKey: 101
+--- !u!114 &116836320368167151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4034817643098968626}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ed805cd105233e4aa2eb6cad4cd22cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSpriteAnimator
+  downFrames:
+  - {fileID: -5207231776682384544, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -8533962960574808602, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -7233381385078609286, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  leftFrames:
+  - {fileID: -8717975482313926904, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: 428769192662469898, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -1761608541376497799, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  rightFrames:
+  - {fileID: 4865651850653354526, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: 8338297180362019975, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -5662007422927484889, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  upFrames:
+  - {fileID: -6803488741268343020, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: 4882864879891092273, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: 6176696409724508548, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  flipRightForLeft: 1
+  walkPattern: 00000000010000000200000001000000
+  idleFrame: 1
+  framesPerSecond: 8
+  moveThreshold: 0.05
+  interactFrames:
+  - {fileID: 5296144606944589133, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+  - {fileID: -8584385582617324526, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+  - {fileID: 2121014247261862624, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+  - {fileID: -1743461575459359894, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
+  interactPerDirection: 0
+  interactTime: 0.4
+  body: {fileID: 0}
+  interaction: {fileID: 0}
+  startFacing: 0
