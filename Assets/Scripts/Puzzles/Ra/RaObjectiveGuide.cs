@@ -236,7 +236,8 @@ public class RaObjectiveGuide : MonoBehaviour
             Make("F_RA_NIGHT_P3_DONE", "남동쪽 일식 석탁에서 개기 일식을 완성하자"),
             Make("F_RA_NIGHT_P4_DONE", "남서쪽 카드 벤치에 죽은 왕의 하루를 새기자"),
             Make("F_RA_NIGHT_P5_DONE", "북쪽 밤의 제단에서 태양의 항해를 완성하자"),
-            Make("", "태양 형판을 들고 북쪽 문으로 나가자")
+            Make("F_RA_PLATE_GIVEN", "라의 성소로 돌아가 라의 형판을 받자"),
+            Make("F_RA_CENTRAL_ENTERED", "태양 형판을 들고 북쪽 문으로 나가자")
         };
     }
 

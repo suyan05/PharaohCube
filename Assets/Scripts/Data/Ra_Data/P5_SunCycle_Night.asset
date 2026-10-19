@@ -16,6 +16,7 @@ MonoBehaviour:
   clearFlag: F_RA_NIGHT_P5_DONE
   useItemGate: 0
   grantRewards: 0
+  useAutoHint: 0
   wakeFlag: F_RA_NIGHT_P4_DONE
   answer: 0200000004000000030000000500000000000000
-  grantPlate: 1
+  grantPlate: 0

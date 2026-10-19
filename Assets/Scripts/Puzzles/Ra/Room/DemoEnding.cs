@@ -5,18 +5,33 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // 데모 엔딩 (기획서 8)
-// P5 클리어 -> 형판 등록 -> 북문 -> 중앙방(큐브 면 0 장착) -> 시현 데모 종료 -> 다음 방
+// 밤 P5 클리어 -> 라의 성소에서 형판 받음(F_RA_PLATE_GIVEN = 형판 등록) -> 북문
+// -> 중앙방(큐브 면 0에 형판 그림 장착) -> 시현 데모 종료 -> 다음 방
 public class DemoEnding : MonoBehaviour
 {
     public const string DemoEndFlag = "F_RA_DEMO_END";
 
+    // 중앙방에 들어간 순간 (RaObjectiveGuide 마지막 단계가 이 플래그로 끝남 -> 목표 문구 숨김)
+    public const string CentralEnteredFlag = "F_RA_CENTRAL_ENTERED";
+
     [Header("연결")]
-    [SerializeField] private SunCyclePuzzle p5;
     [SerializeField] private GameObject endingPanel;
 
     [Header("기존 큐브 시스템 (비어 있어도 연출은 진행됨)")]
     [SerializeField] private PlayerInventory playerInventory;
     [SerializeField] private CubeFaceManager cubeFaceManager;
+
+    [Header("형판 등록 (이 플래그가 켜지면 PlayerInventory에 0번 = 라 형판 등록)")]
+    [SerializeField] private string plateGivenFlag = "F_RA_PLATE_GIVEN";
+
+    [Header("형판 그림 (태양 형판 아트)")]
+    [Tooltip("비우면 예전처럼 면이 금색으로만 바뀜")]
+    [SerializeField] private Sprite plateSprite;
+    [SerializeField] private string plateLabel = "태양 형판";
+    [Tooltip("형판이 위에서 내려와 면에 박히는 시간 (초)")]
+    [SerializeField] private float plateDropTime = 0.7f;
+    [Tooltip("형판이 처음 나타나는 높이 (면 기준 위쪽 거리)")]
+    [SerializeField] private float plateDropHeight = 320f;
 
     [Header("다음 방 (Build Settings의 씬 이름과 똑같이)")]
     [SerializeField] private string nextSceneName = "Puzzle_Test_Anubis";
@@ -25,10 +40,16 @@ public class DemoEnding : MonoBehaviour
     [SerializeField] private float fadeTime = 0.8f;
     [SerializeField] private float mountTime = 2.0f;
 
+    private static readonly Vector2 FacePos = new Vector2(0, 40);
+    private static readonly Vector2 FaceSize = new Vector2(310, 310);
+
     private CanvasGroup group;
     private GameObject roomRoot;
     private GameObject equipButton;
     private Image faceImage;
+    private Text faceLabel;
+    private Image plateImage;
+    private Text plateLabelText;
     private Image blackCover;
     private Text statusText;
     private Text endText;
@@ -40,8 +61,30 @@ public class DemoEnding : MonoBehaviour
     private bool playing;
     private bool mounted;
     private bool waitingNext;
+    private bool plateRegistered;
+    private bool subscribed;
 
     private void Start()
+    {
+        try
+        {
+            SetupColors();
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            group = endingPanel.GetComponent<CanvasGroup>();
+            if (group == null) group = endingPanel.AddComponent<CanvasGroup>();
+
+            BuildUI();
+            endingPanel.SetActive(false);
+            SubscribePlateFlag();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[Ending] 초기화 오류: {e}");
+        }
+    }
+
+    private void SetupColors()
     {
         darkBrown = Hex("#4A3423");
         gold = Hex("#E8B23A");
@@ -49,20 +92,11 @@ public class DemoEnding : MonoBehaviour
         sand = Hex("#E8D9B8");
         lapis = Hex("#1E3A5F");
         bgColor = Hex("#1A120B");
-        font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-        group = endingPanel.GetComponent<CanvasGroup>();
-        if (group == null) group = endingPanel.AddComponent<CanvasGroup>();
-
-        BuildUI();
-        endingPanel.SetActive(false);
-
-        p5.OnSuccess += HandleP5Cleared;
     }
 
     private void OnDestroy()
     {
-        if (p5 != null) p5.OnSuccess -= HandleP5Cleared;
+        if (subscribed && GameManager.Instance != null) GameManager.Instance.OnFlagChanged -= HandleFlagChanged;
     }
 
     private void Update()
@@ -77,12 +111,35 @@ public class DemoEnding : MonoBehaviour
         }
     }
 
-    // ================= P5 클리어 -> 형판 등록 =================
-    private void HandleP5Cleared()
+    // ================= 형판 등록 (성소에서 받은 순간) =================
+    private void SubscribePlateFlag()
     {
+        GameManager gm = GameManager.Instance;
+        if (gm == null)
+        {
+            Debug.LogWarning("[Ending] GameManager가 없어서 형판 등록을 못 받음");
+            return;
+        }
+
+        gm.OnFlagChanged += HandleFlagChanged;
+        subscribed = true;
+        if (gm.HasFlag(plateGivenFlag)) RegisterPlate(); // 이미 받은 상태로 씬에 들어온 경우
+    }
+
+    private void HandleFlagChanged(string flag)
+    {
+        if (flag == plateGivenFlag) RegisterPlate();
+    }
+
+    private void RegisterPlate()
+    {
+        if (plateRegistered) return;
+        plateRegistered = true;
+
         if (playerInventory != null)
         {
             playerInventory.AddPlate(0); // 0번 = 라 (hasPlate[0] = true)
+            Debug.Log("[Ending] 라 형판 등록 (PlayerInventory 0번)");
         }
         else
         {
@@ -97,9 +154,14 @@ public class DemoEnding : MonoBehaviour
         playing = true;
 
         var controller = player.GetComponent<PlayerController2D>();
+        var interaction = player.GetComponent<InteractionSystem>();
         var rb = player.GetComponent<Rigidbody2D>();
         if (controller != null) controller.enabled = false;
+        if (interaction != null) interaction.enabled = false; // 중앙방에서 E로 북문이 다시 눌리지 않게
         if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        GameManager gm = GameManager.Instance;
+        if (gm != null && !gm.HasFlag(CentralEnteredFlag)) gm.SetFlag(CentralEnteredFlag);
 
         StartCoroutine(OpenRoutine());
     }
@@ -167,13 +229,50 @@ public class DemoEnding : MonoBehaviour
         }
     }
 
-    // 장착 연출 (금빛 펄스 2초) -> 데모 종료 플래그 -> 페이드 아웃 -> 다음 방 안내
+    // 형판이 내려와 박힘 -> 금빛 펄스 -> 데모 종료 플래그 -> 페이드 아웃 -> 다음 방 안내
     private IEnumerator MountRoutine()
     {
         statusText.text = "태양 형판 장착!";
-        faceImage.color = gold;
 
-        RectTransform rt = faceImage.rectTransform;
+        if (plateSprite != null) yield return DropPlate();
+        else faceImage.color = gold; // 그림이 없으면 예전처럼 금색
+
+        yield return PulseFace();
+
+        if (GameManager.Instance != null) GameManager.Instance.SetFlag(DemoEndFlag);
+        yield return FadeToEnd();
+    }
+
+    // 위에서 크게 나타나 면 자리로 떨어지며 작아짐 -> 박히는 순간 살짝 튕김
+    private IEnumerator DropPlate()
+    {
+        faceLabel.enabled = false;
+        plateImage.enabled = true;
+        plateLabelText.enabled = !string.IsNullOrEmpty(plateLabel);
+
+        RectTransform rt = plateImage.rectTransform;
+        Vector2 start = FacePos + new Vector2(0f, plateDropHeight);
+        float t = 0f;
+        while (t < plateDropTime)
+        {
+            t += Time.deltaTime;
+            float p = Mathf.Clamp01(t / plateDropTime);
+            float ease = p * p; // 점점 빨라지며 떨어짐
+            rt.anchoredPosition = Vector2.Lerp(start, FacePos, ease);
+            rt.localScale = Vector3.one * Mathf.Lerp(1.25f, 1f, ease);
+            plateImage.color = new Color(1f, 1f, 1f, Mathf.Clamp01(p * 2.5f));
+            yield return null;
+        }
+
+        rt.anchoredPosition = FacePos;
+        plateImage.color = Color.white;
+        faceImage.color = darkBrown; // 형판 뒤 빈 면은 어둡게
+    }
+
+    // 장착된 면(형판 그림이 있으면 형판)이 금빛으로 맥박치듯 커졌다 작아짐
+    private IEnumerator PulseFace()
+    {
+        RectTransform rt = plateSprite != null ? plateImage.rectTransform : faceImage.rectTransform;
         float t = 0f;
         while (t < mountTime)
         {
@@ -183,10 +282,11 @@ public class DemoEnding : MonoBehaviour
             yield return null;
         }
         rt.localScale = Vector3.one;
+    }
 
-        GameManager.Instance.SetFlag(DemoEndFlag);
-
-        t = 0f;
+    private IEnumerator FadeToEnd()
+    {
+        float t = 0f;
         while (t < fadeTime)
         {
             SetAlpha(blackCover, t / fadeTime);
@@ -238,17 +338,8 @@ public class DemoEnding : MonoBehaviour
         CreateText(room, "중앙방", 48, new Vector2(0, 400), new Vector2(800, 70), paper);
         CreateText(room, "여섯 신의 큐브", 26, new Vector2(0, 340), new Vector2(800, 40), sand);
 
-        CreateRect(room, "FaceFrame", new Vector2(0, 40), new Vector2(340, 340), darkBrown);
-        faceImage = CreateRect(room, "Face0", new Vector2(0, 40), new Vector2(310, 310), lapis);
-        CreateText(faceImage.rectTransform, "면 0 - 라", 40, Vector2.zero, new Vector2(310, 310), paper);
-
-        Image btnImg = CreateRect(room, "Btn_Equip", new Vector2(0, -230), new Vector2(320, 80), gold);
-        btnImg.raycastTarget = true;
-        Button btn = btnImg.gameObject.AddComponent<Button>();
-        btn.targetGraphic = btnImg;
-        btn.onClick.AddListener(OnEquipClicked);
-        CreateText(btnImg.rectTransform, "태양 형판 장착", 30, Vector2.zero, new Vector2(320, 80), darkBrown);
-        equipButton = btnImg.gameObject;
+        BuildFace(room);
+        BuildEquipButton(room);
 
         statusText = CreateText(room, "", 28, new Vector2(0, -330), new Vector2(1200, 50), paper);
 
@@ -260,6 +351,36 @@ public class DemoEnding : MonoBehaviour
 
         endText = CreateText(root, "시현 데모 종료", 64, new Vector2(0, 40), new Vector2(1200, 120), gold);
         nextHintText = CreateText(root, "Space / 클릭: 다음 방으로", 28, new Vector2(0, -80), new Vector2(1200, 50), sand);
+    }
+
+    // 큐브 면 0 + 그 위에 놓일 형판 그림 (장착 전에는 숨김)
+    private void BuildFace(RectTransform room)
+    {
+        CreateRect(room, "FaceFrame", FacePos, new Vector2(340, 340), darkBrown);
+        faceImage = CreateRect(room, "Face0", FacePos, FaceSize, lapis);
+        faceLabel = CreateText(faceImage.rectTransform, "면 0 - 라", 40, Vector2.zero, FaceSize, paper);
+
+        plateImage = CreateRect(room, "Plate_Ra", FacePos, FaceSize, Color.white);
+        plateImage.sprite = plateSprite;
+        plateImage.preserveAspect = true;
+        plateImage.enabled = false;
+
+        // 형판 아래쪽 이름 띠 위치 (그림 높이의 약 36% 아래)
+        Vector2 labelPos = new Vector2(0f, -FaceSize.y * 0.36f);
+        plateLabelText = CreateText(plateImage.rectTransform, plateLabel, 24, labelPos,
+            new Vector2(FaceSize.x * 0.7f, 36f), Hex("#FFF3C4"));
+        plateLabelText.enabled = false;
+    }
+
+    private void BuildEquipButton(RectTransform room)
+    {
+        Image btnImg = CreateRect(room, "Btn_Equip", new Vector2(0, -230), new Vector2(320, 80), gold);
+        btnImg.raycastTarget = true;
+        Button btn = btnImg.gameObject.AddComponent<Button>();
+        btn.targetGraphic = btnImg;
+        btn.onClick.AddListener(OnEquipClicked);
+        CreateText(btnImg.rectTransform, "태양 형판 장착", 30, Vector2.zero, new Vector2(320, 80), darkBrown);
+        equipButton = btnImg.gameObject;
     }
 
     // ================= 도우미 함수 =================

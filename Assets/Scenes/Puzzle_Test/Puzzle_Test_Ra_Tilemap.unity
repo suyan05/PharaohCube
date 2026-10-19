@@ -2323,6 +2323,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaObjectiveGuide
   steps:
+  - doneFlag: F_RA_SHRINE_FIRST_TALKED
+    objective: "\uC911\uC559\uC758 \uB77C\uC758 \uC131\uC18C\uB97C \uC870\uC0AC\uD558\uC790"
   - doneFlag: F_RA_CIRCUIT_1
     objective: "\uC11C\uCABD \uBCBD\uC758 \uBE5B \uD68C\uB85C\uB97C \uC870\uC0AC\uD558\uC790"
   - doneFlag: F_RA_P1_DONE
@@ -2346,6 +2348,29 @@ MonoBehaviour:
   - doneFlag: F_RA_P5_DONE
     objective: "\uBD81\uCABD \uD0DC\uC591 \uC81C\uB2E8\uC5D0\uC11C \uD558\uB8E8\uC758
       \uC21C\uD658\uC744 \uC644\uC131\uD558\uC790"
+  - doneFlag: F_RA_NIGHT_OPEN
+    objective: "\uB77C\uC758 \uC131\uC18C\uB85C \uB3CC\uC544\uAC00 \uB77C\uC640 \uC774\uC57C\uAE30\uD558\uC790"
+  - doneFlag: F_RA_SHRINE_NIGHT_TALKED
+    objective: "\uBC24\uC774 \uB0B4\uB824\uC549\uC558\uB2E4. \uB77C\uC758 \uC131\uC18C\uC5D0
+      \uB2E4\uC2DC \uB9D0\uC744 \uAC78\uC5B4 \uBCF4\uC790"
+  - doneFlag: F_RA_NIGHT_P1_DONE
+    objective: "\uD478\uB978 \uBD88\uC774 \uCF1C\uC9C4 \uB3D9\uCABD \uBC29, \uBC24\uC758
+      \uADF8\uB9BC\uC790\uB97C \uC77D\uC790"
+  - doneFlag: F_RA_NIGHT_P3_DONE
+    objective: "\uB0A8\uB3D9\uCABD \uC77C\uC2DD \uC11D\uD0C1\uC5D0\uC11C \uAC1C\uAE30
+      \uC77C\uC2DD\uC744 \uC644\uC131\uD558\uC790"
+  - doneFlag: F_RA_NIGHT_P4_DONE
+    objective: "\uB0A8\uC11C\uCABD \uCE74\uB4DC \uBCA4\uCE58\uC5D0 \uC8FD\uC740 \uC655\uC758
+      \uD558\uB8E8\uB97C \uC0C8\uAE30\uC790"
+  - doneFlag: F_RA_NIGHT_P5_DONE
+    objective: "\uBD81\uCABD \uBC24\uC758 \uC81C\uB2E8\uC5D0\uC11C \uD0DC\uC591\uC758
+      \uD56D\uD574\uB97C \uC644\uC131\uD558\uC790"
+  - doneFlag: F_RA_PLATE_GIVEN
+    objective: "\uB77C\uC758 \uC131\uC18C\uB85C \uB3CC\uC544\uAC00 \uB77C\uC758 \uD615\uD310\uC744
+      \uBC1B\uC790"
+  - doneFlag: F_RA_CENTRAL_ENTERED
+    objective: "\uD0DC\uC591 \uD615\uD310\uC744 \uB4E4\uACE0 \uBD81\uCABD \uBB38\uC73C\uB85C
+      \uB098\uAC00\uC790"
   fontSize: 30
   hudOffset: {x: 0, y: -40}
 --- !u!61 &275252243
@@ -8468,6 +8493,22 @@ MonoBehaviour:
   slotFilledSprite: {fileID: 0}
   backgroundSprite: {fileID: 0}
   backButtonSprite: {fileID: 0}
+  nightBackgroundSprite: {fileID: 2563939635281106754, guid: c6398419d38af0648a0074d70b68e4ec, type: 3}
+  nightBackgroundSize: {x: 620, y: 620}
+  nightRisingSprite: {fileID: 8347382555369916202, guid: 4644c0a6b9481a048a2dc0b292a303ce, type: 3}
+  nightNoonSprite: {fileID: -805985262257961671, guid: d3ddd033fa044de46a7c73f1fbe7fe29, type: 3}
+  nightSettingSprite: {fileID: 8538135737988914654, guid: 48f9041cf2b9ed24893491a56375d152, type: 3}
+  nightNightSprite: {fileID: -7564419708304791206, guid: 2a6f797395a959148ad33d1edd70bef5, type: 3}
+  nightBoatSprite: {fileID: -5631888171773395503, guid: 0d45853d3f7bff243a9e63ea56535d4c, type: 3}
+  nightReturnSprite: {fileID: -6674345093792035028, guid: 995759ba41dcc1842a94ce3c6ffeef9f, type: 3}
+  boatGlowScale: 1.3
+  centerPlateNightSprite: {fileID: 0}
+  clearHoldTime: 1.5
+  finale: {fileID: 0}
+  shakeDuration: 1
+  shakeStrength: 0.2
+  finishMessage: "\uC2E0\uC804 \uC804\uCCB4\uAC00 \uC6B8\uB9B0\uB2E4. \uB77C\uC758
+    \uC131\uC18C\uB85C \uB3CC\uC544\uAC00\uC790."
   buttonSize: {x: 190, y: 90}
   slotSize: {x: 200, y: 80}
   centerPlateSize: {x: 600, y: 600}
@@ -10361,7 +10402,7 @@ MonoBehaviour:
     icon: {fileID: -8190055475346384142, guid: 998f7f630637df14db306bba37584679, type: 3}
   - itemId: PLATE_RA
     displayName: "\uD0DC\uC591 \uD615\uD310"
-    icon: {fileID: 0}
+    icon: {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
   playerController: {fileID: 0}
   margin: {x: 30, y: 56}
   slotSize: 88
@@ -11733,6 +11774,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 921293113}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1143467101
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1143467103}
+  - component: {fileID: 1143467102}
+  m_Layer: 0
+  m_Name: RaNightFinale
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1143467102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143467101}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f4656b89edca6848b5ef2a5cff4c066, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaNightFinale
+  cutSprite: {fileID: 0}
+  caption: "\uD0DC\uC591\uC758 \uBC30\uAC00 \uC800\uC2B9\uC758 \uAC15\uC744 \uAC74\uB108,
+    \uB2E4\uC2DC \uB3D9\uCABD\uC5D0\uC11C \uB5A0\uC624\uB978\uB2E4."
+  fadeTime: 0.8
+  minShowTime: 1.5
+  sortingOrder: 105
+--- !u!4 &1143467103
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1143467101}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1185386898
 GameObject:
   m_ObjectHideFlags: 0
@@ -12367,10 +12458,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 773acab577b143e4bbd9e2ffa4288bc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DemoEnding
-  p5: {fileID: 2035000890}
   endingPanel: {fileID: 435486422}
   playerInventory: {fileID: 24222499}
   cubeFaceManager: {fileID: 24222496}
+  plateGivenFlag: F_RA_PLATE_GIVEN
+  plateSprite: {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
+  plateLabel: "\uD0DC\uC591 \uD615\uD310"
+  plateDropTime: 0.7
+  plateDropHeight: 320
   nextSceneName: Puzzle_Test_Bastet_Tutorial
   fadeTime: 0.8
   mountTime: 2
@@ -17046,6 +17141,8 @@ MonoBehaviour:
   nightTalkedFlag: F_RA_SHRINE_NIGHT_TALKED
   nightClearFlag: F_RA_NIGHT_P5_DONE
   endTalkedFlag: F_RA_SHRINE_END_TALKED
+  plateItemId: PLATE_RA
+  plateGivenFlag: F_RA_PLATE_GIVEN
   nightMessage: "\uC2E0\uC804\uC5D0 \uBC24\uC774 \uB0B4\uB824\uC549\uC558\uB2E4.
     \uBE44\uC11D\uC758 \uAE00\uC774 \uBC14\uB010 \uAC83 \uAC19\uB2E4."
   shakeDuration: 0.8
@@ -18534,109 +18631,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1700063118}
     m_Modifications:
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: idleFrame
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: interactPerDirection
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: leftFrames.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'upFrames.Array.data[0]'
-      value: 
-      objectReference: {fileID: -8533962960574808602, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'upFrames.Array.data[1]'
-      value: 
-      objectReference: {fileID: -8717975482313926904, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'upFrames.Array.data[2]'
-      value: 
-      objectReference: {fileID: -1761608541376497799, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'downFrames.Array.data[1]'
-      value: 
-      objectReference: {fileID: -7233381385078609286, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'downFrames.Array.data[2]'
-      value: 
-      objectReference: {fileID: 428769192662469898, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'leftFrames.Array.data[0]'
-      value: 
-      objectReference: {fileID: 8338297180362019975, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'leftFrames.Array.data[1]'
-      value: 
-      objectReference: {fileID: -6803488741268343020, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'leftFrames.Array.data[2]'
-      value: 
-      objectReference: {fileID: 6176696409724508548, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: interactFrames.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'rightFrames.Array.data[1]'
-      value: 
-      objectReference: {fileID: -5662007422927484889, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'rightFrames.Array.data[2]'
-      value: 
-      objectReference: {fileID: 4882864879891092273, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'interactFrames.Array.data[0]'
-      value: 
-      objectReference: {fileID: 5296144606944589133, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'interactFrames.Array.data[1]'
-      value: 
-      objectReference: {fileID: -1743461575459359894, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'interactFrames.Array.data[2]'
-      value: 
-      objectReference: {fileID: 2121014247261862624, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'interactFrames.Array.data[3]'
-      value: 
-      objectReference: {fileID: -8584385582617324526, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
-    - target: {fileID: 116836320368167151, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: 'interactFrames.Array.data[4]'
-      value: 
-      objectReference: {fileID: -8584385582617324526, guid: b67dab0522d7e6e428cd0a8a32433e9a, type: 3}
-    - target: {fileID: 862387765303063490, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_Interpolate
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4034817643098968626, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 4034817643098968626, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5523812613452425451, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_SortingLayer
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5523812613452425451, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_SortingLayerID
-      value: 814092257
-      objectReference: {fileID: 0}
-    - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.x
@@ -18710,3 +18707,4 @@ SceneRoots:
   - {fileID: 1225731287}
   - {fileID: 2043374339}
   - {fileID: 218227924}
+  - {fileID: 1143467103}

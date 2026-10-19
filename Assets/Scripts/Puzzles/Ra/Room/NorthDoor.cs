@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
-// OBJ_013 북쪽 중앙방 문: 밤 P5 클리어(F_RA_NIGHT_P5_DONE) 후 개방 -> E키로 엔딩 진행
-// (낮 P5는 시련 통과만 하고 라의 성소에서 밤으로 넘어감, 형판과 문은 밤 P5 이후)
+// OBJ_013 북쪽 중앙방 문: 라의 성소에서 태양 형판을 받은 뒤(F_RA_PLATE_GIVEN) 개방 -> E키로 중앙방
+// (밤 P5 클리어 -> 성소 마무리 대사 -> 형판 지급 -> 문 열림)
 public class NorthDoor : MonoBehaviour, IInteractable
 {
-    public const string OpenFlag = "F_RA_NIGHT_P5_DONE";
+    public const string OpenFlag = "F_RA_PLATE_GIVEN";
 
     [Header("연결")]
     [SerializeField] private DemoEnding ending;
@@ -69,7 +69,7 @@ public class NorthDoor : MonoBehaviour, IInteractable
             if (!isOpen)
             {
                 Debug.Log(RaPhaseState.IsNight
-                    ? "[Door] 문이 굳게 닫혀 있다. 밤의 제단이 아직 잠들어 있다."
+                    ? "[Door] 문이 굳게 닫혀 있다. 라에게서 무언가를 받아야 할 것 같다."
                     : "[Door] 문이 굳게 닫혀 있다. 라의 시련을 모두 마쳐야 할 것 같다.");
                 return;
             }

@@ -1,11 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 // OBJ_010 태양 제단: E키로 P5 오버레이 열기/닫기 + 버튼 고리 화면
+// - 밤: 배경, 버튼 6개, 가운데를 밤 그림으로 교체 (아트 요청서 F)
+// - 밤 클리어: 잠깐 보여준 뒤 화면 닫힘 -> 클리어 컷(RaNightFinale) -> 카메라 흔들림 + 알림
+//   (태양 형판은 여기서 안 줌 -> 라의 성소 마무리 대사 후 RaShrine이 지급)
 public class SunCycleStation : MonoBehaviour, IInteractable
 {
+    private const string MessageTag = "[Door] ";
+
     [Header("연결")]
     [SerializeField] private SunCyclePuzzle puzzle;
     [SerializeField] private GameObject overlayPanel;
@@ -29,6 +35,30 @@ public class SunCycleStation : MonoBehaviour, IInteractable
     [Header("아트 - 배경 / 뒤로 버튼")]
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private Sprite backButtonSprite;
+
+    [Header("밤 아트 (비우면 낮 그림 그대로)")]
+    [SerializeField] private Sprite nightBackgroundSprite;   // P5_Altar_Night_BG
+    [Tooltip("밤 배경 크기. 버튼이 고리 동그라미에 안 맞으면 여기로 맞추기")]
+    [SerializeField] private Vector2 nightBackgroundSize = new Vector2(1000, 1000);
+    [SerializeField] private Sprite nightRisingSprite;
+    [SerializeField] private Sprite nightNoonSprite;
+    [SerializeField] private Sprite nightSettingSprite;
+    [SerializeField] private Sprite nightNightSprite;
+    [SerializeField] private Sprite nightBoatSprite;         // P5_Btn_Boat_Glow
+    [SerializeField] private Sprite nightReturnSprite;
+    [Tooltip("밤 태양의 배 버튼 크기 배율 (요청서: 낮 버튼의 1.3배)")]
+    [SerializeField] private float boatGlowScale = 1.3f;
+    [Tooltip("밤 가운데 그림 (비우면 가운데 태양판을 숨김 -> 배경의 빈 원이 보임)")]
+    [SerializeField] private Sprite centerPlateNightSprite;
+
+    [Header("밤 클리어 - 마무리")]
+    [Tooltip("정답을 맞힌 뒤 제단 화면을 보여주는 시간 (초)")]
+    [SerializeField] private float clearHoldTime = 1.5f;
+    [Tooltip("비우면 컷 없이 바로 흔들림 + 알림")]
+    [SerializeField] private RaNightFinale finale;
+    [SerializeField] private float shakeDuration = 1f;
+    [SerializeField] private float shakeStrength = 0.2f;
+    [SerializeField, TextArea] private string finishMessage = "신전 전체가 울린다. 라의 성소로 돌아가자.";
 
     [Header("크기")]
     [SerializeField] private Vector2 buttonSize = new Vector2(190, 90);
@@ -60,6 +90,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
     private readonly List<Image> buttonImages = new List<Image>();
     private readonly Image[] slotImages = new Image[5];
     private readonly Text[] slotTexts = new Text[5];
+    private Image backgroundImage;
     private Image centerPlate;
     private Text statusText;
     private Font font;
@@ -68,10 +99,33 @@ public class SunCycleStation : MonoBehaviour, IInteractable
 
     private bool isOpen;
     private bool flashingRed;
+    private bool playingFinale;
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
 
     private void Start()
+    {
+        try
+        {
+            SetupColors();
+            font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+
+            BuildUI();
+            overlayPanel.SetActive(false);
+
+            puzzle.OnInputChanged += RefreshAll;
+            puzzle.OnHint += HandleHint;
+            puzzle.OnSuccess += HandleSuccess;
+            puzzle.OnFail += HandleFail;
+            puzzle.OnPhaseChanged += HandlePhaseChanged;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{name}] 제단 초기화 오류: {e}");
+        }
+    }
+
+    private void SetupColors()
     {
         darkBrown = Hex("#4A3423");
         gold = Hex("#E8B23A");
@@ -81,15 +135,6 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         dimButton = Hex("#6B5438");
         dimText = Hex("#A89373");
         dimSun = Hex("#8A6A3A");
-        font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-
-        BuildUI();
-        overlayPanel.SetActive(false);
-
-        puzzle.OnInputChanged += RefreshAll;
-        puzzle.OnHint += HandleHint;
-        puzzle.OnSuccess += HandleSuccess;
-        puzzle.OnFail += HandleFail;
     }
 
     private void OnDestroy()
@@ -99,11 +144,12 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         puzzle.OnHint -= HandleHint;
         puzzle.OnSuccess -= HandleSuccess;
         puzzle.OnFail -= HandleFail;
+        puzzle.OnPhaseChanged -= HandlePhaseChanged;
     }
 
     private void Update()
     {
-        if (isOpen && Input.GetKeyDown(KeyCode.Escape)) CloseOverlay();
+        if (isOpen && !playingFinale && Input.GetKeyDown(KeyCode.Escape)) CloseOverlay();
     }
 
     // ================= IInteractable =================
@@ -111,6 +157,8 @@ public class SunCycleStation : MonoBehaviour, IInteractable
 
     public void Interact(GameObject player)
     {
+        if (playingFinale) return; // 클리어 연출 중에는 E 무시
+
         if (isOpen) CloseOverlay();
         else OpenOverlay(player);
     }
@@ -126,12 +174,17 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         isOpen = true;
 
         puzzle.Open();
+        statusText.text = GetOpenMessage();
 
-        if (puzzle.IsCleared) statusText.text = "태양의 순환이 완성되었다.";
-        else if (puzzle.IsAwake) statusText.text = "태양의 하루를 제단에 새겨라.";
-        else statusText.text = "제단이 아직 잠들어 있다.";
-
+        ApplyPhaseArt();
         RefreshAll();
+    }
+
+    private string GetOpenMessage()
+    {
+        if (puzzle.IsCleared) return "태양의 순환이 완성되었다.";
+        if (!puzzle.IsAwake) return "제단이 아직 잠들어 있다.";
+        return puzzle.IsNight ? "밤의 항해를 제단에 새겨라." : "태양의 하루를 제단에 새겨라.";
     }
 
     private void CloseOverlay()
@@ -146,21 +199,15 @@ public class SunCycleStation : MonoBehaviour, IInteractable
     {
         RectTransform root = overlayPanel.GetComponent<RectTransform>();
 
-        // 배경 그림 (있으면 맨 아래에 깔림)
-        if (backgroundSprite != null)
+        // 배경 (낮/밤 그림 중 하나라도 있으면 만들어 둠)
+        if (backgroundSprite != null || nightBackgroundSprite != null)
         {
-            CreateSprite(root, "Background", new Vector2(0, RingY), backgroundSize, backgroundSprite);
+            backgroundImage = CreateSprite(root, "Background", new Vector2(0, RingY), backgroundSize, backgroundSprite);
         }
 
         CreateText(root, "태양의 순환", 44, new Vector2(0, 470), new Vector2(800, 70), paper);
 
-        // 중앙 태양판
-        centerPlate = CreatePiece(root, "CenterPlate", new Vector2(0, RingY), centerPlateSize,
-            centerPlateSprite, dimSun);
-        if (centerPlateSprite == null)
-        {
-            CreateText(centerPlate.rectTransform, "중앙 태양판", 28, Vector2.zero, centerPlateSize, paper);
-        }
+        BuildCenter(root);
 
         // 버튼 6개 고리
         for (int i = 0; i < RingButtons.Length; i++)
@@ -168,15 +215,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
             BuildRingButton(root, i);
         }
 
-        // 입력 슬롯 5칸
-        for (int i = 0; i < 5; i++)
-        {
-            Vector2 pos = new Vector2(-440f + i * 220f, -250);
-            slotImages[i] = CreatePiece(root, $"Slot_{i + 1}", pos, slotSize, slotEmptySprite, sand);
-            slotTexts[i] = CreateText(slotImages[i].rectTransform, (i + 1).ToString(), 24,
-                Vector2.zero, slotSize, darkBrown);
-        }
-
+        BuildSlots(root);
         BuildBackButton(root);
 
         statusText = CreateText(root, "", 28, new Vector2(0, -415), new Vector2(1200, 50), paper);
@@ -184,10 +223,32 @@ public class SunCycleStation : MonoBehaviour, IInteractable
             new Vector2(0, -470), new Vector2(1400, 30), sand);
     }
 
+    // 중앙 태양판
+    private void BuildCenter(RectTransform root)
+    {
+        centerPlate = CreatePiece(root, "CenterPlate", new Vector2(0, RingY), centerPlateSize,
+            centerPlateSprite, dimSun);
+        if (centerPlateSprite == null)
+        {
+            CreateText(centerPlate.rectTransform, "중앙 태양판", 28, Vector2.zero, centerPlateSize, paper);
+        }
+    }
+
+    private void BuildSlots(RectTransform root)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            Vector2 pos = new Vector2(-440f + i * 220f, -250);
+            slotImages[i] = CreatePiece(root, $"Slot_{i + 1}", pos, slotSize, slotEmptySprite, sand);
+            slotTexts[i] = CreateText(slotImages[i].rectTransform, (i + 1).ToString(), 24,
+                Vector2.zero, slotSize, darkBrown);
+        }
+    }
+
     private void BuildRingButton(RectTransform root, int index)
     {
         SunButton b = RingButtons[index];
-        Sprite sprite = SpriteOf(b);
+        Sprite sprite = SpriteOf(b, false);
 
         Image img = CreatePiece(root, $"Btn_{b}", RingPositions[index] + new Vector2(0, RingY),
             buttonSize, sprite, dimButton);
@@ -219,8 +280,12 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         CreateText(back.rectTransform, "뒤로", 26, Vector2.zero, new Vector2(180, 60), darkBrown);
     }
 
-    private Sprite SpriteOf(SunButton b)
+    // 밤이고 밤 그림이 있으면 밤 그림, 아니면 낮 그림
+    private Sprite SpriteOf(SunButton b, bool night)
     {
+        Sprite nightPick = night ? NightSpriteOf(b) : null;
+        if (nightPick != null) return nightPick;
+
         switch (b)
         {
             case SunButton.Rising: return risingSprite;
@@ -232,9 +297,61 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         }
     }
 
+    private Sprite NightSpriteOf(SunButton b)
+    {
+        switch (b)
+        {
+            case SunButton.Rising: return nightRisingSprite;
+            case SunButton.Noon: return nightNoonSprite;
+            case SunButton.Setting: return nightSettingSprite;
+            case SunButton.Night: return nightNightSprite;
+            case SunButton.Boat: return nightBoatSprite;
+            default: return nightReturnSprite;
+        }
+    }
+
+    // ================= 낮 / 밤 그림 교체 =================
+    private void ApplyPhaseArt()
+    {
+        bool night = puzzle.IsNight;
+        ApplyBackground(night);
+
+        for (int i = 0; i < buttonImages.Count; i++)
+        {
+            SunButton b = RingButtons[i];
+            Sprite s = SpriteOf(b, night);
+            if (s == null) continue;
+
+            buttonImages[i].sprite = s;
+            buttonImages[i].preserveAspect = true;
+
+            bool glow = night && b == SunButton.Boat && nightBoatSprite != null;
+            buttonImages[i].rectTransform.sizeDelta = glow ? buttonSize * boatGlowScale : buttonSize;
+        }
+    }
+
+    private void ApplyBackground(bool night)
+    {
+        if (backgroundImage == null) return;
+
+        bool useNight = night && nightBackgroundSprite != null;
+        backgroundImage.sprite = useNight ? nightBackgroundSprite : backgroundSprite;
+        backgroundImage.rectTransform.sizeDelta = useNight ? nightBackgroundSize : backgroundSize;
+        backgroundImage.enabled = backgroundImage.sprite != null;
+    }
+
+    private void HandlePhaseChanged()
+    {
+        ApplyPhaseArt();
+        RefreshAll();
+        if (isOpen) statusText.text = GetOpenMessage();
+    }
+
     // ================= 입력 / 갱신 =================
     private void OnRingClicked(SunButton b)
     {
+        if (playingFinale) return;
+
         if (!puzzle.IsAwake)
         {
             statusText.text = "제단이 아직 잠들어 있다.";
@@ -288,7 +405,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         }
         if (puzzle.HintShown)
         {
-            // 오답 3회 힌트: 정답 5단계 실루엣 (흐리게)
+            // 오답 3회 힌트 (낮): 정답 5단계 실루엣 (흐리게)
             slotTexts[i].text = SunCyclePuzzle.ToKorean(SunCyclePuzzle.AnswerAt(i));
             slotTexts[i].color = dimText;
             return;
@@ -310,6 +427,13 @@ public class SunCycleStation : MonoBehaviour, IInteractable
 
     private void RefreshCenterPlate()
     {
+        if (puzzle.IsNight)
+        {
+            RefreshNightCenter();
+            return;
+        }
+
+        centerPlate.enabled = true;
         if (centerPlateSprite != null)
         {
             bool lit = puzzle.IsCleared;
@@ -320,13 +444,60 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         centerPlate.color = puzzle.IsCleared ? gold : dimSun;
     }
 
-    // 낮: 형판 없이 성소로 안내 / 밤: 형판 획득 + 북쪽 문
+    // 밤: 가운데는 밤 그림 (없으면 숨김 -> 배경의 빈 원이 보임)
+    private void RefreshNightCenter()
+    {
+        centerPlate.enabled = centerPlateNightSprite != null;
+        if (centerPlateNightSprite == null) return;
+
+        centerPlate.sprite = centerPlateNightSprite;
+        centerPlate.color = Color.white;
+    }
+
+    // ================= 결과 =================
+    // 낮: 성소로 안내 / 밤: 잠깐 보여주고 -> 클리어 컷 -> 흔들림 (형판은 성소에서)
     private void HandleSuccess()
     {
-        statusText.text = puzzle.GivesPlate
-            ? "태양이 다시 떠오른다! 태양 형판 획득 - 북쪽 문이 열린다"
-            : "태양의 하루가 제단에 새겨졌다. 입구의 라의 성소가 빛난다.";
+        if (!puzzle.IsNight)
+        {
+            statusText.text = "태양의 하루가 제단에 새겨졌다. 입구의 라의 성소가 빛난다.";
+            RefreshAll();
+            return;
+        }
+
+        statusText.text = "태양의 배가 저승의 강을 건넜다!";
         RefreshAll();
+        if (isActiveAndEnabled) StartCoroutine(NightClearSequence());
+    }
+
+    private IEnumerator NightClearSequence()
+    {
+        playingFinale = true;
+        yield return new WaitForSeconds(clearHoldTime);
+
+        CloseOverlay();
+
+        bool done = finale == null;
+        if (!done) finale.Play(() => done = true);
+        while (!done) yield return null;
+
+        FinishWithShake();
+        playingFinale = false;
+    }
+
+    private void FinishWithShake()
+    {
+        Shake(shakeDuration, shakeStrength);
+        if (!string.IsNullOrEmpty(finishMessage)) Debug.Log(MessageTag + finishMessage);
+    }
+
+    private static void Shake(float duration, float strength)
+    {
+        Camera main = Camera.main;
+        if (main == null) return;
+
+        CameraFollow2D follow = main.GetComponent<CameraFollow2D>();
+        if (follow != null) follow.Shake(duration, strength);
     }
 
     private void HandleFail()

@@ -6,7 +6,7 @@ using UnityEngine;
 //   (1) 낮 시련 전          : 짧은 안내 (처음 한 번 듣기 전까지 "!" 표시 - 입구 비석 역할)
 //   (2) 낮 P5 클리어 후     : "!" 표시 -> 시련 통과 대사 -> 끝나면 밤 시작 (F_RA_NIGHT_OPEN)
 //   (3) 밤 진행 중          : 밤 힌트 대사 (처음 한 번 듣기 전까지 "!" 표시)
-//   (4) 밤 P5 클리어 후     : "!" 표시 -> 마무리 대사 (한 번 들으면 "!" 사라짐)
+//   (4) 밤 P5 클리어 후     : "!" 표시 -> 마무리 대사 -> 끝나면 태양 형판 지급 (한 번만, 북쪽 문 열림)
 public class RaShrine : MonoBehaviour, IInteractable
 {
     private const string MessageTag = "[Door] ";
@@ -30,6 +30,11 @@ public class RaShrine : MonoBehaviour, IInteractable
     [SerializeField] private string nightTalkedFlag = "F_RA_SHRINE_NIGHT_TALKED";
     [SerializeField] private string nightClearFlag = "F_RA_NIGHT_P5_DONE";
     [SerializeField] private string endTalkedFlag = "F_RA_SHRINE_END_TALKED";
+
+    [Header("밤 마무리 - 형판 지급")]
+    [SerializeField] private string plateItemId = "PLATE_RA";
+    [Tooltip("형판을 주면 켜짐 (북쪽 문 개방 조건, 두 번 주기 방지)")]
+    [SerializeField] private string plateGivenFlag = "F_RA_PLATE_GIVEN";
 
     [Header("밤 전환 연출")]
     [SerializeField, TextArea] private string nightMessage = "신전에 밤이 내려앉았다. 비석의 글이 바뀐 것 같다.";
@@ -185,9 +190,27 @@ public class RaShrine : MonoBehaviour, IInteractable
         gm.SetFlag(RaPhaseState.NightFlag); // 모든 라 퍼즐이 밤 데이터로 전환됨
     }
 
+    // 마무리 대사가 끝나면: 형판 지급 -> 들었음 표시
     private void MarkEndTalked()
     {
+        GivePlate();
         SetFlagOnce(endTalkedFlag);
+    }
+
+    private void GivePlate()
+    {
+        if (HasFlag(plateGivenFlag)) return;
+
+        ItemInventory inventory = ItemInventory.Instance;
+        if (inventory == null)
+        {
+            Debug.LogError($"[{name}] ItemInventory가 없어서 태양 형판을 못 줌");
+            return;
+        }
+
+        inventory.Grant(plateItemId);
+        Debug.Log("[노트 6] 태양의 형판을 큐브의 첫 면에 장착하라.");
+        SetFlagOnce(plateGivenFlag); // 북쪽 문이 이 플래그를 보고 열림
     }
 
     private static bool HasFlag(string flag)

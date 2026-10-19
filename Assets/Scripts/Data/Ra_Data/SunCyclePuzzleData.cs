@@ -2,7 +2,8 @@ using UnityEngine;
 
 // P5 태양의 순환 데이터 (낮용 1개, 밤용 1개)
 // 파일 우클릭(점 3개 메뉴) -> "기획서 값 채우기: 낮/밤"으로 기획서 값을 한 번에 넣을 수 있음
-// 형판은 밤 P5에서만 줌 (낮 P5 클리어 -> 라의 성소 대화 -> 밤 시작)
+// 형판은 제단에서 주지 않음 -> 밤 P5 클리어 후 라의 성소 마무리 대사가 끝나면 RaShrine이 지급
+// (Grant Plate는 예전 방식 호환용으로 남겨둠, 기본은 낮/밤 모두 끔)
 [CreateAssetMenu(fileName = "P5_SunCycleData", menuName = "PharaohCube/Ra/P5 SunCycle Data")]
 public class SunCyclePuzzleData : RaPuzzleData
 {
@@ -62,7 +63,7 @@ public class SunCyclePuzzleData : RaPuzzleData
         {
             SunButton.Setting, SunButton.Boat, SunButton.Night, SunButton.Return, SunButton.Rising
         }; // (3) -> (5) -> (4) -> (6) -> (1)
-        grantPlate = true;
+        grantPlate = false; // 형판은 라의 성소에서
         MarkDirty();
     }
 }
