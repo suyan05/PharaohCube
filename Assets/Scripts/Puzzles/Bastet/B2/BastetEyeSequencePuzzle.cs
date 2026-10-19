@@ -23,21 +23,32 @@ public class BastetEyeSequencePuzzle : PuzzleBase
     [SerializeField] private Button btnReplaySequence;
     [SerializeField] private Button btnClose;
 
-    private readonly int[][] forwardSequence = new int[][]
+    // [추가] 한 번에 같이 켜지는 눈 묶음 (Inspector에서 편집하려고 클래스로 감쌈)
+    [System.Serializable]
+    public class EyeGroup
     {
-        new int[] { 0 },
-        new int[] { 2, 3 },
-        new int[] { 5 },
-        new int[] { 1, 4 }
-    };
+        [Tooltip("같이 빛나는 눈 번호 (0~5). 2개 이상이면 동시 점멸")]
+        public int[] eyes = { 0 };
+        public EyeGroup() { }
+        public EyeGroup(params int[] e) { eyes = e; }
+    }
 
-    private readonly int[][] reverseSequence = new int[][]
+    // [수정] 난이도를 Inspector에서 조절 (기본값은 기존과 같음)
+    [Header("[추가] 난이도")]
+    [Tooltip("눈이 빛나는 순서 (위에서부터). 정답은 이 순서의 역순. 단계 수가 많을수록, 동시 점멸이 많을수록 어려움")]
+    [SerializeField] private EyeGroup[] forwardSteps =
     {
-        new int[] { 1, 4 },
-        new int[] { 5 },
-        new int[] { 2, 3 },
-        new int[] { 0 }
+        new EyeGroup(0), new EyeGroup(2, 3), new EyeGroup(5), new EyeGroup(1, 4)
     };
+    [Tooltip("눈 한 묶음이 켜져 있는 시간 (짧을수록 어려움)")]
+    [Range(0.15f, 1.2f)] [SerializeField] private float showOnTime = 0.45f;
+    [Tooltip("묶음 사이 꺼져 있는 시간")]
+    [Range(0.05f, 0.8f)] [SerializeField] private float showGapTime = 0.18f;
+    [Tooltip("켜면 보여 준 뒤 거꾸로 빠르게 한 번 더 보여 줌 (끄면 더 어려움)")]
+    [SerializeField] private bool playRewindPreview = true;
+
+    private int[][] forwardSequence;  // forwardSteps에서 만듦
+    private int[][] reverseSequence;  // forwardSequence의 역순 (정답)
 
     private int currentInputStep = 0;
     private HashSet<int> pendingTargetEyes = new HashSet<int>();
@@ -56,6 +67,8 @@ public class BastetEyeSequencePuzzle : PuzzleBase
 
     private void Awake()
     {
+        BuildSequences(); // [추가]
+
         for (int i = 0; i < eyeButtons.Length; i++)
         {
             int index = i;
@@ -65,6 +78,20 @@ public class BastetEyeSequencePuzzle : PuzzleBase
 
         if (btnReplaySequence != null) btnReplaySequence.onClick.AddListener(PlaySequence);
         if (btnClose != null) btnClose.onClick.AddListener(ClosePuzzle);
+    }
+
+    // [추가] Inspector 순서 -> 정방향 / 역순 배열 (Awake에서 1번만)
+    private void BuildSequences()
+    {
+        int n = forwardSteps != null ? forwardSteps.Length : 0;
+        forwardSequence = new int[n][];
+        reverseSequence = new int[n][];
+        for (int s = 0; s < n; s++)
+        {
+            forwardSequence[s] = forwardSteps[s] != null && forwardSteps[s].eyes != null ? forwardSteps[s].eyes : new int[0];
+            reverseSequence[n - 1 - s] = forwardSequence[s];
+        }
+        if (n == 0) Debug.LogError($"[{name}] Forward Steps가 비어 있음", this);
     }
 
     public override void Open()
@@ -115,7 +142,7 @@ public class BastetEyeSequencePuzzle : PuzzleBase
                     eyeGlowImages[eyes[i]].color = colEyeCyan;
             }
 
-            yield return new WaitForSeconds(0.45f);
+            yield return new WaitForSeconds(showOnTime);
 
             for (int i = 0; i < eyes.Length; i++)
             {
@@ -123,7 +150,7 @@ public class BastetEyeSequencePuzzle : PuzzleBase
                     eyeGlowImages[eyes[i]].color = colEyeDefault;
             }
 
-            yield return new WaitForSeconds(0.18f);
+            yield return new WaitForSeconds(showGapTime);
         }
 
         yield return new WaitForSeconds(0.3f);
@@ -144,7 +171,7 @@ public class BastetEyeSequencePuzzle : PuzzleBase
             textDirectionArrow.color = colEyeRewind;
         }
 
-        for (int s = forwardSequence.Length - 1; s >= 0; s--)
+        for (int s = playRewindPreview ? forwardSequence.Length - 1 : -1; s >= 0; s--) // [수정] 미리보기 끄기 가능
         {
             int[] eyes = forwardSequence[s];
             for (int i = 0; i < eyes.Length; i++)
@@ -167,7 +194,7 @@ public class BastetEyeSequencePuzzle : PuzzleBase
         LoadCurrentStepPendingEyes();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "<b><color=#FF80AB>[◀ 역순 입력]</color></b> 마지막에 켜진 눈부터 거꾸로 누르십시오. (0 / 4)";
+            textStatusNotice.text = $"<b><color=#FF80AB>[◀ 역순 입력]</color></b> 마지막에 켜진 눈부터 거꾸로 누르십시오. (0 / {reverseSequence.Length})";
 
         isShowingSequence = false;
     }
@@ -300,6 +327,7 @@ public class BastetEyeSequencePuzzle : PuzzleBase
 
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [추가] 에디터 Reset 가드
         base.Reset();
         currentInputStep = 0;
         isShowingSequence = false;
