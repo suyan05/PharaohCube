@@ -58601,9 +58601,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9f0a9f34edd134eae70c7c443b81b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnubisSceneExit
-  nextSceneName: Puzzle_Test_Thoth
+  nextSceneName: Puzzle_Test_Anubis_Tutorial
   playerTag: Player
-  exitMessage: "\uD1A0\uD2B8\uC758 \uBC29\uC73C\uB85C \uD5A5\uD569\uB2C8\uB2E4..."
+  exitMessage: "\uC544\uB204\uBE44\uC2A4\uC758 \uBC29\uC73C\uB85C \uD5A5\uD569\uB2C8\uB2E4..."
   fadeOutTime: 1.5
   holdTime: 1
   fadeInTime: 1.2
@@ -58643,7 +58643,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -58709,7 +58709,7 @@ SpriteRenderer:
   m_SortingOrder: 5
   m_MaskInteraction: 0
   m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.3, g: 0.6, b: 0.9, a: 0.5}
+  m_Color: {r: 0.4056604, g: 0.11891768, b: 0.024875412, a: 0.5}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -58728,7 +58728,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.29, y: 22.35, z: 0}
-  m_LocalScale: {x: 2, y: 1, z: 1}
+  m_LocalScale: {x: 19.092812, y: 4.3125, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}

@@ -32770,7 +32770,7 @@ MonoBehaviour:
   smoothTime: 0.12
   focusSmoothTime: 0.35
   zoomSmoothTime: 0.6
-  snapToPixel: 1
+  snapToPixel: 0
   pixelsPerUnit: 32
   boundsTilemap: {fileID: 333963877}
 --- !u!114 &1469239546
