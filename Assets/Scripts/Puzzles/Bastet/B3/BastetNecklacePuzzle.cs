@@ -31,7 +31,32 @@ public class BastetNecklacePuzzle : PuzzleBase
     [SerializeField] private Button btnCheckSymmetry;
     [SerializeField] private Button btnClose;
 
-    private readonly int[][] chainMatrix = new int[][]
+    // [추가] 한 조각을 누르면 같이 도는 조각 묶음 (Inspector에서 편집하려고 클래스로 감쌈)
+    [System.Serializable]
+    public class ChainLink
+    {
+        [Tooltip("이 조각을 누르면 같이 도는 조각 번호 (0~7, 자기 자신 포함)")]
+        public int[] targets = { 0 };
+        public ChainLink() { }
+        public ChainLink(params int[] t) { targets = t; }
+    }
+
+    // [수정] 난이도를 Inspector에서 조절 (기본값은 기존과 같음)
+    [Header("[추가] 난이도")]
+    [Tooltip("조각별 연결 (0~7번 순서). 같이 도는 조각이 많을수록 어려움")]
+    [SerializeField] private ChainLink[] chainLinks =
+    {
+        new ChainLink(0, 1, 3), new ChainLink(0, 1, 4), new ChainLink(2, 3, 5), new ChainLink(2, 3, 4, 6),
+        new ChainLink(3, 4, 7), new ChainLink(2, 5, 6), new ChainLink(3, 5, 6, 7), new ChainLink(4, 6, 7)
+    };
+    [Tooltip("처음 방향 8개 (0 위, 1 오른쪽, 2 아래, 3 왼쪽). 섞기 전 기준")]
+    [SerializeField] private int[] startRotations = { 0, 1, 2, 3, 0, 3, 2, 1 };
+    [Tooltip("처음에 이 순서로 조각을 눌러 섞음. 길수록 정답에서 멀어짐 (빈 배열 = 섞지 않음)")]
+    [SerializeField] private int[] scrambleSequence = { 0, 3, 6, 1, 4, 7, 2 };
+
+    private int[][] chainMatrix; // chainLinks에서 만듦
+
+    private readonly int[][] defaultChainMatrix = new int[][]
     {
         new int[] { 0, 1, 3 },          // 1번: 1, 2, 4
         new int[] { 0, 1, 4 },          // 2번: 1, 2, 5
@@ -59,6 +84,20 @@ public class BastetNecklacePuzzle : PuzzleBase
 
     private void Awake()
     {
+        // [추가] Inspector 연결 -> 배열 (비어 있으면 기존 기본값)
+        if (chainLinks != null && chainLinks.Length == pieces.Length)
+        {
+            chainMatrix = new int[chainLinks.Length][];
+            for (int i = 0; i < chainLinks.Length; i++)
+                chainMatrix[i] = chainLinks[i] != null && chainLinks[i].targets != null ? chainLinks[i].targets : new[] { i };
+        }
+        else
+        {
+            if (chainLinks != null && chainLinks.Length > 0)
+                Debug.LogWarning($"[{name}] Chain Links 수({chainLinks.Length})가 조각 수({pieces.Length})와 달라 기본값 사용", this);
+            chainMatrix = defaultChainMatrix;
+        }
+
         for (int i = 0; i < pieces.Length; i++)
         {
             int index = i;
@@ -205,19 +244,13 @@ public class BastetNecklacePuzzle : PuzzleBase
 
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [추가] 에디터 Reset 가드
         base.Reset();
 
-        pieces[0].currentRotStep = 0; 
-        pieces[1].currentRotStep = 1; 
-        pieces[2].currentRotStep = 2; 
-        pieces[3].currentRotStep = 3;
+        // [수정] 처음 방향과 섞는 순서를 Inspector 값으로
+        for (int i = 0; i < pieces.Length; i++)
+            pieces[i].currentRotStep = (startRotations != null && i < startRotations.Length) ? ((startRotations[i] % 4) + 4) % 4 : 0;
 
-        pieces[4].currentRotStep = 0;
-        pieces[5].currentRotStep = 3;
-        pieces[6].currentRotStep = 2;
-        pieces[7].currentRotStep = 1;
-
-        int[] scrambleSequence = { 0, 3, 6, 1, 4, 7, 2 };
         for (int s = 0; s < scrambleSequence.Length; s++)
         {
             int btn = scrambleSequence[s];

@@ -17,7 +17,16 @@ public class BastetFootprintPuzzle : PuzzleBase
     [SerializeField] private Button btnReplayPath;
     [SerializeField] private Button btnClose;
 
-    private readonly int[] correctPath = { 2, 7, 12, 13, 8, 7, 6, 11, 16 };
+    // [수정] 난이도를 Inspector에서 조절 (기본값은 기존과 같음)
+    [Header("[추가] 난이도 (칸 번호 0 = 왼쪽 위, 5x5에서 오른쪽으로 1씩, 아래로 5씩)")]
+    [Tooltip("밟아야 할 발자국 순서. 길수록 어려움 (같은 칸을 다시 밟는 경로 = 더 어려움)")]
+    [SerializeField] private int[] correctPath = { 2, 7, 12, 13, 8, 7, 6, 11, 16 };
+    [Tooltip("발자국 하나가 켜져 있는 시간 (짧을수록 어려움)")]
+    [Range(0.15f, 1.2f)] [SerializeField] private float stepOnTime = 0.38f;
+    [Tooltip("발자국 사이 꺼져 있는 시간")]
+    [Range(0.05f, 0.8f)] [SerializeField] private float stepGapTime = 0.12f;
+    [Tooltip("틀리면 처음부터 다시 보여 줄지 (끄면 틀린 칸만 빨갛게 하고 이어서 입력)")]
+    [SerializeField] private bool replayOnFail = true;
     private int currentStep = 0;
 
     private bool isPlayingSequence = false;
@@ -87,12 +96,12 @@ public class BastetFootprintPuzzle : PuzzleBase
             if (tileGlowImages[tileIndex] != null)
                 tileGlowImages[tileIndex].color = isBoundary ? colStartEnd : colPurple;
 
-            yield return new WaitForSeconds(0.38f);
+            yield return new WaitForSeconds(stepOnTime);
 
             if (tileGlowImages[tileIndex] != null)
                 tileGlowImages[tileIndex].color = colDefault;
 
-            yield return new WaitForSeconds(0.12f);
+            yield return new WaitForSeconds(stepGapTime);
         }
 
         ResetTileColors();
@@ -175,12 +184,23 @@ public class BastetFootprintPuzzle : PuzzleBase
 
         yield return new WaitForSeconds(0.6f);
 
+        // [수정] replayOnFail을 끄면 진행을 유지하고 틀린 칸만 원래 색으로
+        if (!replayOnFail)
+        {
+            if (tileGlowImages[wrongIndex] != null) tileGlowImages[wrongIndex].color = colDefault;
+            isPlayingSequence = false;
+            if (textStatusNotice != null)
+                textStatusNotice.text = $"발자국 진행: ({currentStep} / {correctPath.Length})";
+            yield break;
+        }
+
         OnFailInternal();
         PlayPathSequence();
     }
 
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [추가] 에디터 Reset 가드
         base.Reset();
         currentStep = 0;
         isPlayingSequence = false;

@@ -33,6 +33,18 @@ public class BastetClawPatternPuzzle : PuzzleBase
     [SerializeField] private Button btnClose;
 
     // 슬래시(/) 기반 발톱 긁힘 문양 표기
+    // [수정] 난이도를 Inspector에서 조절 (기본값은 기존과 같음)
+    [Header("[추가] 난이도 (칸 번호 0 = 왼쪽 위, 4열 기준 오른쪽으로 1씩, 아래로 4씩)")]
+    [Tooltip("전체 무늬 12칸 (1 = /, 2 = //, 3 = ///). 규칙: 가로 좌우 대칭, 세로로 1→2→3→1 순환")]
+    [SerializeField] private int[] fullGridPattern =
+    {
+        1, 2, 2, 1,
+        2, 3, 3, 2,
+        3, 1, 1, 3
+    };
+    [Tooltip("빈칸(?) 번호. 많을수록 어려움")]
+    [SerializeField] private int[] blankIndices = { 1, 4, 6, 9, 11 };
+
     private readonly string[] clawSymbols = { "?", "/", "//", "///" };
 
     private int selectedBlankSlotIndex = -1;
@@ -251,19 +263,12 @@ public class BastetClawPatternPuzzle : PuzzleBase
 
     public override void Reset()
     {
+        if (!Application.isPlaying) return; // [추가] 에디터 Reset 가드
         base.Reset();
 
-        int[] fullGridPattern = {
-            1, 2, 2, 1,
-            2, 3, 3, 2,
-            3, 1, 1, 3
-        };
-
-        HashSet<int> blankIndices = new HashSet<int> { 1, 4, 6, 9, 11 };
-
-        for (int i = 0; i < patternSlots.Length; i++)
+        for (int i = 0; i < patternSlots.Length && i < fullGridPattern.Length; i++)
         {
-            if (blankIndices.Contains(i))
+            if (System.Array.IndexOf(blankIndices, i) >= 0)
             {
                 patternSlots[i].isBlank = true;
                 patternSlots[i].targetValue = fullGridPattern[i];
@@ -280,7 +285,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         UpdateSlotVisuals();
 
         if (textStatusNotice != null)
-            textStatusNotice.text = "가로 대칭과 세로 순환 규칙을 분석하여 5개의 빈칸(?)을 채우십시오.";
+            textStatusNotice.text = $"가로 대칭과 세로 순환 규칙을 분석하여 {blankIndices.Length}개의 빈칸(?)을 채우십시오.";
     }
 
     public void ClosePuzzle()

@@ -32352,10 +32352,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c9f0a9f34edd134eae70c7c443b81b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnubisSceneExit
-  nextSceneName: Puzzle_Test_Bastet
+  nextSceneName: Puzzle_Test_Bastet_Tliemap
   playerTag: Player
-  exitMessage: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uC9C4\uC9DC \uC2E0\uC804\uC73C\uB85C
-    \uB4E4\uC5B4\uAC11\uB2C8\uB2E4..."
+  exitMessage: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uBC29\uC73C\uB85C \uB4E4\uC5B4\uAC11\uB2C8\uB2E4..."
   fadeOutTime: 1.5
   holdTime: 1
   fadeInTime: 1.2
@@ -32771,7 +32770,7 @@ MonoBehaviour:
   smoothTime: 0.12
   focusSmoothTime: 0.35
   zoomSmoothTime: 0.6
-  snapToPixel: 1
+  snapToPixel: 0
   pixelsPerUnit: 32
   boundsTilemap: {fileID: 333963877}
 --- !u!114 &1469239546
