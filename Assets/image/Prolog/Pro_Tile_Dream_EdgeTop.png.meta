@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 958b060338e31b644b0b35247154aa86
+guid: 14b62251a638aec4b9559bed32ff5995
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8929866912724645985
-    second: Pro_Obj_SphinxEyes_0
+      213: 8639986960506048349
+    second: EdgeTop_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pro_Obj_SphinxEyes_0
+      name: EdgeTop_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 0
-        width: 248
-        height: 151
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f978887fa5db21480800000000000000
-      internalID: -8929866912724645985
+      spriteID: d5f48fc2d5667e770800000000000000
+      internalID: 8639986960506048349
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pro_Obj_SphinxEyes_0: -8929866912724645985
+      EdgeTop_0: 8639986960506048349
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

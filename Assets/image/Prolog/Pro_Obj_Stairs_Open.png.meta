@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c66bd28b9af83e948a90933756da52d3
+guid: 6971974c9bd9e8e41b3c0e9c3ac18999
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4439452537971019394
-    second: FloorA_0
+      213: 1998802160137934526
+    second: Pro_Obj_Stairs_Open_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,11 +96,24 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: FloorA_0
+      name: Pro_Obj_Stairs_Open_0
       rect:
         serializedVersion: 2
         x: 0
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 28e08f2ef8a1c9d30800000000000000
-      internalID: 4439452537971019394
+      spriteID: eb61e4b79fb2dbb10800000000000000
+      internalID: 1998802160137934526
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      FloorA_0: 4439452537971019394
+      Pro_Obj_Stairs_Open_0: 1998802160137934526
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
