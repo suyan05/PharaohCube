@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-// 붕괴 연출 (기획서 4.1 / 세부 아트 요청서 1.3 컷 8)
-// 1. 플레이어 발밑에 금 _01 -> _02 -> _03 (0.6초씩), 흔들림 약 -> 강
-// 2. 모래 알갱이가 구멍으로 빨려 들어감
-// 3. 암전 -> 다음 씬 (Prologue_Sphinx, 없으면 다음 번호 씬)
-// 연출 동안 플레이어 조작 잠금
+// 붕괴 연출 (기획서 4.1 / 세부 아트 요청서 1.3 컷 8) - SandPileGroup이 스카라브 뒤에 부름
+// 1. 땅이 낮게 울림 -> "?" "...응?"
+// 2. 무전기 다급한 경고 (끊김)
+// 3. 발밑에 금 _01 -> _02 -> _03 (0.6초씩), 흔들림 약 -> 강, 모래 알갱이가 구멍으로
+// 4. "!!" -> 플레이어가 구멍으로 빨려 떨어짐 -> 암전 -> 정적 -> 다음 씬 (Prologue_Sphinx)
+// Cine 연출 상태는 SandPileGroup에서 이미 시작된 상태로 들어옴 (조작 잠금 + 검은 바 유지)
 public class DigCollapseSequence : MonoBehaviour
 {
     [Header("바닥 금 (Pro_FX_Crack_01~03)")]
@@ -16,8 +17,8 @@ public class DigCollapseSequence : MonoBehaviour
     [SerializeField] private int crackSortingOrder = -1;
 
     [Header("흔들림 (유닛)")]
-    [SerializeField, Min(0f)] private float weakShake = 0.04f;
-    [SerializeField, Min(0f)] private float strongShake = 0.2f;
+    [SerializeField, Min(0f)] private float weakShake = 0.03f;
+    [SerializeField, Min(0f)] private float strongShake = 0.22f;
 
     [Header("모래 알갱이 (Pro_FX_SandGrain_01~03)")]
     [SerializeField] private Sprite[] grainSprites;
@@ -25,8 +26,23 @@ public class DigCollapseSequence : MonoBehaviour
     [SerializeField] private float grainSpread = 2.5f;
     [SerializeField] private int grainSortingOrder = 1;
 
+    [Header("소리 (비워도 됨)")]
+    [SerializeField] private AudioClip rumbleSfx;
+    [SerializeField] private AudioClip radioStaticSfx;
+    [SerializeField] private AudioClip collapseSfx;
+
+    [Header("대사")]
+    [SerializeField] private DialogueLine[] rumbleLines = { new DialogueLine("나", "...응? 땅이 울리는데?") };
+    [SerializeField]
+    private DialogueLine[] radioWarnLines =
+    {
+        new DialogueLine("무전 (탐사대장)", "치직- B구역 아래는- 치지직- 빈 공간일 수도- 당장 나와-!")
+    };
+    [SerializeField] private DialogueLine[] fallLines = { new DialogueLine("나", "어, 어어...?!") };
+
     [Header("끝")]
-    [SerializeField, Min(0f)] private float fadeOutSeconds = 0.6f;
+    [SerializeField, Min(0f)] private float fadeOutSeconds = 0.5f;
+    [SerializeField, Min(0f)] private float blackHoldSeconds = 1f;
     [SerializeField] private string nextScene = "Prologue_Sphinx";
 
     private bool playing;
@@ -40,17 +56,29 @@ public class DigCollapseSequence : MonoBehaviour
 
     private IEnumerator Run()
     {
-        PlayerLock.Lock(this);
-        Vector3 feet = FindFeet();
+        Transform player = CineActor.Player();
+        Vector3 feet = player != null ? player.position : transform.position;
+
+        yield return Warning(player, feet);
         SpriteRenderer crack = CreateCrack(feet);
-
+        CineAudio.Play(collapseSfx);
         yield return PlayCrack(crack);
-        SpawnGrains(feet);
-        CameraShake2D.Set(strongShake);
-
-        yield return ScreenFader.FadeOut(fadeOutSeconds);
-        CameraShake2D.Set(0f);
+        yield return Fall(player, feet);
         LoadNext();
+    }
+
+    // ================= 장면들 =================
+    private IEnumerator Warning(Transform player, Vector3 feet)
+    {
+        CineCamera.Focus(feet);
+        CineAudio.Play(rumbleSfx);
+        yield return CineCamera.Rumble(1f, 0f, weakShake);
+        yield return EmoteBalloonUI.Show(player, "?", 0.7f);
+        yield return Cine.Say(rumbleLines);
+
+        CineAudio.Play(radioStaticSfx);
+        Cine.Run(CineCamera.Rumble(4f, weakShake, weakShake * 1.5f));
+        yield return Cine.Say(radioWarnLines);
     }
 
     // 금이 커질수록 흔들림도 강해짐
@@ -61,20 +89,25 @@ public class DigCollapseSequence : MonoBehaviour
         {
             if (crack != null && crackFrames != null && i < crackFrames.Length) crack.sprite = crackFrames[i];
             float t = count > 1 ? i / (float)(count - 1) : 1f;
-            CameraShake2D.Set(Mathf.Lerp(weakShake, strongShake, t));
-            yield return new WaitForSeconds(frameSeconds);
+            yield return CineCamera.Rumble(frameSeconds, Mathf.Lerp(weakShake, strongShake, t * 0.7f), Mathf.Lerp(weakShake, strongShake, t));
         }
     }
 
-    private Vector3 FindFeet()
+    private IEnumerator Fall(Transform player, Vector3 feet)
     {
-        PlayerController2D player = FindAnyObjectByType<PlayerController2D>();
-        if (player != null) return player.transform.position;
+        SpawnGrains(feet);
+        EmoteBalloonUI.Pop(player, "!!", 0.6f);
+        yield return Cine.Say(fallLines);
 
-        Debug.LogWarning("[DigCollapseSequence] 플레이어를 못 찾음 -> 이 오브젝트 위치에서 붕괴");
-        return transform.position;
+        CineCamera.Zoom(3.5f, 0.5f);
+        Cine.Run(CineCamera.Rumble(fadeOutSeconds + 0.6f, strongShake, strongShake));
+        yield return CineActor.Sink(player, 0.6f, 0.6f);
+        yield return ScreenFader.FadeOut(fadeOutSeconds);
+        yield return CineAudio.StopLoop(0.3f);
+        yield return new WaitForSeconds(blackHoldSeconds);
     }
 
+    // ================= 도우미 =================
     private SpriteRenderer CreateCrack(Vector3 feet)
     {
         try
@@ -114,7 +147,7 @@ public class DigCollapseSequence : MonoBehaviour
         catch (Exception e)
         {
             Debug.LogError($"[DigCollapseSequence] 다음 씬 이동 오류: {e}");
-            PlayerLock.Unlock(this);
+            Cine.End();
             playing = false;
         }
     }

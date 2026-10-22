@@ -5,7 +5,7 @@ using UnityEngine;
 // 월드 도트 그림 자동 임포트 설정 (세부 아트 요청서 0.2)
 // 아래 폴더에 PNG를 "처음" 넣을 때만 자동으로:
 //   Sprite / Single, PPU 32, Point 필터, 압축 없음, 밉맵 끔
-//   피벗: 파일 이름에 _Obj_ 가 있으면 바닥 가운데 (물건이 바닥에 닿는 줄 = 맨 아래), 나머지(타일·FX)는 가운데
+//   피벗: 파일 이름에 _Obj_ 가 있으면 바닥 가운데 (물건이 바닥에 닿는 줄 = 맨 아래), 나머지(타일, FX)는 가운데
 // 이미 들어와 있는 그림은 건드리지 않음 (손으로 바꾼 설정 유지)
 // 주의: 이 파일은 꼭 이름이 Editor인 폴더 안에 있어야 함 (Assets/Scripts/Editor)
 public class PixelArtImporter : AssetPostprocessor

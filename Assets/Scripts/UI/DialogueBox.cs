@@ -25,6 +25,7 @@ public class DialogueLine
 // 범용 대사창 (프롤로그, 조사 오브젝트, 중앙 홀이 같이 씀. 라의 성소는 기존 RaDialogue 그대로)
 // - DialogueBox.Play(대사들, 끝나면 할 일)
 // - DialogueBox.Ask(질문 대사, 선택지들, 고른 번호 받을 함수)  -> 스핑크스 수수께끼 같은 선택지
+// - DialogueBox.ForceClose()  -> 연출 스킵 때 강제로 닫기 (끝나면 할 일은 부르지 않음)
 // - 글자가 한 글자씩. E / Space / Enter / 클릭 = 다음 (나오는 중이면 한 번에 표시)
 // - 선택지: W/S 또는 위/아래 화살표로 고르고 E / Enter로 확정, 마우스 클릭도 됨
 // - 씬에 안 놓아도 처음 부를 때 자동으로 생김
@@ -96,6 +97,11 @@ public class DialogueBox : MonoBehaviour
             return;
         }
         Instance.Open(new[] { question }, null, options, chosen);
+    }
+
+    public static void ForceClose()
+    {
+        if (IsOpen) instance.Close(false);
     }
 
     private void Open(DialogueLine[] newLines, Action finished, string[] newChoices, Action<int> chosen)

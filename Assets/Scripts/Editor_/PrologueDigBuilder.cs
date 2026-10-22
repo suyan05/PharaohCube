@@ -3,14 +3,18 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
 
 // 메뉴 한 번으로 발굴 현장 오브젝트를 기획서 배치대로 만들어주는 도구
 // 메뉴: PharaohCube -> Prologue -> 발굴 현장 배치 만들기   (Prologue_Dig 씬을 열고 실행)
+// 순서: "발굴 현장 바닥 깔기"(DigGrid)를 먼저 하고 이걸 하면 카메라 경계까지 자동으로 맞춤
 //
 // 만드는 것: 맵 경계, 텐트, 야자수, 책상(일지), 장비 상자, 무전기, 모래 더미 3개,
-//            발굴 구역 로프 + 입구(BrushGate), 진행/모래 묶음/붕괴 시스템 (서로 연결까지)
-// 하는 것:   플레이어를 시작 칸(5, 8)으로 옮김, Global Light 2D를 낮빛(255, 225, 160)으로
+//            발굴 구역 로프 + 입구(BrushGate) + 첫 입장 연출(DigZoneEntry),
+//            진행/오프닝 연출/모래 묶음/붕괴 시스템 (서로 연결까지)
+// 하는 것:   플레이어를 시작 칸(5, 8)으로 옮김, Global Light 2D를 낮빛(255, 225, 160)으로,
+//            Main Camera: Z -10, CameraFollow2D Bounds Tilemap = DigGrid/Floor, Bottom Padding 0
 //
 // 좌표 규칙: 맵 28 x 14칸, 맵 왼쪽 아래 = 월드 (0, 0). 기획서 칸 (x, y)는 왼쪽 위 기준
 // 그림은 Assets/image/Prologue/World/ 의 요청서 파일 이름으로 찾음 (없으면 경고만, 그림 없이 만듦)
@@ -43,6 +47,7 @@ public static class PrologueDigBuilder
             BuildAll(root.transform);
             MovePlayer();
             SetDayLight();
+            FixCamera();
 
             EditorSceneManager.MarkSceneDirty(root.scene);
             Debug.Log("[PrologueDigBuilder] 발굴 현장 배치 완료 -> Ctrl+S로 씬 저장");
@@ -60,13 +65,13 @@ public static class PrologueDigBuilder
         Transform objects = Group(root, "Interactables");
         BuildJournal(objects);
         BuildCrate(objects);
-        BuildRadio(objects);
+        Transform radio = BuildRadio(objects);
         Inspectable[] piles = BuildSandPiles(objects);
         BuildRopeZone(root);
-        BuildSystems(root, piles);
+        BuildSystems(root, piles, radio);
     }
 
-    // ================= 맵 경계·장식 =================
+    // ================= 맵 경계, 장식 =================
     private static void BuildBounds(Transform root)
     {
         GameObject go = Group(root, "MapBounds").gameObject;
@@ -117,7 +122,7 @@ public static class PrologueDigBuilder
         });
     }
 
-    private static void BuildRadio(Transform parent)
+    private static Transform BuildRadio(Transform parent)
     {
         GameObject radio = MakeSprite(parent, "Radio", "Pro_Obj_Radio", Foot(2, 9, 1, 1), 0);
         Box(radio, new Vector2(0.9f, 0.8f), new Vector2(0f, 0.4f), false);
@@ -126,8 +131,9 @@ public static class PrologueDigBuilder
         Edit(insp, so =>
         {
             Prop(so, "onceOnly").boolValue = false;
-            SetLines(so, "lines", "", "치직... 아무 응답이 없다.");
+            SetLines(so, "lines", "", "치직... 본부는 다시 조용하다.");
         });
+        return radio.transform;
     }
 
     private static Inspectable[] BuildSandPiles(Transform parent)
@@ -173,6 +179,16 @@ public static class PrologueDigBuilder
         Box(zone, new Vector2(0.2f, 0.4f), new Vector2(18.5f, 7.2f), false); // 왼쪽 위
 
         BuildGate(zone.transform);
+        BuildZoneEntry(zone.transform);
+    }
+
+    // 구역 안쪽을 덮는 트리거. Ignore Raycast 레이어라 E 조사 대상 찾기에 걸리지 않음
+    private static void BuildZoneEntry(Transform zone)
+    {
+        GameObject entry = Group(zone, "ZoneEntry").gameObject;
+        entry.layer = 2; // Ignore Raycast
+        Box(entry, new Vector2(6.8f, 4.8f), new Vector2(22f, 4.9f), true);
+        entry.AddComponent<DigZoneEntry>();
     }
 
     private static void BuildRopeVisuals(Transform zone)
@@ -212,31 +228,47 @@ public static class PrologueDigBuilder
     }
 
     // ================= 진행 시스템 =================
-    private static void BuildSystems(Transform root, Inspectable[] piles)
+    private static void BuildSystems(Transform root, Inspectable[] piles, Transform radio)
     {
         GameObject sys = Group(root, "PrologueSystems").gameObject;
-        sys.AddComponent<DigSiteDirector>();
+        Sprite[] grains = { Load("Pro_FX_SandGrain_01"), Load("Pro_FX_SandGrain_02"), Load("Pro_FX_SandGrain_03") };
 
-        DigCollapseSequence collapse = sys.AddComponent<DigCollapseSequence>();
-        Edit(collapse, so =>
+        DigIntroCutscene intro = sys.AddComponent<DigIntroCutscene>();
+        Edit(intro, so =>
         {
-            SetObjects(so, "crackFrames", Load("Pro_FX_Crack_01"), Load("Pro_FX_Crack_02"), Load("Pro_FX_Crack_03"));
-            SetObjects(so, "grainSprites", Load("Pro_FX_SandGrain_01"), Load("Pro_FX_SandGrain_02"), Load("Pro_FX_SandGrain_03"));
-            Prop(so, "crackSortingLayer").stringValue = sortingLayer;
-            Prop(so, "crackSortingOrder").intValue = standOrder - 1;
-            Prop(so, "grainSortingOrder").intValue = standOrder + 1;
+            Prop(so, "radio").objectReferenceValue = radio;
+            SetObjects(so, "dustSprites", grains);
         });
 
+        DigSiteDirector director = sys.AddComponent<DigSiteDirector>();
+        Edit(director, so => Prop(so, "intro").objectReferenceValue = intro);
+
+        DigCollapseSequence collapse = BuildCollapse(sys, grains);
         SandPileGroup group = sys.AddComponent<SandPileGroup>();
         Edit(group, so =>
         {
             SetObjects(so, "piles", piles);
+            SetObjects(so, "dustSprites", grains);
             Prop(so, "scarabSprite").objectReferenceValue = Load("Pro_Obj_SandPile_Scarab");
             Prop(so, "collapse").objectReferenceValue = collapse;
         });
     }
 
-    // ================= 플레이어·조명 =================
+    private static DigCollapseSequence BuildCollapse(GameObject sys, Sprite[] grains)
+    {
+        DigCollapseSequence collapse = sys.AddComponent<DigCollapseSequence>();
+        Edit(collapse, so =>
+        {
+            SetObjects(so, "crackFrames", Load("Pro_FX_Crack_01"), Load("Pro_FX_Crack_02"), Load("Pro_FX_Crack_03"));
+            SetObjects(so, "grainSprites", grains);
+            Prop(so, "crackSortingLayer").stringValue = sortingLayer;
+            Prop(so, "crackSortingOrder").intValue = standOrder - 1;
+            Prop(so, "grainSortingOrder").intValue = standOrder + 1;
+        });
+        return collapse;
+    }
+
+    // ================= 플레이어, 조명 =================
     private static void ReadPlayerSorting()
     {
         PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
@@ -271,6 +303,47 @@ public static class PrologueDigBuilder
             light.color = new Color(255f / 255f, 225f / 255f, 160f / 255f);
             light.intensity = 1f;
         }
+    }
+
+    // ================= 카메라 =================
+    // Z가 0 이상이면 그림이 카메라 뒤에 있어서 배경색만 보임 -> -10
+    // Bounds Tilemap: 라의 방에서 복사해 오면 연결이 끊겨서 비어 있음 -> DigGrid/Floor
+    // Bottom Padding: 라의 방용(3칸, 검은 타일 여백). 프롤로그는 여백 타일이 없어서 0
+    private static void FixCamera()
+    {
+        Camera cam = Camera.main;
+        if (cam == null)
+        {
+            Debug.LogWarning("[PrologueDigBuilder] Main Camera가 없음 (Tag가 MainCamera인지 확인)");
+            return;
+        }
+
+        Undo.RecordObject(cam.transform, "카메라 Z");
+        Vector3 p = cam.transform.position;
+        if (p.z > -1f) cam.transform.position = new Vector3(p.x, p.y, -10f);
+
+        CameraFollow2D follow = cam.GetComponent<CameraFollow2D>();
+        if (follow == null)
+        {
+            Debug.LogWarning("[PrologueDigBuilder] Main Camera에 CameraFollow2D가 없음 -> 라의 방 카메라에서 복사");
+            return;
+        }
+        SetCameraBounds(follow);
+    }
+
+    private static void SetCameraBounds(CameraFollow2D follow)
+    {
+        GameObject floor = GameObject.Find("DigGrid/Floor");
+        Tilemap map = floor != null ? floor.GetComponent<Tilemap>() : null;
+        if (map == null) Debug.LogWarning("[PrologueDigBuilder] DigGrid/Floor가 없음 -> '발굴 현장 바닥 깔기' 먼저 하고 다시 실행");
+
+        Undo.RecordObject(follow, "카메라 경계");
+        Edit(follow, so =>
+        {
+            if (map != null) Prop(so, "boundsTilemap").objectReferenceValue = map;
+            SerializedProperty pad = so.FindProperty("bottomPadding");
+            if (pad != null) pad.floatValue = 0f;
+        });
     }
 
     // ================= 도우미 =================

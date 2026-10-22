@@ -85,7 +85,7 @@ public static class PrologueDigTiles
         }
     }
 
-    // 위: 윗면(맨 위 줄) + 앞면(그 아래 줄), 왼쪽·오른쪽: 옆 가장자리, 아래: 낮은 턱
+    // 위: 윗면(맨 위 줄) + 앞면(그 아래 줄), 왼쪽, 오른쪽: 옆 가장자리, 아래: 낮은 턱
     private static void FillDune(Tilemap map)
     {
         for (int x = 0; x < MapW; x++)
