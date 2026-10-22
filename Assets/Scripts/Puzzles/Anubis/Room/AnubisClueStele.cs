@@ -16,6 +16,8 @@ public class AnubisClueStele : MonoBehaviour, IInteractable, IAnubisRetryable
     [Tooltip("이 아이템을 가져야 \"!\"가 뜸 (앞 시험 보상). 비우면 처음부터 뜸\n" +
              "예: A2 비석 = ITEM_ANUBIS_GOLD_JAR (A1 보상)")]
     [SerializeField] private string unlockItemId = "";
+    [Tooltip("[추가] 이 플래그가 켜져도 \"!\" 해금 (아이템을 써서 없어져도 유지됨)")]
+    [SerializeField] private string unlockFlag = "";
     [Tooltip("켜면 해금 전에는 읽을 수도 없음 (안내 문구만)")]
     [SerializeField] private bool blockReadWhileLocked = true;
     [TextArea(1, 2)]
@@ -36,8 +38,9 @@ public class AnubisClueStele : MonoBehaviour, IInteractable, IAnubisRetryable
     private Vector3 bubbleBaseScale = Vector3.one;
     private float popTimer;
 
-    public bool IsUnlocked => string.IsNullOrEmpty(unlockItemId)
-                              || (ItemInventory.Instance != null && ItemInventory.Instance.Has(unlockItemId));
+    public bool IsUnlocked => (string.IsNullOrEmpty(unlockItemId) && string.IsNullOrEmpty(unlockFlag))
+                              || (!string.IsNullOrEmpty(unlockItemId) && ItemInventory.Instance != null && ItemInventory.Instance.Has(unlockItemId))
+                              || (!string.IsNullOrEmpty(unlockFlag) && GameManager.Instance != null && GameManager.Instance.HasFlag(unlockFlag)); // [수정]
 
     private string ReadFlag => !string.IsNullOrEmpty(readFlag) ? readFlag
                              : (data != null ? $"F_CLUE_{data.ClueId}_READ" : "");

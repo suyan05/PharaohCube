@@ -34,6 +34,10 @@ public class SymbolSquarePuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVa
     };
     [Tooltip("상징 그림 (선택). 넣으면 글자 대신 그림으로 표시")]
     [SerializeField] private Sprite[] symbolSprites = new Sprite[9];
+    [Tooltip("[추가] 그림이 있어도 이름을 칸 아래쪽에 작게 표시 (그림만으로 헷갈릴 때)")]
+    [SerializeField] private bool showNameWithSprite = true;
+    [Tooltip("[추가] 그림과 함께 쓸 때 이름 글자 크기")]
+    [Range(12, 32)] [SerializeField] private int nameFontSize = 18;
 
     [Header("난이도")]
     [Tooltip("미리 채울 숫자 (0 = 빈칸, 1~9 = 고정칸)\n배치: 0 1 2 / 3 4 5 / 6 7 8")]
@@ -116,6 +120,7 @@ public class SymbolSquarePuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVa
         if (successNotice != null) successNotice.SetActive(false);
         if (textFeedback != null) textFeedback.text = "";
 
+        MoveNamesBelowIcons(); // [추가]
         SetupPalette();
         InitBoard();
         started = true; // [추가]
@@ -303,6 +308,7 @@ public class SymbolSquarePuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVa
     }
 
     // 그림이 있으면 그림, 없으면 이름 글자로 표시
+    // [수정] 그림은 칸의 Icon(자식)에만 넣음 -> 선택판 순서가 바뀌어도 글자와 그림이 항상 같은 신
     private void ShowSymbol(TMP_Text text, Image icon, int number)
     {
         Sprite sprite = number > 0 ? SpriteOf(number) : null;
@@ -311,8 +317,52 @@ public class SymbolSquarePuzzleReal : MonoBehaviour, IAnubisRetryable, IAnubisVa
             icon.gameObject.SetActive(sprite != null);
             icon.sprite = sprite;
         }
-        if (text != null) text.text = (number > 0 && sprite == null) ? NameOf(number) : "";
+        if (text == null) return;
+        if (number <= 0) text.text = "";
+        else if (sprite == null) text.text = NameOf(number);
+        else text.text = showNameWithSprite ? NameOf(number) : "";
     }
+
+    // [추가] 그림이 있을 때 이름을 칸 아래쪽 띠로 옮김 (Start에서 1번)
+    private bool HasAnySprite()
+    {
+        if (symbolSprites == null) return false;
+        foreach (Sprite s in symbolSprites) if (s != null) return true;
+        return false;
+    }
+
+    private void MoveNamesBelowIcons()
+    {
+        if (!showNameWithSprite || !HasAnySprite()) return;
+        MoveToBottom(boardTexts);
+        MoveToBottom(paletteTexts);
+    }
+
+    private void MoveToBottom(TMP_Text[] texts)
+    {
+        if (texts == null) return;
+        foreach (TMP_Text t in texts)
+        {
+            if (t == null) continue;
+            RectTransform r = t.rectTransform;
+            r.anchorMin = new Vector2(0f, 0f);
+            r.anchorMax = new Vector2(1f, 0f);
+            r.pivot = new Vector2(0.5f, 0f);
+            r.anchoredPosition = new Vector2(0f, 2f);
+            r.sizeDelta = new Vector2(0f, nameFontSize + 8f);
+            t.fontSize = nameFontSize;
+            t.alignment = TextAlignmentOptions.Bottom;
+            t.raycastTarget = false;
+        }
+    }
+
+#if UNITY_EDITOR
+    // [추가] 에디터 메뉴용: 그림 목록과 선택판/보드 칸 정보
+    public void EditorSetSprites(Sprite[] sprites) => symbolSprites = sprites;
+    public Button[] EditorPaletteButtons => paletteButtons;
+    public Button[] EditorBoardButtons => boardButtons;
+    public Sprite[] EditorSprites => symbolSprites;
+#endif
 
     private void ShowFeedback(string msg)
     {

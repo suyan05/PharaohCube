@@ -28,8 +28,8 @@ public static class BastetRoomSetup
     private const string StoryCanvasName = "BastetStoryCanvas";
     private const string ExitName = "Exit_ToThoth";
     private const string DoorName = "Door_North_Exit";
-    private const string NextSceneName = "Puzzle_Test_Thoth";
-    private const string NextScenePath = "Assets/Scenes/Puzzle_Test/Puzzle_Test_Thoth.unity";
+    private const string NextSceneName = "Puzzle_Test_Anubis_Tutorial"; // [수정] 토트 씬 완성 전까지 아누비스로
+    private const string NextScenePath = "Assets/Scenes/Puzzle_Test/Puzzle_Test_Anubis_Tutorial.unity";
     private const string ObjectLayer = "Objects";
 
     // 퍼즐 5개 정보 (번호, 이름 꼬리, 팝업 이름, 제단 안내, 잠금 아이템, 보상, 비석 ID, 비석 제목, 비석 본문)
@@ -126,18 +126,18 @@ public static class BastetRoomSetup
                 number = 1, suffix = "Footprint", popupName = "Popup_Bastet1_Footprint", prompt = "고양이 발자국 제단 조사",
                 requiredItem = "", reward = BastetItemIds.Paw, toast = "발자국을 끝까지 따라갔다! 은 발자국 인장을 얻었다.",
                 clueId = "BASTET_B1", clueTitle = "고양이 발자국",
-                clueBody = "바스테트는 지나온 길을 잊지 않는다.\n빛나는 발자국을 끝까지 지켜본 뒤, 같은 순서로 밟아라.\n같은 자리를 두 번 밟는 길도 있다.",
+                clueBody = "바스테트는 지나온 길을 잊지 않는다.\n고양이 석상이 앞발을 내리치면 발자국이 빛난다.\n끝까지 지켜본 뒤, 같은 순서로 밟아라. 길을 벗어나면 횃불이 꺼진다.",
                 placeholderOffset = new Vector3(-6f, -2f, 0f),
-                puzzle = Find<BastetFootprintPuzzle>()
+                puzzle = (PuzzleBase)Find<BastetFootprintWalk>() ?? Find<BastetFootprintPuzzle>() // [수정] 걷는 버전 우선
             },
             new PuzzleInfo
             {
                 number = 2, suffix = "EyeStatue", popupName = "Popup_Bastet2_EyeSequence", prompt = "고양이 눈 제단 조사",
                 requiredItem = BastetItemIds.Paw, reward = BastetItemIds.Eye, toast = "고양이의 시선을 되감았다! 호박 눈을 얻었다.",
                 clueId = "BASTET_B2", clueTitle = "고양이의 눈",
-                clueBody = "고양이는 뒤를 돌아본다.\n함께 빛난 눈은 함께 눌러야 한다.\n마지막에 빛난 눈부터 거꾸로 되짚어라.",
+                clueBody = "고양이는 뒤를 돌아본다.\n작은 석상들의 눈이 빛난 순서를 기억하고, 마지막에 빛난 석상부터 거꾸로 찾아가라.\n틀리면 석상이 횃불을 삼킨다.",
                 placeholderOffset = new Vector3(-6f, 3f, 0f),
-                puzzle = Find<BastetEyeSequencePuzzle>()
+                puzzle = (PuzzleBase)Find<BastetEyeStatueRing>() ?? Find<BastetEyeSequencePuzzle>() // [수정] 걷는 버전 우선
             },
             new PuzzleInfo
             {
@@ -165,7 +165,7 @@ public static class BastetRoomSetup
                 clueId = "BASTET_B5", clueTitle = "해와 달의 기억",
                 clueBody = "낮의 바스테트는 라의 눈. 태양의 배를 따라 걸은 발자국을 기억하라.\n밤이 오면 수호자는 지나온 길을 거슬러 돌아간다.\n마지막에 빛난 눈부터, 거꾸로.",
                 placeholderOffset = new Vector3(0f, 7f, 0f),
-                puzzle = Find<BastetSunMoonMemoryPuzzle>()
+                puzzle = (PuzzleBase)Find<BastetSunMoonWalk>() ?? Find<BastetSunMoonMemoryPuzzle>() // [수정] 걷는 버전 우선
             }
         };
 
@@ -177,12 +177,17 @@ public static class BastetRoomSetup
             if (infos[4].puzzle != null) log.Add("경고: 해와 달의 기억이 없어 옛 B5(BastetMainPuzzle)에 연결. Tools/Bastet/B5 해와 달의 기억 UI 만들기를 먼저 실행 추천");
         }
 
+        // [추가] B1~B4도 클리어 플래그를 켬 (아이템을 봉인석에 넣어 사라져도 목표·비석 진행이 유지되게)
+        foreach (PuzzleInfo info in infos)
+            if (info.number <= 4 && string.IsNullOrEmpty(info.flag)) info.flag = BastetItemIds.ClearFlag(info.number);
+
         var missing = new List<string>();
         foreach (PuzzleInfo info in infos)
         {
             if (info.puzzle == null) { missing.Add($"B{info.number}"); continue; }
 
             info.panel = FindPanel(info.puzzle);
+            if (info.puzzle is BastetWalkPuzzleBase) { log.Add($"B{info.number}: 걷는 퍼즐 '{info.puzzle.name}' 사용"); continue; } // [추가] 팝업 없음
             // 팝업 이름이 바뀌어 있으면 (예: Altar_Bastet3_Necklace) 원래 이름으로
             if (info.panel.name != info.popupName && info.panel.GetComponentInParent<Canvas>(true) != null)
             {
@@ -215,9 +220,36 @@ public static class BastetRoomSetup
         Vector3 pivot = SceneView.lastActiveSceneView != null ? SceneView.lastActiveSceneView.pivot : Vector3.zero;
         pivot.z = 0f;
         var existing = Object.FindObjectsByType<BastetAltarInteractable>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        // [추가] 5개 방 모드(봉인석이 있음): 방 입구 봉인석이 잠금을 맡고 아이템은 넣으면 사라지므로, B2~B4 석상/제단 잠금은 끔
+        bool gated = Object.FindObjectsByType<BastetRoomGate>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length > 0;
+        if (gated) log.Add("5개 방 모드: B2~B5 잠금 = 방 입구 봉인석 (아이템 넣으면 사라짐)");
 
         foreach (PuzzleInfo info in infos)
         {
+            // [추가] 걷는 퍼즐: 제단 대신 시작 석상(BastetPuzzleStarter)에 잠금을 걸고, 비석은 석상 옆에
+            if (info.puzzle is BastetWalkPuzzleBase walk)
+            {
+                BastetPuzzleStarter starter = null;
+                foreach (var st in Object.FindObjectsByType<BastetPuzzleStarter>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                    if (st.Target == walk) { starter = st; break; }
+                if (starter == null)
+                {
+                    log.Add($"경고: B{info.number} 걷는 퍼즐의 시작 석상이 없음 -> Tools/Bastet/걷는 퍼즐 메뉴로 다시 만들기");
+                    info.altar = walk.gameObject;
+                    continue;
+                }
+                Undo.RecordObject(starter, "시작 석상 잠금");
+                string lockItem = gated && info.number >= 2 ? "" : info.requiredItem; // [수정] 5개 방 모드: 방 입구 봉인석이 잠금 (B5 = 북쪽 봉인석에 발톱 인장)
+                starter.EditorSetLock(lockItem,
+                    info.number == 5 ? "신상이 아직 잠들어 있다. 발톱 인장을 가져와 바치자." : "석상이 아직 잠들어 있다. 앞의 시험을 먼저 통과하자.");
+                starter.EditorSetConsume(false, ""); // [수정] 아이템은 봉인석에서 넣음
+                EditorUtility.SetDirty(starter);
+                info.altar = starter.gameObject;
+                string lt = string.IsNullOrEmpty(lockItem) ? "처음부터 열림 (방 봉인석이 잠금)" : $"{lockItem} 필요";
+                log.Add($"{starter.name} (B{info.number} 걷는 퍼즐 시작 석상): {lt}");
+                continue;
+            }
+
             // 같은 퍼즐을 여는 제단이 이미 있으면 그대로 씀
             BastetAltarInteractable altar = null;
             foreach (var a in existing)
@@ -244,7 +276,7 @@ public static class BastetRoomSetup
             if (altar == null) altar = Undo.AddComponent<BastetAltarInteractable>(go);
 
             Undo.RecordObject(altar, "제단 연결");
-            altar.EditorSetup(info.prompt, info.puzzle, info.panel, info.requiredItem,
+            altar.EditorSetup(info.prompt, info.puzzle, info.panel, gated ? "" : info.requiredItem, // [수정] 5개 방 모드는 봉인석이 잠금
                 info.number == 5 ? "신상이 아직 잠들어 있다. 네 개의 흔적을 먼저 모으자." : "제단이 아직 잠들어 있다. 앞의 시험을 먼저 통과하자.");
             EditorUtility.SetDirty(altar);
             FixSortingLayer(go);
@@ -321,12 +353,12 @@ public static class BastetRoomSetup
         var steps = new (string item, string flag, string text)[]
         {
             ("", BastetItemIds.FlagHallRead, "입구의 비석을 읽어 보자 (\"!\")"),
-            (BastetItemIds.Paw, "", "고양이 발자국 제단의 시험을 통과하자 (비석 \"!\" 확인)"),
-            (BastetItemIds.Eye, "", "고양이 눈 제단의 시험을 통과하자"),
-            (BastetItemIds.Necklace, "", "목걸이 제단의 시험을 통과하자"),
-            (BastetItemIds.Claw, "", "발톱 벽화의 시험을 통과하자"),
-            ("", BastetItemIds.FlagMainDone, "흔적 4개가 모였다. 바스테트 신상을 깨우자"),
-            ("", "", "북쪽 문이 열렸다. 토트의 방으로 가자")
+            ("", BastetItemIds.FlagB1Clear, "발자국의 방에서 고양이 석상의 시험을 통과하자"),          // [수정] 플래그로 진행
+            ("", BastetItemIds.FlagB2Clear, "발자국 인장을 눈의 방 봉인석에 넣고 시험을 통과하자"),
+            ("", BastetItemIds.FlagB3Clear, "호박 눈을 목걸이의 방 봉인석에 넣고 시험을 통과하자"),
+            ("", BastetItemIds.FlagB4Clear, "목걸이 구슬을 발톱의 방 봉인석에 넣고 시험을 통과하자"),
+            ("", BastetItemIds.FlagMainDone, "발톱 인장을 북쪽 봉인석에 넣고 신상의 방에서 해와 달의 시험을 풀자"),
+            ("", "", "북쪽 문이 열렸다. 아누비스의 신전으로 가자")
         };
         SerializedProperty stepsProp = gso.FindProperty("steps");
         stepsProp.arraySize = steps.Length;
@@ -365,7 +397,7 @@ public static class BastetRoomSetup
         var intro = GetOrAdd<RaIntroCutscene>(room);
         var iso = new SerializedObject(intro);
         SetString(iso, "playedFlag", BastetItemIds.FlagIntroPlayed);
-        SetString(iso, "overviewMessage", "바스테트의 신전. 네 제단의 시험을 차례로 통과하자. 먼저 입구의 비석부터.");
+        SetString(iso, "overviewMessage", "바스테트의 신전. 불이 켜진 발자국의 방부터 가 보자. 시험을 통과할 때마다 다음 방에 불이 켜진다.");
         iso.ApplyModifiedPropertiesWithoutUndo();
 
         if (Camera.main == null || Camera.main.GetComponent<CameraFollow2D>() == null)
@@ -393,12 +425,15 @@ public static class BastetRoomSetup
         {
             ClueData data = EnsureClueData(info.clueId, info.clueTitle, info.clueBody);
             Vector3 pos = info.altar.transform.position + new Vector3(-1.8f, 0.3f, 0f);
-            SetupStele($"Stele_B{info.number}", pos, data, info.requiredItem, panel, steleSprite);
+            // [수정] 앞 퍼즐 클리어 플래그로 "!" (보상을 봉인석에 넣어 사라져도 유지)
+            string prevFlag = info.number >= 2 ? BastetItemIds.ClearFlag(info.number - 1) : "";
+            if (info.number == 5) prevFlag = BastetItemIds.FlagB4Clear;
+            SetupStele($"Stele_B{info.number}", pos, data, "", panel, steleSprite, prevFlag);
         }
         log.Add($"비석 6개 (입구 + B1~B5), \"!\" 순서: 입구·B1 -> B2 -> B3 -> B4 -> B5 (문구: {ClueFolder})");
     }
 
-    private static void SetupStele(string objName, Vector3 pos, ClueData data, string unlockItem, CluePanel panel, Sprite sprite)
+    private static void SetupStele(string objName, Vector3 pos, ClueData data, string unlockItem, CluePanel panel, Sprite sprite, string unlockFlag = "")
     {
         GameObject go = FindInScene(objName);
         if (go == null)
@@ -429,6 +464,7 @@ public static class BastetRoomSetup
         SetObject(so, "panel", panel);
         SetObject(so, "newBubble", bubble);
         SetString(so, "unlockItemId", unlockItem);
+        SetString(so, "unlockFlag", unlockFlag); // [추가]
         SetString(so, "lockedMessage", "글자가 아직 흐릿하다. 앞의 시험을 먼저 통과하자.");
         so.ApplyModifiedPropertiesWithoutUndo();
     }
@@ -495,6 +531,7 @@ public static class BastetRoomSetup
 
         foreach (PuzzleInfo info in infos)
         {
+            if (info.puzzle is BastetWalkPuzzleBase) continue; // [추가] 걷는 퍼즐은 화면이 없어 힌트 버튼 없음 (비석이 힌트)
             var data = EnsureHintData($"B{info.number}", texts[info.number]);
 
             Transform child = info.panel.transform.Find("HintButton");
@@ -559,7 +596,7 @@ public static class BastetRoomSetup
         if (e == null) e = Undo.AddComponent<AnubisSceneExit>(exit);
         var so = new SerializedObject(e);
         SetString(so, "nextSceneName", NextSceneName);
-        SetString(so, "exitMessage", "토트의 방으로 향합니다...");
+        SetString(so, "exitMessage", "아누비스의 신전으로 향합니다..."); // [수정]
         SetObject(so, "font", font);
         SerializedProperty items = so.FindProperty("itemsToRemoveOnExit");
         if (items != null)
@@ -570,6 +607,16 @@ public static class BastetRoomSetup
             for (int i = 0; i < ids.Length; i++) items.GetArrayElementAtIndex(i).stringValue = ids[i];
         }
         so.ApplyModifiedPropertiesWithoutUndo();
+
+        // [추가] B5를 풀면 이 출구로 자동 이동하도록 연결
+        var b5 = Find<BastetSunMoonWalk>();
+        if (b5 != null)
+        {
+            Undo.RecordObject(b5, "출구 연결");
+            b5.EditorSetExit(e, NextSceneName, "아누비스의 신전으로 향합니다...");
+            EditorUtility.SetDirty(b5);
+            log.Add($"B5 클리어 -> 보상 팝업을 닫으면 자동으로 '{NextSceneName}' 이동");
+        }
 
         if (FindInScene(DoorName) == null)
             log.Add($"경고: '{DoorName}'(B5를 풀면 사라지는 문)이 없음 -> 출구가 처음부터 열려 있음. Puzzle_Test_Bastet에서 복사해 오기");

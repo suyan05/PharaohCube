@@ -119,6 +119,7 @@ public class BastetNecklacePuzzle : PuzzleBase
         }
 
         base.Open();
+        isChecking = false; // [수정] 틀림 연출 도중 창을 닫으면 잠긴 채로 남던 문제 (다시 열면 풀림)
 
         if (successNotice != null) successNotice.SetActive(false);
 
@@ -229,7 +230,7 @@ public class BastetNecklacePuzzle : PuzzleBase
             }
         }
 
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSecondsRealtime(0.7f); // [수정] 시간 정지(timeScale 0) 중에도 진행
 
         for (int i = 0; i < pieces.Length; i++)
         {
@@ -279,6 +280,9 @@ public class BastetNecklacePuzzle : PuzzleBase
         if (textStatusNotice != null)
             textStatusNotice.text = "조각을 회전시켜 중앙선을 기준으로 좌우 대칭을 만드십시오.";
     }
+
+    // [추가] 창이 꺼지면 틀림 연출이 멈추므로 잠금도 풀어 둠
+    private void OnDisable() => isChecking = false;
 
     public void ClosePuzzle()
     {

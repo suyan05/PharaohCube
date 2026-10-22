@@ -90,6 +90,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         }
 
         base.Open();
+        isChecking = false; // [수정] 틀림 연출 도중 창을 닫으면 잠긴 채로 남던 문제
 
         if (successNotice != null) successNotice.SetActive(false);
 
@@ -232,7 +233,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
             }
         }
 
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSecondsRealtime(0.7f); // [수정]
 
         UpdateSlotVisuals();
 
@@ -295,4 +296,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         else
             gameObject.SetActive(false);
     }
+
+    // [추가] 창이 꺼지면 틀림 연출이 멈추므로 잠금도 풀어 둠
+    private void OnDisable() => isChecking = false;
 }

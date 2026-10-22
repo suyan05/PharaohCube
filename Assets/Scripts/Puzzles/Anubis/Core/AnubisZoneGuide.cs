@@ -44,6 +44,10 @@ public class AnubisZoneGuide : MonoBehaviour
         [NonSerialized] public bool lit;
     }
 
+    [Header("[추가] 아이템을 쓰거나 잃었을 때")]
+    [Tooltip("켜면: 해금 아이템을 잃으면 그 구역을 다시 어둡게 (아누비스 처벌용). 끄면: 한 번 켜진 불은 유지 (바스테트 봉인석에 넣는 방식)")]
+    [SerializeField] private bool relockOnConsume = true;
+
     [Header("구역 목록 (위에서부터 순서대로 해금)")]
     [SerializeField] private GuideZone[] zones;
 
@@ -207,7 +211,7 @@ public class AnubisZoneGuide : MonoBehaviour
     // [추가] 켜져 있던 구역의 아이템을 잃으면 지금 인벤토리 기준으로 다시 맞춤
     private void HandleItemConsumed(string itemId)
     {
-        if (zones == null) return;
+        if (zones == null || !relockOnConsume) return; // [수정] 끄면 불 유지
         foreach (GuideZone zone in zones)
         {
             if (zone != null && zone.lit && zone.unlockItem == itemId)

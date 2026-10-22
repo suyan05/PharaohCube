@@ -23,6 +23,8 @@ public class BastetRoomProgress : MonoBehaviour
     [SerializeField] private Entry[] entries = new Entry[0];
 
     [Range(1f, 8f)] [SerializeField] private float toastTime = 4f;
+    [Tooltip("[추가] 보상을 팀 공용 획득 팝업(ItemPopup)으로 보여 줌. 이름·설명·아이콘은 Resources/ItemCatalog")]
+    [SerializeField] private bool showItemPopup = true;
 
     // 람다 대신 핸들러를 저장해 두고 OnDestroy에서 정확히 해제
     private Action[] handlers;
@@ -55,9 +57,17 @@ public class BastetRoomProgress : MonoBehaviour
     {
         Debug.Log($"[BastetRoomProgress] {e.puzzle.name} 클리어 -> 보상 {e.rewardItemId} / 플래그 {e.flag}", this);
 
+        bool popupShown = false;
         if (!string.IsNullOrEmpty(e.rewardItemId))
         {
-            if (ItemInventory.Instance != null) ItemInventory.Instance.Grant(e.rewardItemId);
+            if (showItemPopup)
+            {
+                // [수정] 팀 공용 획득 팝업 (인벤토리 지급 + 팝업). 팝업이 닫히면 안내 문구
+                string toast = e.toast;
+                ItemPopup.Grant(e.rewardItemId, () => { if (!string.IsNullOrEmpty(toast)) AnubisToast.Show(toast, toastTime); });
+                popupShown = true;
+            }
+            else if (ItemInventory.Instance != null) ItemInventory.Instance.Grant(e.rewardItemId);
             else Debug.LogWarning($"[BastetRoomProgress] ItemInventory가 없어 {e.rewardItemId} 지급 못 함", this);
         }
 
@@ -67,7 +77,7 @@ public class BastetRoomProgress : MonoBehaviour
             else Debug.LogWarning($"[BastetRoomProgress] GameManager가 없어 {e.flag} 못 켬", this);
         }
 
-        if (!string.IsNullOrEmpty(e.toast)) AnubisToast.Show(e.toast, toastTime);
+        if (!popupShown && !string.IsNullOrEmpty(e.toast)) AnubisToast.Show(e.toast, toastTime);
     }
 
     // ================= 테스트 =================

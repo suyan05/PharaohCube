@@ -80,6 +80,26 @@ public class AnubisSceneExit : MonoBehaviour
         AnubisSceneFader.Begin(nextSceneName, exitMessage, font, fadeOutTime, holdTime, fadeInTime);
     }
 
+    // [추가] 코드에서 바로 이동 (바스테트 메인 퍼즐 클리어 등)
+    // sceneOverride / messageOverride를 비우면 Inspector 값 사용. 이동을 시작하면 true
+    public bool GoNow(string sceneOverride = null, string messageOverride = null)
+    {
+        if (used) return true;
+        string target = string.IsNullOrEmpty(sceneOverride) ? nextSceneName : sceneOverride;
+        if (!Application.CanStreamedLevelBeLoaded(target))
+        {
+            Debug.LogError($"[{name}] '{target}' 씬이 Build Profiles의 Scene List에 없음", this);
+            return false;
+        }
+        used = true;
+        GameObject player = GameObject.FindWithTag(playerTag);
+        if (player != null) LockPlayer(player);
+        RemoveTutorialItems();
+        Debug.Log($"[{name}] '{target}'(으)로 이동 시작 (코드 호출)", this);
+        AnubisSceneFader.Begin(target, string.IsNullOrEmpty(messageOverride) ? exitMessage : messageOverride, font, fadeOutTime, holdTime, fadeInTime);
+        return true;
+    }
+
     private void RemoveTutorialItems()
     {
         ItemInventory inv = ItemInventory.Instance;
