@@ -115,9 +115,11 @@ public class RaTorchGaugeUI : MonoBehaviour
 
     private void BuildEmber(RectTransform panel)
     {
-        emberIcon = UIBuild.Image(panel, "Ember", new Vector2(-130f, -28f), new Vector2(30f, 30f), emberSprite, gold);
+        // [수정] 아이콘(왼쪽 끝 -145 ~ -115)과 글자(-95부터)가 겹치지 않게 20px 띄움
+        emberIcon = UIBuild.Image(panel, "Ember", new Vector2(-130f, -32f), new Vector2(30f, 30f), emberSprite, gold);
         if (emberSprite == null) emberIcon.sprite = UIBuild.Circle();
-        emberText = UIBuild.Text(panel, "EmberText", PuzzleUITheme.GetBodyFont(), 18, new Vector2(-40f, -28f), new Vector2(150f, 26f), gold);
+        emberText = UIBuild.Text(panel, "EmberText", PuzzleUITheme.GetBodyFont(), 18, new Vector2(-10f, -32f), new Vector2(170f, 26f), gold);
+        emberText.horizontalOverflow = HorizontalWrapMode.Overflow;
         emberText.alignment = TextAnchor.MiddleLeft;
         emberText.text = "라의 불씨";
     }

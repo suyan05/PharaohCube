@@ -14,6 +14,7 @@ using Object = UnityEngine.Object;
 // 4. 기둥 4개: 밑동에 충돌 상자 (앞으로 못 지나감)
 // 5. 성소 화로: 신전 가운데 꺼지지 않는 불 (횃불 다시 붙이기 + 밝은 곳)
 // 6. 단서 그림: 밤 P3, P4, P5 비석에 밤 벽화 넣기 / 일식 석탁 밤 그림(달이 해를 삼킨 문양) 넣기
+// 7. 퍼즐 화면 파피루스 배경판: P1 그림자 시계, P4 카드 벤치 (흰 글자는 진한 갈색으로)
 public static class RaFixSetup
 {
     private const string FirstMenu = "PharaohCube/Ra/라의 방 다듬기 (어둠, 글자, 히든 불씨)";
@@ -43,6 +44,7 @@ public static class RaFixSetup
             RaFixParts.Brazier();
             RaFixArt.ClueArt();
             RaFixArt.EclipseNightArt();
+            RaFixArt.PuzzlePapyrus();
             ObjectiveText();
 
             EditorSceneManager.MarkSceneDirty(root.scene);

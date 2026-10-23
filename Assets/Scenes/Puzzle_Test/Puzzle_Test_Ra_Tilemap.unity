@@ -281,6 +281,8 @@ MonoBehaviour:
   roomSize: {x: 10.8, y: 4.92}
   flagOnRead: 
   needLight: 1
+  roomTorches:
+  - {fileID: 417690089}
   lightRadius: 6.5
   darkLines:
   - speaker: "\uB098"
@@ -7646,7 +7648,7 @@ Transform:
   m_GameObject: {fileID: 324685147}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.375, y: 12.224999, z: 0}
+  m_LocalPosition: {x: 0, y: -1.0000008, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8092,6 +8094,8 @@ MonoBehaviour:
   roomSize: {x: 6.39, y: 6}
   flagOnRead: 
   needLight: 1
+  roomTorches:
+  - {fileID: 161180812}
   lightRadius: 6.5
   darkLines:
   - speaker: "\uB098"
@@ -8722,6 +8726,8 @@ MonoBehaviour:
   roomSize: {x: 0, y: 0}
   flagOnRead: 
   needLight: 1
+  roomTorches:
+  - {fileID: 1245815527}
   lightRadius: 6.5
   darkLines:
   - speaker: "\uB098"
@@ -8824,6 +8830,10 @@ MonoBehaviour:
   applyFont: 1
   addBackdrop: 1
   titleFontSizeMin: 40
+  papyrusSprite: {fileID: 0}
+  papyrusSize: {x: 1500, y: 1100}
+  papyrusPos: {x: 0, y: 0}
+  inkLightText: 1
 --- !u!1 &467889515
 GameObject:
   m_ObjectHideFlags: 0
@@ -9774,6 +9784,10 @@ MonoBehaviour:
   applyFont: 1
   addBackdrop: 1
   titleFontSizeMin: 40
+  papyrusSprite: {fileID: 0}
+  papyrusSize: {x: 1500, y: 1100}
+  papyrusPos: {x: 0, y: 0}
+  inkLightText: 1
 --- !u!1 &666380098
 GameObject:
   m_ObjectHideFlags: 0
@@ -9867,6 +9881,10 @@ MonoBehaviour:
   applyFont: 1
   addBackdrop: 1
   titleFontSizeMin: 40
+  papyrusSprite: {fileID: 0}
+  papyrusSize: {x: 1500, y: 1100}
+  papyrusPos: {x: 0, y: 0}
+  inkLightText: 1
 --- !u!1 &675036619
 GameObject:
   m_ObjectHideFlags: 0
@@ -10065,8 +10083,8 @@ MonoBehaviour:
     size: {x: 0.3248, y: 0.2166}
     spriteName: P3_Disk_Right
   boardImage: {fileID: 1204132703}
-  nightBoardSprite: {fileID: 6277018915983052275, guid: 6ff33ecd5cc57d640a8b7c17f8657dd2, type: 3}
-  nightCompleteSprite: {fileID: 5024550011922168802, guid: d70e727ee81dc8049af361568d785fbd, type: 3}
+  nightBoardSprite: {fileID: 21300000, guid: 6ff33ecd5cc57d640a8b7c17f8657dd2, type: 3}
+  nightCompleteSprite: {fileID: 21300000, guid: d70e727ee81dc8049af361568d785fbd, type: 3}
   nightDiskSprites:
   - {fileID: 21300000, guid: d9c6fa107f80a31419ef3dbaa2d3c054, type: 3}
   - {fileID: 21300000, guid: c9d753379043f2d4d8c1e7169a1013e0, type: 3}
@@ -12312,7 +12330,7 @@ Transform:
   m_GameObject: {fileID: 1110025896}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.375, y: -12.224999, z: 0}
+  m_LocalPosition: {x: 0, y: -1.0000002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -13447,6 +13465,10 @@ MonoBehaviour:
   applyFont: 1
   addBackdrop: 0
   titleFontSizeMin: 40
+  papyrusSprite: {fileID: 21300000, guid: 4c52333f16b251340ab452b1c60865d6, type: 3}
+  papyrusSize: {x: 1460, y: 1060}
+  papyrusPos: {x: 0, y: 0}
+  inkLightText: 1
 --- !u!1 &1311806948
 GameObject:
   m_ObjectHideFlags: 0
@@ -13579,7 +13601,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaNightAtmosphere
   globalLight: {fileID: 0}
   nightGlobalColor: {r: 0.55, g: 0.62, b: 0.95, a: 1}
-  nightGlobalIntensity: 0.07
+  nightGlobalIntensity: 0
   autoFindLights: 1
   extraLights: []
   excludeLights:
@@ -14709,6 +14731,10 @@ MonoBehaviour:
   applyFont: 1
   addBackdrop: 1
   titleFontSizeMin: 40
+  papyrusSprite: {fileID: 21300000, guid: 4c52333f16b251340ab452b1c60865d6, type: 3}
+  papyrusSize: {x: 1460, y: 1060}
+  papyrusPos: {x: 0, y: 0}
+  inkLightText: 1
 --- !u!1 &1595387511
 GameObject:
   m_ObjectHideFlags: 0
@@ -14766,6 +14792,9 @@ MonoBehaviour:
   roomSize: {x: 12.29, y: 4.37}
   flagOnRead: 
   needLight: 1
+  roomTorches:
+  - {fileID: 245588506}
+  - {fileID: 1715705116}
   lightRadius: 6.5
   darkLines:
   - speaker: "\uB098"
@@ -18355,6 +18384,8 @@ MonoBehaviour:
   roomSize: {x: 5.35, y: 9.1}
   flagOnRead: 
   needLight: 1
+  roomTorches:
+  - {fileID: 249815429}
   lightRadius: 6.5
   darkLines:
   - speaker: "\uB098"
@@ -20372,11 +20403,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.5
+      value: 2.6
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.z
@@ -20440,7 +20471,7 @@ MonoBehaviour:
   vesselItemId: ITEM_BASTET_VESSEL
   startWithTorch: 1
   torchLight: {fileID: 0}
-  baseRadius: 3.2
+  baseRadius: 3
   flameColor: {r: 1, g: 0.82, b: 0.48, a: 1}
   emberColor: {r: 1, g: 0.95, b: 0.77, a: 1}
   intensity: 1.25

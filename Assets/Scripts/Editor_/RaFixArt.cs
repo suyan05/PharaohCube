@@ -66,6 +66,45 @@ public static class RaFixArt
         if (img != null) so.FindProperty("boardImage").objectReferenceValue = img;
     }
 
+    // ================= 퍼즐 화면 파피루스 배경판 (P1 그림자 시계, P4 카드 벤치) =================
+    private const string PapyrusPath = "Assets/image/Common/UI/Common_UI_PuzzlePapyrus.png";
+    private static readonly string[] PapyrusOverlays = { "P1_Overlay", "P4_Overlay" };
+
+    public static void PuzzlePapyrus()
+    {
+        Sprite papyrus = PapyrusSprite();
+        if (papyrus == null)
+        {
+            Debug.LogWarning($"[RaFixSetup] 파피루스 그림 없음: {PapyrusPath}");
+            return;
+        }
+        foreach (PuzzleOverlayTheme theme in Object.FindObjectsByType<PuzzleOverlayTheme>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (System.Array.IndexOf(PapyrusOverlays, theme.name) < 0) continue;
+            RaPolishSetup.Edit(theme, so =>
+            {
+                so.FindProperty("papyrusSprite").objectReferenceValue = papyrus;
+                so.FindProperty("papyrusSize").vector2Value = new Vector2(1460f, 1060f);
+            });
+            Debug.Log($"[RaFixSetup] {theme.name}에 파피루스 배경판 연결");
+        }
+    }
+
+    // 일러스트 UI라 도트 설정(Point) 말고 부드럽게
+    private static Sprite PapyrusSprite()
+    {
+        if (!(AssetImporter.GetAtPath(PapyrusPath) is TextureImporter imp)) return null;
+        if (imp.textureType != TextureImporterType.Sprite || imp.spriteImportMode != SpriteImportMode.Single || imp.filterMode != FilterMode.Bilinear)
+        {
+            imp.textureType = TextureImporterType.Sprite;
+            imp.spriteImportMode = SpriteImportMode.Single;
+            imp.filterMode = FilterMode.Bilinear;
+            imp.mipmapEnabled = false;
+            imp.SaveAndReimport();
+        }
+        return FirstSprite(PapyrusPath);
+    }
+
     // 한 장짜리 Sprite로 + (원판은 클릭 판정용 Read/Write 켬)
     private static Sprite LoadSprite(string path, bool readable, bool forceSingle = false)
     {
