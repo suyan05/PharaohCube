@@ -174,11 +174,13 @@ public static class PrologueSphinxBuilder
         Box(go, new Vector2(7.6f, 4.4f), new Vector2(0f, 2.6f), false);
 
         SphinxHead head = go.AddComponent<SphinxHead>();
+        SphinxEyeGlow glow = SphinxEyeGlowBuilder.Create(go.transform, Load("Pro_Obj_SphinxHead_EyeGlow"));
         Edit(head, so =>
         {
             Prop(so, "target").objectReferenceValue = go.GetComponent<SpriteRenderer>();
             Prop(so, "normalSprite").objectReferenceValue = Load("Pro_Obj_SphinxHead");
             Prop(so, "glowSprite").objectReferenceValue = Load("Pro_Obj_SphinxHead_EyeGlow");
+            Prop(so, "eyeGlow").objectReferenceValue = glow;
         });
         return head;
     }

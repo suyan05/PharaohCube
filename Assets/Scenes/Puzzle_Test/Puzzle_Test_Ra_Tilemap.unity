@@ -1404,7 +1404,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5313683744665879520, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
   m_PrefabInstance: {fileID: 2666884712467322245}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2666884712467322246}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7939952b3928a4e47b3a0805195ab6f1, type: 3}
@@ -1415,7 +1415,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5956254122346468321, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
   m_PrefabInstance: {fileID: 2666884712467322245}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 2666884712467322246}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e59d976a62c5b264eae859b15216de80, type: 3}
@@ -1431,6 +1431,8 @@ GameObject:
   m_Component:
   - component: {fileID: 161180810}
   - component: {fileID: 161180811}
+  - component: {fileID: 161180813}
+  - component: {fileID: 161180812}
   m_Layer: 0
   m_Name: Light_off_0 (4)
   m_TagString: Untagged
@@ -1513,6 +1515,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &161180812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161180809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P4_0
+  target: {fileID: 161180811}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 1110025897}
+  litIntensity: 1
+  dayAutoFlag: F_RA_P4_DONE
+  nightAutoFlag: F_RA_NIGHT_P4_DONE
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &161180813
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161180809}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &177846634
 GameObject:
   m_ObjectHideFlags: 0
@@ -1846,8 +1922,8 @@ MonoBehaviour:
   m_LightType: 4
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0.1
+  m_Color: {r: 0.78431374, g: 0.7058824, b: 1, a: 1}
+  m_Intensity: 0.9
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000a737bcb20d981e4de10f8630f7a11d08
@@ -1938,6 +2014,8 @@ GameObject:
   m_Component:
   - component: {fileID: 245588504}
   - component: {fileID: 245588505}
+  - component: {fileID: 245588507}
+  - component: {fileID: 245588506}
   m_Layer: 0
   m_Name: Light_off_0 (2)
   m_TagString: Untagged
@@ -2020,6 +2098,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &245588506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245588503}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P5_0
+  target: {fileID: 245588505}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 201900681}
+  litIntensity: 1
+  dayAutoFlag: F_RA_P5_DONE
+  nightAutoFlag: F_RA_NIGHT_P5_DONE
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &245588507
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245588503}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &249815426
 GameObject:
   m_ObjectHideFlags: 0
@@ -2030,6 +2182,8 @@ GameObject:
   m_Component:
   - component: {fileID: 249815427}
   - component: {fileID: 249815428}
+  - component: {fileID: 249815430}
+  - component: {fileID: 249815429}
   m_Layer: 0
   m_Name: Light_off_0 (5)
   m_TagString: Untagged
@@ -2112,6 +2266,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &249815429
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249815426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P1_0
+  target: {fileID: 249815428}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 1245874343}
+  litIntensity: 1
+  dayAutoFlag: F_RA_P1_DONE
+  nightAutoFlag: F_RA_NIGHT_P1_DONE
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &249815430
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 249815426}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &275252236
 GameObject:
   m_ObjectHideFlags: 0
@@ -2265,6 +2493,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RaObjectiveGuide
   steps:
+  - doneFlag: F_RA_FIRST_TORCH_LIT
+    objective: "\uBCBD \uD683\uBD88\uC5D0 \uB0B4 \uBD88\uC744 \uC62E\uACA8 \uBD99\uC774\uC790\n(\uBCBD
+      \uD683\uBD88 \uC55E\uC5D0\uC11C E \uAE38\uAC8C)"
   - doneFlag: F_RA_SHRINE_FIRST_TALKED
     objective: "\uC911\uC559\uC758 \uB77C\uC758 \uC131\uC18C\uB97C \uC870\uC0AC\uD558\uC790"
   - doneFlag: F_RA_CIRCUIT_1
@@ -2296,8 +2527,9 @@ MonoBehaviour:
     objective: "\uBC24\uC774 \uB0B4\uB824\uC549\uC558\uB2E4. \uB77C\uC758 \uC131\uC18C\uC5D0
       \uB2E4\uC2DC \uB9D0\uC744 \uAC78\uC5B4 \uBCF4\uC790"
   - doneFlag: F_RA_NIGHT_P1_DONE
-    objective: "\uD478\uB978 \uBD88\uC774 \uCF1C\uC9C4 \uB3D9\uCABD \uBC29, \uBC24\uC758
-      \uADF8\uB9BC\uC790\uB97C \uC77D\uC790"
+    objective: "\uD683\uBD88\uC774 \uBAA8\uB450 \uAEBC\uC84C\uB2E4. \uB2E4\uC2DC
+      \uBC1D\uD788\uBA70\n\uB3D9\uCABD \uBC29 \uBC24\uC758 \uADF8\uB9BC\uC790\uB97C
+      \uC77D\uC790"
   - doneFlag: F_RA_NIGHT_P3_DONE
     objective: "\uB0A8\uB3D9\uCABD \uC77C\uC2DD \uC11D\uD0C1\uC5D0\uC11C \uAC1C\uAE30
       \uC77C\uC2DD\uC744 \uC644\uC131\uD558\uC790"
@@ -7674,6 +7906,8 @@ GameObject:
   m_Component:
   - component: {fileID: 417690087}
   - component: {fileID: 417690088}
+  - component: {fileID: 417690090}
+  - component: {fileID: 417690089}
   m_Layer: 0
   m_Name: Light_off_0 (7)
   m_TagString: Untagged
@@ -7756,6 +7990,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &417690089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 417690086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P3_0
+  target: {fileID: 417690088}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 324685148}
+  litIntensity: 1
+  dayAutoFlag: F_RA_P3_DONE
+  nightAutoFlag: F_RA_NIGHT_P3_DONE
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &417690090
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 417690086}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &422565332
 GameObject:
   m_ObjectHideFlags: 0
@@ -8598,8 +8906,8 @@ Camera:
   m_GameObject: {fileID: 508559067}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.07058824, g: 0.05490196, b: 0.101960786, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -8678,7 +8986,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -8718,7 +9026,7 @@ MonoBehaviour:
   zoomSmoothTime: 0.6
   snapToPixel: 0
   pixelsPerUnit: 32
-  boundsTilemap: {fileID: 288896182}
+  boundsTilemap: {fileID: 0}
 --- !u!1 &534959767
 GameObject:
   m_ObjectHideFlags: 0
@@ -10874,6 +11182,106 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &916886668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 916886671}
+  - component: {fileID: 916886670}
+  - component: {fileID: 916886669}
+  m_Layer: 0
+  m_Name: RaTemple
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &916886669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 916886668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e68959804de7e3499e306afbc6934f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaTorchManager
+  firstTorchFlag: F_RA_FIRST_TORCH_LIT
+  nightFlag: F_RA_NIGHT_OPEN
+  delayBeforeOut: 1.2
+  gapBetween: 0.18
+  firstTorchLines:
+  - speaker: "\uB098"
+    text: "\uC88B\uC544, \uBC29\uC774 \uBC1D\uC544\uC84C\uC5B4."
+    portrait: {fileID: 0}
+  - speaker: "\uB098"
+    text: "\uB2E4\uB978 \uBC29\uC5D0 \uB4E4\uC5B4\uAC00\uBA74 \uBCBD \uD683\uBD88\uBD80\uD130
+      \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  nightMessage: "\uD574\uAC00 \uC9C0\uC790 \uC2E0\uC804\uC758 \uD683\uBD88\uC774
+    \uBAA8\uB450 \uAEBC\uC84C\uB2E4"
+  nightLines:
+  - speaker: "\uB098"
+    text: "\uBD88\uC774... \uC804\uBD80 \uAEBC\uC84C\uC5B4. \uB2E4\uC2DC \uBC1D\uD788\uBA70
+      \uAC00\uC57C\uACA0\uB2E4."
+    portrait: {fileID: 0}
+--- !u!114 &916886670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 916886668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1522dc6daf185488a301662d1b071f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaTempleEntry
+  playedFlag: F_RA_TEMPLE_ENTERED
+  legacyIntroFlag: F_RA_INTRO_PLAYED
+  firstTorch: {fileID: 1962034717}
+  title: "\uB77C\uC758 \uC2E0\uC804"
+  subtitle: "\uCCAB \uBC88\uC9F8 \uBB38 - \uD0DC\uC591"
+  closeSize: 3
+  roomSize: 5
+  darkLines:
+  - speaker: "\uB098"
+    text: "...\uC544\uBB34\uAC83\uB3C4 \uC548 \uBCF4\uC5EC."
+    portrait: {fileID: 0}
+  - speaker: "\uB098"
+    text: "\uC911\uC559 \uD640\uC5D0\uC11C \uD683\uBD88\uC744 \uCC59\uACA8 \uC624\uAE38
+      \uC798\uD588\uB2E4."
+    portrait: {fileID: 0}
+  torchLines:
+  - speaker: "\uB098"
+    text: "\uBCBD\uC5D0 \uD683\uBD88\uC774 \uAC78\uB824 \uC788\uC5B4. \uB2E4 \uAEBC\uC838
+      \uC788\uB124."
+    portrait: {fileID: 0}
+  - speaker: "\uB098"
+    text: "\uB0B4 \uBD88\uC744 \uC62E\uACA8 \uBD99\uC774\uC790. (\uBCBD \uD683\uBD88
+      \uC55E\uC5D0\uC11C E \uAE38\uAC8C)"
+    portrait: {fileID: 0}
+--- !u!4 &916886671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 916886668}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &919613778
 GameObject:
   m_ObjectHideFlags: 0
@@ -11688,6 +12096,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1185386899}
   - component: {fileID: 1185386900}
+  - component: {fileID: 1185386902}
+  - component: {fileID: 1185386901}
   m_Layer: 0
   m_Name: Light_off_0 (8)
   m_TagString: Untagged
@@ -11770,6 +12180,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1185386901
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185386898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P0_2
+  target: {fileID: 1185386900}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 196289569}
+  litIntensity: 1
+  dayAutoFlag: 
+  nightAutoFlag: 
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &1185386902
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185386898}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1204132701
 GameObject:
   m_ObjectHideFlags: 0
@@ -11904,7 +12388,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1225731285}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f54e5d2457b65c44fad834d1352df93b, type: 3}
   m_Name: 
@@ -11948,6 +12432,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1245815526}
   - component: {fileID: 1245815525}
+  - component: {fileID: 1245815528}
+  - component: {fileID: 1245815527}
   m_Layer: 0
   m_Name: Light_off_0 (5)
   m_TagString: Untagged
@@ -12030,6 +12516,80 @@ Transform:
   - {fileID: 142549225}
   m_Father: {fileID: 2082716322}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1245815527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245815524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P2_0
+  target: {fileID: 1245815525}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 142549224}
+  litIntensity: 1
+  dayAutoFlag: F_RA_CIRCUIT_4
+  nightAutoFlag: 
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &1245815528
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1245815524}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1245874342
 GameObject:
   m_ObjectHideFlags: 0
@@ -12400,7 +12960,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaNightAtmosphere
   globalLight: {fileID: 0}
   nightGlobalColor: {r: 0.55, g: 0.62, b: 0.95, a: 1}
-  nightGlobalIntensity: 0.8
+  nightGlobalIntensity: 0.3
   autoFindLights: 1
   extraLights: []
   excludeLights: []
@@ -16038,48 +16598,37 @@ MonoBehaviour:
     unlockFlag: 
     unlockMessage: 
     focusPoint: {fileID: 0}
-    turnOn:
-    - {fileID: 1001528357}
-    - {fileID: 69259032}
-    - {fileID: 196289568}
+    turnOn: []
     turnOff: []
-    fadeLights:
-    - {fileID: 1001528359}
-    - {fileID: 69259033}
-    - {fileID: 196289569}
+    fadeLights: []
   - zoneName: LightObject_P1
     unlockFlag: F_RA_CIRCUIT_1
-    unlockMessage: "\uB3D9\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    unlockMessage: "\uB3D9\uCABD \uBC29 \uBB38\uC774 \uC5F4\uB838\uB2E4"
     focusPoint: {fileID: 722716529}
-    turnOn:
-    - {fileID: 1245874342}
+    turnOn: []
     turnOff:
     - {fileID: 766199338}
-    fadeLights:
-    - {fileID: 1245874343}
+    fadeLights: []
   - zoneName: LightObject_P2
     unlockFlag: 
     unlockMessage: 
     focusPoint: {fileID: 0}
-    turnOn:
-    - {fileID: 142549223}
+    turnOn: []
     turnOff: []
     fadeLights: []
   - zoneName: LightObject_P3
     unlockFlag: F_RA_CIRCUIT_2
-    unlockMessage: "\uBD81\uC11C\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    unlockMessage: "\uBD81\uC11C\uCABD \uBC29 \uBB38\uC774 \uC5F4\uB838\uB2E4"
     focusPoint: {fileID: 95068950}
-    turnOn:
-    - {fileID: 324685147}
+    turnOn: []
     turnOff:
     - {fileID: 1567499332}
     fadeLights: []
   - zoneName: LightObject_P4
     unlockFlag: F_RA_CIRCUIT_3
-    unlockMessage: "\uB0A8\uC11C\uCABD \uBC29 \uD683\uBD88\uC5D0 \uBD88\uC774 \uBD99\uC5C8\uB2E4"
+    unlockMessage: "\uB0A8\uC11C\uCABD \uBC29 \uBB38\uC774 \uC5F4\uB838\uB2E4"
     focusPoint: {fileID: 676778866}
-    turnOn:
-    - {fileID: 1110025896}
+    turnOn: []
     turnOff:
     - {fileID: 1799568323}
     fadeLights: []
@@ -16087,9 +16636,7 @@ MonoBehaviour:
     unlockFlag: F_RA_CIRCUIT_4
     unlockMessage: "\uD0DC\uC591\uC758 \uBB38\uC774 \uC5F4\uB838\uB2E4"
     focusPoint: {fileID: 1442230130}
-    turnOn:
-    - {fileID: 201900680}
-    - {fileID: 1715705113}
+    turnOn: []
     turnOff:
     - {fileID: 1443495942}
     fadeLights: []
@@ -16451,6 +16998,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1715705114}
   - component: {fileID: 1715705115}
+  - component: {fileID: 1715705117}
+  - component: {fileID: 1715705116}
   m_Layer: 0
   m_Name: Light_off_0 (3)
   m_TagString: Untagged
@@ -16533,6 +17082,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1715705116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715705113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P5_1
+  target: {fileID: 1715705115}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 986646026}
+  litIntensity: 1
+  dayAutoFlag: F_RA_P5_DONE
+  nightAutoFlag: F_RA_NIGHT_P5_DONE
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &1715705117
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1715705113}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1728029268
 GameObject:
   m_ObjectHideFlags: 0
@@ -17431,6 +18054,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1874798903}
   - component: {fileID: 1874798904}
+  - component: {fileID: 1874798906}
+  - component: {fileID: 1874798905}
   m_Layer: 0
   m_Name: Light_off_0
   m_TagString: Untagged
@@ -17513,6 +18138,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1874798905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874798902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P0_0
+  target: {fileID: 1874798904}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 1001528359}
+  litIntensity: 1
+  dayAutoFlag: 
+  nightAutoFlag: 
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &1874798906
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874798902}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1928032440
 GameObject:
   m_ObjectHideFlags: 0
@@ -17602,6 +18301,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1962034715}
   - component: {fileID: 1962034716}
+  - component: {fileID: 1962034718}
+  - component: {fileID: 1962034717}
   m_Layer: 0
   m_Name: Light_off_0 (1)
   m_TagString: Untagged
@@ -17684,6 +18385,80 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &1962034717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1962034714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b33dc15ffebf2864eb3ecc01af8c7e8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallTorch
+  torchId: P0_1
+  target: {fileID: 1962034716}
+  offSprite: {fileID: -4791186027735397949, guid: a8b706a2b53190947830defbdd6e2a7e, type: 3}
+  onSprite: {fileID: 5501237833905390230, guid: 2c1d96405c6352e4c983ef2f5487b7b5, type: 3}
+  lightSource: {fileID: 69259033}
+  litIntensity: 1
+  dayAutoFlag: 
+  nightAutoFlag: 
+  nightFlag: F_RA_NIGHT_OPEN
+  holdSeconds: 1
+  holdRange: 1.8
+  noFireLines:
+  - speaker: "\uB098"
+    text: "\uBD88 \uAEBC\uC9C4 \uD683\uBD88\uC774\uB2E4. \uBD88\uC774 \uC788\uC73C\uBA74
+      \uC62E\uACA8 \uBD99\uC77C \uC218 \uC788\uC744 \uD150\uB370."
+    portrait: {fileID: 0}
+--- !u!61 &1962034718
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1962034714}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.37, y: 0.71}
+    newSize: {x: 0.37, y: 0.71}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.37, y: 0.71}
+  m_EdgeRadius: 0
 --- !u!1 &1968553059
 GameObject:
   m_ObjectHideFlags: 0
@@ -18607,11 +19382,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 7942778504318266952, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
       propertyPath: m_LocalPosition.z
@@ -18648,8 +19423,47 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4034817643098968626, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2666884712467322247}
   m_SourcePrefab: {fileID: 100100000, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+--- !u!1 &2666884712467322246 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4034817643098968626, guid: a18bbaa46e96cfd449b66d72f3af6b82, type: 3}
+  m_PrefabInstance: {fileID: 2666884712467322245}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2666884712467322247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2666884712467322246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4f026c588195b7419d307e4b078c00c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerTorchTemp
+  torchItemId: ITEM_TORCH
+  emberItemId: ITEM_RA_EMBER
+  vesselItemId: ITEM_BASTET_VESSEL
+  startWithTorch: 1
+  torchLight: {fileID: 0}
+  baseRadius: 4
+  flameColor: {r: 1, g: 0.82, b: 0.48, a: 1}
+  emberColor: {r: 1, g: 0.95, b: 0.77, a: 1}
+  intensity: 1.1
+  radiusLerpSpeed: 6
+  litMul: 1
+  litEmberMul: 1.3
+  litVesselMul: 2
+  litBothMul: 3
+  outMul: 0.4
+  outEmberMul: 0.8
+  burnSeconds: 600
+  emberNeverBurnsOut: 1
+  emberRelightHold: 2
 --- !u!1001 &4983221717371263002
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -18736,3 +19550,4 @@ SceneRoots:
   - {fileID: 218227924}
   - {fileID: 1143467103}
   - {fileID: 1461167453}
+  - {fileID: 916886671}

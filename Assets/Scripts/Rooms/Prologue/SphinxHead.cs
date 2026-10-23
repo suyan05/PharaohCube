@@ -17,6 +17,8 @@ public class SphinxHead : MonoBehaviour
     [SerializeField, Min(0f)] private float dimSeconds = 0.4f;
     [Tooltip("SFX_SPHINX_VOICE (낮은 울림, 비워도 됨)")]
     [SerializeField] private AudioClip voiceSfx;
+    [Tooltip("눈빛 연출 (후광, 빛줄기, 광원). 비우면 눈 그림만 바뀜")]
+    [SerializeField] private SphinxEyeGlow eyeGlow;
 
     private void Awake()
     {
@@ -68,6 +70,7 @@ public class SphinxHead : MonoBehaviour
 
     private void SetGlow(bool on)
     {
+        if (eyeGlow != null) eyeGlow.SetOn(on);
         if (target == null) return;
         Sprite s = on ? glowSprite : normalSprite;
         if (s != null) target.sprite = s;
