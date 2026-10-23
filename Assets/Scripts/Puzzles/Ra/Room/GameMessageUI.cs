@@ -187,7 +187,7 @@ public class GameMessageUI : MonoBehaviour
         if (msg.StartsWith("[Item] 획득: "))
         {
             string id = msg.Substring("[Item] 획득: ".Length).Trim();
-            string name = ItemNames.ContainsKey(id) ? ItemNames[id] : id;
+            string name = ItemNames.ContainsKey(id) ? ItemNames[id] : CatalogName(id); // [수정] 목록에 없으면 ItemCatalog 이름
             AddToast($"획득: {name}", toastTime, false);
             return;
         }
@@ -207,6 +207,19 @@ public class GameMessageUI : MonoBehaviour
         }
 
         HandleHorusLog(msg);
+    }
+
+    // [추가] ItemNames에 없는 아이템(라의 불씨, 횃불 등)은 ItemCatalog의 표시 이름을 씀 (없으면 ID 그대로)
+    private static string CatalogName(string id)
+    {
+        try
+        {
+            return ItemCatalog.Main.TryGet(id, out ItemDefinition def) && !string.IsNullOrEmpty(def.displayName) ? def.displayName : id;
+        }
+        catch (Exception)
+        {
+            return id;
+        }
     }
 
     private void HandleCircuitLog(string msg)

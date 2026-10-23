@@ -9,6 +9,7 @@ using UnityEngine.Rendering.Universal;
 // - 밤이 되면(F_RA_NIGHT_OPEN) RaTorchManager가 전부 끔 -> 밤에는 다시 붙여야 함 (밤 불은 푸른빛, RaNightAtmosphere)
 // - 이미 켜진 벽 횃불에서 E: 꺼진 내 횃불에 다시 불 붙이기
 // - 켜진 상태는 플래그로 저장 (F_RA_TORCH_<id>_D / _N) -> 씬에 다시 들어와도 유지
+// - 꺼진 벽 횃불은 내 불빛이 가까이 오면 가끔 불똥이 반짝 (어둠 속에서 "여기 붙일 수 있어" 단서)
 [RequireComponent(typeof(Collider2D))]
 public class WallTorch : MonoBehaviour, IInteractable
 {
@@ -31,6 +32,11 @@ public class WallTorch : MonoBehaviour, IInteractable
     [SerializeField, Min(0.1f)] private float holdSeconds = 1f;
     [SerializeField] private float holdRange = 1.8f;
 
+    [Header("꺼진 횃불 반짝임 (가까이 가면)")]
+    [SerializeField] private float glintRange = 4.5f;
+    [SerializeField, Min(0.2f)] private float glintEvery = 1.6f;
+    [SerializeField] private Vector3 glintOffset = new Vector3(0f, 0.45f, 0f);
+
     [Header("대사")]
     [SerializeField] private DialogueLine[] noFireLines = { new DialogueLine("나", "불 꺼진 횃불이다. 불이 있으면 옮겨 붙일 수 있을 텐데.") };
 
@@ -43,6 +49,7 @@ public class WallTorch : MonoBehaviour, IInteractable
     private float progress;
     private Transform player;
     private bool subscribed;
+    private float glintTimer;
 
     public bool IsLit => lit;
     private bool IsNight => HasFlag(nightFlag);
@@ -119,6 +126,7 @@ public class WallTorch : MonoBehaviour, IInteractable
     private void Update()
     {
         if (lit && !animating) Flicker();
+        else if (!lit && !animating) Glint();
         if (!holding && progress <= 0f) return;
 
         bool pressing = holding && Input.GetKey(KeyCode.E) && InRange() && !PlayerLock.IsLocked && PlayerFireLit;
@@ -204,6 +212,24 @@ public class WallTorch : MonoBehaviour, IInteractable
         if (lightSource == null) return;
         float n = Mathf.PerlinNoise(Time.time * 3f, transform.position.x);
         lightSource.intensity = litIntensity * (0.85f + n * 0.3f);
+    }
+
+    // 내 횃불이 켜진 채로 가까이 있으면 가끔 불똥 2~3개
+    private void Glint()
+    {
+        glintTimer -= Time.deltaTime;
+        if (glintTimer > 0f) return;
+        glintTimer = glintEvery * UnityEngine.Random.Range(0.7f, 1.3f);
+
+        Component fire = TorchLink.Current as Component;
+        if (fire == null || !PlayerFireLit || target == null) return;
+        if (Vector2.Distance(fire.transform.position, transform.position) > glintRange) return;
+
+        int count = UnityEngine.Random.Range(2, 4);
+        for (int i = 0; i < count; i++)
+        {
+            RaGlowFx.Spark(transform.position + glintOffset, new Color(1f, 0.72f, 0.3f), target.sortingLayerName, target.sortingOrder + 1);
+        }
     }
 
     private static bool HasFlag(string flag)
