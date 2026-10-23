@@ -322,6 +322,11 @@ public static class PrologueDigBuilder
         Vector3 p = cam.transform.position;
         if (p.z > -1f) cam.transform.position = new Vector3(p.x, p.y, -10f);
 
+        // 맵 바깥이 노랗게 보이던 문제: 배경이 "Uninitialized"(안 지움)라 아무 색이나 남음 -> 어두운 모래색 단색으로
+        Undo.RecordObject(cam, "카메라 배경");
+        cam.clearFlags = CameraClearFlags.SolidColor;
+        cam.backgroundColor = new Color(0x1E / 255f, 0x16 / 255f, 0x10 / 255f);
+
         CameraFollow2D follow = cam.GetComponent<CameraFollow2D>();
         if (follow == null)
         {
