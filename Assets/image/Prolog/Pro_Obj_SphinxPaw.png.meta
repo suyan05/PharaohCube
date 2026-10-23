@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d02a814e6fbeb5d4ca1848fb9e346a13
+guid: 535a588c75707ea40986b2db48bf74d3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4520728185483900425
-    second: Pro_Obj_PawSand _Small_0
+      213: -2902903347931150194
+    second: Pro_Obj_SphinxPaw _0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,17 +96,30 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pro_Obj_PawSand _Small_0
+      name: Pro_Obj_SphinxPaw _0
       rect:
         serializedVersion: 2
-        x: 10
-        y: 1
-        width: 46
-        height: 22
+        x: 4
+        y: 0
+        width: 56
+        height: 128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7f9c22acaa52341c0800000000000000
-      internalID: -4520728185483900425
+      spriteID: e88854909c0d6b7d0800000000000000
+      internalID: -2902903347931150194
       vertices: []
       indices: 
       edges: []
@@ -135,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Pro_Obj_PawSand _Small_0: -4520728185483900425
+      Pro_Obj_SphinxPaw _0: -2902903347931150194
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

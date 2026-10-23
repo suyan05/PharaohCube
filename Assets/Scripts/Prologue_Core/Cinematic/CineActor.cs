@@ -93,6 +93,54 @@ public static class CineActor
         target.localPosition = origin;
     }
 
+    // ================= 두리번거리기 =================
+    // 아주 잠깐 그 방향으로 속도를 줘서 PlayerSpriteAnimator가 그쪽을 보게 함 (거의 안 움직임)
+    public static IEnumerator Look(Transform actor, Vector2 dir)
+    {
+        Rigidbody2D body = actor != null ? actor.GetComponent<Rigidbody2D>() : null;
+        if (body == null || dir == Vector2.zero) yield break;
+
+        body.linearVelocity = dir.normalized;
+        yield return null;
+        yield return null;
+        if (body != null) body.linearVelocity = Vector2.zero;
+    }
+
+    // ================= 눕기 / 일어나기 =================
+    // 누운 그림(Player_Lie_Down)이 오기 전까지 캐릭터 그림을 옆으로 90도 눕혀서 대신함
+    public static void LieDown(Transform actor, bool lying)
+    {
+        Transform visual = VisualOf(actor);
+        if (visual != null) visual.localRotation = lying ? Quaternion.Euler(0f, 0f, 90f) : Quaternion.identity;
+    }
+
+    // 90도 -> 0도로 일으키면서 살짝 들썩
+    public static IEnumerator StandUp(Transform actor, float seconds)
+    {
+        Transform visual = VisualOf(actor);
+        if (visual == null) yield break;
+
+        Vector3 origin = visual.localPosition;
+        float t = 0f;
+        while (t < seconds && !Cine.Skipping)
+        {
+            t += Time.deltaTime;
+            float p = Mathf.Clamp01(t / seconds);
+            visual.localRotation = Quaternion.Euler(0f, 0f, Mathf.Lerp(90f, 0f, p * p));
+            visual.localPosition = origin + Vector3.up * Mathf.Sin(p * Mathf.PI) * 0.15f;
+            yield return null;
+        }
+        visual.localRotation = Quaternion.identity;
+        visual.localPosition = origin;
+    }
+
+    private static Transform VisualOf(Transform actor)
+    {
+        if (actor == null) return null;
+        SpriteRenderer sr = actor.GetComponentInChildren<SpriteRenderer>();
+        return sr != null ? sr.transform : actor;
+    }
+
     // 구멍으로 떨어짐: 아래로 내려가며 작아지고 사라짐 (원래 크기는 다음 씬에서 새 플레이어라 복구 안 함)
     public static IEnumerator Sink(Transform actor, float seconds, float depth)
     {

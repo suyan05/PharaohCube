@@ -27,12 +27,18 @@ public static class CineFX
 
     public static void Puff(Sprite[] sprites, Vector3 pos, int count, float power = 1.2f)
     {
+        Puff(sprites, pos, count, power, Dust);
+    }
+
+    // 색을 바꾼 먼지 (꿈 공간의 보랏빛 모래 등)
+    public static void Puff(Sprite[] sprites, Vector3 pos, int count, float power, Color color)
+    {
         for (int i = 0; i < count; i++)
         {
             Vector2 dir = Random.insideUnitCircle.normalized;
             dir.y = Mathf.Abs(dir.y) * 0.7f + 0.2f; // 위, 옆으로 퍼짐
             Vector3 start = pos + (Vector3)(Random.insideUnitCircle * 0.15f);
-            DriftFX.Spawn(Pick(sprites), start, dir * Random.Range(0.4f, 1f) * power, Random.Range(0.5f, 0.9f), Dust, SortingLayer, SortingOrder);
+            DriftFX.Spawn(Pick(sprites), start, dir * Random.Range(0.4f, 1f) * power, Random.Range(0.5f, 0.9f), color, SortingLayer, SortingOrder);
         }
     }
 
