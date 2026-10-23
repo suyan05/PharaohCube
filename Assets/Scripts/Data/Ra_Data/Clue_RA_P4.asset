@@ -24,5 +24,5 @@ MonoBehaviour:
     title: "\uC8FD\uC740 \uC655\uC758 \uD558\uB8E8"
     body: "\uC8FD\uC740 \uC655\uC758 \uD558\uB8E8\uB294 \uD574\uAC00 \uB215\uB294
       \uACF3\uC5D0\uC11C \uC2DC\uC791\uB41C\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: -8082285938524514539, guid: 69d27a9bcb541ae42b53896bc6ebbd52, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}

@@ -90,6 +90,9 @@ public class SunCycleStation : MonoBehaviour, IInteractable
     private readonly List<Image> buttonImages = new List<Image>();
     private readonly Image[] slotImages = new Image[5];
     private readonly Text[] slotTexts = new Text[5];
+    private readonly Image[] slotIcons = new Image[5];    // [추가] 고른 버튼 그림
+    private readonly Text[] slotLabels = new Text[5];     // [추가] 고른 버튼 이름 (슬롯 아래)
+    private readonly List<Text> orderBadges = new List<Text>(); // [추가] 고리 버튼에 몇 번째로 골랐는지
     private Image backgroundImage;
     private Image centerPlate;
     private Text statusText;
@@ -242,6 +245,12 @@ public class SunCycleStation : MonoBehaviour, IInteractable
             slotImages[i] = CreatePiece(root, $"Slot_{i + 1}", pos, slotSize, slotEmptySprite, sand);
             slotTexts[i] = CreateText(slotImages[i].rectTransform, (i + 1).ToString(), 24,
                 Vector2.zero, slotSize, darkBrown);
+
+            // [추가] 고른 버튼 그림이 슬롯 안에, 이름은 슬롯 아래에
+            slotIcons[i] = CreateRect(slotImages[i].rectTransform, "Icon", Vector2.zero, Vector2.one * (slotSize.y * 1.05f), Color.white);
+            slotIcons[i].preserveAspect = true;
+            slotIcons[i].enabled = false;
+            slotLabels[i] = CreateText(slotImages[i].rectTransform, "", 20, new Vector2(0, -slotSize.y * 0.5f - 16f), new Vector2(slotSize.x + 20f, 28f), paper);
         }
     }
 
@@ -267,6 +276,13 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         }
 
         buttonImages.Add(img);
+
+        // [추가] 몇 번째로 골랐는지 동그라미 숫자 (오른쪽 위)
+        Image badge = CreateRect(img.rectTransform, "OrderBadge", new Vector2(buttonSize.x * 0.42f, buttonSize.y * 0.42f), new Vector2(36, 36), gold);
+        Text badgeText = CreateText(badge.rectTransform, "", 22, Vector2.zero, new Vector2(36, 36), darkBrown);
+        badge.sprite = UIBuild.Circle();
+        badge.enabled = false;
+        orderBadges.Add(badgeText);
     }
 
     private void BuildBackButton(RectTransform root)
@@ -374,9 +390,13 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         for (int i = 0; i < buttonImages.Count; i++)
         {
             bool hasSprite = buttonImages[i].sprite != null;
+            int order = PressedOrder(RingButtons[i]);
+            UpdateBadge(i, order);
             if (hasSprite)
             {
-                buttonImages[i].color = active ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.85f);
+                // [추가] 이미 고른 버튼은 어둡게 (몇 번째인지는 동그라미 숫자로)
+                Color c = active ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.85f);
+                buttonImages[i].color = order > 0 && !puzzle.IsCleared ? new Color(0.42f, 0.38f, 0.34f, 1f) : c;
                 continue;
             }
             buttonImages[i].color = puzzle.IsCleared ? gold : (active ? paper : dimButton);
@@ -395,11 +415,37 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         }
     }
 
+    // [추가] 고리 버튼이 몇 번째로 눌렸는지 (안 눌렸으면 0)
+    private int PressedOrder(SunButton b)
+    {
+        var inputs = puzzle.Inputs;
+        for (int k = 0; k < inputs.Count; k++)
+        {
+            if (inputs[k] == b) return k + 1;
+        }
+        return 0;
+    }
+
+    private void UpdateBadge(int i, int order)
+    {
+        if (i >= orderBadges.Count) return;
+        Text t = orderBadges[i];
+        t.text = order > 0 ? order.ToString() : "";
+        var badge = t.transform.parent.GetComponent<Image>();
+        if (badge != null) badge.enabled = order > 0;
+    }
+
     private void UpdateSlotText(int i, bool filled, IReadOnlyList<SunButton> inputs)
     {
+        // [추가] 고른 버튼 그림 + 이름
+        Sprite icon = filled ? SpriteOf(inputs[i], puzzle.IsNight) : null;
+        slotIcons[i].sprite = icon;
+        slotIcons[i].enabled = icon != null;
+        slotLabels[i].text = filled ? SunCyclePuzzle.ToKorean(inputs[i]) : "";
+
         if (filled)
         {
-            slotTexts[i].text = SunCyclePuzzle.ToKorean(inputs[i]);
+            slotTexts[i].text = icon != null ? "" : SunCyclePuzzle.ToKorean(inputs[i]);
             slotTexts[i].color = darkBrown;
             return;
         }

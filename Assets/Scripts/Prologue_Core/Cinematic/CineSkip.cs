@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // 연출 건너뛰기: ESC를 holdSeconds초 동안 누르고 있으면 Requested = true
-// - Cine.Begin(true)일 때만 동작, 화면 오른쪽 아래에 "ESC 길게: 건너뛰기" 안내
+// - Cine.Begin(true)일 때만 동작, 화면 오른쪽 위(위쪽 검은 바 안)에 "ESC 길게: 건너뛰기" 안내 (대사창에 안 가리게)
 // - 시연, 발표 때 프롤로그를 빨리 넘기는 용도 (기획서 5장 확인 필요 항목)
 public class CineSkip : MonoBehaviour
 {
@@ -67,7 +67,7 @@ public class CineSkip : MonoBehaviour
         if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
         RectTransform root = UIBuild.CreateCanvas(transform, "SkipCanvas", 95, out canvasGo);
-        hint = UIBuild.Text(root, "Hint", font, 22, new Vector2(760f, -510f), new Vector2(360f, 36f), new Color(1f, 1f, 1f, 0.6f));
+        hint = UIBuild.Text(root, "Hint", font, 22, new Vector2(760f, 505f), new Vector2(360f, 36f), new Color(1f, 1f, 1f, 0.6f));
         hint.alignment = TextAnchor.MiddleRight;
     }
 }

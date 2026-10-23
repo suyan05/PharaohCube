@@ -38,12 +38,16 @@ public class RaHudDirector : MonoBehaviour
     private PlayerController2D controller;
     private float searchTime, searchTimer;
 
+    // 다른 라의 방 HUD(횃불 게이지 등)가 숨을지 정할 때 씀: 연출, 대사, 팝업, 퍼즐 화면, 플레이어가 묶여 있음
+    public static bool Busy { get; private set; }
+
     private void LateUpdate()
     {
         try
         {
             FindParts();
             bool busy = IsBusy();
+            Busy = busy || PuzzleOverlayFocus.IsActive || (controller != null && !controller.enabled);
             FadeGroup(objectiveGroup, busy);
             FadeGroup(inventoryGroup, busy);
             WatchObjective(busy);
@@ -53,6 +57,11 @@ public class RaHudDirector : MonoBehaviour
             Debug.LogError($"[RaHudDirector] 화면 정리 오류 (정리 기능만 끔): {e}");
             enabled = false;
         }
+    }
+
+    private void OnDisable()
+    {
+        Busy = false;
     }
 
     // ================= 찾기 (UI는 각자 Start에서 코드로 만들어져서 조금 늦게 생김) =================

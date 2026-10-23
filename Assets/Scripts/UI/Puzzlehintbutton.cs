@@ -59,6 +59,12 @@ public class PuzzleHintButton : MonoBehaviour
         }
     }
 
+    // [추가] 문구 상자는 화면 맨 위 캔버스로 옮겨서, 퍼즐 화면이 닫힐 때 같이 숨겨야 함
+    private void OnDisable()
+    {
+        if (messageBox != null) messageBox.SetActive(false);
+    }
+
     private bool EnsureBuilt()
     {
         if (buttonRoot != null) return true;
@@ -118,11 +124,21 @@ public class PuzzleHintButton : MonoBehaviour
 
             nextReadyTime = Time.time + cooldown;
             ShowMessage(message);
+            MarkHintUsed();
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 힌트 실행 오류: {e}");
         }
+    }
+
+    // [추가] 힌트를 한 번이라도 쓰면 기록 (업적 '스스로 읽은 자' 판정용)
+    public const string HintUsedFlag = "F_HINT_USED";
+
+    private static void MarkHintUsed()
+    {
+        GameManager gm = GameManager.Instance;
+        if (gm != null && !gm.HasFlag(HintUsedFlag)) gm.SetFlag(HintUsedFlag);
     }
 
     private void ShowMessage(string message)
@@ -178,13 +194,34 @@ public class PuzzleHintButton : MonoBehaviour
         button.spriteState = state;
     }
 
+    // [수정] 힌트 문구가 퍼즐 그림 뒤에 가려지던 문제:
+    //  문구 상자에 따로 Canvas를 달아 퍼즐 화면보다 항상 위에 그림 (대사창보다는 아래)
+    //  + 금색 테두리 + 위치를 퍼즐 제목 바로 아래 가운데로 고정
     private void BuildMessage()
     {
-        Image box = CreateImage((RectTransform)transform, "HintMessage", messagePos, new Vector2(1100f, 64f), new Color(0.1f, 0.07f, 0.04f, 0.9f));
-        messageBox = box.gameObject;
+        Image border = CreateImage((RectTransform)transform, "HintMessage", Vector2.zero, new Vector2(1120f, 84f), Hex("#E8B23A"));
+        border.preserveAspect = false;
+        messageBox = border.gameObject;
+        PinToScreenTop(border.rectTransform);
 
-        messageText = CreateText(box.rectTransform, "", 26, Vector2.zero, new Vector2(1060f, 60f), Hex("#E8B23A"));
+        Canvas canvas = messageBox.AddComponent<Canvas>();
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = 98;
+
+        Image box = CreateImage(border.rectTransform, "Inner", Vector2.zero, new Vector2(1112f, 76f), new Color(0.1f, 0.07f, 0.04f, 0.96f));
+        box.preserveAspect = false;
+        messageText = CreateText(box.rectTransform, "", 26, Vector2.zero, new Vector2(1070f, 70f), Hex("#E8B23A"));
         messageText.horizontalOverflow = HorizontalWrapMode.Wrap;
+    }
+
+    // 버튼이 어디에 붙어 있든 화면 위 가운데 (위에서 150px)
+    private void PinToScreenTop(RectTransform rt)
+    {
+        Canvas root = GetComponentInParent<Canvas>();
+        if (root != null) rt.SetParent(root.rootCanvas.transform, false);
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 1f);
+        rt.pivot = new Vector2(0.5f, 1f);
+        rt.anchoredPosition = new Vector2(0f, -150f);
     }
 
     // ================= 도우미 함수 =================

@@ -40,6 +40,13 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
         new DiskSlot { center = new Vector2(0.7265f, 0.5461f), size = new Vector2(0.3248f, 0.2166f), spriteName = "P3_Disk_Right" }       // C
     };
 
+    [Header("[추가] 밤 그림 - 달이 해를 삼킨 문양 (비우면 낮 그림 그대로)")]
+    [SerializeField] private Image boardImage;
+    [SerializeField] private Sprite nightBoardSprite;      // P3_Board_Base_Night
+    [SerializeField] private Sprite nightCompleteSprite;   // P3_Complete_Night
+    [Tooltip("A, B, C 순서 (P3_Disk_BottomLeft_Night, P3_Disk_Top_Night, P3_Disk_Right_Night)")]
+    [SerializeField] private Sprite[] nightDiskSprites = new Sprite[3];
+
     [Header("튜닝 (기획서 6.2)")]
     [SerializeField] private float hintDelay = 30f;
     [SerializeField] private float rotateAnimTime = 0.25f;
@@ -53,6 +60,8 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
     private static readonly Vector2 BoardPos = new Vector2(0f, 40f);
 
     private float[] currentZ;
+    private Sprite dayBoard, dayComplete;
+    private Sprite[] dayDisks;
     private bool isOpen;
     private bool hintActive; // 낮 자동 힌트 (30초)
     private float hintTimer;
@@ -73,6 +82,8 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
                 AddClick(disks[i], i);
             }
 
+            CacheDayArt();
+            ApplyPhaseArt();
             overlayPanel.SetActive(false);
             Subscribe();
         }
@@ -137,6 +148,38 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
         rt.pivot = new Vector2(0.5f, 0.5f); // 원판 가운데를 축으로 회전
+    }
+
+    // [추가] 낮 그림 기억 (밤 -> 낮으로 돌아갈 일은 없지만 비어 있는 밤 그림 칸은 낮 그림을 씀)
+    private void CacheDayArt()
+    {
+        if (boardImage == null && overlayPanel != null)
+        {
+            Transform b = overlayPanel.transform.Find("Board");
+            if (b != null) boardImage = b.GetComponent<Image>();
+        }
+        dayBoard = boardImage != null ? boardImage.sprite : null;
+        dayComplete = completeImage != null ? completeImage.sprite : null;
+        dayDisks = new Sprite[disks.Length];
+        for (int i = 0; i < disks.Length; i++) dayDisks[i] = disks[i].image.sprite;
+    }
+
+    // [추가] 낮 / 밤에 맞는 판, 원판, 완성 그림
+    private void ApplyPhaseArt()
+    {
+        bool night = puzzle.IsNight;
+        if (boardImage != null) boardImage.sprite = Pick(night, nightBoardSprite, dayBoard);
+        if (completeImage != null) completeImage.sprite = Pick(night, nightCompleteSprite, dayComplete);
+        for (int i = 0; i < disks.Length; i++)
+        {
+            Sprite n = nightDiskSprites != null && i < nightDiskSprites.Length ? nightDiskSprites[i] : null;
+            disks[i].image.sprite = Pick(night, n, dayDisks[i]);
+        }
+    }
+
+    private static Sprite Pick(bool night, Sprite nightSprite, Sprite daySprite)
+    {
+        return night && nightSprite != null ? nightSprite : daySprite;
     }
 
     private void AddClick(DiskSlot d, int index)
@@ -318,6 +361,7 @@ public class EclipseArtStation : MonoBehaviour, IInteractable
     {
         hintActive = false;
         hintTimer = 0f;
+        if (dayDisks != null) ApplyPhaseArt();
         if (currentZ != null) SnapDisks();
         RefreshVisuals();
         if (isOpen) statusText.text = GetOpenMessage();

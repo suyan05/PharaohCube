@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 // 파란 비석: E -> 단서 패널 열기 / 닫기 (기존 NoteStone 대체)
@@ -7,6 +8,11 @@ using UnityEngine;
 //   Room Size가 0이면 범위 체크 없이 항상 표시
 // - 읽음 플래그는 낮/밤 따로 -> 밤이 되어 단서가 바뀌면 "!"가 다시 뜸
 //   낮: F_CLUE_<id>_READ / 밤: F_CLUE_<id>_NIGHT_READ (나중에 저널이 이 플래그로 목록을 만듦)
+// [추가] 횃불 신전
+// - 빛이 있어야 읽힘: 근처 벽 횃불(또는 성소 화로)이 켜져 있어야 "!"가 뜨고 글이 보임. 어두우면 "너무 어두워..." 혼잣말
+//   불이 들어오는 순간 비석에서 불똥이 피어오르며 "!"가 나타남
+// - 밤: 손상된 상형문자 -> 렌즈로 비춰 해독(SteleDecodeUI) -> 몇 글자는 "?"로 남은 글이 단서 패널에 뜸 (RaNightClueText)
+//   한 번 해독하면 F_CLUE_<id>_NIGHT_DECODED -> 다음부터 바로 패널
 public class ClueStele : MonoBehaviour, IInteractable
 {
     [Header("연결")]
@@ -30,6 +36,20 @@ public class ClueStele : MonoBehaviour, IInteractable
     [Header("읽을 때 추가로 켤 플래그 (기존 NoteStone의 flagOnRead, 비우면 없음)")]
     [SerializeField] private string flagOnRead = "";
 
+    [Header("[추가] 빛이 있어야 읽힘 (횃불 신전)")]
+    [SerializeField] private bool needLight = true;
+    [Tooltip("이 비석이 있는 방의 벽 횃불 (하나라도 켜지면 읽힘). 플레이어 손 횃불은 안 셈. 배치 메뉴가 채움")]
+    [SerializeField] private WallTorch[] roomTorches;
+    [Tooltip("Room Torches가 비었을 때만: 이 반경 안의 벽 횃불이 켜져 있으면 밝음")]
+    [SerializeField] private float lightRadius = 6.5f;
+    [SerializeField] private DialogueLine[] darkLines = { new DialogueLine("나", "너무 어두워서 글씨가 보이지 않는다. 이 방 벽 횃불부터 밝히자.") };
+
+    [Header("[추가] 밤: 손상된 글을 렌즈로 해독")]
+    [SerializeField] private bool lensDecodeAtNight = true;
+
+    private bool wasLit;
+    private bool decoding;
+
     private Vector3 bubbleBasePos;
     private Vector3 bubbleBaseScale = Vector3.one;
     private float popTimer;
@@ -37,6 +57,19 @@ public class ClueStele : MonoBehaviour, IInteractable
     private Transform player;
 
     private string ReadFlag => $"F_CLUE_{data.ClueId}{(RaPhaseState.IsNight ? "_NIGHT" : "")}_READ";
+    private string DecodedFlag => $"F_CLUE_{data.ClueId}_NIGHT_DECODED";
+
+    // [추가] 근처 벽 횃불이나 성소 화로가 켜져 있으면 밝음
+    private bool IsLitHere()
+    {
+        if (!needLight) return true;
+        if (roomTorches != null && roomTorches.Length > 0)
+        {
+            foreach (WallTorch t in roomTorches) if (t != null && t.IsLit) return true;
+            return false; // 규칙: 그 방 벽 횃불을 밝혀야 읽힘 (손에 든 횃불, 옆 방 불빛으로는 안 됨)
+        }
+        return WallTorch.AnyLitNear(transform.position, lightRadius);
+    }
 
     // ================= 초기화 =================
     private void Start()
@@ -112,7 +145,11 @@ public class ClueStele : MonoBehaviour, IInteractable
     {
         if (newBubble == null) return;
 
-        bool show = valid && !IsRead() && IsPlayerInRoom();
+        bool lit = IsLitHere();
+        if (lit && !wasLit) RevealSparkle();
+        wasLit = lit;
+
+        bool show = valid && lit && !IsRead() && IsPlayerInRoom();
         if (!show)
         {
             newBubble.enabled = false;
@@ -127,6 +164,17 @@ public class ClueStele : MonoBehaviour, IInteractable
         float y = Mathf.Sin(Time.time * bobSpeed) * bobHeight;
         newBubble.transform.localPosition = bubbleBasePos + new Vector3(0f, y, 0f);
         newBubble.transform.localScale = bubbleBaseScale * Mathf.SmoothStep(0f, 1f, pop);
+    }
+
+    // [추가] 불이 들어와 글씨가 드러나는 순간
+    private void RevealSparkle()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr == null) return;
+        for (int i = 0; i < 8; i++)
+        {
+            RaGlowFx.Spark(transform.position + new Vector3(0f, 0.5f + i * 0.08f, 0f), new Color(0.55f, 0.75f, 1f), sr.sortingLayerName, sr.sortingOrder + 1);
+        }
     }
 
     private bool IsRead()
@@ -154,7 +202,9 @@ public class ClueStele : MonoBehaviour, IInteractable
     // ================= IInteractable =================
     public string GetPrompt()
     {
+        if (decoding) return null;
         if (valid && panel.IsOpenFor(this)) return "E: 닫기";
+        if (!IsLitHere()) return "E: 살펴보기";
         return "E: 비석 읽기";
     }
 
@@ -162,7 +212,7 @@ public class ClueStele : MonoBehaviour, IInteractable
     {
         try
         {
-            if (!valid) return;
+            if (!valid || decoding) return;
 
             if (panel.IsOpenFor(this))
             {
@@ -170,13 +220,65 @@ public class ClueStele : MonoBehaviour, IInteractable
                 return;
             }
 
-            panel.Show(data.Get(RaPhaseState.IsNight), this, who);
+            // [추가] 어두우면 못 읽음
+            if (!IsLitHere())
+            {
+                if (!DialogueBox.IsOpen && DialogueBox.ClosedFrame != Time.frameCount) DialogueBox.Play(darkLines);
+                return;
+            }
+
+            // [추가] 밤: 처음 한 번은 렌즈로 해독
+            if (RaPhaseState.IsNight && lensDecodeAtNight && !HasFlag(DecodedFlag))
+            {
+                StartCoroutine(DecodeThenShow(who));
+                return;
+            }
+
+            panel.Show(CurrentContent(), this, who);
             MarkRead();
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 비석 상호작용 오류: {e}");
         }
+    }
+
+    // [추가] 밤에는 손상된 글(몇 글자 "?")로 보여줌. 그림은 그대로
+    private ClueData.ClueContent CurrentContent()
+    {
+        ClueData.ClueContent c = data.Get(RaPhaseState.IsNight);
+        if (!RaPhaseState.IsNight || !lensDecodeAtNight) return c;
+
+        return new ClueData.ClueContent
+        {
+            title = c.title,
+            body = RaNightClueText.Get(data.ClueId, c.body),
+            illustration = c.illustration,
+            illustrationTint = c.illustrationTint
+        };
+    }
+
+    // [추가] 상형문자 판 -> 렌즈로 비춰 해독 -> 단서 패널
+    private IEnumerator DecodeThenShow(GameObject who)
+    {
+        decoding = true;
+        PlayerLock.Lock(this);
+        ClueData.ClueContent c = CurrentContent();
+        yield return SteleDecodeUI.Decode(c.title, RaNightClueText.ToLines(c.body, 12));
+
+        GameManager gm = GameManager.Instance;
+        if (gm != null && !gm.HasFlag(DecodedFlag)) gm.SetFlag(DecodedFlag);
+        PlayerLock.Unlock(this);
+        decoding = false;
+
+        yield return null; // 판을 닫은 E키로 패널이 바로 닫히지 않게
+        panel.Show(c, this, who);
+        MarkRead();
+    }
+
+    private static bool HasFlag(string flag)
+    {
+        return !string.IsNullOrEmpty(flag) && GameManager.Instance != null && GameManager.Instance.HasFlag(flag);
     }
 
     // 이미 켜진 플래그를 또 켜면 GameManager가 로그를 남기니까 확인 후 켬

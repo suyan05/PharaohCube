@@ -31,9 +31,10 @@ public class DialogueLine
 // - 씬에 안 놓아도 처음 부를 때 자동으로 생김
 public class DialogueBox : MonoBehaviour
 {
-    private static readonly Vector2 BoxPos = new Vector2(0f, -400f);
-    private static readonly Vector2 BoxSize = new Vector2(1600f, 240f);
-    private static readonly Vector2 PortraitSize = new Vector2(200f, 200f);
+    // [수정] 화면 아래를 덜 가리게 조금 작게 (1600x240 -> 1440x210)
+    private static readonly Vector2 BoxPos = new Vector2(0f, -392f);
+    private static readonly Vector2 BoxSize = new Vector2(1440f, 210f);
+    private static readonly Vector2 PortraitSize = new Vector2(180f, 180f);
 
     private static DialogueBox instance;
 

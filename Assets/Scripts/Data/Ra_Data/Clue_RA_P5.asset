@@ -18,12 +18,12 @@ MonoBehaviour:
     body: "\uD0DC\uC591\uC758 \uD558\uB8E8\uB294 \uB2E4\uC12F \uAC78\uC74C\uC774\uB2E4.
       \uAE68\uC5B4\uB098\uACE0, \uC815\uC810\uC5D0 \uC11C\uACE0, \uBAB8\uC744 \uB204\uC774\uACE0,
       \uAC15\uC744 \uAC74\uB108, \uB2E4\uC2DC \uD0DC\uC5B4\uB09C\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: -1745532928364372877, guid: e9f846826b82d374580956b2c722e2bf, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: "\uBC24\uC758 \uD56D\uD574"
     body: "\uBC24\uC758 \uC5EC\uC815\uC740 \uD574\uAC00 \uB215\uB294 \uACF3\uC5D0\uC11C
       \uC2DC\uC791\uD574 \uAE68\uC5B4\uB098\uB294 \uACF3\uC5D0\uC11C \uB05D\uB09C\uB2E4.
       \uADF8 \uC0AC\uC774, \uADF8\uB294 \uAC77\uC9C0 \uC54A\uB294\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: 3072084719488866886, guid: 45028bcb88f0ac34abbcf3452cdc90ea, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}

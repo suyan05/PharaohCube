@@ -8,6 +8,7 @@ using UnityEngine;
 //   라의 대화가 끝나길 기다림 -> 검은 바 + 카메라가 넓게 물러남
 //   -> 플레이어 가까운 횃불부터 차례로 깜빡이다 꺼짐 -> 쿵 -> "..." -> 혼잣말
 //   -> (배 모형 글귀를 읽었고 불씨가 없으면) 불씨 힌트 혼잣말 한 줄 더
+//   -> 라가 먼저 밤의 대사를 건넴 (성소에 다시 갈 필요 없음, F_RA_SHRINE_NIGHT_TALKED)
 // - 이미 밤인 상태로 씬에 들어오면 WallTorch가 알아서 밤 기준으로 복원하므로 여기서는 연출만
 public class RaTorchManager : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class RaTorchManager : MonoBehaviour
     [SerializeField, Min(0f)] private float delayBeforeOut = 1.0f;
     [SerializeField, Min(0f)] private float gapBetween = 0.28f;
     [SerializeField, Min(1f)] private float nightViewSize = 7f;
+
+    [SerializeField] private string nightTalkedFlag = "F_RA_SHRINE_NIGHT_TALKED";
 
     [Header("불씨 힌트 (배 모형 글귀를 읽었을 때만)")]
     [SerializeField] private string boatSeenFlag = "F_RA_BOAT_SEEN";
@@ -104,6 +107,18 @@ public class RaTorchManager : MonoBehaviour
 
         yield return NightTalk(player);
         Cine.End();
+
+        yield return new WaitForSeconds(0.4f);
+        AutoRaNightTalk(player);
+    }
+
+    // 라의 밤 대사 자동 (성소 단계가 "밤"일 때 Interact = 밤 대사 + 들었음 표시)
+    private void AutoRaNightTalk(Transform player)
+    {
+        GameManager gm = GameManager.Instance;
+        if (gm == null || gm.HasFlag(nightTalkedFlag) || player == null) return;
+        RaShrine shrine = FindFirstObjectByType<RaShrine>(FindObjectsInactive.Include);
+        if (shrine != null) shrine.Interact(player.gameObject);
     }
 
     private IEnumerator NightTalk(Transform player)

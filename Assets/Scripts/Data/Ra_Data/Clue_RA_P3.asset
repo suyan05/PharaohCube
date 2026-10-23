@@ -23,5 +23,5 @@ MonoBehaviour:
     title: "\uAC1C\uAE30 \uC77C\uC2DD"
     body: "\uB2EC\uC774 \uD574\uB97C \uC0BC\uD0A4\uBA74, \uC2DC\uAC04\uC740 \uAC70\uAFB8\uB85C
       \uD750\uB978\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: 5818380473800298483, guid: bacba2e7ee261b341b7f2284b75938e9, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}

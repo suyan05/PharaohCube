@@ -179,7 +179,8 @@ public class GameMessageUI : MonoBehaviour
         // 노트 1~7
         if (msg.StartsWith("[노트"))
         {
-            AddToast(msg, noteTime, true);
+            // [수정] 긴 글은 고고학 수첩(J) 메모로 옮기고, 여기는 짧게 알림만 (NotebookNotes가 저장)
+            AddToast(NoteToast(msg), toastTime + 1f, true);
             return;
         }
 
@@ -207,6 +208,14 @@ public class GameMessageUI : MonoBehaviour
         }
 
         HandleHorusLog(msg);
+    }
+
+    // [추가] "[노트 4] 긴 글..." -> "[노트 4] 고고학 수첩에 기록되었다 (J)"
+    private static string NoteToast(string msg)
+    {
+        int end = msg.IndexOf(']');
+        string tag = end > 0 ? msg.Substring(0, end + 1) : "[노트]";
+        return $"{tag} 고고학 수첩에 기록되었다 (J)";
     }
 
     // [추가] ItemNames에 없는 아이템(라의 불씨, 횃불 등)은 ItemCatalog의 표시 이름을 씀 (없으면 ID 그대로)

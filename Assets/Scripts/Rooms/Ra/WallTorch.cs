@@ -30,7 +30,9 @@ public class WallTorch : MonoBehaviour, IInteractable
 
     [Header("길게 누르기")]
     [SerializeField, Min(0.1f)] private float holdSeconds = 1f;
-    [SerializeField] private float holdRange = 1.8f;
+    [SerializeField] private float holdRange = 2.4f;
+    [Tooltip("이 반경 안에 있으면 '밝은 곳' (횃불 시간이 안 줄고, 비석 글씨가 보임)")]
+    [SerializeField] private float brightRadius = 4f;
 
     [Header("꺼진 횃불 반짝임 (가까이 가면)")]
     [SerializeField] private float glintRange = 4.5f;
@@ -42,6 +44,9 @@ public class WallTorch : MonoBehaviour, IInteractable
 
     // 아무 벽 횃불이든 플레이어가 직접 붙였을 때 (첫 횃불 튜토리얼용)
     public static event Action<WallTorch> PlayerLit;
+
+    // 씬에 있는 벽 횃불 전체 (밝은 곳 판정용)
+    private static readonly System.Collections.Generic.List<WallTorch> all = new System.Collections.Generic.List<WallTorch>();
 
     private bool lit;
     private bool animating;
@@ -56,6 +61,22 @@ public class WallTorch : MonoBehaviour, IInteractable
     private string LitFlag => $"F_RA_TORCH_{torchId}_{(IsNight ? "N" : "D")}";
     private string AutoFlag => IsNight ? nightAutoFlag : dayAutoFlag;
     private static bool PlayerFireLit => TorchLink.Current != null && TorchLink.Current.IsLit;
+
+    // pos가 켜진 벽 횃불의 빛 안에 있는지 (radius를 주면 그 반경으로 판정)
+    public static bool AnyLitNear(Vector3 pos, float radius = -1f)
+    {
+        foreach (WallTorch t in all)
+        {
+            if (t == null || !t.lit) continue;
+            float r = radius > 0f ? radius : t.brightRadius;
+            if ((t.transform.position - pos).sqrMagnitude <= r * r) return true;
+        }
+        return false;
+    }
+
+    private void OnEnable() => all.Add(this);
+
+    private void OnDisable() => all.Remove(this);
 
     // ================= 초기화 =================
     private void Awake()
