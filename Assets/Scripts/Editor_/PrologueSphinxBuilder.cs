@@ -153,7 +153,7 @@ public static class PrologueSphinxBuilder
         SphinxHead head = BuildHead(root);
         BuildPaws(root);
         Inspectable[] sands = { BuildPawSand(root, "PawSand_L", "PRO_OBJ_PAWSAND_L", 7f), BuildPawSand(root, "PawSand_R", "PRO_OBJ_PAWSAND_R", 15f) };
-        Inspectable stele = BuildStele(root);
+        SteleReader stele = BuildStele(root);
         DreamStairs stairs = BuildStairs(root);
         BuildSystems(root, head, sands, stele, stairs);
     }
@@ -213,22 +213,12 @@ public static class PrologueSphinxBuilder
         return insp;
     }
 
-    // 비석 (10, 6) 2x2. 묻혀 있을 때는 조사 막힘, 드러난 뒤 렌즈 필요
-    private static Inspectable BuildStele(Transform root)
+    // 비석 (10, 6) 2x2. 묻힘 -> 드러남(상형문자, 못 읽음) -> 렌즈로 비춘 만큼 해독 (SteleReader)
+    private static SteleReader BuildStele(Transform root)
     {
         GameObject go = MakeSprite(root, "DreamStele", "Pro_Obj_Stele_Buried", Foot(10, 6, 2, 2), 0);
         Box(go, new Vector2(1.6f, 0.8f), new Vector2(0f, 0.4f), false);
-
-        Inspectable insp = AddInspectable(go, "PRO_OBJ_STELE", "비석 읽기");
-        Edit(insp, so =>
-        {
-            Prop(so, "requiredFlag").stringValue = "F_PRO_STELE_SHOWN";
-            SetLines(so, "lockedLines", "나", "모래 속에 무언가 묻혀 있다.");
-            Prop(so, "requiredTool").stringValue = "TOOL_LENS";
-            SetLines(so, "missingToolLines", "나", "닳은 글자가 빼곡하다. 맨눈으론 읽을 수 없다.");
-            SetLines(so, "afterDoneLines", "나", "첫 문은 태양의 신이 지킨다...");
-        });
-        return insp;
+        return go.AddComponent<SteleReader>();
     }
 
     // 계단 (10, 9) 2x2 바닥. 처음엔 바닥처럼 보이고, 입구 트리거는 열릴 때 켜짐
@@ -251,7 +241,7 @@ public static class PrologueSphinxBuilder
     }
 
     // ================= 진행 시스템 =================
-    private static void BuildSystems(Transform root, SphinxHead head, Inspectable[] sands, Inspectable stele, DreamStairs stairs)
+    private static void BuildSystems(Transform root, SphinxHead head, Inspectable[] sands, SteleReader stele, DreamStairs stairs)
     {
         GameObject sys = Group(root, "PrologueSystems").gameObject;
 
@@ -393,9 +383,10 @@ public static class PrologueSphinxBuilder
         return new[] { Load("Pro_FX_SandGrain_01"), Load("Pro_FX_SandGrain_02"), Load("Pro_FX_SandGrain_03") };
     }
 
+    // Pro_Obj_ = 바닥 피벗, 나머지(FX) = 가운데 피벗. 둘 다 PPU 32로 맞춰서 요청서 크기 그대로
     private static Sprite Load(string file)
     {
-        return PrologueAssetFinder.Sprite(file);
+        return PrologueAssetFinder.PixelSprite(file, file.StartsWith("Pro_Obj_"));
     }
 
     private static Transform Group(Transform parent, string name)

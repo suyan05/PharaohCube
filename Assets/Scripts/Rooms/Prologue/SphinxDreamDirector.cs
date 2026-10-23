@@ -6,7 +6,8 @@ using UnityEngine;
 // 1. 시작 연출 (SphinxWakeCutscene)
 // 2. 목표: 앞발 모래 2개를 붓으로 털기 (PawSand Inspectable 2개)
 // 3. 둘 다 털면: 땅울림 -> 비석 드러남 -> 스핑크스 수수께끼 (틀리면 힌트 후 다시) -> 볼록렌즈 획득
-// 4. 목표: 비석을 렌즈로 읽기 (Stele Inspectable, 렌즈 필요) -> 해독 화면 -> 스핑크스 작별 -> 계단 열림
+//    (비석이 드러나면 먼저 상형문자만 보여줌 -> 못 읽음 -> 스핑크스: 읽고 싶으면 답하라)
+// 4. 목표: 비석을 렌즈로 읽기 (SteleReader) -> 렌즈로 비춘 만큼 해독 -> 스핑크스 작별 -> 계단 열림
 // 5. 계단에 들어가면 DreamStairs가 F_PROLOGUE_CLEAR + 다음 씬
 public class SphinxDreamDirector : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class SphinxDreamDirector : MonoBehaviour
     [SerializeField] private SphinxWakeCutscene wake;
     [SerializeField] private SphinxHead head;
     [SerializeField] private Inspectable[] pawSands;
-    [SerializeField] private Inspectable stele;
+    [SerializeField] private SteleReader stele;
     [SerializeField] private SpriteRenderer steleRenderer;
     [Tooltip("Pro_Obj_Stele_Shown")]
     [SerializeField] private Sprite steleShownSprite;
@@ -82,7 +83,7 @@ public class SphinxDreamDirector : MonoBehaviour
                 if (sand != null) sand.OnCompleted += HandlePawCleared;
             }
         }
-        if (stele != null) stele.OnCompleted += HandleSteleRead;
+        if (stele != null) stele.AfterDecode = AfterDecode;
     }
 
     private void OnDestroy()
@@ -96,7 +97,7 @@ public class SphinxDreamDirector : MonoBehaviour
                 if (sand != null) sand.OnCompleted -= HandlePawCleared;
             }
         }
-        if (stele != null) stele.OnCompleted -= HandleSteleRead;
+        if (stele != null) stele.AfterDecode = null;
     }
 
     // ================= 목표 =================
@@ -145,6 +146,8 @@ public class SphinxDreamDirector : MonoBehaviour
         ShowStele();
         yield return Cine.Wait(0.8f);
         yield return Cine.Say(lines.steleRevealed);
+        if (stele != null) yield return stele.ShowUnreadable();
+        yield return HeadSay(lines.askToRead);
 
         yield return Riddle();
         yield return GrantLens();
@@ -195,22 +198,15 @@ public class SphinxDreamDirector : MonoBehaviour
     }
 
     // ================= 비석 해독 -> 계단 =================
-    private void HandleSteleRead(Inspectable _)
+    // SteleReader가 해독을 끝낸 직후, 같은 연출(Cine) 안에서 이어서 돌림
+    private IEnumerator AfterDecode()
     {
-        StartCoroutine(DecodeAndOpen());
-    }
-
-    private IEnumerator DecodeAndOpen()
-    {
-        Cine.Begin(false);
-        yield return LensDecodeUI.Show(lines.decodeTitle, lines.decodeBody);
         yield return Cine.Say(lines.afterDecode);
         yield return HeadSay(lines.farewell);
 
         SetObjective(objectiveStairs);
         if (stairs != null) yield return stairs.Open();
         else Debug.LogError("[SphinxDreamDirector] DreamStairs가 연결 안 됨 -> F12로 넘기기");
-        Cine.End();
     }
 
     private IEnumerator HeadSay(DialogueLine[] toSay)
