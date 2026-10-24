@@ -62,7 +62,12 @@ public class CameraFollow2D : MonoBehaviour
     private float zoomVelocity;
     private float currentZoomSmooth;
 
+    // [추가] 방 경계 (CameraRoomZone이 켬): 방 안에 있으면 맵 대신 방 크기에 맞춰 멈춤
+    private bool hasRoom;
+    private Bounds roomBounds;
+
     public bool IsFocusing => hasFocus;
+    public bool HasRoomBounds => hasRoom;
     public bool HasMapBounds => hasBounds;
     public float BaseSize => baseSize;
     public bool IsZoomSettled => cam != null && Mathf.Abs(cam.orthographicSize - targetSize) < 0.02f;
@@ -172,7 +177,7 @@ public class CameraFollow2D : MonoBehaviour
         returningFromFocus = true;
     }
 
-    // ================= 줌 =================
+
     /// <summary>카메라 Size를 size로 부드럽게 바꿈. smooth가 0 이하면 기본값 사용.</summary>
     public void SetZoom(float size, float smooth = -1f)
     {
@@ -211,6 +216,22 @@ public class CameraFollow2D : MonoBehaviour
     public Vector3 GetMapCenter()
     {
         return hasBounds ? mapBounds.center : transform.position;
+    }
+
+    /// <summary>[추가] 방 경계로 카메라를 가둠 (방이 화면보다 작으면 방 가운데 고정).</summary>
+    public void SetRoomBounds(Bounds b)
+    {
+        roomBounds = b;
+        hasRoom = true;
+        returningFromFocus = true; // 방이 바뀔 때 부드럽게 이동
+    }
+
+    /// <summary>[추가] 방 경계를 풀고 맵 경계(또는 자유)로 돌아감.</summary>
+    public void ClearRoomBounds()
+    {
+        if (!hasRoom) return;
+        hasRoom = false;
+        returningFromFocus = true;
     }
 
     private void UpdateZoom()
@@ -268,13 +289,14 @@ public class CameraFollow2D : MonoBehaviour
 
     private Vector3 ClampToMap(Vector3 pos)
     {
-        if (!hasBounds) return pos;
+        if (!hasBounds && !hasRoom) return pos;
+        Bounds b = hasRoom ? roomBounds : mapBounds; // [수정] 방 안이면 방 경계 우선
 
         float halfH = cam.orthographicSize;
         float halfW = halfH * cam.aspect;
 
-        pos.x = ClampAxis(pos.x, mapBounds.min.x, mapBounds.max.x, halfW);
-        pos.y = ClampAxis(pos.y, mapBounds.min.y, mapBounds.max.y, halfH);
+        pos.x = ClampAxis(pos.x, b.min.x, b.max.x, halfW);
+        pos.y = ClampAxis(pos.y, b.min.y, b.max.y, halfH);
         return pos;
     }
 

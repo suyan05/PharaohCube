@@ -203,6 +203,8 @@ public static class BastetMapFitBuilder
             log.AppendLine($"- 전역 조명 '{l.name}' 밝기 -> 0.35");
         }
 
+        BastetCameraZones.Build(log); // [추가] 방마다 카메라 영역 (방 밖이 안 보이게)
+
         EditorSceneManager.MarkSceneDirty(root.scene);
         Selection.activeGameObject = root;
         Debug.Log(log.ToString(), root);
