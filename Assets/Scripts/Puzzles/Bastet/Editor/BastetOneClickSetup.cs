@@ -10,6 +10,7 @@ using UnityEngine;
 //  4) 실전 방 세팅 (보상, 비석 "!", 목표, 힌트, 입장 연출, 출구)
 //  5) 5개 방 배치 한 번 더 (4번에서 생긴 B3·B4 제단과 비석을 각 방으로 옮김)
 //  6) 플레이어에 임시 횃불
+//  8) [추가] 벽 횃불로 방 밝히기 (라의 방 방식, 방 불이 자동으로 켜지지 않음)
 //  7) [추가] 석상·발판 그림 붙이기 (Assets/image/Bastet/Puzzle/, 맵 배치 안에서도 한 번 실행됨)
 public static class BastetOneClickSetup
 {
@@ -31,6 +32,12 @@ public static class BastetOneClickSetup
         BastetRoomSetup.Apply();
         if (hasMap) BastetMapFitBuilder.Build(false); else BastetAreaBuilder.Build();
         BastetWalkBuilder.AddTorchToPlayer();
+        if (hasMap) // [추가] 라의 방처럼 벽 횃불로 방 밝히기
+        {
+            var tl = new System.Text.StringBuilder("[BastetTorchLighting] 횃불로 방 밝히기\n");
+            BastetTorchLighting.Build(tl);
+            Debug.Log(tl.ToString());
+        }
         if (!hasMap) // [추가] 맵 배치(MapFit)는 안에서 이미 붙임
         {
             var log = new System.Text.StringBuilder("[BastetArtApplier] 그림 붙이기\n");

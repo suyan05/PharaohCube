@@ -26,7 +26,8 @@ public class SettingsWindow : MonoBehaviour
     private Button closeButton;
 
     // returnTo: 닫은 뒤 다시 고를 버튼 (키보드 조작용)
-    public static void Open(Action closed = null, Selectable returnTo = null)
+    // background: 뒤에 깔 배경 그림 (시작 화면에서 열 때. 게임 중에는 비워서 게임 화면이 어둡게 비침)
+    public static void Open(Action closed = null, Selectable returnTo = null, Sprite background = null)
     {
         if (current != null) return;
         GameSettings.Load();
@@ -35,7 +36,7 @@ public class SettingsWindow : MonoBehaviour
         current.onClosed = closed;
         current.returnTo = returnTo;
         current.openedFrame = Time.frameCount;
-        current.Build(canvas.transform);
+        current.Build(canvas.transform, background);
         Debug.Log("[SettingsWindow] 열림");
     }
 
@@ -45,10 +46,15 @@ public class SettingsWindow : MonoBehaviour
     }
 
     // ================= 만들기 =================
-    private void Build(Transform root)
+    private void Build(Transform root, Sprite background)
     {
         MenuTheme th = MenuUI.Theme;
-        MenuUI.FullScreen("Dim", root, th.dimColor);
+        if (background != null) // [추가] 설정 배경 그림 (TitleScreen / MenuTheme의 Settings Background 칸)
+        {
+            Image bg = MenuUI.FullScreen("Background", root, Color.white);
+            bg.sprite = background;
+        }
+        MenuUI.FullScreen("Dim", root, background != null ? new Color(0f, 0f, 0f, 0.35f) : th.dimColor);
         Image panel = MenuUI.Panel("Panel", root, new Vector2(1060f, 980f));
         MenuUI.Column(panel.transform, 6f, new RectOffset(70, 70, 40, 40));
 

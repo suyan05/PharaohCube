@@ -68,9 +68,31 @@ public static class GameMenuSetup
         camGo.transform.position = new Vector3(0f, 0f, -10f);
         camGo.AddComponent<AudioListener>();
 
-        new GameObject("TitleScreen").AddComponent<TitleScreen>();
+        TitleScreen ts = new GameObject("TitleScreen").AddComponent<TitleScreen>();
+        ts.BuildUI();               // [추가] 화면 오브젝트를 씬에 저장 (Hierarchy에서 보임)
+        MenuUI.EnsureEventSystem();
         EditorSceneManager.SaveScene(scene, ScenePath);
         log.Add($"시작 화면 씬 만듦: {ScenePath}");
+    }
+
+    // [추가] 메뉴: 이미 있는 Title 씬에 화면 오브젝트(배경·로고·버튼)를 다시 만들어 저장
+    [MenuItem("Tools/UI/시작 화면 다시 만들기 (씬에 오브젝트로)", priority = 1)]
+    public static void RebuildTitle()
+    {
+        if (!File.Exists(ScenePath)) { Run(); return; }
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
+        TitleScreen ts = Object.FindFirstObjectByType<TitleScreen>();
+        if (ts == null) ts = new GameObject("TitleScreen").AddComponent<TitleScreen>();
+        Undo.RegisterFullObjectHierarchyUndo(ts.gameObject, "시작 화면 다시 만들기");
+        ts.BuildUI();
+        MenuUI.EnsureEventSystem();
+        EditorUtility.SetDirty(ts);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Selection.activeGameObject = ts.gameObject;
+        Debug.Log("[GameMenuSetup] 시작 화면 오브젝트 다시 만듦 -> TitleScreen의 [그림] 칸에 배경·로고를 넣으세요");
+        EditorUtility.DisplayDialog("시작 화면", "Title 씬에 화면 오브젝트를 만들었습니다.\n\nHierarchy: TitleScreen > TitleCanvas > Background / Logo / Menu ...\n배경 그림은 TitleScreen 컴포넌트의 [그림] 칸에 끌어다 놓으세요.", "확인");
     }
 
     private static void EnsureBuildOrder(List<string> log)

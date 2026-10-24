@@ -14,6 +14,8 @@ public class MenuTheme : ScriptableObject
     public Sprite titleBackground;
     [Tooltip("게임 로고 그림 (비우면 아래 제목 글자를 씀)")]
     public Sprite logo;
+    [Tooltip("[추가] 시작 화면에서 설정 창을 열 때 뒤에 깔리는 배경 (비우면 시작 화면이 어둡게 비침)")]
+    public Sprite settingsBackground;
     public string gameTitle = "PHARAOH CUBE";
     public string gameSubtitle = "파라오의 큐브";
     [Tooltip("새 게임을 누르면 가는 첫 씬 (Build Profiles의 Scene List에 있어야 함)")]

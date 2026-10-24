@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 // [추가] 메뉴: Tools/Bastet/카메라 방 영역 만들기
-// 방 가이드(BastetRoomArea)마다 자식 "CameraZone"(CameraRoomZone + 트리거)을 만듦
+// 퍼즐 방(B1~B5) 가이드마다 자식 "CameraZone" (가운데 홀은 기본 카메라)(CameraRoomZone + 트리거)을 만듦
 // -> 방에 들어가면 카메라가 방 밖(파란 빈 화면)을 보여 주지 않고, 큰 방(B5 16x7)은 방 전체가 보이게 줌 아웃
 // + Main Camera의 CameraFollow2D 맵 경계(Bounds Tilemap)가 비어 있으면 Ground 타일맵을 넣음 (통로에서도 맵 밖 안 보임)
 public static class BastetCameraZones
@@ -26,6 +26,13 @@ public static class BastetCameraZones
         int count = 0;
         foreach (BastetRoomArea area in Object.FindObjectsByType<BastetRoomArea>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
+            // [수정] 가운데 홀은 넓어서 전체를 보여 주면 너무 작아짐 -> 기본 카메라 (영역 없음)
+            if (area.name == "Hall_Center")
+            {
+                Transform old = area.transform.Find("CameraZone");
+                if (old != null) { Undo.DestroyObjectImmediate(old.gameObject); log.AppendLine("- Hall_Center: 카메라 영역 지움 (기본 카메라)"); }
+                continue;
+            }
             Transform t = area.transform.Find("CameraZone");
             if (t == null)
             {

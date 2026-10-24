@@ -44,7 +44,9 @@ public class RaTorchGaugeUI : MonoBehaviour
         if (group == null) return;
         if (torch == null) torch = FindFirstObjectByType<PlayerTorchTemp>();
 
-        bool show = torch != null && !RaHudDirector.Busy;
+        // [수정] 횃불을 얻은 뒤에만 보임 (꺼져서 재가 돼도 횃불 아이템이 있으면 "꺼짐"으로 계속 보임)
+        bool owned = torch != null && (torch.HasTorch || (ItemInventory.Instance != null && ItemInventory.Instance.Has("ITEM_TORCH")));
+        bool show = owned && !RaHudDirector.Busy;
         group.alpha = Mathf.MoveTowards(group.alpha, show ? 1f : 0f, Time.unscaledDeltaTime * 6f);
         if (torch == null) return;
 

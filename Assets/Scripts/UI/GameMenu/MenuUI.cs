@@ -16,7 +16,7 @@ public static class MenuUI
     {
         EnsureEventSystem();
         var go = new GameObject(name, typeof(RectTransform));
-        if (dontDestroy) UnityEngine.Object.DontDestroyOnLoad(go);
+        if (dontDestroy && Application.isPlaying) UnityEngine.Object.DontDestroyOnLoad(go);
         var canvas = go.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = sortingOrder;
@@ -35,7 +35,7 @@ public static class MenuUI
         if (EventSystem.current != null) return;
         if (UnityEngine.Object.FindAnyObjectByType<EventSystem>() != null) return;
         var es = new GameObject("EventSystem", typeof(EventSystem), typeof(InputSystemUIInputModule));
-        UnityEngine.Object.DontDestroyOnLoad(es);
+        if (Application.isPlaying) UnityEngine.Object.DontDestroyOnLoad(es); // [수정] 에디터에서 만들 때는 씬에 저장
     }
 
     public static RectTransform Rect(string name, Transform parent)
