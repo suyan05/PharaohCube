@@ -21,7 +21,7 @@ MonoBehaviour:
       \uC904\uB85C \uB0B4\uB824\uAC08\uC218\uB85D \uBC1C\uD1B1\uC774 \uD558\uB098\uC529
       \uAE4A\uC5B4\uC9C0\uACE0, \uAC00\uC7A5 \uAE4A\uC740 \uB2E4\uC74C\uC740 \uB2E4\uC2DC
       \uD558\uB098\uB85C \uB3CC\uC544\uAC04\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: -9169728448032374516, guid: 778be06f6d477004398ea2429b603852, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: 

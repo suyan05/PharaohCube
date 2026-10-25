@@ -20,7 +20,7 @@ MonoBehaviour:
       \uC624\uBA74 \uC218\uD638\uC790\uB294 \uC9C0\uB098\uC628 \uAE38\uC744 \uAC70\uC2AC\uB7EC
       \uB3CC\uC544\uAC04\uB2E4.\n\uB9C8\uC9C0\uB9C9\uC5D0 \uBE5B\uB09C \uB208\uBD80\uD130,
       \uAC70\uAFB8\uB85C."
-    illustration: {fileID: 0}
+    illustration: {fileID: -4820769383706407784, guid: a310745ea8aaff74db51f26606736388, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: 

@@ -57,7 +57,15 @@ public static class AchievementData
 
     private static void AddOtherRooms(List<AchievementDef> l)
     {
-        l.Add(Any("ACH_BAS_CLEAR", "바스테트", "고양이 여신의 축복", "청동 고양이상", AchGrade.Bronze, "금 귀걸이를 한 청동 고양이. 바스테트에게 바친 제물이다.", "고양이 여신의 방"));
+        // [추가] 바스테트 (플래그: BastetItemIds - F_BASTET_B1~B4_CLEAR, F_BASTET_MAIN_DONE)
+        l.Add(Any("ACH_BAS_B1", "바스테트", "고양이의 발걸음", "고양이 발자국 부조", AchGrade.Papyrus, "모래 위에 찍힌 작은 발자국. 고양이는 지나온 길을 잊지 않는다고 믿었다.", "발자국의 방", "F_BASTET_B1_CLEAR"));
+        l.Add(Any("ACH_BAS_B2", "바스테트", "거꾸로 읽는 눈", "호박 고양이 눈 부적", AchGrade.Papyrus, "어둠에서도 빛나는 고양이의 눈. 밤을 지키는 눈으로 여겨 부적으로 지녔다.", "눈의 방", "F_BASTET_B2_CLEAR"));
+        l.Add(Any("ACH_BAS_B3", "바스테트", "거울 같은 목걸이", "청금석 우세크 목걸이", AchGrade.Papyrus, "가슴을 덮는 넓은 목걸이. 왼쪽과 오른쪽이 꼭 같아야 아름답다고 여겼다.", "목걸이의 방", "F_BASTET_B3_CLEAR"));
+        l.Add(Any("ACH_BAS_B4", "바스테트", "발톱의 문양", "발톱 긁힘 석판", AchGrade.Papyrus, "규칙대로 새긴 발톱 무늬. 반복되는 무늬는 영원을 뜻했다.", "발톱의 방", "F_BASTET_B4_CLEAR"));
+        l.Add(Any("ACH_BAS_CLEAR", "바스테트", "고양이 여신의 축복", "청동 고양이상", AchGrade.Bronze, "금 귀걸이를 한 청동 고양이. 바스테트에게 바친 제물이다.", "해와 달의 기억을 풀자", "F_BASTET_MAIN_DONE"));
+        AchievementDef vessel = Any("ACH_BAS_VESSEL", "바스테트", "향과 기름의 그릇", "설화석고 향유 그릇", AchGrade.Bronze, "바스테트는 향과 기름 그릇을 지키는 여신. 이 그릇에 담긴 불은 오래 탄다.", "???");
+        vessel.allItems = new[] { "ITEM_BASTET_VESSEL" };
+        l.Add(vessel);
         l.Add(Any("ACH_THO_1", "토트", "서기관의 손", "서기관 팔레트", AchGrade.Papyrus, "갈대 펜과 먹 두 개(검정, 빨강)를 담는 나무 팔레트. 글을 아는 자는 귀한 대접을 받았다.", "지식의 방 첫 관문"));
         l.Add(Any("ACH_THO_2", "토트", "달의 셈", "따오기 상", AchGrade.Papyrus, "달을 세는 신 토트의 새. 따오기의 부리는 초승달을 닮았다.", "지식의 방 두 번째 관문"));
         l.Add(Any("ACH_THO_CLEAR", "토트", "신성문자 해독가", "로제타석", AchGrade.Bronze, "세 가지 글자로 같은 내용을 새긴 돌. 이 돌 덕분에 상형문자를 다시 읽게 됐다.", "지식의 방을 끝내자"));

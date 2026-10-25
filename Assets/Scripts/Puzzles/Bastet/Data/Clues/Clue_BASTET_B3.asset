@@ -20,7 +20,7 @@ MonoBehaviour:
       3\u21947, 4\u21948. \uC704\uC544\uB798\uB294 \uADF8\uB300\uB85C, \uC67C\uCABD
       \uC624\uB978\uCABD\uC740 \uBC18\uB300\uB85C.\n\uC870\uAC01 \uD558\uB098\uB97C
       \uB3CC\uB9AC\uBA74 \uC774\uC6C3\uD55C \uC870\uAC01\uB3C4 \uD568\uAED8 \uB3C8\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: 6566848910463550763, guid: 6cbde364ec1a8a9448b068740f58fb4f, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: 

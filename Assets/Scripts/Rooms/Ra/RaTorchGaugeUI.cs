@@ -66,7 +66,11 @@ public class RaTorchGaugeUI : MonoBehaviour
         bool paused = RaTorchTimer.InBrightPlace && torch.IsLit && !torch.HasEmber;
         barFrame.color = paused ? gold : new Color(0.1f, 0.07f, 0.04f, 0.85f);
         flame.color = torch.IsLit ? Color.Lerp(fillColor, Color.white, 0.2f * Mathf.PerlinNoise(Time.time * 4f, 1f)) : new Color(0.3f, 0.3f, 0.3f);
-        stateText.text = !torch.IsLit ? "꺼짐 - 불을 찾자" : (torch.HasEmber ? "꺼지지 않음" : (paused ? "밝은 곳 - 멈춤" : ""));
+        // [수정] 어두운 곳에서 타는 중일 때도 남은 시간을 글로 표시 (바스테트·라 공용)
+        stateText.text = !torch.IsLit ? (torch.HasEmber ? "꺼짐 - E 길게: 불씨로 붙이기" : "꺼짐 - 불을 찾자")
+            : torch.HasEmber ? "꺼지지 않음"
+            : paused ? "밝은 곳 - 멈춤"
+            : $"타는 중 - {Mathf.CeilToInt(torch.BurnSecondsLeft)}초";
     }
 
     private void RefreshEmber()

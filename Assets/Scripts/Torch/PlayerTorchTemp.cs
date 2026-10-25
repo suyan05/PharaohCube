@@ -65,6 +65,7 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     public bool IsLit => lit;
     public bool HasEmber => HasItem(emberItemId);
     public bool HasVessel => HasItem(vesselItemId);
+    public float BurnSecondsLeft => BurnInfinite ? -1f : Mathf.Max(0f, burnLeft); // [추가] 남은 초 (꺼지지 않으면 -1)
     public float BurnRatio => BurnInfinite ? 1f : Mathf.Clamp01(burnLeft / Mathf.Max(1f, BurnTotal));
 
     private float BurnTotal => burnSeconds * (HasVessel ? 2f : 1f);

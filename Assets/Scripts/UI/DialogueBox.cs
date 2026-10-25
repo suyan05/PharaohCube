@@ -282,6 +282,17 @@ public class DialogueBox : MonoBehaviour
         int picked = i;
         bg.gameObject.AddComponent<Button>().onClick.AddListener(() => Choose(picked));
 
+        // [추가] 마우스를 올리면 그 선택지로 표시 이동 (키보드 W/S와 같은 표시)
+        var trigger = bg.gameObject.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+        var enter = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter };
+        enter.callback.AddListener(_ =>
+        {
+            if (choices == null || choiceIndex == picked) return;
+            choiceIndex = picked;
+            RefreshChoices();
+        });
+        trigger.triggers.Add(enter);
+
         Text t = UIBuild.Text(bg.rectTransform, "Label", font, 28, Vector2.zero, new Vector2(280f, h - 8f), Hex("#4A3423"));
         t.alignment = TextAnchor.MiddleLeft;
         return t;

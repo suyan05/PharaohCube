@@ -455,6 +455,8 @@ public static class BastetRoomSetup
             col.isTrigger = true; // 비석은 지나갈 수 있게
         }
 
+        if (go.GetComponent<BastetClueStele>() != null) return; // [추가] 이미 바스테트 비석(라의 방 방식)으로 바꿨으면 그대로
+
         var stele = go.GetComponent<AnubisClueStele>();
         if (stele == null) stele = Undo.AddComponent<AnubisClueStele>(go);
         SpriteRenderer bubble = EnsureBubble(go);

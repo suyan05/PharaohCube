@@ -19,7 +19,7 @@ MonoBehaviour:
       \uC54A\uB294\uB2E4.\n\uBE5B\uB098\uB294 \uBC1C\uC790\uAD6D\uC744 \uB05D\uAE4C\uC9C0
       \uC9C0\uCF1C\uBCF8 \uB4A4, \uAC19\uC740 \uC21C\uC11C\uB85C \uBC1F\uC544\uB77C.\n\uAC19\uC740
       \uC790\uB9AC\uB97C \uB450 \uBC88 \uBC1F\uB294 \uAE38\uB3C4 \uC788\uB2E4."
-    illustration: {fileID: 0}
+    illustration: {fileID: 5886099117574381523, guid: 9f828fda62eecaa40b7bfc82ac64d160, type: 3}
     illustrationTint: {r: 1, g: 1, b: 1, a: 1}
   night:
     title: 

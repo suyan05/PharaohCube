@@ -303,6 +303,8 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
     {
         yield return null; // 팝업이 뜨는 프레임 지나고
         while (ItemPopup.IsShowing || DialogueBox.IsOpen) yield return null;
+        yield return null;
+        while (BastetGoddess.Busy || ItemPopup.IsShowing || DialogueBox.IsOpen) yield return null; // [추가] 여신 마무리 대사가 끝날 때까지
         if (autoExitDelay > 0f) yield return new WaitForSecondsRealtime(autoExitDelay);
 
         if (sceneExit == null) sceneExit = FindFirstObjectByType<AnubisSceneExit>();

@@ -2057,7 +2057,7 @@ Transform:
   m_GameObject: {fileID: 110256533}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.76, y: 5.26, z: 0}
+  m_LocalPosition: {x: -2.76, y: 4.96, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4547,6 +4547,7 @@ Transform:
   - {fileID: 1857614106}
   - {fileID: 1204185001}
   - {fileID: 135050069}
+  - {fileID: 993810600}
   m_Father: {fileID: 970529023}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &201976785
@@ -6649,6 +6650,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 64396919}
+  - {fileID: 911857068}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -9550,7 +9552,7 @@ GameObject:
   - component: {fileID: 458335038}
   - component: {fileID: 458335037}
   - component: {fileID: 458335036}
-  - component: {fileID: 458335035}
+  - component: {fileID: 458335039}
   m_Layer: 0
   m_Name: Slate_Bastet_Hall
   m_TagString: Untagged
@@ -9558,30 +9560,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &458335035
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 458335034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: f7cf69b6b9c1f6842b2cd807fc5ab6b9, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: 
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 262313442}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &458335036
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9703,6 +9681,42 @@ Transform:
   - {fileID: 262313443}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &458335039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 458335034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: f7cf69b6b9c1f6842b2cd807fc5ab6b9, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: 
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 1204185002}
+  - {fileID: 135050070}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 10
+  noteText: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uD754\uC801\uC740 \uB137: \uBC1C\uC790\uAD6D,
+    \uB208, \uBAA9\uAC78\uC774, \uBC1C\uD1B1. \uBAA8\uB450 \uBAA8\uC774\uBA74 \uC2E0\uC0C1\uC774
+    \uAE68\uC5B4\uB09C\uB2E4."
+  newBubble: {fileID: 262313442}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &472413676
 GameObject:
   m_ObjectHideFlags: 0
@@ -11921,7 +11935,7 @@ Transform:
   m_GameObject: {fileID: 561852559}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.97, y: 4.58, z: 0}
+  m_LocalPosition: {x: -2.97, y: 3.94, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48962,6 +48976,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2118029647}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &911857067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 911857068}
+  - component: {fileID: 911857069}
+  m_Layer: 0
+  m_Name: Bastet_Dialogue
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &911857068
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911857067}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 333527253}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &911857069
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911857067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7367e1feab9ed42469b55f62943c84e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RaDialogue
+  portraitDefault: {fileID: -5691370484201655750, guid: fb8759c6079e62c4d86896c3b0ab18e9, type: 3}
+  portraitGlow: {fileID: 5356647230405279352, guid: 3a1edb5779ad7db479ccc198bb5022ff, type: 3}
+  portraitNight: {fileID: -9033950872837901750, guid: 7d330b3f0de85354b920630975fdc754, type: 3}
+  dialogBoxSprite: {fileID: 5489906625856531276, guid: 9dc5f1240c9d06d448788798186a8156, type: 3}
+  nextSprite: {fileID: -7032537868347507245, guid: e2fe516137a50bd4793df2113c77eb00, type: 3}
+  speakerName: "\uBC14\uC2A4\uD14C\uD2B8"
+  charsPerSecond: 28
+  backdropColor: {r: 0, g: 0, b: 0, a: 0.35}
+  hideWhileOpen: []
 --- !u!1 &911887319
 GameObject:
   m_ObjectHideFlags: 0
@@ -50181,9 +50252,9 @@ BoxCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.16, y: 0.16}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -50240,8 +50311,8 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.66, g: 0.42, b: 0.36, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 86b14718214c6c54c9766908645ca2d5, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -51001,6 +51072,212 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 983519258}
   m_CullTransparentMesh: 1
+--- !u!1 &993810599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 993810600}
+  - component: {fileID: 993810603}
+  - component: {fileID: 993810602}
+  - component: {fileID: 993810601}
+  m_Layer: 0
+  m_Name: BastetGoddess
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &993810600
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993810599}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.12, y: -2.32, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1265918647}
+  m_Father: {fileID: 201976784}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &993810601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993810599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91bc5c9fc28eab748930152bd8ed253c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetGoddess
+  dialogue: {fileID: 911857069}
+  newBubble: {fileID: 1265918648}
+  bobHeight: 0.08
+  bobSpeed: 3
+  autoIntro: 1
+  autoIntroDelay: 1.2
+  introFlag: F_BASTET_GODDESS_INTRO
+  mainOpenFlag: F_BASTET_B4_CLEAR
+  mainTalkFlag: F_BASTET_GODDESS_MAIN
+  mainDoneFlag: F_BASTET_MAIN_DONE
+  endTalkFlag: F_BASTET_GODDESS_END
+  introLines:
+  - portrait: 0
+    text: "\uC5B4\uB460 \uC18D\uC744 \uAC78\uC5B4\uC628 \uC790\uC5EC. \uB098\uB294
+      \uBC14\uC2A4\uD14C\uD2B8, \uB77C\uC758 \uB208\uC774\uC790 \uBC24\uC744 \uC9C0\uD0A4\uB294
+      \uACE0\uC591\uC774\uB2E4."
+  - portrait: 0
+    text: "\uC774 \uC2E0\uC804\uC758 \uBD88\uC740 \uC2A4\uC2A4\uB85C \uCF1C\uC9C0\uC9C0
+      \uC54A\uB294\uB2E4. \uB124 \uC190\uC758 \uBD88\uB85C \uBCBD\uC758 \uD683\uBD88\uC744
+      \uAE68\uC6CC\uB77C."
+  - portrait: 1
+    text: "\uB124 \uAC1C\uC758 \uBC29\uC5D0 \uB098\uC758 \uD754\uC801\uC774 \uC7A0\uB4E4\uC5B4
+      \uC788\uB2E4. \uBC1C\uC790\uAD6D, \uB208, \uBAA9\uAC78\uC774, \uBC1C\uD1B1.
+      \uBAA8\uB450 \uCC3E\uC544\uC624\uB108\uB77C."
+  mainLines:
+  - portrait: 1
+    text: "\uB124 \uAC1C\uC758 \uD754\uC801\uC774 \uBAA8\uB450 \uB3CC\uC544\uC654\uAD6C\uB098."
+  - portrait: 0
+    text: "\uBD81\uCABD \uC2E0\uC0C1\uC758 \uBC29\uC73C\uB85C \uAC00\uB77C. \uB0AE\uC5D0\uB294
+      \uD574\uB97C \uB530\uB77C \uAC77\uACE0, \uBC24\uC5D0\uB294 \uC9C0\uB098\uC628
+      \uAE38\uC744 \uAC70\uC2AC\uB7EC \uB3CC\uC544\uC624\uB108\uB77C."
+  - portrait: 2
+    text: "\uBC24\uC774 \uC624\uBA74 \uB098\uC758 \uB208\uC740 \uB2EC\uBE5B\uC774
+      \uB41C\uB2E4. \uB9C8\uC9C0\uB9C9\uC5D0 \uBE5B\uB09C \uB208\uC744 \uC78A\uC9C0
+      \uB9C8\uB77C."
+  endLines:
+  - portrait: 1
+    text: "\uD574\uC640 \uB2EC\uC744 \uBAA8\uB450 \uAE30\uC5B5\uD558\uB294\uAD6C\uB098.
+      \uB108\uB294 \uB098\uC758 \uC2DC\uD5D8\uC744 \uD1B5\uACFC\uD588\uB2E4."
+  - portrait: 0
+    text: "\uADF8 \uD615\uD310\uC744 \uAC00\uC838\uAC00\uB77C. \uD050\uBE0C\uC758
+      \uD55C \uBA74\uC774 \uB420 \uAC83\uC774\uB2E4."
+  - portrait: 0
+    text: "\uB2E4\uC74C\uC740 \uC2EC\uD310\uC758 \uC2E0\uC804. \uC544\uB204\uBE44\uC2A4\uAC00
+      \uB124 \uB9C8\uC74C\uC758 \uBB34\uAC8C\uB97C \uB2EC\uC544 \uBCFC \uAC83\uC774\uB2E4."
+  progressHints:
+  - "\uC11C\uCABD \uC544\uB798, \uBC1C\uC790\uAD6D\uC758 \uBC29\uBD80\uD130 \uAC00\uAC70\uB77C.
+    \uACE0\uC591\uC774\uB294 \uC9C0\uB098\uC628 \uAE38\uC744 \uC78A\uC9C0 \uC54A\uB294\uB2E4."
+  - "\uBC1C\uC790\uAD6D \uC778\uC7A5\uC744 \uC11C\uCABD \uC704 \uB208\uC758 \uBC29
+    \uBD09\uC778\uC11D\uC5D0 \uB123\uC5B4\uB77C."
+  - "\uD638\uBC15 \uB208\uC744 \uB3D9\uCABD \uC704 \uBAA9\uAC78\uC774\uC758 \uBC29
+    \uBD09\uC778\uC11D\uC5D0 \uB123\uC5B4\uB77C."
+  - "\uBAA9\uAC78\uC774 \uAD6C\uC2AC\uC744 \uB3D9\uCABD \uC544\uB798 \uBC1C\uD1B1\uC758
+    \uBC29 \uBD09\uC778\uC11D\uC5D0 \uB123\uC5B4\uB77C."
+--- !u!61 &993810602
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993810599}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.96, y: 1.49}
+    newSize: {x: 2, y: 3}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 0.96, y: 1.49}
+  m_EdgeRadius: 0
+--- !u!212 &993810603
+SpriteRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 993810599}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 814092257
+  m_SortingLayer: 3
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: -4321299477807043688, guid: b114a083606d5f94591f156d0a770161, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 2, y: 3}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
 --- !u!1 &995273760
 GameObject:
   m_ObjectHideFlags: 0
@@ -56446,7 +56723,7 @@ Transform:
   m_GameObject: {fileID: 1204185000}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.2, y: 1.36, z: 0}
+  m_LocalPosition: {x: -7.97, y: 1.36, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -57096,6 +57373,97 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1261412685}
   m_CullTransparentMesh: 1
+--- !u!1 &1265918646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1265918647}
+  - component: {fileID: 1265918648}
+  m_Layer: 0
+  m_Name: NewBubble
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1265918647
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265918646}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.19, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 993810600}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &1265918648
+SpriteRenderer:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265918646}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 814092257
+  m_SortingLayer: 3
+  m_SortingOrder: 2
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: 2052814808417162879, guid: 301fcf8849d79ff4e80f6e643bcd8242, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 0.62, y: 0.64}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
 --- !u!1 &1266359694
 GameObject:
   m_ObjectHideFlags: 0
@@ -57191,7 +57559,7 @@ GameObject:
   - component: {fileID: 1280659581}
   - component: {fileID: 1280659580}
   - component: {fileID: 1280659579}
-  - component: {fileID: 1280659578}
+  - component: {fileID: 1280659582}
   m_Layer: 0
   m_Name: Stele_B1
   m_TagString: Untagged
@@ -57199,30 +57567,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1280659578
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1280659577}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: 18326d828f64f3f4894cdc7b1eb659d5, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: 
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 300928134}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &1280659579
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -57344,6 +57688,41 @@ Transform:
   - {fileID: 300928135}
   m_Father: {fileID: 117142564}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1280659582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1280659577}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: 18326d828f64f3f4894cdc7b1eb659d5, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: 
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 561852561}
+  - {fileID: 1773180726}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 11
+  noteText: "\uC11D\uC0C1\uC774 \uC55E\uBC1C\uC744 \uB0B4\uB9AC\uCE58\uBA74 \uBC1C\uC790\uAD6D\uC774
+    \uBE5B\uB09C\uB2E4. \uBE5B\uB09C \uC21C\uC11C \uADF8\uB300\uB85C \uBC1F\uB294\uB2E4."
+  newBubble: {fileID: 300928134}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &1293602895
 GameObject:
   m_ObjectHideFlags: 0
@@ -63106,7 +63485,7 @@ GameObject:
   - component: {fileID: 1579969422}
   - component: {fileID: 1579969421}
   - component: {fileID: 1579969420}
-  - component: {fileID: 1579969419}
+  - component: {fileID: 1579969423}
   m_Layer: 0
   m_Name: Stele_B4
   m_TagString: Untagged
@@ -63114,30 +63493,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1579969419
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1579969418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: cf885a758bae0df4b9d2899eb5aebf26, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: F_BASTET_B3_CLEAR
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 1186061930}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &1579969420
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -63259,6 +63614,42 @@ Transform:
   - {fileID: 1186061931}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1579969423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579969418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: cf885a758bae0df4b9d2899eb5aebf26, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: F_BASTET_B3_CLEAR
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 1480452734}
+  - {fileID: 663035265}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 14
+  noteText: "\uBC1C\uD1B1 \uBB34\uB2AC: \uD55C \uC904\uC740 \uC88C\uC6B0 \uB300\uCE6D,
+    \uC544\uB798\uB85C \uAC08\uC218\uB85D \uD558\uB098\uC529 \uAE4A\uC5B4\uC9C0\uACE0
+    \uC14B \uB2E4\uC74C\uC740 \uD558\uB098."
+  newBubble: {fileID: 1186061930}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &1581619086
 GameObject:
   m_ObjectHideFlags: 0
@@ -68351,7 +68742,7 @@ Transform:
   m_GameObject: {fileID: 1773180724}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.2, y: 4.65, z: 0}
+  m_LocalPosition: {x: 2.2, y: 3.94, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -71392,7 +71783,7 @@ GameObject:
   - component: {fileID: 1922908945}
   - component: {fileID: 1922908944}
   - component: {fileID: 1922908943}
-  - component: {fileID: 1922908942}
+  - component: {fileID: 1922908946}
   m_Layer: 0
   m_Name: Stele_B5
   m_TagString: Untagged
@@ -71400,30 +71791,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1922908942
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1922908941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: 428681824e23eba488c7675afa419cbd, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: F_BASTET_B4_CLEAR
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 1727693584}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &1922908943
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -71545,6 +71912,42 @@ Transform:
   - {fileID: 1727693585}
   m_Father: {fileID: 337359624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1922908946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1922908941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: 428681824e23eba488c7675afa419cbd, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: F_BASTET_B4_CLEAR
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 1635682707}
+  - {fileID: 851822435}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 15
+  noteText: "\uB0AE\uC5D0\uB294 \uB298\uC5B4\uB098\uB294 \uBC1C\uC790\uAD6D\uC744
+    \uB530\uB77C \uAC77\uACE0, \uBC24\uC5D0\uB294 \uB9C8\uC9C0\uB9C9\uC5D0 \uBE5B\uB09C
+    \uB208\uBD80\uD130 \uAC70\uAFB8\uB85C."
+  newBubble: {fileID: 1727693584}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &1924995865
 GameObject:
   m_ObjectHideFlags: 0
@@ -72062,9 +72465,9 @@ BoxCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.16, y: 0.16}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -72121,8 +72524,8 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.66, g: 0.42, b: 0.36, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 86b14718214c6c54c9766908645ca2d5, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -72216,7 +72619,7 @@ GameObject:
   - component: {fileID: 1952571215}
   - component: {fileID: 1952571214}
   - component: {fileID: 1952571213}
-  - component: {fileID: 1952571212}
+  - component: {fileID: 1952571216}
   m_Layer: 0
   m_Name: Stele_B3
   m_TagString: Untagged
@@ -72224,30 +72627,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1952571212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1952571211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: 33dd6af123a1e084582f38f01b43f1c4, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: F_BASTET_B2_CLEAR
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 1140052613}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &1952571213
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -72369,6 +72748,42 @@ Transform:
   - {fileID: 1140052614}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1952571216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1952571211}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: 33dd6af123a1e084582f38f01b43f1c4, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: F_BASTET_B2_CLEAR
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 2042552112}
+  - {fileID: 1432656097}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 13
+  noteText: "\uBAA9\uAC78\uC774\uB294 \uAC00\uC6B4\uB370 \uC120\uC774 \uAC70\uC6B8.
+    1\u21945, 2\u21946, 3\u21947, 4\u21948\uC774 \uC88C\uC6B0\uB85C \uB9C8\uC8FC
+    \uBCF4\uAC8C."
+  newBubble: {fileID: 1140052613}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &1954821646
 GameObject:
   m_ObjectHideFlags: 0
@@ -72821,7 +73236,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 0.82, b: 0.48, a: 1}
-  m_Intensity: 0.04
+  m_Intensity: 0.005
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000a737bcb20d981e4de10f8630f7a11d08
@@ -74091,9 +74506,9 @@ BoxCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0.049999997, y: 0.049999997, z: 0.049999997, w: 0.049999997}
+    border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.16, y: 0.16}
+    oldSize: {x: 1, y: 1}
     newSize: {x: 0.16, y: 0.16}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -74150,8 +74565,8 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-  m_Color: {r: 0.66, g: 0.42, b: 0.36, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 86b14718214c6c54c9766908645ca2d5, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -75937,7 +76352,7 @@ GameObject:
   - component: {fileID: 2118029647}
   - component: {fileID: 2118029646}
   - component: {fileID: 2118029645}
-  - component: {fileID: 2118029644}
+  - component: {fileID: 2118029648}
   m_Layer: 0
   m_Name: Stele_B2
   m_TagString: Untagged
@@ -75945,30 +76360,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2118029644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2118029643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c1a20eb71fbf5140b6afb355e9f118b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AnubisClueStele
-  data: {fileID: 11400000, guid: 9861705b3e29e9e418f7edb3d2d1bc19, type: 2}
-  panel: {fileID: 64396918}
-  unlockItemId: 
-  unlockFlag: F_BASTET_B1_CLEAR
-  blockReadWhileLocked: 1
-  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
-    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
-  newBubble: {fileID: 909400692}
-  bobHeight: 0.08
-  bobSpeed: 3
-  popTime: 0.2
-  readFlag: 
 --- !u!61 &2118029645
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -76090,6 +76481,42 @@ Transform:
   - {fileID: 909400693}
   m_Father: {fileID: 1101555234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2118029648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118029643}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c0889ba6ec6a474e9121ddf8244eec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetClueStele
+  data: {fileID: 11400000, guid: 9861705b3e29e9e418f7edb3d2d1bc19, type: 2}
+  panel: {fileID: 64396918}
+  unlockFlag: F_BASTET_B1_CLEAR
+  lockedMessage: "\uAE00\uC790\uAC00 \uC544\uC9C1 \uD750\uB9BF\uD558\uB2E4. \uC55E\uC758
+    \uC2DC\uD5D8\uC744 \uBA3C\uC800 \uD1B5\uACFC\uD558\uC790."
+  needLight: 1
+  roomTorches:
+  - {fileID: 110256535}
+  - {fileID: 2061166324}
+  lightRadius: 6.5
+  darkLines:
+  - speaker: "\uB098"
+    text: "\uB108\uBB34 \uC5B4\uB450\uC6CC\uC11C \uAE00\uC528\uAC00 \uBCF4\uC774\uC9C0
+      \uC54A\uB294\uB2E4. \uC774 \uBC29 \uBCBD \uD683\uBD88\uBD80\uD130 \uBC1D\uD788\uC790."
+    portrait: {fileID: 0}
+  lensDecode: 1
+  charsPerLine: 12
+  noteNumber: 12
+  noteText: "\uC791\uC740 \uC11D\uC0C1\uC758 \uB208\uC774 \uBE5B\uB09C \uC21C\uC11C\uB97C
+    \uAE30\uC5B5\uD558\uACE0, \uB9C8\uC9C0\uB9C9\uC5D0 \uBE5B\uB09C \uC11D\uC0C1\uBD80\uD130
+    \uAC70\uAFB8\uB85C."
+  newBubble: {fileID: 909400692}
+  bobHeight: 0.08
+  bobSpeed: 3
 --- !u!1 &2133758912
 GameObject:
   m_ObjectHideFlags: 0
