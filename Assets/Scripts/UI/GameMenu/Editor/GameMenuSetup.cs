@@ -16,6 +16,9 @@ public static class GameMenuSetup
     private const string ThemePath = "Assets/Resources/MenuTheme.asset";
     private const string ScenePath = "Assets/Scenes/Title.unity";
     private const string FontPath = "Assets/Fonts/MonoplexKR/MonoplexKR-Regular SDF.asset";
+    // [추가] 시작 화면 배경 그림 (있으면 가져오기 설정 + TitleScreen 칸에 자동으로 넣음)
+    private const string TitleBgPath = "Assets/image/UI/Title/Title_Background.png";
+    private const string SettingsBgPath = "Assets/image/UI/Title/Title_SettingsBackground.png";
 
     [MenuItem("Tools/UI/★ 시작 화면·설정 창 만들기", priority = 0)]
     public static void Run()
@@ -69,6 +72,7 @@ public static class GameMenuSetup
         camGo.AddComponent<AudioListener>();
 
         TitleScreen ts = new GameObject("TitleScreen").AddComponent<TitleScreen>();
+        AssignBackgrounds(ts);
         ts.BuildUI();               // [추가] 화면 오브젝트를 씬에 저장 (Hierarchy에서 보임)
         MenuUI.EnsureEventSystem();
         EditorSceneManager.SaveScene(scene, ScenePath);
@@ -85,6 +89,7 @@ public static class GameMenuSetup
         TitleScreen ts = Object.FindFirstObjectByType<TitleScreen>();
         if (ts == null) ts = new GameObject("TitleScreen").AddComponent<TitleScreen>();
         Undo.RegisterFullObjectHierarchyUndo(ts.gameObject, "시작 화면 다시 만들기");
+        AssignBackgrounds(ts);
         ts.BuildUI();
         MenuUI.EnsureEventSystem();
         EditorUtility.SetDirty(ts);
@@ -93,6 +98,34 @@ public static class GameMenuSetup
         Selection.activeGameObject = ts.gameObject;
         Debug.Log("[GameMenuSetup] 시작 화면 오브젝트 다시 만듦 -> TitleScreen의 [그림] 칸에 배경·로고를 넣으세요");
         EditorUtility.DisplayDialog("시작 화면", "Title 씬에 화면 오브젝트를 만들었습니다.\n\nHierarchy: TitleScreen > TitleCanvas > Background / Logo / Menu ...\n배경 그림은 TitleScreen 컴포넌트의 [그림] 칸에 끌어다 놓으세요.", "확인");
+    }
+
+    // [추가] 배경 그림: UI용 가져오기 설정(Sprite, Point, 압축 없음) + 비어 있는 칸에만 넣기
+    private static void AssignBackgrounds(TitleScreen ts)
+    {
+        var so = new SerializedObject(ts);
+        Fill(so, "titleBackground", TitleBgPath);
+        Fill(so, "settingsBackground", SettingsBgPath);
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void Fill(SerializedObject so, string prop, string path)
+    {
+        SerializedProperty p = so.FindProperty(prop);
+        if (p == null || p.objectReferenceValue != null || !File.Exists(path)) return;
+        if (AssetImporter.GetAtPath(path) is TextureImporter ti &&
+            (ti.textureType != TextureImporterType.Sprite || ti.filterMode != FilterMode.Point))
+        {
+            ti.textureType = TextureImporterType.Sprite;
+            ti.spriteImportMode = SpriteImportMode.Single;
+            ti.filterMode = FilterMode.Point;
+            ti.textureCompression = TextureImporterCompression.Uncompressed;
+            ti.mipmapEnabled = false;
+            ti.maxTextureSize = 2048;
+            ti.SaveAndReimport();
+        }
+        p.objectReferenceValue = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        Debug.Log($"[GameMenuSetup] {prop} = {path}");
     }
 
     private static void EnsureBuildOrder(List<string> log)

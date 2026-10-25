@@ -145,7 +145,7 @@ public class TitleScreen : MonoBehaviour
 
         // 로고: 그림(Logo Image) + 그림이 없을 때 쓰는 제목 글자
         RectTransform logoArea = MenuUI.Rect("Logo", root);
-        logoArea.anchorMin = logoArea.anchorMax = new Vector2(0.5f, 0.70f);
+        logoArea.anchorMin = logoArea.anchorMax = new Vector2(0.5f, 0.62f); // [수정] 배경 위쪽 큐브 빛과 겹치지 않게 조금 아래
         logoArea.sizeDelta = new Vector2(1200f, 320f);
         logoImage = logoArea.gameObject.AddComponent<Image>();
         logoImage.preserveAspect = true;
@@ -162,8 +162,8 @@ public class TitleScreen : MonoBehaviour
 
         // 버튼 세로 줄 (앵커 가운데 아래 30%: 해상도가 바뀌어도 같은 자리)
         RectTransform menu = MenuUI.Rect("Menu", root);
-        menu.anchorMin = menu.anchorMax = new Vector2(0.5f, 0.30f);
-        menu.sizeDelta = new Vector2(460f, 420f);
+        menu.anchorMin = menu.anchorMax = new Vector2(0.5f, 0.26f); // [수정] 로고가 내려간 만큼 버튼도 아래
+        menu.sizeDelta = new Vector2(460f, 400f);
         MenuUI.Column(menu, 18f, new RectOffset(0, 0, 0, 0), TextAnchor.MiddleCenter);
         menuRoot = menu.gameObject;
         continueButton = MenuUI.Button("Continue", menu, "title.continue", 36f, null);
@@ -173,7 +173,7 @@ public class TitleScreen : MonoBehaviour
         foreach (Button b in new[] { continueButton, newGameButton, settingsButton, quitButton }) MenuUI.Size(b, 0f, 76f);
 
         lastSaveText = MenuUI.Text("LastSave", root, null, 24f, th.disabledText, TextAlignmentOptions.Center, "");
-        lastSaveText.rectTransform.anchorMin = lastSaveText.rectTransform.anchorMax = new Vector2(0.5f, 0.08f);
+        lastSaveText.rectTransform.anchorMin = lastSaveText.rectTransform.anchorMax = new Vector2(0.5f, 0.045f);
         lastSaveText.rectTransform.sizeDelta = new Vector2(800f, 40f);
 
         versionText = MenuUI.Text("Version", root, null, 22f, th.disabledText, TextAlignmentOptions.BottomRight, th.versionText);
