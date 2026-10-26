@@ -28,10 +28,12 @@ public class BastetRoomProgress : MonoBehaviour
 
     // 람다 대신 핸들러를 저장해 두고 OnDestroy에서 정확히 해제
     private Action[] handlers;
+    private bool[] granted; // [추가] 이미 보상을 준 항목 (두 번 주기 방지)
 
     private void Start()
     {
         handlers = new Action[entries.Length];
+        granted = new bool[entries.Length];
         for (int i = 0; i < entries.Length; i++)
         {
             Entry e = entries[i];
@@ -40,7 +42,8 @@ public class BastetRoomProgress : MonoBehaviour
                 Debug.LogWarning($"[BastetRoomProgress] {i + 1}번 항목의 퍼즐이 비어 있음", this);
                 continue;
             }
-            handlers[i] = () => HandleSolved(e);
+            int idx = i;
+            handlers[i] = () => Give(idx);
             e.puzzle.OnSuccess += handlers[i];
         }
     }
@@ -51,6 +54,28 @@ public class BastetRoomProgress : MonoBehaviour
         for (int i = 0; i < entries.Length; i++)
             if (handlers[i] != null && entries[i] != null && entries[i].puzzle != null)
                 entries[i].puzzle.OnSuccess -= handlers[i];
+    }
+
+    // [추가] 퍼즐이 풀렸는데 보상을 못 받은 경우 다시 확인 (이 오브젝트가 늦게 켜졌거나 이벤트를 놓쳤을 때)
+    private void Update()
+    {
+        if (granted == null) return;
+        for (int i = 0; i < entries.Length; i++)
+        {
+            if (granted[i] || entries[i] == null || entries[i].puzzle == null || !entries[i].puzzle.IsCleared) continue;
+            Debug.LogWarning($"[BastetRoomProgress] {entries[i].puzzle.name}는 풀렸는데 보상을 안 줌 -> 지금 지급", this);
+            Give(i);
+        }
+    }
+
+    private void Give(int i)
+    {
+        if (granted != null && i < granted.Length)
+        {
+            if (granted[i]) return;
+            granted[i] = true;
+        }
+        HandleSolved(entries[i]);
     }
 
     private void HandleSolved(Entry e)

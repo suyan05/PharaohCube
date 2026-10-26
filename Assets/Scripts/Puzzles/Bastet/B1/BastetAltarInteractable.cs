@@ -61,6 +61,23 @@ public class BastetAltarInteractable : MonoBehaviour, IInteractable
         }
 
         SetOpen(true);
+
+        // [추가] 팝업이 실제로 보이는지 확인 (부모 Canvas가 꺼져 있으면 열리자마자 닫힘)
+        if (puzzleUIPanel == null)
+            Debug.LogWarning($"[BastetAltar] {name}: Puzzle UI Panel이 비어 있음", this);
+        else if (!puzzleUIPanel.activeInHierarchy)
+            Debug.LogWarning($"[BastetAltar] {name}: {puzzleUIPanel.name}의 부모({OffParent(puzzleUIPanel.transform)})가 꺼져 있어 팝업이 안 보임", this);
+        else
+            Debug.Log($"[BastetAltar] {name}: {puzzleUIPanel.name} 열림", this);
+    }
+
+    // [추가] 꺼져 있는 가장 위 부모 이름 찾기
+    private static string OffParent(Transform t)
+    {
+        string off = "?";
+        for (Transform p = t.parent; p != null; p = p.parent)
+            if (!p.gameObject.activeSelf) off = p.name;
+        return off;
     }
 
     // [추가] 팝업이 닫혔는지는 이벤트가 없어서 열려 있는 동안만 bool 하나 확인 (할당 없음)
