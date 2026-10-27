@@ -22,7 +22,15 @@ public class SteleDecodeUI : MonoBehaviour
     [SerializeField, Range(0.2f, 0.6f)] private float revealRadius = 0.45f; // 렌즈 크기 대비
     [SerializeField] private int sortingOrder = 120;
 
+    // 아트(Common_UI_Stele_Panel 760x820) 기준 글자 자리: 안쪽 액자 (115, 250) ~ (655, 720) -> 가운데에서 (5, -75), 크기 520x440
+    private static readonly Vector2 ArtSize = new Vector2(724f, 783f);        // 투명 여백을 잘라낸 스프라이트 크기
+    private static readonly Vector2 ArtOffset = new Vector2(4f, -11.5f);      // 잘라낸 만큼 원래 760x820 자리에 맞추기
+    private static readonly Vector2 ArtTextOffset = new Vector2(5f, -75f);
+    private static readonly Vector2 ArtTextBox = new Vector2(520f, 440f);
+    private static readonly Vector2 ShapeTextBox = new Vector2(640f, 560f);
+
     private readonly List<SteleCell> cells = new List<SteleCell>();
+    private Vector2 textBox = new Vector2(640f, 560f);
     private GameObject canvasGo;
     private RectTransform root, panel, textArea, lens;
     private Text titleText, noteText, hintText;
@@ -162,27 +170,39 @@ public class SteleDecodeUI : MonoBehaviour
         foreach (Transform child in textArea) Destroy(child.gameObject);
         cells.Clear();
 
-        float top = (lines.Length - 1) * RowHeight * 0.5f;
+        // [수정] 글자 자리(textBox) 안에 다 들어가게 줄이 많거나 길면 칸을 줄임
+        Vector2 cell = CellSize(lines);
+        float top = (lines.Length - 1) * cell.y * 0.5f;
         for (int row = 0; row < lines.Length; row++)
         {
             string line = lines[row] ?? "";
-            float left = -(line.Length - 1) * CellWidth * 0.5f;
+            float left = -(line.Length - 1) * cell.x * 0.5f;
             for (int i = 0; i < line.Length; i++)
             {
                 if (char.IsWhiteSpace(line[i])) continue;
-                Vector2 pos = new Vector2(left + i * CellWidth, top - row * RowHeight);
-                cells.Add(CreateCell(line[i], pos, row * 100 + i));
+                Vector2 pos = new Vector2(left + i * cell.x, top - row * cell.y);
+                cells.Add(CreateCell(line[i], pos, row * 100 + i, cell));
             }
         }
     }
 
-    private SteleCell CreateCell(char c, Vector2 pos, int seed)
+    private Vector2 CellSize(string[] lines)
     {
-        RectTransform rt = UIBuild.Rect(textArea, $"Cell_{seed}", pos, new Vector2(CellWidth, RowHeight));
-        Image glyph = UIBuild.Image(rt, "Glyph", Vector2.zero, new Vector2(40f, 40f), GlyphFactory.Get(seed + c), Color.white);
+        int longest = 1;
+        foreach (string l in lines) if (l != null) longest = Mathf.Max(longest, l.Length);
+        float w = Mathf.Min(CellWidth, textBox.x / longest);
+        float h = Mathf.Min(RowHeight, textBox.y / Mathf.Max(1, lines.Length));
+        return new Vector2(w, h);
+    }
+
+    private SteleCell CreateCell(char c, Vector2 pos, int seed, Vector2 cell)
+    {
+        float k = Mathf.Min(cell.x / CellWidth, cell.y / RowHeight); // 칸이 줄어든 만큼 글자, 상형문자도
+        RectTransform rt = UIBuild.Rect(textArea, $"Cell_{seed}", pos, cell);
+        Image glyph = UIBuild.Image(rt, "Glyph", Vector2.zero, new Vector2(40f, 40f) * k, GlyphFactory.Get(seed + c), Color.white);
         glyph.color = Hex("#4A3A28");
 
-        Text letter = UIBuild.Text(rt, "Letter", font, 38, Vector2.zero, new Vector2(CellWidth, RowHeight), Hex("#6B3E10"));
+        Text letter = UIBuild.Text(rt, "Letter", font, Mathf.RoundToInt(38 * k), Vector2.zero, cell, Hex("#6B3E10"));
         letter.fontStyle = FontStyle.Bold;
         letter.text = c.ToString();
         return new SteleCell(rt, glyph, letter);
@@ -210,6 +230,14 @@ public class SteleDecodeUI : MonoBehaviour
     private void BuildPanel()
     {
         Vector2 center = new Vector2(0f, -20f);
+        Sprite art = PuzzleUITheme.GetStelePanel();
+        if (art != null)
+        {
+            BuildArtPanel(center, art);
+            return;
+        }
+
+        textBox = ShapeTextBox;
         Image top = UIBuild.Image(root, "Top", center + new Vector2(0f, PanelSize.y * 0.5f - 40f), new Vector2(PanelSize.x, 300f), UIBuild.Circle(), Color.white);
         top.preserveAspect = false; // 납작한 타원으로 둥근 윗부분
         top.color = Hex("#A89C86");
@@ -222,6 +250,16 @@ public class SteleDecodeUI : MonoBehaviour
         UIBuild.Image(root, "Sun", sun, new Vector2(60f, 60f), UIBuild.Circle(), Color.white).color = Hex("#E8B23A");
 
         textArea = UIBuild.Rect(root, "TextArea", center - new Vector2(0f, 50f), PanelSize);
+    }
+
+    // [추가] 아트 비석 판 (Common_UI_Stele_Panel). 태양 원반, 날개는 그림에 이미 있어서 안 그림
+    private void BuildArtPanel(Vector2 center, Sprite art)
+    {
+        Image img = UIBuild.Image(root, "PanelArt", center + ArtOffset, ArtSize, art, Color.white);
+        img.preserveAspect = true;
+        panel = img.rectTransform;
+        textBox = ArtTextBox;
+        textArea = UIBuild.Rect(root, "TextArea", center + ArtTextOffset, ArtTextBox);
     }
 
     private void BuildTexts()

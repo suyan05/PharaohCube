@@ -17,3 +17,4 @@ MonoBehaviour:
   backdropColor: {r: 0, g: 0, b: 0, a: 0.88}
   buttonSprite: {fileID: 0}
   labelPlateSprite: {fileID: 0}
+  stelePanelSprite: {fileID: 4526453353522576776, guid: a116fc4c4f927be4fae144084a4c065d, type: 3}

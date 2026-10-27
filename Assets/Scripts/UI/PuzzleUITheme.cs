@@ -19,6 +19,9 @@ public class PuzzleUITheme : ScriptableObject
     [SerializeField] private Sprite buttonSprite;
     [SerializeField] private Sprite labelPlateSprite;
 
+    [Header("[추가] 비석 해독 화면 판 (Common_UI_Stele_Panel, 비우면 도형으로 그림)")]
+    [SerializeField] private Sprite stelePanelSprite;
+
     public Font BodyFont => bodyFont;
     public Font TitleFont => titleFont;
     public Color BackdropColor => backdropColor;
@@ -50,6 +53,13 @@ public class PuzzleUITheme : ScriptableObject
         PuzzleUITheme t = Current;
         if (t != null && t.bodyFont != null) return t.bodyFont;
         return Resources.GetBuiltinResource<Font>(BuiltinFontName);
+    }
+
+    // [추가] 비석 해독 화면(SteleDecodeUI)이 씬에 없이 실행 중에 만들어져서, 그림은 이 테마(Resources)에서 받아 감
+    public static Sprite GetStelePanel()
+    {
+        PuzzleUITheme t = Current;
+        return t != null ? t.stelePanelSprite : null;
     }
 
     public static Font GetTitleFont()
