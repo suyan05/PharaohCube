@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 // - 씬이 열릴 때 벽 횃불(WallTorch)이 있는 씬이면 = 라의 방
 // - 아래 컴포넌트가 씬에 하나도 없으면 "RaSystems (자동)" 오브젝트를 만들어 붙임
 //   RaDarkness(어둠), RaHudDirector(글자 정리), RaTorchTimer(횃불 시간), RaTorchGaugeUI(게이지), RaDayToNight(낮 -> 밤 자동)
+//   RaFinale(밤을 다 풀면 라 일러스트 엔딩 -> 중앙 홀)
 // - 메뉴(라의 방 고치기)로 이미 씬에 붙어 있으면 아무것도 안 함
 public static class RaRuntimeBootstrap
 {
@@ -28,6 +29,7 @@ public static class RaRuntimeBootstrap
             Ensure<RaTorchTimer>(ref host);
             Ensure<RaTorchGaugeUI>(ref host);
             Ensure<RaDayToNight>(ref host);
+            Ensure<RaFinale>(ref host);
         }
         catch (Exception e)
         {

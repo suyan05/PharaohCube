@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 378ae58025054fd5a2d86ecb4cbc0528, type: 3}
+  m_Name: RaFinaleArt
+  m_EditorClassIdentifier: Assembly-CSharp::RaFinaleArt
+  raIllustration: {fileID: 0}
+  cubeSprite: {fileID: 5752739366588724016, guid: 27c69db98137ffd42b4a9abbe15e2d20, type: 3}
+  faceSprite: {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
+  plateSprite: {fileID: 1643375200076353098, guid: a3291b1902775674486111a86d92774c, type: 3}
+  faceSlot: {x: 0.506, y: 0.378}
+  faceSlotHeight: 0.238

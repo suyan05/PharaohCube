@@ -10,6 +10,7 @@ PharaohCube 소리 출처 (Assets/Resources/Audio)
 배경음악: bgm_prologue_desert (D 프리지안 도미넌트, 우드 느낌 뜯는 소리 + 프레임 드럼)
           bgm_sphinx_dream (패드 + 종소리, 긴 울림)
           bgm_ra_temple_day / bgm_ra_temple_night (신전 테마 낮 / 밤)
+          bgm_ra_finale (라 엔딩: 히자즈 음계, 큰 북 + 다르부카, 금관 찌르기, 합창, 미즈마르 피리)
 
 더 좋은 소리로 바꾸려면 같은 이름(.wav 또는 .ogg)으로 덮어쓰면 코드 수정 없이 바뀜.
 외부 소리를 넣을 때는 CC0(퍼블릭 도메인) 또는 상업 이용 가능 라이선스인지 꼭 확인하고 이 파일에 출처를 적어주세요.

@@ -28,4 +28,7 @@ public class HallTempLines
     public DialogueLine[] gotTorch = { new DialogueLine(Me, "됐다. 이 불이면 어두운 곳도 갈 수 있겠어.") };
 
     public DialogueLine[] toDoor = { new DialogueLine(Me, "북쪽 문 너머가 첫 번째 신전... 태양의 신, 라.") };
+
+    // 신전을 끝내고 돌아왔을 때 (신전마다 다른 대사는 HallTempDirector의 Routes 칸)
+    public DialogueLine[] returnArrive = { new DialogueLine(Me, "돌아왔다... 큐브가 나를 부르는 것 같아.") };
 }

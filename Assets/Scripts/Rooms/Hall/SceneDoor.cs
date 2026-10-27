@@ -40,6 +40,13 @@ public class SceneDoor : MonoBehaviour, IInteractable
         }
     }
 
+    // 중앙 홀: 신전을 하나 끝낼 때마다 같은 북쪽 문이 다음 신전으로 이어짐 (HallTempDirector가 부름)
+    public void Retarget(string prompt, string scene)
+    {
+        if (!string.IsNullOrEmpty(prompt)) promptText = prompt;
+        if (!string.IsNullOrEmpty(scene)) nextScene = scene;
+    }
+
     private bool HasItem()
     {
         if (string.IsNullOrEmpty(requiredItem)) return true;

@@ -81,8 +81,8 @@ public class RaDayToNight : MonoBehaviour
         yield return Cine.Wait(0.7f);
     }
 
-    // 제단 화면, 대사, 다른 연출이 다 끝나고 플레이어가 움직일 수 있을 때까지
-    private static IEnumerator WaitUntilFree()
+    // 제단 화면, 대사, 다른 연출이 다 끝나고 플레이어가 움직일 수 있을 때까지 (RaFinale도 같이 씀)
+    public static IEnumerator WaitUntilFree()
     {
         PlayerController2D pc = FindFirstObjectByType<PlayerController2D>();
         while (Cine.Running || DialogueBox.IsOpen || ItemPopup.IsShowing || PuzzleOverlayFocus.IsActive || (pc != null && !pc.enabled))

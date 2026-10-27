@@ -7,6 +7,7 @@ using UnityEngine;
 //   (2) 낮 P5 클리어 후     : "!" 표시 -> 시련 통과 대사 -> 끝나면 밤 시작 (F_RA_NIGHT_OPEN)
 //   (3) 밤 진행 중          : 밤 힌트 대사 (처음 한 번 듣기 전까지 "!" 표시)
 //   (4) 밤 P5 클리어 후     : "!" 표시 -> 마무리 대사 -> 끝나면 태양 형판 지급 (한 번만, 북쪽 문 열림)
+//       [수정] 이제 (4)는 RaFinale(라 일러스트 엔딩)이 자동으로 함. 엔딩이 없거나 이미 끝난 뒤에만 예전 대사
 public class RaShrine : MonoBehaviour, IInteractable
 {
     private const string MessageTag = "[Door] ";
@@ -152,7 +153,9 @@ public class RaShrine : MonoBehaviour, IInteractable
         {
             case Stage.TrialPassed: dialogue.Play(trialPassedLines, BeginNight); break;
             case Stage.Night: dialogue.Play(nightLines, MarkNightTalked); break;
-            case Stage.NightCleared: dialogue.Play(nightClearedLines, MarkEndTalked); break;
+            case Stage.NightCleared:
+                if (!RaFinale.TryStart()) dialogue.Play(nightClearedLines, MarkEndTalked);
+                break;
             default: dialogue.Play(beforeTrialLines, MarkFirstTalked); break;
         }
     }
