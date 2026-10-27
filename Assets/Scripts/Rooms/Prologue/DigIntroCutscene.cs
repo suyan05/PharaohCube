@@ -80,7 +80,7 @@ public class DigIntroCutscene : MonoBehaviour
         try
         {
             ScreenFader.SetBlack();
-            CineAudio.Loop(GameAudio.Or(windLoop, "sfx_wind_loop"), 0.6f);
+            CineAudio.Loop(GameAudio.Or(windLoop, "sfx_wind_loop"), 0.35f);
             if (player != null) CineActor.Place(player, player.GetComponent<Rigidbody2D>(), tentDoor);
             CineActor.SetAlpha(player, 0f);
 
@@ -150,7 +150,7 @@ public class DigIntroCutscene : MonoBehaviour
     private void Finish()
     {
         CineActor.SetAlpha(player, 1f);
-        CineAudio.SetLoopVolume(0.3f);
+        CineAudio.SetLoopVolume(0.12f); // 플레이 중에는 아주 작게 (배경음악 밑에 깔리는 정도)
         Cine.End();
     }
 }

@@ -19,8 +19,8 @@ public class GameAudio : MonoBehaviour
     private const string Folder = "Audio/";
     private const int PoolSize = 10;
 
-    public static float SfxVolume = 0.5f;
-    public static float MusicVolume = 0.4f;
+    public static float SfxVolume = 0.4f;
+    public static float MusicVolume = 0.5f;
 
     private static GameAudio instance;
     private static readonly Dictionary<string, AudioClip> cache = new Dictionary<string, AudioClip>();
