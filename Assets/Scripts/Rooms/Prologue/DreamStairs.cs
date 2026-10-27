@@ -45,7 +45,7 @@ public class DreamStairs : MonoBehaviour
         CineCamera.Zoom(4.5f, 0.8f);
         yield return Cine.Wait(0.8f);
 
-        CineAudio.Play(rumbleSfx);
+        CineAudio.Play(GameAudio.Or(rumbleSfx, "sfx_rumble"));
         DreamFX.Ripple(2f, 0.3f);
         Cine.Run(CineCamera.Rumble(1.6f, 0.03f, 0.12f));
         CineFX.Puff(dustSprites, transform.position + Vector3.up * 0.6f, 18, 1.6f, dustColor);

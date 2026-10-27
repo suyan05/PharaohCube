@@ -176,6 +176,7 @@ public class WallTorch : MonoBehaviour, IInteractable
         if (byPlayer && GameManager.Instance != null && !HasFlag(LitFlag)) GameManager.Instance.SetFlag(LitFlag);
 
         CineFX.Puff(FxSprites.Dots, transform.position + Vector3.up * 0.5f, 10, 1.2f, new Color(1f, 0.75f, 0.3f));
+        GameAudio.Play("sfx_fire_ignite", byPlayer ? 0.8f : 0.5f);
         float t = 0f;
         while (t < 0.8f)
         {

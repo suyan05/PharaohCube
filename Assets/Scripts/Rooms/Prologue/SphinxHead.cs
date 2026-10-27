@@ -59,7 +59,7 @@ public class SphinxHead : MonoBehaviour
     {
         SetGlow(true);
         CineLight.Dim(dimTo, dimSeconds);
-        CineAudio.Play(voiceSfx);
+        CineAudio.Play(GameAudio.Or(voiceSfx, "sfx_sphinx_voice"));
     }
 
     private void EndSpeak()

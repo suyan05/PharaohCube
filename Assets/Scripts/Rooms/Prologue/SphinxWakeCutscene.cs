@@ -59,7 +59,7 @@ public class SphinxWakeCutscene : MonoBehaviour
         {
             ScreenFader.SetBlack();
             EyelidUI.SetClosed();
-            CineAudio.Loop(droneLoop, 0.6f);
+            CineAudio.Loop(GameAudio.Or(droneLoop, "sfx_dream_drone_loop"), 0.6f);
             DreamFX.SetHaze(1f);
 
             if (player != null) CineActor.Place(player, player.GetComponent<Rigidbody2D>(), wakePoint);
@@ -105,7 +105,7 @@ public class SphinxWakeCutscene : MonoBehaviour
     // ================= 전환 =================
     private IEnumerator ToThirdPerson()
     {
-        CineAudio.Play(shimmerSfx);
+        CineAudio.Play(GameAudio.Or(shimmerSfx, "sfx_dream_shimmer"));
         DreamFX.Ripple(1.6f, 0.45f);
         Cine.Run(ScreenTintUI.Flash(flashColor, 0.45f, 0.35f, 0.9f));
         yield return Cine.Wait(0.5f);

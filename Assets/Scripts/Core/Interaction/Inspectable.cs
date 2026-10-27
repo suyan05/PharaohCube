@@ -160,6 +160,7 @@ public class Inspectable : MonoBehaviour, IInteractable
         float rate = 1f / holdSeconds;
         holdProgress += (pressing ? rate : -rate * holdDecayRate) * Time.deltaTime;
         holdProgress = Mathf.Clamp01(holdProgress);
+        if (pressing && requiredTool == "TOOL_BRUSH") GameAudio.PlayThrottled("sfx_brush", 0.24f, 0.55f); // [추가] 붓질 소리
 
         ApplyHoldStage();
         if (holdProgress > 0f) HoldRingUI.Show(transform.position, holdProgress);

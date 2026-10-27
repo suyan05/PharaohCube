@@ -171,9 +171,11 @@ public class RaDialogue : MonoBehaviour
             return;
         }
 
+        int before = Mathf.FloorToInt(visibleChars);
         visibleChars += charsPerSecond * Time.unscaledDeltaTime;
         int count = Mathf.Min(fullText.Length, Mathf.FloorToInt(visibleChars));
         bodyText.text = fullText.Substring(0, count);
+        if (count > before && count > 0 && !char.IsWhiteSpace(fullText[count - 1])) GameAudio.Blip("sfx_blip_ra"); // [추가] 라의 목소리
     }
 
     private void Close(bool invokeFinished)

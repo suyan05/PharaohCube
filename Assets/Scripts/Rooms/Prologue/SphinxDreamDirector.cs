@@ -139,7 +139,7 @@ public class SphinxDreamDirector : MonoBehaviour
         CineCamera.Zoom(4.5f, 1f);
         yield return Cine.Wait(0.6f);
 
-        CineAudio.Play(rumbleSfx);
+        CineAudio.Play(GameAudio.Or(rumbleSfx, "sfx_rumble"));
         DreamFX.Ripple(1.6f, 0.25f);
         yield return CineCamera.Rumble(1.2f, 0.02f, 0.1f);
         CineFX.Puff(dustSprites, spot + Vector3.up * 0.5f, 20, 1.6f, dustColor);

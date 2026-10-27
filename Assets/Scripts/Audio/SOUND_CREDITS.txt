@@ -1,0 +1,15 @@
+PharaohCube 소리 출처 (Assets/Resources/Audio)
+
+모든 효과음과 배경음악은 외부 소리를 쓰지 않고 코드(파이썬 numpy)로 직접 합성한 소리입니다.
+샘플, 녹음, 다른 사람의 음원을 하나도 쓰지 않아서 저작권 문제가 없습니다. (2026-10-27 생성)
+
+효과음: sfx_wind_loop, sfx_wind_gust, sfx_radio_static, sfx_step_sand_1~3, sfx_step_stone_1~3,
+        sfx_brush, sfx_brush_done, sfx_sand_collapse, sfx_discover, sfx_item_get, sfx_rumble,
+        sfx_dream_shimmer, sfx_dream_drone_loop, sfx_sphinx_voice, sfx_fire_ignite,
+        sfx_blip_low / mid / high / ra (대사 소리)
+배경음악: bgm_prologue_desert (D 프리지안 도미넌트, 우드 느낌 뜯는 소리 + 프레임 드럼)
+          bgm_sphinx_dream (패드 + 종소리, 긴 울림)
+          bgm_ra_temple_day / bgm_ra_temple_night (신전 테마 낮 / 밤)
+
+더 좋은 소리로 바꾸려면 같은 이름(.wav 또는 .ogg)으로 덮어쓰면 코드 수정 없이 바뀜.
+외부 소리를 넣을 때는 CC0(퍼블릭 도메인) 또는 상업 이용 가능 라이선스인지 꼭 확인하고 이 파일에 출처를 적어주세요.

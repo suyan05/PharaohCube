@@ -77,6 +77,7 @@ public class RaDayToNight : MonoBehaviour
         Destroy(light.gameObject);
         StartCoroutine(ScreenTintUI.Flash(new Color(1f, 0.85f, 0.5f, 0.45f), 0.08f, 0.1f, 0.5f));
         CineCamera.Shake(0.5f, 0.08f);
+        GameAudio.Play("sfx_rumble", 0.9f);
         yield return Cine.Wait(0.7f);
     }
 

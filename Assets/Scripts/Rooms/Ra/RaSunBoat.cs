@@ -139,6 +139,7 @@ public class RaSunBoat : MonoBehaviour, IInteractable
     {
         CineCamera.Focus(EmberWorld());
         CineCamera.Zoom(2.6f, 1.2f);
+        GameAudio.Play("sfx_dream_shimmer", 0.8f);
         yield return Cine.Wait(0.9f);
 
         float t = 0f;

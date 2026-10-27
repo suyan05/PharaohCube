@@ -103,6 +103,7 @@ public class RaTorchManager : MonoBehaviour
         float total = ExtinguishAll(player);
         yield return Cine.Wait(total + 0.5f);
         CineCamera.Shake(0.35f, 0.05f);
+        GameAudio.Play("sfx_rumble", 0.7f, 0.8f);
         yield return Cine.Wait(0.9f);
 
         yield return NightTalk(player);

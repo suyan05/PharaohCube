@@ -74,7 +74,7 @@ public class SandPileGroup : MonoBehaviour
             if (scarabFound || pile == null) return;
             clearedCount++;
             CineFX.Puff(dustSprites, pile.transform.position + Vector3.up * 0.2f, 10);
-            CineAudio.Play(brushDoneSfx);
+            CineAudio.Play(GameAudio.Or(brushDoneSfx, "sfx_brush_done"));
 
             if (clearedCount >= piles.Length) StartCoroutine(FindScarab(pile));
             else StartCoroutine(Cine.Say(clearedCount == 1 ? firstLines : laterLines));
@@ -109,7 +109,7 @@ public class SandPileGroup : MonoBehaviour
         yield return Cine.Wait(0.9f);
 
         CineFX.Sparkle(dustSprites, spot, 14);
-        CineAudio.Play(glintSfx);
+        CineAudio.Play(GameAudio.Or(glintSfx, "sfx_discover"));
         yield return EmoteBalloonUI.Show(player, "!", 0.7f);
         yield return Cine.Say(beforeLines);
     }

@@ -80,7 +80,7 @@ public class DigIntroCutscene : MonoBehaviour
         try
         {
             ScreenFader.SetBlack();
-            CineAudio.Loop(windLoop, 0.6f);
+            CineAudio.Loop(GameAudio.Or(windLoop, "sfx_wind_loop"), 0.6f);
             if (player != null) CineActor.Place(player, player.GetComponent<Rigidbody2D>(), tentDoor);
             CineActor.SetAlpha(player, 0f);
 
@@ -110,7 +110,7 @@ public class DigIntroCutscene : MonoBehaviour
 
     private IEnumerator Lament()
     {
-        CineAudio.Play(gustSfx);
+        CineAudio.Play(GameAudio.Or(gustSfx, "sfx_wind_gust"));
         Cine.Run(CineFX.Wind(dustSprites, 1.8f, 40f));
         CineFX.Puff(dustSprites, player != null ? player.position : (Vector3)tentFront, 8);
         CineCamera.Shake(0.4f, 0.04f);
@@ -126,7 +126,7 @@ public class DigIntroCutscene : MonoBehaviour
 
     private IEnumerator RadioCall()
     {
-        CineAudio.Play(radioStaticSfx);
+        CineAudio.Play(GameAudio.Or(radioStaticSfx, "sfx_radio_static"));
         Cine.Run(CineActor.Jitter(radio, 1.4f, 0.05f));
         yield return EmoteBalloonUI.Show(player, "!", 0.7f);
         if (radio != null) CineCamera.Focus(radio.position + Vector3.up);

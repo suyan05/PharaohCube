@@ -215,9 +215,21 @@ public class DialogueBox : MonoBehaviour
             return;
         }
 
+        int before = Mathf.FloorToInt(visibleChars);
         visibleChars += charsPerSecond * Time.unscaledDeltaTime;
         int count = Mathf.Min(fullText.Length, Mathf.FloorToInt(visibleChars));
         bodyText.text = fullText.Substring(0, count);
+        if (count > before && count > 0 && !char.IsWhiteSpace(fullText[count - 1])) GameAudio.Blip(VoiceOf(speakerText.text)); // [추가] 대사 삐리리
+    }
+
+    // [추가] 말하는 사람마다 목소리 높이 (나 = 중간, 스핑크스 = 낮게, 라 / ??? = 신비롭게, 그 밖 = 높게)
+    private static string VoiceOf(string speaker)
+    {
+        if (string.IsNullOrEmpty(speaker)) return "sfx_blip_low";
+        if (speaker == "나") return "sfx_blip_mid";
+        if (speaker.Contains("스핑크스")) return "sfx_blip_low";
+        if (speaker == "라" || speaker == "???") return "sfx_blip_ra";
+        return "sfx_blip_high";
     }
 
     // ================= 선택지 =================

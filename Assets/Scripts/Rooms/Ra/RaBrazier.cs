@@ -67,6 +67,7 @@ public class RaBrazier : MonoBehaviour, IInteractable
             ITorchLight t = TorchLink.Current;
             if (t == null || t.IsLit) return;
             t.Relight(message);
+            GameAudio.Play("sfx_fire_ignite", 0.8f);
             CineFX.Puff(FxSprites.Dots, transform.position + Vector3.up * 0.8f, 8, 1f, sparkColor);
         }
         catch (Exception e)
