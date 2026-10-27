@@ -87,7 +87,7 @@ MonoBehaviour:
     displayName: "\uACE0\uC591\uC774 \uD615\uD310"
     description: "\uD050\uBE0C\uC758 \uB450 \uBC88\uC9F8 \uBA74\uC5D0 \uB07C\uC6B0\uB294
       \uBC14\uC2A4\uD14C\uD2B8\uC758 \uD615\uD310"
-    icon: {fileID: 0}
+    icon: {fileID: -4401819410366401690, guid: 8c85558847ce13141915403f8baf6836, type: 3}
     hidden: 0
   - id: KEY_REEDPEN
     displayName: "\uD1A0\uD2B8\uC758 \uAC08\uB300 \uD39C"

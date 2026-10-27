@@ -112,6 +112,7 @@ public class BastetRoomGate : MonoBehaviour, IInteractable
         if (GameManager.Instance != null) GameManager.Instance.SetFlag(OpenFlag);
         AnubisToast.Show(string.Format(insertMessage, ItemName(requiredItemId)), 3f);
         Debug.Log($"[BastetRoomGate] {roomName}: {requiredItemId} 넣음 -> 열림 (아이템 {(consumeItem ? "사라짐" : "유지")})", this);
+        BastetSfx.Gate(); // [추가] 봉인석이 가라앉는 쿠르릉
         OpenNow(true);
         RefreshGlyph();
     }

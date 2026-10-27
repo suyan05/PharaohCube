@@ -2478,6 +2478,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &225446237
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -4683,6 +4688,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &511140174
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -6554,6 +6564,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &626987058
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -40130,6 +40145,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &840644261
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -42926,6 +42946,83 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1089422419
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1089422421}
+  - component: {fileID: 1089422420}
+  m_Layer: 0
+  m_Name: BastetEnding
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1089422420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089422419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19aa80e3228e3f44b98deaf41614f8c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BastetEnding
+  illustration: {fileID: 5356647230405279352, guid: 3a1edb5779ad7db479ccc198bb5022ff, type: 3}
+  mural: {fileID: -4820769383706407784, guid: a310745ea8aaff74db51f26606736388, type: 3}
+  plateSprite: {fileID: -4401819410366401690, guid: 8c85558847ce13141915403f8baf6836, type: 3}
+  cubeSprite: {fileID: 5752739366588724016, guid: 27c69db98137ffd42b4a9abbe15e2d20, type: 3}
+  faceSprites:
+  - {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
+  - {fileID: -4401819410366401690, guid: 8c85558847ce13141915403f8baf6836, type: 3}
+  - {fileID: -2909773197796118627, guid: b780bfcbb8687fc48a69d50449b9ca76, type: 3}
+  - {fileID: -5237746922409818941, guid: 9cad3efe5cc7b9c4a8ccf42fe684e191, type: 3}
+  - {fileID: -5700976550161359322, guid: 5ae35cf713dc67b4d9ebe9bb3bb48096, type: 3}
+  - {fileID: 4264317810600858832, guid: 530a30c4d0889064ea47abf5172f8f60, type: 3}
+  font: {fileID: 11400000, guid: 54d78516cfeaa85489ea08fa83cb9b4f, type: 2}
+  storyLines:
+  - "\uD0DC\uC591\uC758 \uBC30\uAC00 \uC800\uC2B9\uC744 \uAC74\uB108\uB358 \uBC24,"
+  - "\uD63C\uB3C8\uC758 \uBC40 \uC544\uD3A9\uC774 \uC5B4\uB460 \uC18D\uC5D0\uC11C
+    \uBC30\uB97C \uB178\uB838\uB2E4."
+  - "\uADF8\uB54C \uACE0\uC591\uC774\uC758 \uBAA8\uC2B5\uC744 \uD55C \uBC14\uC2A4\uD14C\uD2B8\uAC00
+    \uBC40\uC744 \uBB3C\uB9AC\uCCE4\uACE0"
+  - "\uB2E4\uC2DC \uC0C8\uBCBD\uC774 \uC5F4\uB838\uB2E4."
+  goddessLine: "\"\uADF8 \uD615\uD310\uC744 \uAC00\uC838\uAC00\uB77C. \uD050\uBE0C\uC758
+    \uD55C \uBA74\uC774 \uB420 \uAC83\uC774\uB2E4.\""
+  plateName: "\uACE0\uC591\uC774 \uD615\uD310"
+  plateDesc: "\uD050\uBE0C\uC758 \uB450 \uBC88\uC9F8 \uBA74\uC5D0 \uB07C\uC6B0\uB294
+    \uBC14\uC2A4\uD14C\uD2B8\uC758 \uD615\uD310"
+  bastetSlot: 1
+  playerInventoryFace: 2
+  plateGivenFlag: F_BASTET_PLATE_GIVEN
+  endingDoneFlag: F_BASTET_ENDING_DONE
+  nextSceneName: Puzzle_Test_Anubis_Tutorial
+  exitMessage: "\uB2E4\uC74C \uC2E0\uC758 \uBC29\uC73C\uB85C \uD5A5\uD569\uB2C8\uB2E4..."
+  fadeTime: 0.9
+  lineTime: 2.2
+  plateFlyTime: 0.9
+--- !u!4 &1089422421
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1089422419}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1090278794
 GameObject:
   m_ObjectHideFlags: 0
@@ -43774,6 +43871,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1138309800
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -45990,6 +46092,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1345615092
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -46644,6 +46751,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1409937463
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -47276,6 +47388,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1434951386
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -48109,6 +48226,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1450060600
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -48259,6 +48381,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1458860602
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -49851,6 +49978,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1553340773
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -54761,6 +54893,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1851543145
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -55922,6 +56059,11 @@ MonoBehaviour:
   dimAlpha: 0.25
   dimLightIntensity: 0.15
   dimColor: {r: 0.94, g: 0.86, b: 0.76, a: 1}
+  pressTint: {r: 0.55, g: 0.5, b: 0.45, a: 1}
+  pressTime: 0.22
+  pressSound: 1
+  pulseBoost: 2.6
+  pulseTime: 0.45
 --- !u!58 &1910107329
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -59693,6 +59835,9 @@ MonoBehaviour:
   discRenderer: {fileID: 0}
   sunDiscSprite: {fileID: 0}
   moonDiscSprite: {fileID: 0}
+  roundClearHold: 1.2
+  showStepProgress: 1
+  ending: {fileID: 1089422420}
   worldExitDoor: {fileID: 790356933}
   rewardItemId: PLATE_BASTET
   autoExitOnClear: 1
@@ -60582,3 +60727,4 @@ SceneRoots:
   - {fileID: 970529023}
   - {fileID: 914296006}
   - {fileID: 21948206}
+  - {fileID: 1089422421}
