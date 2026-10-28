@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaFinaleArt
   raIllustration: {fileID: 0}
   cubeSprite: {fileID: 5752739366588724016, guid: 27c69db98137ffd42b4a9abbe15e2d20, type: 3}
-  faceSprite: {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
-  plateSprite: {fileID: 1643375200076353098, guid: a3291b1902775674486111a86d92774c, type: 3}
-  faceSlot: {x: 0.506, y: 0.378}
-  faceSlotHeight: 0.238
+  faceSprites:
+  - {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
+  - {fileID: -4401819410366401690, guid: 8c85558847ce13141915403f8baf6836, type: 3}
+  - {fileID: -2909773197796118627, guid: b780bfcbb8687fc48a69d50449b9ca76, type: 3}
+  - {fileID: -5237746922409818941, guid: 9cad3efe5cc7b9c4a8ccf42fe684e191, type: 3}
+  - {fileID: -5700976550161359322, guid: 5ae35cf713dc67b4d9ebe9bb3bb48096, type: 3}
+  - {fileID: 4264317810600858832, guid: 530a30c4d0889064ea47abf5172f8f60, type: 3}

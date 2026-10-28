@@ -66,8 +66,9 @@ public static class RaFixArt
         if (img != null) so.FindProperty("boardImage").objectReferenceValue = img;
     }
 
-    // ================= 퍼즐 화면 파피루스 배경판 (P1 그림자 시계, P4 카드 벤치) =================
-    private const string PapyrusPath = "Assets/image/Common/UI/Common_UI_PuzzlePapyrus.png";
+    // ================= 퍼즐 화면 배경판 (P1 그림자 시계, P4 카드 벤치) =================
+    // [수정] 파피루스 대신 단서 화면과 같은 두루마리 틀 (테두리 9-slice라 크게 늘려도 막대가 안 늘어남)
+    private const string PapyrusPath = "Assets/image/ui/UI_Journal_Frame.png";
     private static readonly string[] PapyrusOverlays = { "P1_Overlay", "P4_Overlay" };
 
     public static void PuzzlePapyrus()
@@ -84,24 +85,15 @@ public static class RaFixArt
             RaPolishSetup.Edit(theme, so =>
             {
                 so.FindProperty("papyrusSprite").objectReferenceValue = papyrus;
-                so.FindProperty("papyrusSize").vector2Value = new Vector2(1460f, 1060f);
+                so.FindProperty("papyrusSize").vector2Value = new Vector2(1500f, 1080f);
             });
             Debug.Log($"[RaFixSetup] {theme.name}에 파피루스 배경판 연결");
         }
     }
 
-    // 일러스트 UI라 도트 설정(Point) 말고 부드럽게
+    // [수정] 두루마리 틀은 단서 화면(CluePanel)도 같이 쓰는 그림이라 설정을 바꾸지 않고 그대로 가져옴
     private static Sprite PapyrusSprite()
     {
-        if (!(AssetImporter.GetAtPath(PapyrusPath) is TextureImporter imp)) return null;
-        if (imp.textureType != TextureImporterType.Sprite || imp.spriteImportMode != SpriteImportMode.Single || imp.filterMode != FilterMode.Bilinear)
-        {
-            imp.textureType = TextureImporterType.Sprite;
-            imp.spriteImportMode = SpriteImportMode.Single;
-            imp.filterMode = FilterMode.Bilinear;
-            imp.mipmapEnabled = false;
-            imp.SaveAndReimport();
-        }
         return FirstSprite(PapyrusPath);
     }
 

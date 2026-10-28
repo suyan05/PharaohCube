@@ -38,6 +38,19 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
     [Tooltip("오버레이가 열려 있는 동안 투명하게 숨길 UI (목표 문구, 노트 팝업 등)")]
     [SerializeField] private GameObject[] hideWhileOpen;
 
+    [Header("[추가] 밤 힌트: 틀리면 낮의 벽화를 보여줌")]
+    [Tooltip("비우면 씬의 비석(단서 ID)에서 낮 벽화 그림을 가져옴")]
+    [SerializeField] private Sprite dayMuralSprite;
+    [SerializeField] private string muralClueId = "RA_P4";
+    [Tooltip("밤에 이 횟수만큼 틀리면 낮 벽화가 떠오름")]
+    [SerializeField, Min(1)] private int nightHintAfterFails = 2;
+
+    [Header("[추가] 제목 (낮 / 밤)")]
+    [SerializeField] private string dayTitle = "태양의 하루";
+    [SerializeField] private string daySubtitle = "벽화에 그려진 하루의 순서대로, 왼쪽부터 카드를 놓자";
+    [SerializeField] private string nightTitle = "죽은 왕의 하루";
+    [SerializeField] private string nightSubtitle = "밤의 벽화를 읽고, 그 순서대로 왼쪽부터 카드를 놓자";
+
     // 카드 / 틀 크기 (카드 원본 비율 1000x1638)
     private static readonly Vector2 CardSize = new Vector2(220f, 360f);
     private static readonly Vector2 FrameSize = new Vector2(250f, 390f);
@@ -57,6 +70,9 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
     private readonly List<Text> nameLabels = new List<Text>();
     private GameObject sealGroup;
     private Text statusText;
+    private Text titleText, subtitleText;
+    private GameObject muralHintGroup;
+    private int nightFails;
     private Font font;
     private Canvas canvas;
 
@@ -99,6 +115,7 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
         puzzle.OnUnsealed += HandleUnsealed;
         puzzle.OnSuccess += HandleSuccess;
         puzzle.OnFail += HandleFail;
+        puzzle.OnPhaseChanged += HandlePhaseChanged;
     }
 
     private void OnDestroy()
@@ -108,6 +125,7 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
         puzzle.OnUnsealed -= HandleUnsealed;
         puzzle.OnSuccess -= HandleSuccess;
         puzzle.OnFail -= HandleFail;
+        puzzle.OnPhaseChanged -= HandlePhaseChanged;
     }
 
     private void Update()
@@ -157,6 +175,7 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
         overlayPanel.SetActive(true);
         isOpen = true;
 
+        RefreshTitle();
         statusText.text = GetOpenMessage();
         puzzle.Open(); // 여기서 황동 열쇠 자동 사용 시도
 
@@ -182,7 +201,7 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
     private string GetOpenMessage()
     {
         if (puzzle.IsCleared) return "이미 해결한 벤치다.";
-        if (puzzle.Unsealed) return "벽화를 보고 카드를 동쪽(왼쪽)부터 배열하자.";
+        if (puzzle.Unsealed) return puzzle.IsNight ? "밤의 벽화는 낮과 다르게 읽어야 한다..." : "벽화의 순서대로 왼쪽부터 카드를 놓자.";
         return "봉인줄이 감겨 있다. 열쇠가 필요할 것 같다.";
     }
 
@@ -216,8 +235,11 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
     {
         RectTransform root = overlayPanel.GetComponent<RectTransform>();
 
-        CreateText(root, "동쪽에서 서쪽으로", 44, new Vector2(0, 470), new Vector2(800, 70), paper);
+        // [수정] "동쪽에서 서쪽으로"는 헷갈려서 -> 낮/밤 제목 + 무엇을 하는지 한 줄
+        titleText = CreateText(root, dayTitle, 44, new Vector2(0, 470), new Vector2(800, 70), paper);
+        subtitleText = CreateText(root, daySubtitle, 24, new Vector2(0, 422), new Vector2(1200, 36), sand);
         if (showMuralHint) BuildMuralHint(root);
+        BuildNightMuralHint(root);
 
         for (int i = 0; i < puzzle.SlotCount; i++)
         {
@@ -444,6 +466,55 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
         }
     }
 
+    // ================= [추가] 낮/밤 제목, 밤 힌트 =================
+    private void HandlePhaseChanged()
+    {
+        nightFails = 0;
+        ShowNightMuralHint(false);
+        RefreshTitle();
+        if (isOpen) statusText.text = GetOpenMessage();
+    }
+
+    private void RefreshTitle()
+    {
+        if (titleText == null) return;
+        titleText.text = puzzle.IsNight ? nightTitle : dayTitle;
+        subtitleText.text = puzzle.IsNight ? nightSubtitle : daySubtitle;
+    }
+
+    // 카드 위쪽에 낮 벽화 그림 + 설명 (처음엔 숨김)
+    private void BuildNightMuralHint(RectTransform root)
+    {
+        muralHintGroup = new GameObject("NightMuralHint", typeof(RectTransform));
+        var rt = muralHintGroup.GetComponent<RectTransform>();
+        rt.SetParent(root, false);
+        rt.sizeDelta = Vector2.zero;
+
+        Sprite mural = dayMuralSprite != null ? dayMuralSprite : FindDayMural();
+        CreateRect(rt, "MuralPlate", new Vector2(0, 300), new Vector2(560, 196), new Color(0.18f, 0.11f, 0.07f, 0.85f));
+        Image img = CreateImage(rt, "DayMural", mural, new Vector2(540, 180), new Vector2(0, 300));
+        img.preserveAspect = true;
+        CreateText(rt, "낮의 벽화", 20, new Vector2(0, 186), new Vector2(400, 28), sand);
+        muralHintGroup.SetActive(false);
+    }
+
+    private Sprite FindDayMural()
+    {
+        foreach (ClueStele s in FindObjectsByType<ClueStele>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (s.Data == null || s.Data.ClueId != muralClueId) continue;
+            ClueData.ClueContent day = s.Data.Get(false);
+            if (day != null && day.illustration != null) return day.illustration;
+        }
+        Debug.LogWarning($"[{name}] 낮 벽화 그림을 못 찾음 (Day Mural Sprite 칸을 채우거나 단서 ID '{muralClueId}' 확인)");
+        return null;
+    }
+
+    private void ShowNightMuralHint(bool show)
+    {
+        if (muralHintGroup != null) muralHintGroup.SetActive(show);
+    }
+
     private void HandleUnsealed()
     {
         statusText.text = "황동 열쇠로 봉인줄을 풀었다! 카드를 움직일 수 있다.";
@@ -452,7 +523,9 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
 
     private void HandleSuccess()
     {
-        statusText.text = "벽화와 같은 순서다! 거울 조각 (3) 획득";
+        // [수정] 밤에는 거울 조각을 주지 않으니 다른 문구
+        statusText.text = puzzle.IsNight ? "죽은 왕의 하루가 새겨졌다." : "벽화와 같은 순서다! 거울 조각 (3) 획득";
+        ShowNightMuralHint(false);
         RefreshCards();
     }
 
@@ -460,6 +533,14 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
     {
         statusText.text = "순서가 맞지 않는다... (배치는 그대로)";
         if (isActiveAndEnabled) StartCoroutine(FlashCardsRed());
+        if (!puzzle.IsNight) return;
+
+        nightFails++;
+        if (nightFails >= nightHintAfterFails && !muralHintGroup.activeSelf)
+        {
+            ShowNightMuralHint(true);
+            statusText.text = "낮에 본 벽화가 떠오른다... 밤에는 이 순서를 어떻게 읽어야 할까?";
+        }
     }
 
     // 오답: 붉은 플래시 0.3초 (기획서 10.3)

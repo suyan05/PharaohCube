@@ -14,6 +14,9 @@ public class InteractionSystem : MonoBehaviour
     // 화면 안내용: 지금 가까이 있는 대상의 안내 문구 (없으면 null)
     public string CurrentPrompt => currentTarget != null ? currentTarget.GetPrompt() : null;
 
+    // [추가] 지금 가까이 있는 대상의 위치 (오브젝트 위에 E 말풍선 띄우기용, 없으면 null)
+    public Transform CurrentTargetTransform => currentTarget is Component c && c != null ? c.transform : null;
+
     // E키로 무언가를 조사한 순간 (플레이어 조사 동작 애니메이션용)
     public event Action<IInteractable> OnInteracted;
 

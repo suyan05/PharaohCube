@@ -22,7 +22,7 @@ public class PuzzleOverlayTheme : MonoBehaviour
     [SerializeField] private int titleFontSizeMin = 40;
 
     [Header("[추가] 파피루스 배경판 (뒤에 배경 그림이 없는 퍼즐 화면용: P1, P4)")]
-    [Tooltip("Common_UI_PuzzlePapyrus. 비우면 배경판 없음")]
+    [Tooltip("배경판 그림 (지금은 단서 화면과 같은 두루마리 UI_Journal_Frame). 비우면 배경판 없음")]
     [SerializeField] private Sprite papyrusSprite;
     [SerializeField] private Vector2 papyrusSize = new Vector2(1500f, 1100f);
     [SerializeField] private Vector2 papyrusPos = Vector2.zero;
@@ -96,6 +96,8 @@ public class PuzzleOverlayTheme : MonoBehaviour
             papyrus.raycastTarget = false;
         }
         papyrus.sprite = papyrusSprite;
+        // [수정] 두루마리 틀처럼 테두리(9-slice)가 정해진 그림이면 막대는 그대로 두고 가운데만 늘림
+        papyrus.type = papyrusSprite.border != Vector4.zero ? Image.Type.Sliced : Image.Type.Simple;
         papyrus.rectTransform.sizeDelta = papyrusSize;
         papyrus.rectTransform.anchoredPosition = papyrusPos;
         papyrus.transform.SetSiblingIndex(BackgroundCount());

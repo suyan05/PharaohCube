@@ -17,6 +17,9 @@ public class ClueStele : MonoBehaviour, IInteractable
 {
     [Header("연결")]
     [SerializeField] private ClueData data;
+
+    // [추가] 다른 화면이 이 비석의 그림을 빌려 쓸 때 (P4 밤 힌트: 낮 벽화)
+    public ClueData Data => data;
     [Tooltip("비우면 씬에서 자동으로 찾음")]
     [SerializeField] private CluePanel panel;
 

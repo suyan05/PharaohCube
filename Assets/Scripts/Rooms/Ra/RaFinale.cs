@@ -6,7 +6,8 @@ using UnityEngine.Rendering.Universal;
 // 밤 P5까지 다 풀면(F_RA_NIGHT_P5_DONE) 라가 직접 모습을 드러내는 엔딩 (예전 "시현 데모 종료" 대신)
 // 1. 퍼즐 화면을 닫고 조작이 풀리면 -> 카메라가 라의 성소로 -> 금빛이 차오르며 흔들림
 // 2. 하얗게 번쩍 -> 라 일러스트 전체 화면 + 강렬한 이집트 음악(bgm_ra_finale) + 라의 대사
-// 3. 큐브 그림이 나오고 태양 형판이 라의 면에 박힘 -> 아이템 획득 팝업(PLATE_RA)
+// 3. 큐브 공개 (바스테트 엔딩과 같은 방식): 큐브 옆 여섯 면 칸 중 "라" 칸에 라의 면이 박힘
+//    [수정] 아이템 획득 팝업은 없앰 (형판은 조용히 인벤토리에 들어감)
 // 4. 작별 대사 -> 암전 -> 중앙 홀(CentralRoom_Temp)로 이동 -> 중앙 홀에서 돌아온 연출
 // - 성소를 직접 눌러도 이 연출이 나옴 (RaShrine이 TryStart를 부름)
 // - 씬에 안 놓아도 RaRuntimeBootstrap이 자동으로 붙임
@@ -105,18 +106,24 @@ public class RaFinale : MonoBehaviour
         yield return cut.Open();
         yield return Cine.Say(lines.appear);
         yield return Cine.Say(lines.gift);
+        GrantPlate(); // 큐브 칸이 채워지기 전에 넣어서 (형판 n / 6) 개수에 바로 반영
         yield return cut.ShowCube(lines.cubeCaption);
-        yield return GrantPlate();
         yield return cut.HideCube();
         yield return Cine.Say(lines.farewell);
     }
 
-    // 아이템 팝업이 닫힐 때까지 기다린 뒤 플래그 (북쪽 문, 업적, 목표 문구가 이걸 봄)
-    private IEnumerator GrantPlate()
+    // [수정] 팝업 없이 인벤토리에 넣고 플래그 (북쪽 문, 업적, 목표 문구가 이걸 봄)
+    private void GrantPlate()
     {
-        bool closed = false;
-        ItemPopup.Grant(plateItemId, () => closed = true);
-        while (!closed) yield return null;
+        try
+        {
+            if (ItemInventory.Instance != null) ItemInventory.Instance.Grant(plateItemId);
+            else Debug.LogWarning($"[RaFinale] ItemInventory가 없어서 {plateItemId}를 못 넣음 (플래그만 켬)");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[RaFinale] 형판 지급 오류: {e}");
+        }
 
         SetFlagOnce(plateGivenFlag);
         SetFlagOnce(endTalkedFlag);

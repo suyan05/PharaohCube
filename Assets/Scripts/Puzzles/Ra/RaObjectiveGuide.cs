@@ -214,10 +214,10 @@ public class RaObjectiveGuide : MonoBehaviour
         return new List<RaObjectiveStep>
         {
             Make("F_RA_SHRINE_FIRST_TALKED", "중앙의 라의 성소를 조사하자"),
-            Make("F_RA_CIRCUIT_1", "서쪽 벽의 빛 회로를 조사하자"),
+            Make("F_RA_CIRCUIT_1", "남동쪽 벽의 빛 회로를 조사하자"),
             Make("F_RA_P1_DONE", "주황 렌즈를 들고 동쪽 그림자 다이얼로 가자"),
             Make("F_RA_CIRCUIT_2", "거울 조각 1을 들고 회로판 빈 슬롯에 끼우자"),
-            Make("F_RA_P3_DONE", "청색 안료를 들고 남동쪽 일식 석탁으로 가자"),
+            Make("F_RA_P3_DONE", "청색 안료를 들고 북서쪽 일식 석탁으로 가자"),
             Make("F_RA_CIRCUIT_3", "거울 조각 2와 프리즘을 들고 회로판으로 돌아가자"),
             Make("F_RA_P4_DONE", "황동 열쇠를 들고 남서쪽 카드 벤치로 가자"),
             Make("F_RA_CIRCUIT_4", "거울 조각 3을 들고 회로판 마지막 슬롯에 끼우자"),
@@ -233,7 +233,7 @@ public class RaObjectiveGuide : MonoBehaviour
             Make("F_RA_NIGHT_OPEN", "라의 성소로 돌아가 라와 이야기하자"),
             Make("F_RA_SHRINE_NIGHT_TALKED", "밤이 내려앉았다. 라의 성소에 다시 말을 걸어 보자"),
             Make("F_RA_NIGHT_P1_DONE", "푸른 불이 켜진 동쪽 방, 밤의 그림자를 읽자"),
-            Make("F_RA_NIGHT_P3_DONE", "남동쪽 일식 석탁에서 개기 일식을 완성하자"),
+            Make("F_RA_NIGHT_P3_DONE", "북서쪽 일식 석탁에서 개기 일식을 완성하자"),
             Make("F_RA_NIGHT_P4_DONE", "남서쪽 카드 벤치에 죽은 왕의 하루를 새기자"),
             Make("F_RA_NIGHT_P5_DONE", "북쪽 밤의 제단에서 태양의 항해를 완성하자"),
             Make("F_RA_PLATE_GIVEN", "라의 성소로 돌아가 라의 형판을 받자"),

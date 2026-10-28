@@ -61,6 +61,7 @@ public class HallTempDirector : MonoBehaviour
         }
 
         ApplyRoute();
+        EnableDoorAutoEnter();
         Subscribe();
         started = true;
         RefreshObjective();
@@ -261,6 +262,14 @@ public class HallTempDirector : MonoBehaviour
     {
         if (brazier != null) brazier.SetInstant(true);
         if (cube != null && LatestCleared() != null) cube.SetInstant(true);
+    }
+
+    // [추가] 북쪽 문은 E 없이 닿기만 하면 들어감
+    private void EnableDoorAutoEnter()
+    {
+        if (door == null) return;
+        SceneDoor sceneDoor = door.GetComponent<SceneDoor>();
+        if (sceneDoor != null) sceneDoor.SetAutoEnter(true);
     }
 
     // 북쪽 문을 다음 신전으로 바꿈

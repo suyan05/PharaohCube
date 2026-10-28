@@ -38,6 +38,9 @@ public class GameMessageUI : MonoBehaviour
         public bool highlight;
     }
 
+    // [추가] 오브젝트 위 E 말풍선(WorldPromptUI)이 대신 보여줄 때 아래쪽 안내를 끔
+    public static bool SuppressBottomPrompt;
+
     private readonly List<Toast> toasts = new List<Toast>();
     private readonly List<PendingToast> pending = new List<PendingToast>();
     private RectTransform toastRoot;
@@ -112,7 +115,7 @@ public class GameMessageUI : MonoBehaviour
         bool canMove = playerController == null || playerController.enabled;
         string prompt = (interaction != null && canMove) ? interaction.CurrentPrompt : null;
 
-        bool show = !string.IsNullOrEmpty(prompt);
+        bool show = !SuppressBottomPrompt && !string.IsNullOrEmpty(prompt);
         promptBox.SetActive(show);
         if (show) promptText.text = prompt;
 

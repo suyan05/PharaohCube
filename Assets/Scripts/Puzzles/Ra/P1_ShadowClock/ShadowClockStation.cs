@@ -14,19 +14,28 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 {
     // 기본 크기 (우클릭 -> "크기 기본값 적용"으로 씬에 저장된 값을 덮어쓸 수 있음)
     private static readonly Vector2 DefaultSymbolSize = new Vector2(130, 160);
-    private static readonly Vector2 DefaultDialSize = new Vector2(300, 300);
-    private static readonly Vector2 DefaultLongShadowSize = new Vector2(130, 26);
-    private static readonly Vector2 DefaultShortShadowSize = new Vector2(84, 52);
-    private static readonly Vector2 DefaultSunSize = new Vector2(56, 56);
+    // [수정] 다이얼, 오벨리스크, 그림자를 크게 (그림자가 한눈에 읽히게)
+    private static readonly Vector2 DefaultDialSize = new Vector2(400, 400);
+    private static readonly Vector2 DefaultLongShadowSize = new Vector2(185, 56);
+    private static readonly Vector2 DefaultShortShadowSize = new Vector2(130, 74);
+    private static readonly Vector2 DefaultSunSize = new Vector2(70, 70);
     private static readonly Vector2 DefaultSlotSize = new Vector2(200, 70);
     private static readonly Vector2 DefaultLensSize = new Vector2(120, 120);
     private static readonly Vector2 DefaultLensPos = new Vector2(430, -20);
-    private static readonly Vector2 DefaultObeliskSize = new Vector2(64, 64);
+    private static readonly Vector2 DefaultObeliskSize = new Vector2(104, 180);
+
+    // 예전 기본값 (씬에 이 값이 저장돼 있으면 새 기본값으로 바꿔서 씀)
+    private static readonly Vector2 OldDialSize = new Vector2(300, 300);
+    private static readonly Vector2 OldLongShadowSize = new Vector2(130, 26);
+    private static readonly Vector2 OldShortShadowSize = new Vector2(84, 52);
+    private static readonly Vector2 OldSunSize = new Vector2(56, 56);
+    private static readonly Vector2 OldObeliskSize = new Vector2(64, 64);
 
     private const float WallY = 300f;
     private const float SlotY = -280f;
     private const float SideLabelGap = 45f;
-    private static readonly Vector2 DialPos = new Vector2(0, -20);
+    private static readonly Vector2 DialPos = new Vector2(0, -40);
+    private const float ShadowGrowTime = 0.7f;
 
     [Header("연결")]
     [SerializeField] private ShadowClockPuzzle puzzle;
@@ -101,6 +110,8 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     private Font font;
 
     private static Sprite circleSprite;
+    private static Sprite wedgeSprite;
+    private string lastShadowKey = "";
 
     private bool isOpen;
     private bool flashingRed;
@@ -120,6 +131,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 
             SetupColors();
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            UpgradeOldSizes();
 
             BuildUI();
             overlayPanel.SetActive(false);
@@ -129,6 +141,16 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         {
             Debug.LogError($"[{name}] 초기화 오류: {e}");
         }
+    }
+
+    // [추가] 씬에 예전 작은 크기가 저장돼 있으면 새 크기로 (직접 바꾼 값은 그대로 둠)
+    private void UpgradeOldSizes()
+    {
+        if (dialSize == OldDialSize) dialSize = DefaultDialSize;
+        if (longShadowSize == OldLongShadowSize) longShadowSize = DefaultLongShadowSize;
+        if (shortShadowSize == OldShortShadowSize) shortShadowSize = DefaultShortShadowSize;
+        if (sunSize == OldSunSize) sunSize = DefaultSunSize;
+        if (obeliskSize == OldObeliskSize) obeliskSize = DefaultObeliskSize;
     }
 
     private void Subscribe()
@@ -216,6 +238,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     {
         StopAllCoroutines();
         flashingRed = false;
+        lastShadowKey = ""; // 다시 열면 그림자가 다시 드리워짐
 
         overlayPanel.SetActive(false);
         isOpen = false;
@@ -272,8 +295,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         BuildBackdrop(root);
         CreateText(root, "태양 그림자 시계", 44, new Vector2(0, 470), new Vector2(800, 70), paper);
 
-        // 동쪽 벽 기호 띠 (그림 유무와 상관없이 항상)
-        CreateRect(root, "WallBand", new Vector2(0, WallY), new Vector2(1100, 230), wallColor);
+        // [수정] 기호 뒤 황토색 벽 띠는 지움 (UI와 안 어울림) -> 기호만
         for (int i = 0; i < 4; i++)
         {
             BuildSymbol(root, i);
@@ -356,7 +378,13 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         BuildSideLabels(root);
         BuildShadows(root);
 
-        if (obeliskSprite != null) CreateSprite(root, "Obelisk", DialPos, obeliskSize, obeliskSprite);
+        // [수정] 오벨리스크를 크게, 밑동이 다이얼 가운데(그림자가 시작하는 곳)에 서게
+        if (obeliskSprite != null)
+        {
+            Image obelisk = CreateSprite(root, "Obelisk", DialPos, obeliskSize, obeliskSprite);
+            obelisk.rectTransform.pivot = new Vector2(0.5f, 0.06f);
+            obelisk.rectTransform.anchoredPosition = DialPos;
+        }
         else CreateRect(root, "Obelisk", DialPos, obeliskSize * 0.5f, gold, 45f);
 
         BuildSunMarker(root);
@@ -397,7 +425,9 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     private void BuildShadows(RectTransform root)
     {
         // 긴 그림자: 오벨리스크 쪽 끝을 축으로 동쪽을 향함 (서쪽은 좌우 뒤집기)
-        shadowLong = CreatePiece(root, "ShadowLong", DialPos, longShadowSize, shadowLongSprite, shadowColor);
+        Sprite longSprite = shadowLongSprite != null ? shadowLongSprite : GetWedgeSprite();
+        shadowLong = CreateSprite(root, "ShadowLong", DialPos, longShadowSize, longSprite);
+        shadowLong.color = shadowLongSprite != null ? Color.white : shadowColor;
         shadowLong.preserveAspect = false;
         shadowLong.rectTransform.pivot = new Vector2(0f, 0.5f);
         shadowLong.rectTransform.anchoredPosition = DialPos;
@@ -518,7 +548,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
     private void RefreshLens()
     {
         bool mounted = puzzle.LensMounted;
-        lensLabel.color = mounted ? gold : dimText;
+        lensLabel.color = mounted ? Hex("#C2661A") : dimText; // [수정] 두루마리 위에서도 읽히는 주황
 
         if (lensInactiveSprite == null && lensActiveSprite == null)
         {
@@ -543,11 +573,28 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         shadowLong.enabled = isLong;
         shadowShort.enabled = isShort;
 
-        if (isLong)
+        float flip = isLong && rule.shadowSide == DialSide.West ? -1f : 1f;
+        string key = show ? $"{puzzle.IsNight}_{puzzle.SolvedCount}_{rule.time}" : "";
+        if (key == lastShadowKey) return;
+
+        lastShadowKey = key;
+        if (show && isActiveAndEnabled) StartCoroutine(GrowShadow(flip, isLong));
+        else shadowLong.rectTransform.localScale = new Vector3(flip, 1f, 1f);
+    }
+
+    // [추가] 새 문제마다 그림자가 오벨리스크 밑에서부터 쭉 드리워짐 (짧은 그림자는 퍼지듯)
+    private IEnumerator GrowShadow(float flip, bool isLong)
+    {
+        RectTransform target = isLong ? shadowLong.rectTransform : shadowShort.rectTransform;
+        float t = 0f;
+        while (t < ShadowGrowTime)
         {
-            float flip = rule.shadowSide == DialSide.West ? -1f : 1f;
-            shadowLong.rectTransform.localScale = new Vector3(flip, 1f, 1f);
+            t += Time.deltaTime;
+            float k = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / ShadowGrowTime));
+            target.localScale = isLong ? new Vector3(flip * k, 1f, 1f) : new Vector3(k, k, 1f);
+            yield return null;
         }
+        target.localScale = isLong ? new Vector3(flip, 1f, 1f) : Vector3.one;
     }
 
     // 해 위치 힌트 (같은 문제 3회 오답 후에만)
@@ -729,6 +776,38 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
 
         circleSprite = Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100f);
         return circleSprite;
+    }
+
+    // [추가] 긴 그림자: 왼쪽(오벨리스크 쪽)이 굵고 진하고, 오른쪽 끝으로 갈수록 가늘고 흐려짐
+    private static Sprite GetWedgeSprite()
+    {
+        if (wedgeSprite != null) return wedgeSprite;
+
+        const int w = 256, h = 64;
+        var pixels = new Color32[w * h];
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                pixels[y * w + x] = new Color32(255, 255, 255, (byte)(WedgeAlpha(x / (float)w, y / (float)(h - 1)) * 255f));
+            }
+        }
+
+        var tex = new Texture2D(w, h, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+        tex.SetPixels32(pixels);
+        tex.Apply();
+        wedgeSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0f, 0.5f), 100f);
+        return wedgeSprite;
+    }
+
+    private static float WedgeAlpha(float u, float v)
+    {
+        float half = Mathf.Lerp(0.5f, 0.16f, u);             // 끝으로 갈수록 가늘게
+        float d = Mathf.Abs(v - 0.5f);
+        float edge = Mathf.Clamp01((half - d) / 0.05f);      // 옆 가장자리 부드럽게
+        float fade = Mathf.Lerp(1f, 0.45f, u);               // 끝으로 갈수록 흐리게
+        float tip = Mathf.Clamp01((1f - u) / 0.12f);         // 맨 끝 둥글게 사라짐
+        return edge * fade * tip;
     }
 
     // 그림이 있으면 그림으로, 없으면 색 네모로

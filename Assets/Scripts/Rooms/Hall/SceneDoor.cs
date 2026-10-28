@@ -5,6 +5,7 @@ using UnityEngine;
 // 다른 씬으로 가는 문 (E로 조사)
 // - Required Item이 없으면 Locked Lines (예: 횃불이 없으면 "너무 어둡다")
 // - 있으면: 문 앞까지 걸어감 -> 안쪽으로 들어가며 사라짐 -> 암전 -> Next Scene (비우면 Build 순서의 다음 씬)
+// - [추가] Auto Enter를 켜면 E 없이 문에 닿기만 해도 들어감 (중앙 홀 북쪽 문은 HallTempDirector가 켬)
 [RequireComponent(typeof(Collider2D))]
 public class SceneDoor : MonoBehaviour, IInteractable
 {
@@ -17,11 +18,61 @@ public class SceneDoor : MonoBehaviour, IInteractable
     [SerializeField] private string nextScene = "";
     [SerializeField] private string setFlagOnEnter = "";
 
+    [Header("[추가] 닿으면 자동으로 들어가기 (E 없이)")]
+    [SerializeField] private bool autoEnter = false;
+    [Tooltip("문 충돌 상자에서 이 거리 안으로 들어오면 들어감")]
+    [SerializeField, Min(0.1f)] private float autoEnterDistance = 0.6f;
+
     private bool used;
+    private bool lockedShown;
+    private Collider2D doorCollider;
 
     public string GetPrompt()
     {
-        return used ? null : $"E: {promptText}";
+        if (used || autoEnter) return null; // 자동 문은 E 안내를 띄우지 않음
+        return $"E: {promptText}";
+    }
+
+    public void SetAutoEnter(bool on)
+    {
+        autoEnter = on;
+    }
+
+    private void Update()
+    {
+        if (!autoEnter || used) return;
+        try
+        {
+            TryAutoEnter();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SceneDoor] 자동 입장 오류: {e}");
+            autoEnter = false;
+        }
+    }
+
+    // 문에 닿으면: 들어갈 수 있으면 바로 입장, 아니면 잠김 대사 한 번 (멀어졌다 다시 오면 또)
+    private void TryAutoEnter()
+    {
+        if (Cine.Running || DialogueBox.IsOpen || ItemPopup.IsShowing || PuzzleOverlayFocus.IsActive) return;
+        Transform player = CineActor.Player();
+        if (player == null) return;
+
+        if (doorCollider == null) doorCollider = GetComponent<Collider2D>();
+        Vector2 closest = doorCollider != null ? doorCollider.ClosestPoint(player.position) : (Vector2)transform.position;
+        if (Vector2.Distance(player.position, closest) > autoEnterDistance)
+        {
+            lockedShown = false;
+            return;
+        }
+
+        if (HasItem()) StartCoroutine(Enter(player));
+        else if (!lockedShown)
+        {
+            lockedShown = true;
+            DialogueBox.Play(lockedLines);
+        }
     }
 
     public void Interact(GameObject who)

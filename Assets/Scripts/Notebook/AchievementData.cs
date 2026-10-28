@@ -46,7 +46,7 @@ public static class AchievementData
         l.Add(Any("ACH_PRO_RIDDLE", "프롤로그", "지평선의 수수께끼", "꿈의 비석", AchGrade.Bronze, "스핑크스 앞발 사이에 선 비석. 한 왕자가 꾼 꿈이 새겨져 있다.", "꿈속의 문지기", "F_PRO_STELE_DECODED"));
         l.Add(Any("ACH_RA_P1", "라", "그림자를 읽는 자", "그림자 시계", AchGrade.Papyrus, "해가 높을수록 그림자는 짧아진다. 고대 이집트인은 그림자로 시간을 재었다.", "라의 방 동쪽", "F_RA_P1_DONE"));
         l.Add(Any("ACH_RA_P2", "라", "빛의 길", "청동 손거울", AchGrade.Papyrus, "광을 낸 청동 거울. 태양 원반을 닮은 둥근 거울은 빛과 생명을 뜻했다.", "라의 방 서쪽", "F_RA_CIRCUIT_4"));
-        l.Add(Any("ACH_RA_P3", "라", "세 개의 태양", "날개 달린 태양 원반", AchGrade.Papyrus, "신전 문 위에서 악한 것을 막던 날개 달린 태양.", "라의 방 남동쪽", "F_RA_P3_DONE"));
+        l.Add(Any("ACH_RA_P3", "라", "세 개의 태양", "날개 달린 태양 원반", AchGrade.Papyrus, "신전 문 위에서 악한 것을 막던 날개 달린 태양.", "라의 방 북서쪽", "F_RA_P3_DONE"));
         l.Add(Any("ACH_RA_P4", "라", "하루의 순서", "채색 벽화 조각", AchGrade.Papyrus, "무덤 벽에 그려진 하루. 해는 동쪽에서 태어나 서쪽에 눕는다.", "라의 방 남서쪽", "F_RA_P4_DONE"));
         l.Add(Any("ACH_RA_P5", "라", "태양의 다섯 걸음", "태양의 배 모형", AchGrade.Bronze, "라는 밤마다 배를 타고 저승의 강을 건넌다.", "라의 방 북쪽", "F_RA_P5_DONE"));
         AchievementDef night = Any("ACH_RA_NIGHT", "라", "밤의 시련", "숫양 머리 밤 태양 부적", AchGrade.Bronze, "밤의 라는 숫양의 머리를 하고 어둠을 건넌다.", "해가 진 뒤의 라의 방");
