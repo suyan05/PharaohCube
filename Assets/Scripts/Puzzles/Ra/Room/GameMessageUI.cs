@@ -87,8 +87,27 @@ public class GameMessageUI : MonoBehaviour
         "완성", "얻었다", "획득", "장착", "풀렸다", "열렸다", "되었다", "끼웠다", "털어냈다", "드러났다", "필요"
     };
 
+    // [추가] 엔딩 같은 큰 연출 중에는 오른쪽 위 알림을 아예 안 띄움 (떠 있던 것도 지움)
+    public static bool Muted { get; private set; }
+    private static GameMessageUI instance;
+
+    public static void SetMuted(bool muted)
+    {
+        Muted = muted;
+        if (muted && instance != null) instance.ClearToasts();
+    }
+
+    private void ClearToasts()
+    {
+        foreach (Toast t in toasts) if (t.go != null) Destroy(t.go);
+        toasts.Clear();
+        pending.Clear();
+    }
+
     private void Awake()
     {
+        instance = this;
+        Muted = false; // 씬이 바뀌면 다시 켜짐
         boxColor = new Color(0.1f, 0.07f, 0.04f, 0.85f);
         ColorUtility.TryParseHtmlString("#F6F1E7", out paper);
         ColorUtility.TryParseHtmlString("#E8B23A", out gold);
@@ -177,7 +196,7 @@ public class GameMessageUI : MonoBehaviour
     // ================= 로그 -> 화면 메시지 =================
     private void HandleLog(string msg, string stackTrace, LogType type)
     {
-        if (type != LogType.Log) return;
+        if (type != LogType.Log || Muted) return;
 
         // 노트 1~7
         if (msg.StartsWith("[노트"))

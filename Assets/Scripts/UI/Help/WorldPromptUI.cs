@@ -6,6 +6,8 @@ using UnityEngine.UI;
 // - 플레이어 시선이 화면 아래까지 안 내려가서 안내를 못 본다는 피드백 반영
 // - 키 모양 네모(E) + 노란 글자, 살짝 위아래로 흔들림, 대상이 바뀌면 톡 튀어나옴
 // - 연출, 대사, 아이템 팝업, 퍼즐 화면 중에는 숨김
+// - [수정] 길게 누르는 중(게이지 링이 보이는 동안)에도 숨김 (링과 겹치지 않게)
+// - [수정] "E 길게: 길게 눌러 털기" -> 키 네모 "E" + 글자 "길게 눌러 털기" (길게가 두 번 나오던 문제)
 // - 이게 켜져 있으면 GameMessageUI의 아래쪽 안내는 꺼짐 (둘이 겹치지 않게)
 // - HelpUIBootstrap이 정해진 씬에 자동으로 붙임
 public class WorldPromptUI : MonoBehaviour
@@ -77,7 +79,7 @@ public class WorldPromptUI : MonoBehaviour
         try
         {
             Transform target = CurrentTarget(out string prompt);
-            bool show = target != null && !Busy();
+            bool show = target != null && !Busy() && !HoldRingVisible(target);
             group.alpha = show ? 1f : 0f;
             if (!show)
             {
@@ -114,6 +116,14 @@ public class WorldPromptUI : MonoBehaviour
         return locked || Cine.Running || DialogueBox.IsOpen || ItemPopup.IsShowing || PuzzleOverlayFocus.IsActive;
     }
 
+    // 길게 누르기 게이지가 보이는 동안 (누르는 중이거나 게이지가 남아 있음)
+    private static bool HoldRingVisible(Transform target)
+    {
+        if (Inspectable.Holding != null) return true;
+        Inspectable inspect = target.GetComponent<Inspectable>();
+        return inspect != null && inspect.HoldProgress > 0f;
+    }
+
     private void StartPop(Transform target, string prompt)
     {
         lastTarget = target;
@@ -121,12 +131,16 @@ public class WorldPromptUI : MonoBehaviour
         label.text = StripKey(prompt);
     }
 
-    // "E: 발굴 일지 읽기" -> "발굴 일지 읽기" (키는 네모에 따로 그림)
+    // "E: 발굴 일지 읽기" -> "발굴 일지 읽기" / "E 길게: 털기" -> "길게 눌러 털기" (키는 네모에 따로 그림)
     private static string StripKey(string prompt)
     {
-        if (prompt.StartsWith("E:")) return prompt.Substring(2).Trim();
-        if (prompt.StartsWith("E ")) return prompt.Substring(2).Trim();
-        return prompt;
+        int colon = prompt.IndexOf(':');
+        if (!prompt.StartsWith("E") || colon < 0) return prompt;
+
+        string head = prompt.Substring(0, colon);
+        string body = prompt.Substring(colon + 1).Trim();
+        if (head.Contains("길게") && !body.Contains("길게")) body = "길게 눌러 " + body;
+        return body;
     }
 
     // 오브젝트 그림의 윗부분 위에 말풍선 (가운데 정렬은 키+글자 전체 폭 기준)

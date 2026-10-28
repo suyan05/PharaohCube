@@ -116,6 +116,6 @@ public class GameAudioDirector : MonoBehaviour
     private static void HandleLog(string msg, string stack, LogType type)
     {
         if (type != LogType.Log || !msg.StartsWith("[Door] ")) return;
-        if (msg.Contains("열렸")) GameAudio.Play("sfx_rumble", 0.8f);
+        if (msg.Contains("열렸")) UnlockRumble.Play(); // [수정] 더 크게 + 겹치면 한 번만
     }
 }

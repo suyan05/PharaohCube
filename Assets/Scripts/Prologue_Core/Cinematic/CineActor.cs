@@ -4,7 +4,8 @@ using UnityEngine;
 
 // 연출용 캐릭터, 물건 움직이기
 // - WalkTo: Rigidbody2D 속도로 걸려서 PlayerSpriteAnimator가 걷기 애니메이션, 방향을 알아서 바꿈
-//           (막혀서 못 가면 시간이 지나면 목표 위치로 순간이동, 스킵 때도 순간이동)
+//           (스킵 때는 목표 위치로 순간이동)
+//           [수정] 물건에 막혀서 더 못 가면 제자리걸음 하지 않고 그 자리에서 바로 멈춤 (예: 무전기 앞)
 // - Fade: 캐릭터 그림 투명도 (텐트에서 나오기 등)
 // - Jitter: 제자리 덜덜 (무전기 울림)
 // - Sink: 작아지면서 아래로 빨려 들어감 (구멍에 떨어지기)
@@ -24,17 +25,47 @@ public static class CineActor
 
         Rigidbody2D body = actor.GetComponent<Rigidbody2D>();
         float timeout = Vector2.Distance(actor.position, point) / Mathf.Max(0.1f, speed) + 1.5f;
+        var stuck = new StuckCheck(actor.position);
 
         while (timeout > 0f && !Cine.Skipping)
         {
             Vector2 diff = point - (Vector2)actor.position;
             if (diff.magnitude <= speed * Time.deltaTime * 1.5f) break;
+            if (stuck.Update(actor.position, Time.deltaTime))
+            {
+                Place(actor, body, actor.position); // 막힘 -> 여기서 멈춤 (순간이동 없이)
+                yield break;
+            }
 
             SetVelocity(actor, body, diff.normalized * speed);
             timeout -= Time.deltaTime;
             yield return null;
         }
         Place(actor, body, point);
+    }
+
+    // 0.2초 동안 거의 못 움직였으면 막힌 것
+    private class StuckCheck
+    {
+        private const float Window = 0.2f;
+        private const float MinMove = 0.03f;
+        private Vector2 last;
+        private float timer;
+
+        public StuckCheck(Vector2 start)
+        {
+            last = start;
+        }
+
+        public bool Update(Vector2 now, float dt)
+        {
+            timer += dt;
+            if (timer < Window) return false;
+            bool stuck = Vector2.Distance(now, last) < MinMove;
+            last = now;
+            timer = 0f;
+            return stuck;
+        }
     }
 
     private static void SetVelocity(Transform actor, Rigidbody2D body, Vector2 velocity)

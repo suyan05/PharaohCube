@@ -62,6 +62,11 @@ public class Inspectable : MonoBehaviour, IInteractable
 
     public string ObjectId => objectId;
     public bool IsDone => done;
+
+    // [추가] 지금 E를 길게 누르고 있는 조사 대상 (플레이어 무릎 꿇기, E 말풍선 숨기기용. 없으면 null)
+    public static Inspectable Holding { get; private set; }
+    public bool IsHoldType => holdSeconds > 0f && !done;
+    public float HoldProgress => holdProgress;
     private string DoneFlag => $"F_{objectId}_DONE";
 
     // ================= 초기화 =================
@@ -137,7 +142,11 @@ public class Inspectable : MonoBehaviour, IInteractable
     // ================= 길게 누르기 =================
     private void Update()
     {
-        if (holdSeconds <= 0f || done || busy) return;
+        if (holdSeconds <= 0f || done || busy)
+        {
+            if (Holding == this) Holding = null;
+            return;
+        }
         if (!holdActive && holdProgress <= 0f) return;
 
         try
@@ -148,14 +157,18 @@ public class Inspectable : MonoBehaviour, IInteractable
         {
             Debug.LogError($"[{name}] 길게 누르기 오류: {e}");
             holdActive = false;
+            if (Holding == this) Holding = null;
             HoldRingUI.Hide();
         }
     }
+
 
     private void UpdateHold()
     {
         bool pressing = holdActive && Input.GetKey(KeyCode.E) && PlayerInRange() && !PlayerLock.IsLocked;
         if (!pressing) holdActive = false;
+        if (pressing) Holding = this;
+        else if (Holding == this) Holding = null;
 
         float rate = 1f / holdSeconds;
         holdProgress += (pressing ? rate : -rate * holdDecayRate) * Time.deltaTime;
@@ -245,6 +258,7 @@ public class Inspectable : MonoBehaviour, IInteractable
     private void OnDisable()
     {
         holdActive = false;
+        if (Holding == this) Holding = null; // [추가]
         if (holdProgress > 0f) HoldRingUI.Hide();
     }
 

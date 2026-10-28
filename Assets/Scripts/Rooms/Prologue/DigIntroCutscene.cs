@@ -21,7 +21,7 @@ public class DigIntroCutscene : MonoBehaviour
     [SerializeField] private Vector2 tentDoor = new Vector2(4f, 7.4f);
     [SerializeField] private Vector2 tentFront = new Vector2(4f, 6.3f);
     [SerializeField] private Vector2 lamentSpot = new Vector2(5.6f, 6.1f);
-    [SerializeField] private Vector2 radioSpot = new Vector2(3.4f, 4.5f);
+    [SerializeField] private Vector2 radioSpot = new Vector2(3.55f, 4.5f); // [수정] 무전기 충돌 상자에 안 걸리게 살짝 오른쪽
     [SerializeField] private Vector2 zoneView = new Vector2(22f, 5f);
     [SerializeField] private Transform radio;
 
@@ -80,7 +80,7 @@ public class DigIntroCutscene : MonoBehaviour
         try
         {
             ScreenFader.SetBlack();
-            CineAudio.Loop(GameAudio.Or(windLoop, "sfx_wind_loop"), 0.35f);
+            CineAudio.Loop(GameAudio.Or(windLoop, "sfx_wind_loop"), 0.18f); // [수정] 더 작게 (0.35 -> 0.18)
             if (player != null) CineActor.Place(player, player.GetComponent<Rigidbody2D>(), tentDoor);
             CineActor.SetAlpha(player, 0f);
 
@@ -110,7 +110,7 @@ public class DigIntroCutscene : MonoBehaviour
 
     private IEnumerator Lament()
     {
-        CineAudio.Play(GameAudio.Or(gustSfx, "sfx_wind_gust"));
+        CineAudio.Play(GameAudio.Or(gustSfx, "sfx_wind_gust"), 0.4f); // [수정] 돌풍도 작게
         Cine.Run(CineFX.Wind(dustSprites, 1.8f, 40f));
         CineFX.Puff(dustSprites, player != null ? player.position : (Vector3)tentFront, 8);
         CineCamera.Shake(0.4f, 0.04f);
@@ -133,6 +133,7 @@ public class DigIntroCutscene : MonoBehaviour
         yield return Cine.Say(staticLines);
 
         yield return CineActor.WalkTo(player, radioSpot, 3f);
+        if (radio != null && player != null) yield return CineActor.Look(player, radio.position - player.position); // 무전기 쪽을 봄
         yield return Cine.Wait(0.3f);
         yield return Cine.Say(radioLines);
     }
@@ -150,7 +151,7 @@ public class DigIntroCutscene : MonoBehaviour
     private void Finish()
     {
         CineActor.SetAlpha(player, 1f);
-        CineAudio.SetLoopVolume(0.12f); // 플레이 중에는 아주 작게 (배경음악 밑에 깔리는 정도)
+        CineAudio.SetLoopVolume(0.05f); // [수정] 플레이 중에는 거의 안 들릴 만큼 (0.12 -> 0.05)
         Cine.End();
     }
 }

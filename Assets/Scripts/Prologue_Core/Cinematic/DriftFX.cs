@@ -26,7 +26,7 @@ public class DriftFX : MonoBehaviour
             fx.sr = go.AddComponent<SpriteRenderer>();
             fx.sr.sprite = sprite;
             fx.sr.sortingLayerName = layer;
-            fx.sr.sortingOrder = order;
+            fx.sr.sortingOrder = YSortSystem.OrderFor(layer, order, pos); // [수정] 앞뒤 자동 정렬 중이면 그 위치 높이에 맞춤
             fx.sr.color = color;
             fx.Setup(velocity, life, color, drag);
         }

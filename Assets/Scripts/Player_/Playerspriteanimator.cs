@@ -6,6 +6,8 @@ using UnityEngine;
 // - 걷기: 방향별 프레임을 walkPattern 순서로 재생 (쯔꾸르식 3프레임 = 0,1,2,1)
 // - 멈춤: 마지막으로 본 방향의 idleFrame
 // - E키 조사: InteractionSystem.OnInteracted -> 조사 프레임을 잠깐 보여줌
+// - [추가] 무릎 꿇기: 모래 털기처럼 E를 길게 누르는 동안 + 낮은 물건(높이 1.1칸 이하)을 조사할 때 잠깐
+//   그림: Kneel Frames (아래, 왼쪽, 오른쪽, 위). 비우면 Resources/Player/Player_Kneel 시트를 씀
 // Player 오브젝트(SpriteRenderer가 있는 곳)에 붙임
 [RequireComponent(typeof(SpriteRenderer))]
 public class PlayerSpriteAnimator : MonoBehaviour
@@ -41,6 +43,13 @@ public class PlayerSpriteAnimator : MonoBehaviour
     [Tooltip("켜면 E를 누를 때 방향과 그림 이름을 Console에 찍음 (프레임 순서 확인용, 다 맞추면 끄기)")]
     [SerializeField] private bool debugInteractLog = false;
 
+    [Header("[추가] 무릎 꿇고 조사")]
+    [Tooltip("아래, 왼쪽, 오른쪽, 위 순서. 비우면 Resources/Player/Player_Kneel 사용")]
+    [SerializeField] private Sprite[] kneelFrames;
+    [Tooltip("조사 대상 그림 높이가 이보다 낮으면 E를 눌렀을 때 무릎을 꿇음 (월드 단위)")]
+    [SerializeField, Min(0f)] private float kneelMaxTargetHeight = 1.1f;
+    [SerializeField, Min(0.05f)] private float kneelTime = 0.6f;
+
     [Header("연결 (비우면 같은 오브젝트에서 찾음)")]
     [SerializeField] private Rigidbody2D body;
     [SerializeField] private InteractionSystem interaction;
@@ -50,6 +59,7 @@ public class PlayerSpriteAnimator : MonoBehaviour
     private Facing facing;
     private float walkTimer;
     private float interactTimer;
+    private float kneelTimer;
     private bool warnedEmpty;
 
     public Facing CurrentFacing => facing;
@@ -61,6 +71,16 @@ public class PlayerSpriteAnimator : MonoBehaviour
         if (body == null) body = GetComponent<Rigidbody2D>();
         if (interaction == null) interaction = GetComponent<InteractionSystem>();
         facing = startFacing;
+        if (!HasFrames(kneelFrames)) kneelFrames = LoadKneelFrames();
+    }
+
+    // Resources/Player/Player_Kneel 시트 조각을 이름 순서대로 (_0 아래, _1 왼쪽, _2 오른쪽, _3 위)
+    private static Sprite[] LoadKneelFrames()
+    {
+        Sprite[] loaded = Resources.LoadAll<Sprite>("Player/Player_Kneel");
+        if (loaded == null || loaded.Length == 0) return null;
+        Array.Sort(loaded, (a, b) => string.CompareOrdinal(a.name, b.name));
+        return loaded;
     }
 
     private void OnEnable()
@@ -78,6 +98,12 @@ public class PlayerSpriteAnimator : MonoBehaviour
         try
         {
             if (faceTargetOnInteract && target is Component c) FaceToward(c.transform.position);
+            if (ShouldKneel(target))
+            {
+                kneelTimer = kneelTime;
+                interactTimer = 0f;
+                return;
+            }
             if (!HasFrames(interactFrames)) return;
 
             interactTimer = interactTime;
@@ -87,6 +113,31 @@ public class PlayerSpriteAnimator : MonoBehaviour
         {
             Debug.LogError($"[{name}] 조사 동작 오류: {e}");
         }
+    }
+
+    // [추가] 길게 누르는 조사(모래 털기) 또는 낮은 물건이면 무릎 꿇기
+    private bool ShouldKneel(IInteractable target)
+    {
+        if (!HasFrames(kneelFrames) || !(target is Component c) || c == null) return false;
+        Inspectable inspect = c.GetComponent<Inspectable>();
+        if (inspect != null && inspect.IsHoldType) return true;
+
+        SpriteRenderer targetSr = c.GetComponentInChildren<SpriteRenderer>();
+        return targetSr != null && targetSr.bounds.size.y <= kneelMaxTargetHeight;
+    }
+
+    private bool IsKneeling()
+    {
+        if (!HasFrames(kneelFrames)) return false;
+        if (kneelTimer > 0f) return true;
+        return Inspectable.Holding != null && (body == null || body.linearVelocity.sqrMagnitude < moveThreshold * moveThreshold);
+    }
+
+    private void ShowKneel()
+    {
+        kneelTimer -= Time.deltaTime;
+        if (Inspectable.Holding != null) FaceToward(Inspectable.Holding.transform.position);
+        SetFrame(kneelFrames, (int)facing, false);
     }
 
     // 대상과의 차이가 더 큰 축으로 방향을 정함 (걷기 방향 판단과 같은 방식)
@@ -128,8 +179,10 @@ public class PlayerSpriteAnimator : MonoBehaviour
         try
         {
             bool moving = UpdateFacing();
+            if (moving) kneelTimer = 0f; // 걸으면 바로 일어남
 
-            if (interactTimer > 0f) ShowInteract();
+            if (!moving && IsKneeling()) ShowKneel();
+            else if (interactTimer > 0f) ShowInteract();
             else if (moving) ShowWalk();
             else ShowIdle();
         }

@@ -77,14 +77,26 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         SunButton.Noon, SunButton.Return, SunButton.Rising,
         SunButton.Boat, SunButton.Night, SunButton.Setting
     };
+    // [수정] 원판 그림(Solar panel charging, 600 크기)의 구멍 가운데에 딱 맞춤
     private static readonly Vector2[] RingPositions =
     {
-        new Vector2(0, 230),      // (2) 정오 - 하늘, 12시
-        new Vector2(199, 115),    // (6) 재림 - 2시
-        new Vector2(199, -115),   // (1) 떠오르는 태양 - 4시
-        new Vector2(0, -230),     // (5) 태양의 배 - 6시
-        new Vector2(-199, -115),  // (4) 밤 - 8시 [낮 함정]
-        new Vector2(-199, 115)    // (3) 지는 태양 - 10시
+        new Vector2(0, 238),      // (2) 정오 - 하늘, 12시
+        new Vector2(208, 116),    // (6) 재림 - 2시
+        new Vector2(208, -120),   // (1) 떠오르는 태양 - 4시
+        new Vector2(0, -242),     // (5) 태양의 배 - 6시
+        new Vector2(-206, -120),  // (4) 밤 - 8시 [낮 함정]
+        new Vector2(-206, 116)    // (3) 지는 태양 - 10시
+    };
+
+    // [추가] 밤 원판 그림(P5_Altar_Night_BG, 620 크기)의 구멍 자리 (낮 그림과 조금 다름)
+    private static readonly Vector2[] RingPositionsNight =
+    {
+        new Vector2(0, 238),
+        new Vector2(200, 118),
+        new Vector2(200, -113),
+        new Vector2(0, -232),
+        new Vector2(-202, -113),
+        new Vector2(-204, 118)
     };
 
     private readonly List<Image> buttonImages = new List<Image>();
@@ -332,8 +344,10 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         bool night = puzzle.IsNight;
         ApplyBackground(night);
 
+        Vector2[] ring = night && nightBackgroundSprite != null ? RingPositionsNight : RingPositions;
         for (int i = 0; i < buttonImages.Count; i++)
         {
+            buttonImages[i].rectTransform.anchoredPosition = ring[i] + new Vector2(0, RingY); // [추가] 구멍 자리
             SunButton b = RingButtons[i];
             Sprite s = SpriteOf(b, night);
             if (s == null) continue;
@@ -544,6 +558,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
 
         CameraFollow2D follow = main.GetComponent<CameraFollow2D>();
         if (follow != null) follow.Shake(duration, strength);
+        UnlockRumble.Play(); // [추가] 쿠르릉
     }
 
     private void HandleFail()

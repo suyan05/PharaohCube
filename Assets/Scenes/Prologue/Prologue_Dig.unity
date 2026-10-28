@@ -2678,7 +2678,7 @@ MonoBehaviour:
   tentDoor: {x: 4, y: 7.4}
   tentFront: {x: 4, y: 6.3}
   lamentSpot: {x: 5.6, y: 6.1}
-  radioSpot: {x: 3.4, y: 4.5}
+  radioSpot: {x: 3.55, y: 4.5}
   zoneView: {x: 22, y: 5}
   radio: {fileID: 1622428040}
   closeSize: 4.5

@@ -8,6 +8,7 @@ using UnityEngine.Rendering.Universal;
 // - 밤(F_RA_NIGHT_OPEN): 신전 불이 다 꺼지면 배 안에서만 작은 불빛이 깜빡임 + 불똥이 피어오름 (어둠 속 단서)
 // - 밤에 E 길게 -> 불씨가 배에서 떠올라 내 횃불로 날아와 합쳐지는 연출 -> 라의 불씨 획득 (ITEM_RA_EMBER, 금테 팝업)
 // - 불씨 효과는 PlayerTorchTemp가 이미 처리: 시야 1.3배, 시간으로 안 꺼짐, 꺼져도 E 2초로 어디서든 다시 붙임
+// - [추가] 불씨를 얻으면 배 모형이 스르륵 사라짐 (이미 먹은 것). 다시 들어와도 안 보임
 [RequireComponent(typeof(Collider2D))]
 public class RaSunBoat : MonoBehaviour, IInteractable
 {
@@ -42,6 +43,13 @@ public class RaSunBoat : MonoBehaviour, IInteractable
     private Transform player;
 
     private bool Available => RaPhaseState.IsNight && !HasFlag(foundFlag) && !HasEmber();
+    private bool Taken => HasFlag(foundFlag) || HasEmber();
+
+    // [추가] 이미 불씨를 얻은 상태로 씬에 들어오면 처음부터 숨김
+    private void Start()
+    {
+        if (Taken) gameObject.SetActive(false);
+    }
 
     // ================= IInteractable =================
     public string GetPrompt()
@@ -132,6 +140,7 @@ public class RaSunBoat : MonoBehaviour, IInteractable
 
         Cine.End();
         taking = false;
+        yield return FadeAway(); // 연출을 다 끝낸 뒤에 사라짐 (오브젝트가 꺼지면 이 코루틴도 멈추니까 맨 마지막)
     }
 
     // 카메라가 배로 다가가고, 배 안의 불이 크게 숨쉬듯 밝아짐
@@ -170,6 +179,29 @@ public class RaSunBoat : MonoBehaviour, IInteractable
         SetFlagOnce(seenFlag);
         if (p != null) yield return EmoteBalloonUI.Show(p, "!", 0.8f);
         yield return Cine.Say(foundLines);
+    }
+
+    // [추가] 배 모형이 불티를 흩날리며 0.8초 동안 사라짐 -> 오브젝트 끔
+    private IEnumerator FadeAway()
+    {
+        SpriteRenderer[] parts = GetComponentsInChildren<SpriteRenderer>();
+        if (body != null) RaGlowFx.Spark(EmberWorld(), emberColor, body.sortingLayerName, body.sortingOrder + 2);
+        float t = 0f;
+        while (t < 0.8f)
+        {
+            t += Time.deltaTime;
+            float a = 1f - Mathf.Clamp01(t / 0.8f);
+            foreach (SpriteRenderer sr in parts)
+            {
+                if (sr == null) continue;
+                Color c = sr.color;
+                c.a = Mathf.Min(c.a, a);
+                sr.color = c;
+            }
+            yield return null;
+        }
+        HoldRingUI.Hide();
+        gameObject.SetActive(false);
     }
 
     // ================= 도우미 =================

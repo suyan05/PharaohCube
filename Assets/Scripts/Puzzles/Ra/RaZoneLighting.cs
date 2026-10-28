@@ -367,6 +367,7 @@ public class RaZoneLighting : MonoBehaviour
         try
         {
             if (cameraFollow != null) cameraFollow.Shake(shakeDuration, shakeStrength);
+            UnlockRumble.Play(); // [추가] 구역이 열릴 때마다 쿠르릉 (알림 문구가 없는 구역도)
         }
         catch (Exception e)
         {

@@ -90,6 +90,7 @@ public class RaFinale : MonoBehaviour
 
         TorchLink.SetBurnPaused(this, true); // 연출 중에는 내 횃불이 줄지 않게
         Cine.Begin(true);
+        GameMessageUI.SetMuted(true); // [추가] 엔딩 중에는 오른쪽 위 알림(문 열림, 획득 등) 안 띄움
         GameAudio.StopMusic(1.5f);
         yield return ShrineGlow();
         yield return Cutscene();
@@ -128,7 +129,6 @@ public class RaFinale : MonoBehaviour
         SetFlagOnce(plateGivenFlag);
         SetFlagOnce(endTalkedFlag);
         SetFlagOnce(DemoEnding.CentralEnteredFlag);
-        Debug.Log("[노트 6] 태양의 형판을 큐브의 첫 면에 장착하라.");
     }
 
     private IEnumerator LeaveToHall()
