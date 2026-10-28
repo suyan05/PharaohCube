@@ -82,6 +82,18 @@ public class BastetNecklacePuzzle : PuzzleBase
     private readonly Color colWrong = new Color(0.9f, 0.22f, 0.22f, 1f);
     private readonly Color colGold = new Color(1f, 0.85f, 0.2f, 1f);
 
+    // [추가] 그림(Sprite)이 들어간 조각은 그림 색을 살리는 색으로 (단색 네모일 때는 위 색 그대로)
+    [Header("[추가] 그림이 있을 때 색 (Tools/Bastet/★ 오브젝트·퍼즐 그림 입히기가 그림을 넣음)")]
+    [SerializeField] private Color artNormal = Color.white;
+    [SerializeField] private Color artWrong = new Color(1f, 0.45f, 0.4f, 1f);
+    [SerializeField] private Color artGold = new Color(1f, 0.93f, 0.55f, 1f);
+    [SerializeField] private Color artGemIdle = new Color(0.75f, 0.75f, 0.8f, 1f);
+
+    private static bool HasArt(Image img) => img != null && img.sprite != null;
+    private Color Normal(Image img) => HasArt(img) ? artNormal : colNormal;
+    private Color Wrong(Image img) => HasArt(img) ? artWrong : colWrong;
+    private Color Gold(Image img) => HasArt(img) ? artGold : colGold;
+
     private void Awake()
     {
         // [추가] Inspector 연결 -> 배열 (비어 있으면 기존 기본값)
@@ -140,6 +152,7 @@ public class BastetNecklacePuzzle : PuzzleBase
             pieces[targetIdx].currentRotStep = (pieces[targetIdx].currentRotStep + 1) % 4;
             UpdatePieceVisual(pieces[targetIdx]);
         }
+        BastetSfx.Press(); // [추가] 조각 도는 소리
     }
 
     private void UpdatePieceVisual(NecklacePiece piece)
@@ -151,7 +164,7 @@ public class BastetNecklacePuzzle : PuzzleBase
 
         if (piece.pieceImage != null)
         {
-            piece.pieceImage.color = colNormal;
+            piece.pieceImage.color = Normal(piece.pieceImage); // [수정]
         }
     }
 
@@ -195,11 +208,12 @@ public class BastetNecklacePuzzle : PuzzleBase
         for (int i = 0; i < pieces.Length; i++)
         {
             if (pieces[i].pieceImage != null)
-                pieces[i].pieceImage.color = colGold;
+                pieces[i].pieceImage.color = Gold(pieces[i].pieceImage); // [수정]
         }
 
-        if (centerEyeGem != null) centerEyeGem.color = colGold;
-        if (centerLine != null) centerLine.color = colGold;
+        if (centerEyeGem != null) centerEyeGem.color = HasArt(centerEyeGem) ? Color.white : colGold; // [수정]
+        if (centerLine != null) centerLine.color = HasArt(centerLine) ? Color.white : colGold;
+        BastetSfx.RoundClear(); // [추가]
 
         if (textStatusNotice != null)
             textStatusNotice.text = "<color=#FFD700>목걸이의 8개 문양이 완벽한 대칭을 이룹니다! (세 번째 패턴 기록)</color>";
@@ -210,6 +224,7 @@ public class BastetNecklacePuzzle : PuzzleBase
     private IEnumerator FailRoutine()
     {
         isChecking = true;
+        BastetSfx.Wrong(); // [추가]
 
         if (textStatusNotice != null)
             textStatusNotice.text = "<color=#FF4444>좌우 대칭이 맞지 않는 조각이 붉게 반응합니다!</color>";
@@ -225,8 +240,8 @@ public class BastetNecklacePuzzle : PuzzleBase
 
             if (rightStep != requiredRightStep)
             {
-                if (pieces[leftIdx].pieceImage != null) pieces[leftIdx].pieceImage.color = colWrong;
-                if (pieces[rightIdx].pieceImage != null) pieces[rightIdx].pieceImage.color = colWrong;
+                if (pieces[leftIdx].pieceImage != null) pieces[leftIdx].pieceImage.color = Wrong(pieces[leftIdx].pieceImage); // [수정]
+                if (pieces[rightIdx].pieceImage != null) pieces[rightIdx].pieceImage.color = Wrong(pieces[rightIdx].pieceImage);
             }
         }
 
@@ -274,8 +289,9 @@ public class BastetNecklacePuzzle : PuzzleBase
             UpdatePieceVisual(pieces[i]);
         }
 
-        if (centerEyeGem != null) centerEyeGem.color = new Color(0.4f, 0.35f, 0.5f, 1f);
-        if (centerLine != null) centerLine.color = new Color(0.5f, 0.4f, 0.6f, 0.4f);
+        // [수정] 그림이 있으면 그림 색을 살림
+        if (centerEyeGem != null) centerEyeGem.color = HasArt(centerEyeGem) ? artGemIdle : new Color(0.4f, 0.35f, 0.5f, 1f);
+        if (centerLine != null) centerLine.color = HasArt(centerLine) ? artGemIdle : new Color(0.5f, 0.4f, 0.6f, 0.4f);
 
         if (textStatusNotice != null)
             textStatusNotice.text = "조각을 회전시켜 중앙선을 기준으로 좌우 대칭을 만드십시오.";
