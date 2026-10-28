@@ -63,6 +63,16 @@ public class WallTorch : MonoBehaviour, IInteractable
     private static bool PlayerFireLit => TorchLink.Current != null && TorchLink.Current.IsLit;
 
     // pos가 켜진 벽 횃불의 빛 안에 있는지 (radius를 주면 그 반경으로 판정)
+    // [추가] 시연 치트(T): 씬의 벽 횃불을 전부 켜진 것으로 저장 (씬을 다시 불러오면 다 켜져 있음)
+    public static void MarkAllLit()
+    {
+        if (GameManager.Instance == null) return;
+        foreach (WallTorch t in all)
+        {
+            if (t != null && !HasFlag(t.LitFlag)) GameManager.Instance.SetFlag(t.LitFlag);
+        }
+    }
+
     public static bool AnyLitNear(Vector3 pos, float radius = -1f)
     {
         foreach (WallTorch t in all)

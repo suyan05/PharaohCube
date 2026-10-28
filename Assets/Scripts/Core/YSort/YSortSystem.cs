@@ -21,7 +21,9 @@ public class YSortSystem : MonoBehaviour
     private const int SortedMax = 25000;
     private const int Step = 20;                // 높이 0.05칸마다 20칸 띄움 (붙은 장식이 들어갈 자리)
     private const int AttachRange = 9;          // 붙은 장식은 원래 순서 차이를 -9 ~ +9 안에서 유지
-    private const int BelowBase = -30000;
+    // [수정] 바닥에 붙은 것(계단, 구멍, 갈라짐)은 바닥 타일(작은 번호)보다는 위, 정렬되는 물건(1000~)보다는 아래
+    //        예전 -30000은 바닥 타일 밑으로 들어가서 싱크홀이 아예 안 보였음
+    private const int BelowBase = 500;
     private const int AboveBase = 30000;
     private const int NormalMin = -4;
     private const int NormalMax = 19;
@@ -221,7 +223,7 @@ public class YSortSystem : MonoBehaviour
         else if (main != null)
         {
             // 항상 아래 / 항상 위: 그림 순서만 맨 아래(위) 구간으로 옮김 (원래 순서끼리의 차이는 유지)
-            main.sortingOrder = (e.kind == Kind.Below ? BelowBase : AboveBase) + Mathf.Clamp(e.original, -2000, 2000);
+            main.sortingOrder = (e.kind == Kind.Below ? BelowBase : AboveBase) + Mathf.Clamp(e.original, -400, 400);
         }
         entries.Add(e);
     }
@@ -252,7 +254,8 @@ public class YSortSystem : MonoBehaviour
     {
         // [추가] 계단, 구멍, 그림자처럼 바닥에 붙은 것도 항상 아래 (스핑크스 계단 위에서 플레이어가 가려지던 문제)
         return n.Contains("Floor") || n.Contains("Ground") || n.Contains("Rug") || n.Contains("바닥")
-            || n.Contains("Stairs") || n.Contains("Hole") || n.Contains("Pit") || n.Contains("Shadow") || n.Contains("Carpet");
+            || n.Contains("Stairs") || n.Contains("Hole") || n.Contains("Pit") || n.Contains("Shadow") || n.Contains("Carpet")
+            || n.Contains("Crack") || n.Contains("Decal"); // [추가] 발굴 현장 땅 갈라짐(구멍)도 바닥
     }
 
     // ================= 붙은 장식 찾기 =================
