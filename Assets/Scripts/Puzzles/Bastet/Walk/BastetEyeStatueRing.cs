@@ -98,6 +98,7 @@ public class BastetEyeStatueRing : BastetWalkPuzzleBase, IBastetStatueOwner
         for (int s = 0; s < StepCount; s++)
         {
             foreach (int i in forwardSteps[s].statues) if (Valid(i)) statues[i].SetEyes(true, showColor);
+            BastetSfx.Eye(s); // [추가]
             yield return waitOn;
             foreach (int i in forwardSteps[s].statues) if (Valid(i)) statues[i].SetEyes(false, showColor);
             yield return waitGap;
@@ -138,6 +139,7 @@ public class BastetEyeStatueRing : BastetWalkPuzzleBase, IBastetStatueOwner
         pending.Remove(index);
         lit[index] = true;
         statues[index].SetEyes(true, doneColor);
+        BastetSfx.Correct(step); // [추가]
 
         if (pending.Count > 0) return;
         step++;
@@ -149,6 +151,7 @@ public class BastetEyeStatueRing : BastetWalkPuzzleBase, IBastetStatueOwner
     {
         state = State.Showing;
         statues[index].EatTorch(wrongColor, eatTime);
+        BastetSfx.Wrong(); // [추가]
         PunishTorch(wrongMessage);
         yield return waitEat;
         AllOff();
@@ -171,6 +174,7 @@ public class BastetEyeStatueRing : BastetWalkPuzzleBase, IBastetStatueOwner
         SetSolving(false); // [추가]
         state = State.Cleared;
         for (int i = 0; i < statues.Length; i++) if (statues[i] != null) statues[i].SetEyes(true, doneColor);
+        BastetSfx.RoundClear(); // [추가]
         Toast(clearMessage);
     }
 

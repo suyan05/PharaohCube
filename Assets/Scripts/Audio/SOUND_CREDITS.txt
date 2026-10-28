@@ -14,3 +14,10 @@ PharaohCube 소리 출처 (Assets/Resources/Audio)
 
 더 좋은 소리로 바꾸려면 같은 이름(.wav 또는 .ogg)으로 덮어쓰면 코드 수정 없이 바뀜.
 외부 소리를 넣을 때는 CC0(퍼블릭 도메인) 또는 상업 이용 가능 라이선스인지 꼭 확인하고 이 파일에 출처를 적어주세요.
+
+[추가 2026-10-28] 바스테트의 방 (강태호, 같은 방식으로 파이썬 numpy 합성)
+효과음: sfx_bastet_plate_press(발판 눌림), sfx_bastet_plate_show(발판 빛남), sfx_bastet_correct(맞음),
+        sfx_bastet_wrong(틀림, 하악), sfx_bastet_round_clear(단계 통과), sfx_bastet_eye(석상 눈),
+        sfx_bastet_night(해가 짐), sfx_bastet_clear(메인 클리어), sfx_bastet_plate_mount(형판 장착),
+        sfx_bastet_ending_chime(엔딩 일러스트 컷)
+배경음악: bgm_bastet_temple (A 히자즈 음계, 시스트럼·프레임 드럼·우드·네이), bgm_bastet_ending (패드 + 뜯는 소리)

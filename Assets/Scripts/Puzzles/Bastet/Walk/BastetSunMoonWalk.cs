@@ -41,13 +41,23 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
     [SerializeField] private Sprite sunDiscSprite;   // Bastet_Obj_ShrineDisc_Sun
     [SerializeField] private Sprite moonDiscSprite;  // Bastet_Obj_ShrineDisc_Moon
 
+    [Header("[추가] 눌렀는지 확실히 보이게")]
+    [Tooltip("한 단계를 다 밟으면 밟은 발판을 금빛으로 켜 둔 채 이 시간만큼 기다렸다가 다음 단계를 보여 줌")]
+    [Range(0.3f, 3f)] [SerializeField] private float roundClearHold = 1.2f;
+    [Tooltip("밟을 때마다 '발자국 2 / 4' 처럼 진행 알림")]
+    [SerializeField] private bool showStepProgress = true;
+
+    [Header("[추가] 엔딩 연출 (바스테트 일러스트 컷 + 큐브 공개 + 중앙 홀 복귀)")]
+    [Tooltip("비우면 씬에서 찾음. 있으면 클리어 후 바로 다음 씬으로 가지 않고 엔딩을 보여 줌")]
+    [SerializeField] private BastetEnding ending;
+
     [Header("클리어 보상")]
     [Tooltip("클리어하면 꺼지는 출구 막이 (Door_North_Exit)")]
     [SerializeField] private GameObject worldExitDoor;
     [SerializeField] private string rewardItemId = "PLATE_BASTET";
 
     [Header("[추가] 클리어 후 다음 씬으로 자동 이동 (토트 전까지는 아누비스로)")]
-    [Tooltip("켜면 보상 팝업을 닫은 뒤 잠시 후 화면이 어두워지며 다음 씬으로 넘어감. 끄면 북쪽 출구(Exit_ToThoth)를 밟아야 넘어감")]
+    [Tooltip("엔딩(BastetEnding)이 없을 때만 씀. 켜면 보상 팝업을 닫은 뒤 다음 씬으로 넘어감. 끄면 북쪽 출구(Exit_ToThoth)를 밟아야 넘어감")]
     [SerializeField] private bool autoExitOnClear = true;
     [Tooltip("Build Profiles의 Scene List에 있는 씬 이름. 토트 씬이 완성되면 Puzzle_Test_Thoth로 바꾸기")]
     [SerializeField] private string nextSceneName = "Puzzle_Test_Anubis_Tutorial";
@@ -64,7 +74,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
     private BastetFootprintPlate lastPlate;
     private Color dayColor = Color.white;
     private float dayIntensity = 1f;
-    private WaitForSeconds waitBefore, waitGap, waitFail;
+    private WaitForSeconds waitBefore, waitGap, waitFail, waitRoundHold; // [추가] waitRoundHold
     private WaitForSeconds[] waitOnByRound;
 
     private int Count => Mathf.Min(plates.Length, statues.Length);
@@ -94,6 +104,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         waitBefore = new WaitForSeconds(data.BeforeShowDelay);
         waitGap = new WaitForSeconds(data.ShowGapTime);
         waitFail = new WaitForSeconds(data.FailFlashTime);
+        waitRoundHold = new WaitForSeconds(roundClearHold); // [추가]
         waitOnByRound = new WaitForSeconds[data.SunRounds + 1];
         for (int r = 0; r < data.SunRounds; r++) waitOnByRound[r] = new WaitForSeconds(data.ShowOnTime(r + 1));
         waitOnByRound[data.SunRounds] = new WaitForSeconds(data.ShowOnTime(data.SunRounds));
@@ -155,6 +166,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         {
             int b = sunSeq[i];
             plates[b].SetGlow(true, data.ButtonColor(b));
+            BastetSfx.Show(b); // [추가] 발판마다 다른 음
             yield return on;
             plates[b].SetGlow(false, data.ButtonColor(b));
             yield return waitGap;
@@ -179,14 +191,29 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
             return;
         }
 
-        plate.SetGlow(true, data.GoldColor);
+        // [수정] 맞게 밟음: 금빛으로 번쩍 + 소리 + 진행 알림 (눌렸는지 확실히)
+        plate.Pulse(data.GoldColor);
+        BastetSfx.Correct(inputIndex);
         inputIndex++;
+        if (showStepProgress && inputIndex < round) Toast($"발자국 {inputIndex} / {round}");
         if (inputIndex < round) return;
 
-        // 라운드 통과
-        if (round >= SunRounds) { StartCoroutine(ChangeToMoon()); return; }
+        // [수정] 라운드 통과: 바로 넘어가지 않고 밟은 발판을 켜 둔 채 잠깐 보여 줌
+        StartCoroutine(RoundClearRoutine());
+    }
+
+    // [추가] 단계 통과 연출 -> 다음 단계 (또는 밤으로)
+    private IEnumerator RoundClearRoutine()
+    {
+        state = State.Showing; // 기다리는 동안 밟아도 무시
+        BastetSfx.RoundClear();
+        Toast(round >= SunRounds ? "해의 발자국을 모두 따라갔다!" : $"{round}단계 통과! 다음 발자국을 보자.");
+        Debug.Log($"[BastetB5] 해 {round}단계 통과", this);
+        yield return waitRoundHold;
+
+        if (round >= SunRounds) { yield return ChangeToMoon(); yield break; }
         round++;
-        StartCoroutine(ShowSun());
+        yield return ShowSun();
     }
 
     // 해 -> 달: 방이 어두워짐
@@ -196,6 +223,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         inMoon = true;
         failCount = 0;
         Toast(data.ChangeMessage);
+        BastetSfx.Night(); // [추가] 해가 지는 징 소리
         SetDisc(false); // [추가] 원반을 달로
         yield return FadeGlobal(nightColor, nightIntensity, data.PhaseChangeTime);
         AllOff();
@@ -216,6 +244,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         {
             int b = moonSeq[k];
             statues[b].SetEyes(true, EyeColor(b));
+            BastetSfx.Eye(b); // [추가]
             yield return on;
             statues[b].SetEyes(false, EyeColor(b));
             yield return waitGap;
@@ -242,7 +271,9 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         }
 
         statues[index].SetEyes(true, data.GoldColor);
+        BastetSfx.Correct(inputIndex); // [추가]
         inputIndex++;
+        if (showStepProgress && inputIndex < MoonCount) Toast($"석상 {inputIndex} / {MoonCount}"); // [추가]
         if (inputIndex >= MoonCount) Submit(); // [수정]
     }
 
@@ -251,6 +282,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
     {
         state = State.Showing;
         failCount++;
+        BastetSfx.Wrong(); // [추가]
         if (statues[index] != null) statues[index].EatTorch(data.WrongColor, data.FailFlashTime);
         if (!moon) plates[index].SetGlow(true, data.WrongColor);
         PunishTorch(moon ? data.MoonRetryMessage : data.SunRetryMessage);
@@ -294,8 +326,10 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         if (!string.IsNullOrEmpty(rewardItemId)) ItemPopup.Grant(rewardItemId); // [수정] 팀 공용 획득 팝업 (지급 + 팝업)
         if (restoreDayOnClear) StartCoroutine(FadeGlobal(dayColor, dayIntensity, data.PhaseChangeTime));
         Toast(data.ClearMessage);
+        BastetSfx.Clear(); // [추가]
         Debug.Log("[BastetB5] 해와 달의 기억 클리어!", this);
-        if (autoExitOnClear) StartCoroutine(AutoExit()); // [추가]
+        if (ending == null) ending = FindFirstObjectByType<BastetEnding>(FindObjectsInactive.Include); // [추가]
+        if (ending != null || autoExitOnClear) StartCoroutine(AutoExit()); // [수정] 엔딩이 있으면 엔딩 먼저
     }
 
     // [추가] 보상 팝업·대사가 닫히면 잠시 뒤 다음 씬으로
@@ -306,6 +340,14 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         yield return null;
         while (BastetGoddess.Busy || ItemPopup.IsShowing || DialogueBox.IsOpen) yield return null; // [추가] 여신 마무리 대사가 끝날 때까지
         if (autoExitDelay > 0f) yield return new WaitForSecondsRealtime(autoExitDelay);
+
+        // [추가] 엔딩 연출이 있으면 엔딩이 다음 씬 이동까지 맡음
+        if (ending != null)
+        {
+            Debug.Log("[BastetB5] 엔딩 연출 시작", this);
+            ending.Play();
+            yield break;
+        }
 
         if (sceneExit == null) sceneExit = FindFirstObjectByType<AnubisSceneExit>();
         if (sceneExit != null && sceneExit.GoNow(nextSceneName, exitMessage))

@@ -47,6 +47,20 @@ public class BastetClawPatternPuzzle : PuzzleBase
 
     private readonly string[] clawSymbols = { "?", "/", "//", "///" };
 
+    // [추가] 발톱 자국 그림 (0 = 빈칸, 1~3 = 발톱 1~3줄). 4장 모두 있으면 글자 대신 그림으로 보여 줌
+    [Header("[추가] 발톱 자국 그림 (Tools/Bastet/★ 오브젝트·퍼즐 그림 입히기가 넣음)")]
+    [SerializeField] private Sprite[] clawSprites = new Sprite[4];
+    [SerializeField] private Color artFixed = Color.white;
+    [SerializeField] private Color artBlank = new Color(0.92f, 0.9f, 0.85f, 1f);
+    [SerializeField] private Color artSelected = new Color(1f, 0.82f, 0.4f, 1f);
+    [SerializeField] private Color artWrong = new Color(1f, 0.5f, 0.45f, 1f);
+    [SerializeField] private Color artGold = new Color(1f, 0.92f, 0.55f, 1f);
+
+    [Tooltip("그림 모드일 때 안내·후보 글자 색 (파피루스 위 갈색)")]
+    [SerializeField] private Color artInk = new Color(0.42f, 0.25f, 0.07f, 1f);
+
+    private bool UseArt => clawSprites != null && clawSprites.Length >= 4 && clawSprites[0] != null && clawSprites[1] != null && clawSprites[2] != null && clawSprites[3] != null;
+
     private int selectedBlankSlotIndex = -1;
     private bool isChecking = false;
 
@@ -59,6 +73,8 @@ public class BastetClawPatternPuzzle : PuzzleBase
 
     private void Awake()
     {
+        ApplyArtLook(); // [추가] 그림이 연결돼 있으면 후보 버튼·글자도 그림에 맞춤 (메뉴를 안 눌러도)
+
         for (int i = 0; i < patternSlots.Length; i++)
         {
             int index = i;
@@ -133,6 +149,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
             patternSlots[selectedBlankSlotIndex].currentValue = value;
             selectedBlankSlotIndex = -1;
             UpdateSlotVisuals();
+            BastetSfx.Press(); // [추가] 발톱 자국 새기는 소리
         }
     }
 
@@ -141,6 +158,19 @@ public class BastetClawPatternPuzzle : PuzzleBase
         for (int i = 0; i < patternSlots.Length; i++)
         {
             var slot = patternSlots[i];
+
+            // [추가] 그림 모드: 칸 그림 = 발톱 자국, 글자는 빈칸 '?'만
+            if (UseArt)
+            {
+                int v = slot.isBlank ? slot.currentValue : slot.fixedValue;
+                if (slot.slotBackground != null)
+                {
+                    slot.slotBackground.sprite = clawSprites[Mathf.Clamp(v, 0, 3)];
+                    slot.slotBackground.color = !slot.isBlank ? artFixed : (i == selectedBlankSlotIndex ? artSelected : artBlank);
+                }
+                if (slot.slotText != null) slot.slotText.text = (slot.isBlank && v == 0) ? "?" : "";
+                continue;
+            }
 
             if (!slot.isBlank)
             {
@@ -206,7 +236,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
         for (int i = 0; i < patternSlots.Length; i++)
         {
             if (patternSlots[i].slotBackground != null)
-                patternSlots[i].slotBackground.color = colGold;
+                patternSlots[i].slotBackground.color = UseArt ? artGold : colGold; // [수정]
             if (patternSlots[i].slotText != null)
                 patternSlots[i].slotText.color = new Color(0.2f, 0.15f, 0.05f, 1f);
         }
@@ -215,11 +245,13 @@ public class BastetClawPatternPuzzle : PuzzleBase
             textStatusNotice.text = "<color=#FFD700>4x3 벽화의 좌우 대칭과 세로 순환이 완성되었습니다! (메인 반복 규칙 획득)</color>";
 
         if (successNotice != null) successNotice.SetActive(true);
+        BastetSfx.RoundClear(); // [추가]
     }
 
     private IEnumerator FailRoutine()
     {
         isChecking = true;
+        BastetSfx.Wrong(); // [추가]
 
         if (textStatusNotice != null)
             textStatusNotice.text = "<color=#FF4444>가로 대칭 또는 세로 순환 규칙이 어긋난 빈칸이 있습니다!</color>";
@@ -229,7 +261,7 @@ public class BastetClawPatternPuzzle : PuzzleBase
             if (patternSlots[i].isBlank && patternSlots[i].currentValue != patternSlots[i].targetValue)
             {
                 if (patternSlots[i].slotBackground != null)
-                    patternSlots[i].slotBackground.color = colWrong;
+                    patternSlots[i].slotBackground.color = UseArt ? artWrong : colWrong; // [수정]
             }
         }
 
@@ -288,6 +320,56 @@ public class BastetClawPatternPuzzle : PuzzleBase
         if (textStatusNotice != null)
             textStatusNotice.text = $"가로 대칭과 세로 순환 규칙을 분석하여 {blankIndices.Length}개의 빈칸(?)을 채우십시오.";
     }
+
+    // [추가] 그림 모드 꾸미기: 후보 버튼 = 발톱 1~3줄 그림, 칸 색 = 흰색(그림 색 그대로), 글자 = 갈색
+    private void ApplyArtLook()
+    {
+        if (!UseArt) return;
+        for (int i = 0; i < candidateButtons.Length && i < 3; i++)
+        {
+            Button b = candidateButtons[i];
+            if (b == null) continue;
+            Image img = b.targetGraphic as Image ?? b.GetComponent<Image>();
+            if (img != null) { img.sprite = clawSprites[i + 1]; img.type = Image.Type.Simple; img.color = Color.white; }
+            foreach (TMP_Text t in b.GetComponentsInChildren<TMP_Text>(true)) t.text = ""; // '/' 글자 대신 그림
+        }
+        for (int i = 0; i < patternSlots.Length; i++)
+        {
+            PatternSlot slot = patternSlots[i];
+            if (slot.slotBackground != null) slot.slotBackground.type = Image.Type.Simple;
+            if (slot.slotText != null) slot.slotText.color = new Color(0.23f, 0.14f, 0.06f, 1f);
+        }
+        if (textStatusNotice != null) textStatusNotice.color = artInk;
+    }
+
+#if UNITY_EDITOR
+    // [추가] 그림 4장이 비어 있으면 에디터에서 자동으로 찾아 넣음 (씬을 열거나 스크립트가 바뀔 때) -> Ctrl+S로 저장
+    private void OnValidate()
+    {
+        if (UseArt) return;
+        if (clawSprites == null || clawSprites.Length < 4) clawSprites = new Sprite[4];
+        bool changed = false;
+        for (int i = 0; i < 4; i++)
+        {
+            if (clawSprites[i] != null) continue;
+            clawSprites[i] = FindSprite($"Bastet_UI_Claw_{i}"); // [수정] 폴더와 상관없이 이름으로 찾음
+            changed |= clawSprites[i] != null;
+        }
+        if (!changed) return;
+        Debug.Log($"[{name}] 발톱 자국 그림 4장 자동 연결 (Ctrl+S로 씬 저장)", this);
+        UnityEditor.EditorApplication.delayCall += () => { if (this != null) UnityEditor.EditorUtility.SetDirty(this); }; // 저장 대상으로 표시
+    }
+
+    private static Sprite FindSprite(string file)
+    {
+        foreach (string guid in UnityEditor.AssetDatabase.FindAssets(file + " t:Texture2D"))
+        {
+            string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
+            if (System.IO.Path.GetFileNameWithoutExtension(path) == file) return UnityEditor.AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+        return null;
+    }
+#endif
 
     public void ClosePuzzle()
     {

@@ -91,6 +91,7 @@ public class BastetFootprintWalk : BastetWalkPuzzleBase
         {
             if (!Valid(i)) continue;
             plates[i].SetGlow(true, showColor);
+            BastetSfx.Show(i); // [추가] 발판마다 다른 음
             yield return waitOn;
             plates[i].SetGlow(false, showColor);
             yield return waitGap;
@@ -116,8 +117,10 @@ public class BastetFootprintWalk : BastetWalkPuzzleBase
             return;
         }
 
-        plate.SetGlow(true, doneColor);
+        plate.Pulse(doneColor);   // [수정] 번쩍 + 켜진 채로 (눌렸는지 확실히)
+        BastetSfx.Correct(step);  // [추가]
         step++;
+        if (step < sequence.Length) Toast($"발자국 {step} / {sequence.Length}"); // [추가] 진행 알림
         if (step >= sequence.Length) Submit();
     }
 
@@ -125,6 +128,7 @@ public class BastetFootprintWalk : BastetWalkPuzzleBase
     {
         state = State.Showing; // 깜빡이는 동안 입력 막음
         wrong.SetGlow(true, wrongColor);
+        BastetSfx.Wrong(); // [추가]
         PunishTorch(wrongMessage);
         yield return waitFail;
         AllOff();
@@ -148,6 +152,7 @@ public class BastetFootprintWalk : BastetWalkPuzzleBase
         SetSolving(false); // [추가]
         state = State.Cleared;
         foreach (int i in sequence) if (Valid(i)) plates[i].SetGlow(true, doneColor);
+        BastetSfx.RoundClear(); // [추가]
         Toast(clearMessage);
     }
 
