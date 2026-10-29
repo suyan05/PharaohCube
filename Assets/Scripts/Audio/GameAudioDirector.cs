@@ -53,7 +53,8 @@ public class GameAudioDirector : MonoBehaviour
     // ================= 배경음악 =================
     private static void PlaySceneMusic(string scene)
     {
-        if (scene.Contains("Prologue_Dig")) GameAudio.Music("bgm_prologue_desert");
+        if (scene == "Title") GameAudio.Music("bgm_title");
+        else if (scene.Contains("Prologue_Dig")) GameAudio.Music("bgm_prologue_desert");
         else if (scene.Contains("Sphinx")) GameAudio.Music("bgm_sphinx_dream");
         else if (scene.Contains("Ra_Tilemap")) GameAudio.Music(RaPhaseState.IsNight ? "bgm_ra_temple_night" : "bgm_ra_temple_day");
         else if (scene.Contains("CentralRoom") || scene.Contains("CentralHall")) GameAudio.Music("bgm_ra_temple_day");
