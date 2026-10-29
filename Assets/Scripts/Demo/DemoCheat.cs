@@ -15,6 +15,9 @@ using UnityEngine.UI;
 // - 아누비스의 방: 서브 퍼즐 보상 4개 + 양피지 조각 전부 -> 바로 메인 저울
 // - 라, 바스테트는 플래그를 켠 뒤 씬을 다시 불러옴 (모든 방, 횃불, 문이 저장된 상태대로 정리됨)
 //
+// - 프롤로그 (발굴 현장, 스핑크스의 꿈): 연출 중이면 연출 건너뛰기, 대화창만 떠 있으면 대화 건너뛰기
+//   (선택지 대화와 아이템 팝업은 건너뛰지 않음 -> E로 직접)
+//
 // [순서 고정]
 // - 바스테트 엔딩이 끝나면 아누비스 튜토리얼 대신 중앙 홀로 (중앙 홀 북쪽 문 -> 아누비스의 방)
 // - 중앙 홀 -> 바스테트, 아누비스도 튜토리얼 방 없이 바로 실전 방 (HallRoute 기본값)
@@ -79,18 +82,43 @@ public class DemoCheat : MonoBehaviour
     private void Update()
     {
         UpdateToast();
-        if (!Input.GetKeyDown(CheatKey) || Time.unscaledTime < nextAllowed) return;
-        if (Cine.Running || DialogueBox.IsOpen || ItemPopup.IsShowing) return;
-        nextAllowed = Time.unscaledTime + Cooldown;
+        if (!Input.GetKeyDown(CheatKey)) return;
 
         try
         {
-            HandleCheat(SceneManager.GetActiveScene().name);
+            string scene = SceneManager.GetActiveScene().name;
+            if (IsPrologue(scene))
+            {
+                SkipPrologue();
+                return;
+            }
+            if (Time.unscaledTime < nextAllowed) return;
+            if (Cine.Running || DialogueBox.IsOpen || ItemPopup.IsShowing) return;
+            nextAllowed = Time.unscaledTime + Cooldown;
+            HandleCheat(scene);
         }
         catch (Exception e)
         {
             Debug.LogError($"[DemoCheat] 치트 오류: {e}");
         }
+    }
+
+    // ================= 프롤로그 T = 건너뛰기 =================
+    private static bool IsPrologue(string scene)
+    {
+        return scene.Contains("Prologue_Dig") || scene.Contains("Prologue_Sphinx");
+    }
+
+    // 연출 중 -> 연출 전체 건너뛰기 (ESC 길게와 같음). 이미 건너뛰는 중이거나 연출 밖 -> 대화창 건너뛰기
+    private void SkipPrologue()
+    {
+        if (Cine.Running && !Cine.Skipping)
+        {
+            CineSkip.RequestNow();
+            Toast("[치트] 연출 건너뛰기");
+            return;
+        }
+        DialogueBox.SkipToEnd();
     }
 
     // ================= T =================

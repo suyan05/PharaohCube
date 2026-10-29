@@ -35,6 +35,21 @@ public class CineSkip : MonoBehaviour
         }
     }
 
+    // 시연용 T 키 (DemoCheat): 지금 돌고 있는 연출을 바로 건너뜀 (ESC 길게와 같은 효과, Begin(false) 연출도 포함)
+    public static void RequestNow()
+    {
+        try
+        {
+            if (!Cine.Running || Requested) return;
+            Requested = true;
+            if (instance != null) instance.SetHint(false);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[CineSkip] 바로 건너뛰기 오류: {e}");
+        }
+    }
+
     private static CineSkip Get()
     {
         if (instance == null) instance = CineRunner.Instance.gameObject.AddComponent<CineSkip>();

@@ -105,6 +105,16 @@ public class DialogueBox : MonoBehaviour
         if (IsOpen) instance.Close(false);
     }
 
+    // 시연용 T 키 (DemoCheat): 남은 대사를 건너뛰고 끝난 것으로 처리 (끝나면 할 일은 부름)
+    // - 선택지가 있는 대화(스핑크스 수수께끼 등)는 건너뛰지 않음 -> false
+    public static bool SkipToEnd()
+    {
+        if (!IsOpen || instance.choices != null) return false;
+        if (Time.frameCount == instance.openedFrame) return false;
+        instance.Close(true);
+        return true;
+    }
+
     private void Open(DialogueLine[] newLines, Action finished, string[] newChoices, Action<int> chosen)
     {
         try
