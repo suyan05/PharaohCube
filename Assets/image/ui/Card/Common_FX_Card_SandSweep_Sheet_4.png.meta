@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: f40d956104b97834ebcbd3040460e51b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5497556296775996693
+    second: Common_FX_Card_SandSweep_Sheet_4_0
+  - first:
+      213: -7336336420439238311
+    second: Common_FX_Card_SandSweep_Sheet_4_1
+  - first:
+      213: -8582346507946958711
+    second: Common_FX_Card_SandSweep_Sheet_4_2
+  - first:
+      213: 5965419799297295955
+    second: Common_FX_Card_SandSweep_Sheet_4_3
+  - first:
+      213: -2706980248355467079
+    second: Common_FX_Card_SandSweep_Sheet_4_4
+  - first:
+      213: 8862204865920093499
+    second: Common_FX_Card_SandSweep_Sheet_4_5
+  - first:
+      213: 9133140586413637637
+    second: Common_FX_Card_SandSweep_Sheet_4_6
+  - first:
+      213: -865234609351219070
+    second: Common_FX_Card_SandSweep_Sheet_4_7
+  - first:
+      213: 4837011344564732
+    second: Common_FX_Card_SandSweep_Sheet_4_8
+  - first:
+      213: -2323057419020276094
+    second: Common_FX_Card_SandSweep_Sheet_4_9
+  - first:
+      213: -7966952061252603166
+    second: Common_FX_Card_SandSweep_Sheet_4_10
+  - first:
+      213: -7409411763473553233
+    second: Common_FX_Card_SandSweep_Sheet_4_11
+  - first:
+      213: -7632302074034348858
+    second: Common_FX_Card_SandSweep_Sheet_4_12
+  - first:
+      213: 5140434648658495234
+    second: Common_FX_Card_SandSweep_Sheet_4_13
+  - first:
+      213: -1894276114496376248
+    second: Common_FX_Card_SandSweep_Sheet_4_14
+  - first:
+      213: -2075739014522686419
+    second: Common_FX_Card_SandSweep_Sheet_4_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3
+        width: 480
+        height: 717
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5159b0a135e3b4c40800000000000000
+      internalID: 5497556296775996693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_1
+      rect:
+        serializedVersion: 2
+        x: 218
+        y: 53
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95955fa25e8103a90800000000000000
+      internalID: -7336336420439238311
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_2
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 93
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 980e18e725165e880800000000000000
+      internalID: -8582346507946958711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_3
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 75
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 356823983bd69c250800000000000000
+      internalID: 5965419799297295955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_4
+      rect:
+        serializedVersion: 2
+        x: 380
+        y: 80
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b016ca6ecfde6ad0800000000000000
+      internalID: -2706980248355467079
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_5
+      rect:
+        serializedVersion: 2
+        x: 381
+        y: 33
+        width: 7
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3dc7ef1f50ecfa70800000000000000
+      internalID: 8862204865920093499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 53
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50043e059fe6fbe70800000000000000
+      internalID: 9133140586413637637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_7
+      rect:
+        serializedVersion: 2
+        x: 391
+        y: 82
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2882f3ef4b11ef3f0800000000000000
+      internalID: -865234609351219070
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_8
+      rect:
+        serializedVersion: 2
+        x: 396
+        y: 82
+        width: 16
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf1a7f67c3f211000800000000000000
+      internalID: 4837011344564732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_9
+      rect:
+        serializedVersion: 2
+        x: 411
+        y: 88
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28ee572e597d2cfd0800000000000000
+      internalID: -2323057419020276094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_10
+      rect:
+        serializedVersion: 2
+        x: 413
+        y: 51
+        width: 6
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e2f87e9f43bf6190800000000000000
+      internalID: -7966952061252603166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_11
+      rect:
+        serializedVersion: 2
+        x: 419
+        y: 75
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa8ee83024b7c2990800000000000000
+      internalID: -7409411763473553233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_12
+      rect:
+        serializedVersion: 2
+        x: 423
+        y: 79
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cc94ba83bd941690800000000000000
+      internalID: -7632302074034348858
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_13
+      rect:
+        serializedVersion: 2
+        x: 430
+        y: 72
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2074668e31e765740800000000000000
+      internalID: 5140434648658495234
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_14
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 87
+        width: 38
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 842bfe009ed26b5e0800000000000000
+      internalID: -1894276114496376248
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Common_FX_Card_SandSweep_Sheet_4_15
+      rect:
+        serializedVersion: 2
+        x: 445
+        y: 84
+        width: 8
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d24b4f03d5e7133e0800000000000000
+      internalID: -2075739014522686419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Common_FX_Card_SandSweep_Sheet_4_0: 5497556296775996693
+      Common_FX_Card_SandSweep_Sheet_4_1: -7336336420439238311
+      Common_FX_Card_SandSweep_Sheet_4_10: -7966952061252603166
+      Common_FX_Card_SandSweep_Sheet_4_11: -7409411763473553233
+      Common_FX_Card_SandSweep_Sheet_4_12: -7632302074034348858
+      Common_FX_Card_SandSweep_Sheet_4_13: 5140434648658495234
+      Common_FX_Card_SandSweep_Sheet_4_14: -1894276114496376248
+      Common_FX_Card_SandSweep_Sheet_4_15: -2075739014522686419
+      Common_FX_Card_SandSweep_Sheet_4_2: -8582346507946958711
+      Common_FX_Card_SandSweep_Sheet_4_3: 5965419799297295955
+      Common_FX_Card_SandSweep_Sheet_4_4: -2706980248355467079
+      Common_FX_Card_SandSweep_Sheet_4_5: 8862204865920093499
+      Common_FX_Card_SandSweep_Sheet_4_6: 9133140586413637637
+      Common_FX_Card_SandSweep_Sheet_4_7: -865234609351219070
+      Common_FX_Card_SandSweep_Sheet_4_8: 4837011344564732
+      Common_FX_Card_SandSweep_Sheet_4_9: -2323057419020276094
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
