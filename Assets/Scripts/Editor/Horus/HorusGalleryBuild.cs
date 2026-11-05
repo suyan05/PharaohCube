@@ -100,6 +100,7 @@ public static class HorusGalleryBuild
     private static void Director(Sprite falcon)
     {
         HorusDirector d = new GameObject("HorusDirector").AddComponent<HorusDirector>();
+        d.gameObject.AddComponent<HorusTestKit>(); // 에디터에서 호루스 씬을 바로 Play할 때만 돋보기/붓/횃불 지급
         Volume dream = DreamVolume(d.transform);
         var so = new SerializedObject(d);
         HorusArtSetup.Prop(so, "horusPortrait").objectReferenceValue = HorusArtSetup.Art("H5/H5_06"); // [임시] 호루스 초상화가 오면 바꾸기

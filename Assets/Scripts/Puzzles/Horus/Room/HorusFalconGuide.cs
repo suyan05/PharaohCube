@@ -75,6 +75,7 @@ public class HorusFalconGuide : MonoBehaviour
         edgeIcon.preserveAspect = true;
         edgeIcon.color = Color.white;
         edgeArrow.raycastTarget = edgeIcon.raycastTarget = false;
+        HideEdge(); // 처음엔 꺼 둠 (화면 밖일 때만 UpdateEdge가 켬)
     }
 
     private void SetShown(bool on)
@@ -82,6 +83,13 @@ public class HorusFalconGuide : MonoBehaviour
         shown = on;
         if (root != null) root.gameObject.SetActive(on);
         if (shadow != null) shadow.enabled = on;
+        if (!on) HideEdge(); // [수정] 등장 전엔 화면 가장자리 표시도 숨김 (화면 가운데에 떠 있던 것)
+    }
+
+    private void HideEdge()
+    {
+        if (edgeIcon != null) edgeIcon.enabled = false;
+        if (edgeArrow != null) edgeArrow.enabled = false;
     }
 
     // ================= 매 프레임 =================

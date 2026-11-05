@@ -123,6 +123,27 @@ public static class HorusRoomSetup
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // 퍼즐 완료 플래그가 씬에서 비어 있으면 채움 (H1이 비어 있어서 목표 안내/매/노트 3이 멈췄었음)
+    public static void FixPuzzleFlags()
+    {
+        SetClearFlag<MirrorWingPuzzle>("F_HO_H1_DONE");
+        SetClearFlag<WedjatRestorePuzzle>("F_HO_H3_DONE");
+        SetClearFlag<StarPathLockPuzzle>("F_HO_H4_DONE");
+        SetClearFlag<SkyAlignPuzzle>("F_HO_H5_DONE");
+    }
+
+    private static void SetClearFlag<T>(string flag) where T : PuzzleBase
+    {
+        T puzzle = Object.FindFirstObjectByType<T>(FindObjectsInactive.Include);
+        if (puzzle == null) return;
+        var so = new SerializedObject(puzzle);
+        SerializedProperty p = so.FindProperty("clearFlag");
+        if (p == null || !string.IsNullOrEmpty(p.stringValue)) return;
+        p.stringValue = flag;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        Debug.Log($"[HorusRoomSetup] {typeof(T).Name} 완료 플래그가 비어 있어서 {flag}로 채움");
+    }
+
     public static void AddToBuildSettings(string path)
     {
         var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);

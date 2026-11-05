@@ -36,6 +36,7 @@ public static class HorusRoomBuilder
             HorusArtSetup.Apply();
             HorusRoomSetup.FinishSorting(layer);
             HorusRoomSetup.SetupObjectiveGuide();
+            HorusRoomSetup.FixPuzzleFlags();
             EditorSceneManager.SaveScene(scene);
             HorusRoomSetup.AddToBuildSettings(ScenePath);
             EditorUtility.DisplayDialog("호루스 타일맵", $"{ScenePath}\n만들었어요. Play로 확인해 주세요.", "확인");

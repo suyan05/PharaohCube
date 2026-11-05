@@ -32,11 +32,11 @@ public static class HorusWorldArt
         return n;
     }
 
-    // 청금석 별 3개 (3번은 테스트 씬에서 길 칸 크기로 잘못 들어가 있어서 기획서 자리로 되돌림)
+    // 청금석 별 3개 (3번은 테스트 씬에서 길 칸 크기로 잘못 들어가 있었음 -> 기둥과 겹치지 않는 북동쪽 구석으로)
     private static int LapisStars()
     {
         GameObject third = HorusArtSetup.Find("OBJ_H16_LapisStar_3");
-        if (third != null) third.transform.position = new Vector3(16.3f, 11.2f, 0f);
+        if (third != null) third.transform.position = new Vector3(18.6f, 12.6f, 0f);
         int n = 0;
         for (int i = 1; i <= 3; i++) n += Fit($"OBJ_H16_LapisStar_{i}", "H2/H2_star_on", new Vector2(0.6f, 0.6f), Lapis);
         return n;

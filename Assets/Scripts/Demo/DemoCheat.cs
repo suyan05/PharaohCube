@@ -148,6 +148,7 @@ public class DemoCheat : MonoBehaviour
         }
         SetFlags(HorusFlags);
         GrantItem(HorusItemIds.WedjatAmulet); // 매의 회랑(히든 방) 확인용 (원래는 토트의 방 보상)
+        GrantItem("TOOL_LENS");               // 비석 상형문자 해독용 (원래는 스핑크스에게 받음)
         Toast("[치트] 호루스 메인 퍼즐로 (북쪽 매의 제단) + 우자트 부적");
     }
 
