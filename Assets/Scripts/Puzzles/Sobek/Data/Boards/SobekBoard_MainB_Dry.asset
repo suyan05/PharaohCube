@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1f23479baf8c94aab6040e7d47f144, type: 3}
+  m_Name: SobekBoard_MainB_Dry
+  m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
+  displayName: "\uC170\uB370\uD2B8 \uC2E0\uC804 \xB7 \uAC74\uAE30"
+  intro: "\uBB3C\uC774 \uBE60\uC9C4 \uC544\uB798\uCE35. \uC81C\uB2E8\uC740 \uBCBD\uC5D0
+    \uB458\uB7EC\uC2F8\uC5EC \uC788\uB2E4."
+  map: '#############
+
+    #.....#.....#
+
+    #.....##.##.#
+
+    ######~#.####
+
+    #...~~~~.##.#
+
+    #...##~#.####
+
+    ########....#
+
+    ###########.#
+
+    #############'
+  dryPits: 1
+  start: {x: 1, y: 1}
+  entrance: {x: 1, y: 1}
+  goal: {x: 11, y: 4}
+  goalKind: 2
+  allowExit: 0
+  levelCount: 1
+  startLevel: 0
+  useTerraces: 0
+  eggs:
+  - {x: 2, y: 2}
+  islands:
+  - center: {x: 6, y: 4}
+    north: 1
+    east: 1
+    south: 0
+    west: 0
+  plates:
+  - cell: {x: 4, y: 2}
+    kind: 1
+    bridgeId: B
+    spins: []
+  - cell: {x: 6, y: 4}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 0
+      clockwise: 1
+  - cell: {x: 1, y: 4}
+    kind: 3
+    bridgeId: 
+    spins: []
+  - cell: {x: 5, y: 1}
+    kind: 3
+    bridgeId: 
+    spins: []
+  bridges:
+  - cell: {x: 4, y: 4}
+    id: B
+  rewardItemId: 
+  clearFlag: 
+  timeLimit: 300
+  hintAfterResets: 3
+  hint: "\uC54C\uC744 B \uBC1C\uD310\uC5D0 \uC62C\uB824 \uB2E4\uB9AC\uB97C \uBA3C\uC800
+    \uB744\uC6B4 \uB4A4 \uAC70\uC6B8 \uC138\uACC4\uB85C \uB118\uC5B4\uAC00\uC790."

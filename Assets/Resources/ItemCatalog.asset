@@ -101,3 +101,39 @@ MonoBehaviour:
       \uD683\uBD88\uC774 \uB450 \uBC30 \uBC1D\uACE0 \uB450 \uBC30 \uC624\uB798 \uD0C4\uB2E4"
     icon: {fileID: 0}
     hidden: 1
+  - id: ITEM_SOBEK_AMULET_ROTATE
+    displayName: "\uC18C\uC6A9\uB3CC\uC774 \uBD80\uC801"
+    description: "\uB098\uC77C\uC758 \uC18C\uC6A9\uB3CC\uC774\uB97C \uB2E4\uC2A4\uB9AC\uB294
+      \uC545\uC5B4 \uBD80\uC801"
+    icon: {fileID: 0}
+    hidden: 0
+  - id: ITEM_SOBEK_AMULET_LIFT
+    displayName: "\uC545\uC5B4 \uB4F1 \uBD80\uC801"
+    description: "\uB4F1\uC744 \uB0B4\uC5B4 \uC8FC\uB294 \uC18C\uBCA0\uD06C\uC758
+      \uC545\uC5B4 \uBD80\uC801"
+    icon: {fileID: 0}
+    hidden: 0
+  - id: ITEM_SOBEK_AMULET_WATER
+    displayName: "\uBC94\uB78C \uBD80\uC801"
+    description: "\uB098\uC77C\uC758 \uBC94\uB78C\uC744 \uB2F4\uC740 \uC545\uC5B4
+      \uBD80\uC801"
+    icon: {fileID: 0}
+    hidden: 0
+  - id: ITEM_SOBEK_AMULET_MIRROR
+    displayName: "\uC218\uBA74 \uBD80\uC801"
+    description: "\uBB3C \uC704\uC640 \uBB3C\uC18D\uC744 \uBE44\uCD94\uB294 \uC545\uC5B4
+      \uBD80\uC801"
+    icon: {fileID: 0}
+    hidden: 0
+  - id: PLATE_SOBEK
+    displayName: "\uC545\uC5B4 \uD615\uD310"
+    description: "\uD050\uBE0C\uC758 \uB2E4\uC12F \uBC88\uC9F8 \uBA74\uC5D0 \uB07C\uC6B0\uB294
+      \uC18C\uBCA0\uD06C\uC758 \uD615\uD310"
+    icon: {fileID: 0}
+    hidden: 0
+  - id: ITEM_SOBEK_TOOTH
+    displayName: "\uC18C\uBCA0\uD06C\uC758 \uC774\uBE68"
+    description: "\uBA54\uC778 \uD37C\uC990\uC744 \uD55C \uBC88 \uB354 \uB3C4\uC804\uD560
+      \uC218 \uC788\uAC8C \uD574 \uC8FC\uB294 \uC545\uC5B4 \uC774\uBE68"
+    icon: {fileID: 0}
+    hidden: 1

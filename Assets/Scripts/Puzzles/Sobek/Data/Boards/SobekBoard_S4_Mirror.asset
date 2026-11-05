@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1f23479baf8c94aab6040e7d47f144, type: 3}
+  m_Name: SobekBoard_S4_Mirror
+  m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
+  displayName: "S4 \uB450 \uAC1C\uC758 \uC218\uBA74"
+  intro: "\uAC70 \uBC1C\uD310\uC744 \uBC1F\uC73C\uBA74 \uB124 \uC790\uB9AC\uB294
+    \uADF8\uB300\uB85C, \uBC29\uC774 \uC88C\uC6B0\uB85C \uB4A4\uC9D1\uD78C\uB2E4."
+  map: '#########
+
+    ..#.....#
+
+    #....##.#
+
+    #....#.##
+
+    #...#.#.#
+
+    #########'
+  dryPits: 0
+  start: {x: 1, y: 1}
+  entrance: {x: -1, y: 1}
+  goal: {x: 7, y: 4}
+  goalKind: 0
+  allowExit: 1
+  levelCount: 1
+  startLevel: 0
+  useTerraces: 0
+  eggs: []
+  islands: []
+  plates:
+  - cell: {x: 1, y: 4}
+    kind: 3
+    bridgeId: 
+    spins: []
+  - cell: {x: 1, y: 2}
+    kind: 3
+    bridgeId: 
+    spins: []
+  bridges: []
+  rewardItemId: ITEM_SOBEK_AMULET_MIRROR
+  clearFlag: F_SOBEK_S4_CLEAR
+  timeLimit: 0
+  hintAfterResets: 3
+  hint: "\uAC70\uC6B8 \uC138\uACC4\uC5D0\uC11C \uBCF4\uC774\uB294 \uBAA9\uD45C\uB294
+    \uAC00\uC9DC. \uC9C4\uC9DC \uBAA9\uD45C\uB294 \uBC18\uB300\uCABD \uAC70\uC6B8
+    \uBC1C\uD310 \uBC11\uC5D0 \uC788\uB2E4."
