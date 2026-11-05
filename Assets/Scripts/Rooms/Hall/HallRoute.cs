@@ -20,10 +20,10 @@ public class HallRoute
 
     public static HallRoute[] Defaults()
     {
-        return new[] { Ra(), Bastet() };
+        return new[] { Ra(), Bastet(), Horus() };
     }
 
-    // [추가] 바스테트를 끝내고 돌아오면 -> 아누비스의 방 (튜토리얼 없이 실전 방)
+    // [수정] 바스테트를 끝내고 돌아오면 -> 호루스의 방 (토트는 아직 준비 중이라 건너뜀, 준비되면 이 사이에 Thoth() 추가)
     private static HallRoute Bastet()
     {
         return new HallRoute
@@ -32,14 +32,36 @@ public class HallRoute
             clearFlag = "F_BASTET_ENDING_DONE",
             returnedFlag = "F_HALL_BASTET_RETURNED",
             faceTitle = "큐브의 두 번째 면 - 고양이",
+            nextScene = "Puzzle_Horus_Test",
+            nextPrompt = "호루스의 신전으로",
+            objective = "북쪽 문으로 호루스의 신전에 들어가자",
+            cubeLines = new[]
+            {
+                new DialogueLine("???", "고양이의 면이 깨어났다."),
+                new DialogueLine("???", "다음 문이 열린다. 하늘을 나는 매, 호루스의 신전이다."),
+                new DialogueLine("나", "두 번째 빛... 다음은 호루스.")
+            }
+        };
+    }
+
+    // [추가] 호루스를 끝내고 돌아오면 -> 아누비스의 방 (튜토리얼 없이 실전 방)
+    // [확인 필요] faceTitle 몇 번째 면인지: 기획 순서(라-바스테트-토트-호루스)대로 네 번째로 적음
+    private static HallRoute Horus()
+    {
+        return new HallRoute
+        {
+            god = "호루스",
+            clearFlag = "F_HO_H5_DONE",
+            returnedFlag = "F_HALL_HORUS_RETURNED",
+            faceTitle = "큐브의 네 번째 면 - 하늘",
             nextScene = "Puzzle_Test_Anubis_Tilemap",
             nextPrompt = "아누비스의 신전으로",
             objective = "북쪽 문으로 아누비스의 신전에 들어가자",
             cubeLines = new[]
             {
-                new DialogueLine("???", "고양이의 면이 깨어났다."),
+                new DialogueLine("???", "하늘의 면이 깨어났다."),
                 new DialogueLine("???", "다음 문이 열린다. 죽은 자를 심판하는 자, 아누비스의 신전이다."),
-                new DialogueLine("나", "두 번째 빛... 이제 아누비스야.")
+                new DialogueLine("나", "매의 눈까지 찾았어... 이제 아누비스야.")
             }
         };
     }

@@ -6,12 +6,13 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // 시연용 치트키 T + 시연 순서 고정 (빌드에서도 동작. 시연이 끝나면 AllowInBuild = false)
-// 순서: 타이틀 -> 발굴 현장 -> 스핑크스의 꿈 -> 중앙 홀 -> 라의 방 -> 중앙 홀 -> 바스테트의 방 -> 중앙 홀 -> 아누비스의 방
+// 순서: 타이틀 -> 발굴 현장 -> 스핑크스의 꿈 -> 중앙 홀 -> 라의 방 -> 중앙 홀 -> 바스테트의 방 -> 중앙 홀 -> 호루스의 방 -> 중앙 홀 -> 아누비스의 방
 //
 // [T 키]
 // - 라의 방 (낮): 낮 P1~P4를 푼 상태로 -> 바로 북쪽 태양 제단(낮 메인 퍼즐)을 풀 수 있음
 // - 라의 방 (밤): 밤 P1~P4를 푼 상태로 -> 바로 북쪽 밤의 제단(밤 메인 퍼즐)을 풀 수 있음
 // - 바스테트의 방: 서브 방 1~4를 푼 상태 + 신상의 방 문 열림 -> 바로 메인 퍼즐(해와 달의 기억)
+// - 호루스의 방: 성도 4단계 + H1·H3·H4 + 노트 3·4·5 + 달의 눈 -> 바로 메인 제단(H5 호루스의 하늘)
 // - 아누비스의 방: 서브 퍼즐 보상 4개 + 양피지 조각 전부 -> 바로 메인 저울
 // - 라, 바스테트는 플래그를 켠 뒤 씬을 다시 불러옴 (모든 방, 횃불, 문이 저장된 상태대로 정리됨)
 //
@@ -48,6 +49,13 @@ public class DemoCheat : MonoBehaviour
         "FLAG_BASTET_P1", "FLAG_BASTET_P2", "FLAG_BASTET_P3", "FLAG_BASTET_P4",
         "F_BASTET_GATE_Gate_Room2_OPEN", "F_BASTET_GATE_Gate_Room3_OPEN",
         "F_BASTET_GATE_Gate_Room4_OPEN", "F_BASTET_GATE_Gate_T_OPEN"
+    };
+
+    // 호루스: H5 제단은 열 때마다 플래그를 직접 봄 -> 다시 불러오지 않음
+    private static readonly string[] HorusFlags =
+    {
+        "F_HO_CHART_1", "F_HO_CHART_2", "F_HO_CHART_3", "F_HO_CHART_4",
+        "F_HO_H1_DONE", "F_HO_H3_DONE", "F_HO_H4_DONE", "F_HO_NOTE_4", "F_HO_MOON_EYE"
     };
 
     private static DemoCheat instance;
@@ -126,8 +134,20 @@ public class DemoCheat : MonoBehaviour
     {
         if (scene.Contains("Ra_Tilemap")) CheatRa();
         else if (scene.Contains("Bastet_Tliemap") || scene.Contains("Bastet_Tilemap")) CheatBastet();
+        else if (scene.Contains("Horus")) CheatHorus();
         else if (scene.Contains("Anubis_Tilemap")) CheatAnubis();
         else Toast("이 방에는 치트가 없습니다");
+    }
+
+    private void CheatHorus()
+    {
+        if (HasFlag("F_HO_H5_DONE"))
+        {
+            Toast("호루스의 하늘은 이미 되찾았다");
+            return;
+        }
+        SetFlags(HorusFlags);
+        Toast("[치트] 호루스 메인 퍼즐로 (북쪽 매의 제단)");
     }
 
     private void CheatRa()

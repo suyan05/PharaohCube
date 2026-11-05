@@ -58,6 +58,7 @@ public class GameAudioDirector : MonoBehaviour
         else if (scene.Contains("Sphinx")) GameAudio.Music("bgm_sphinx_dream");
         else if (scene.Contains("Ra_Tilemap")) GameAudio.Music(RaPhaseState.IsNight ? "bgm_ra_temple_night" : "bgm_ra_temple_day");
         else if (scene.Contains("CentralRoom") || scene.Contains("CentralHall")) GameAudio.Music("bgm_ra_temple_day");
+        else if (scene.Contains("Horus")) GameAudio.Music("bgm_horus_temple");
     }
 
     private void HandleFlag(string flag)

@@ -190,14 +190,16 @@ public class SkyAlignPuzzle : PuzzleBase
     }
 
     // ================= 단서 (화면 표시용) =================
+    // [수정] 난이도: 카드에서 (아버지)/(어머니)/(아들) 표시를 뺌
+    //   -> 노트 4·5는 '아버지/어머니/아들의 별'로 말하므로, 오시리스·이시스가 호루스의 부모라는 걸 한 번 이어야 순서가 풀림
     public List<string> GetCardLines()
     {
         return new List<string>
         {
             CardLine("F_HO_CHART_1", "메스케티우 - 지지 않는 황소 다리"),
-            CardLine("F_HO_CHART_2", "사흐 - 오시리스의 별 (아버지)"),
-            CardLine("F_HO_CHART_3", "소프데트 - 이시스의 별 (어머니)"),
-            CardLine("F_HO_CHART_4", "우자트 - 호루스의 눈 (아들)")
+            CardLine("F_HO_CHART_2", "사흐 - 오시리스의 별"),
+            CardLine("F_HO_CHART_3", "소프데트 - 이시스의 별"),
+            CardLine("F_HO_CHART_4", "우자트 - 호루스의 눈")
         };
     }
 
