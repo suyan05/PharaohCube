@@ -32,7 +32,7 @@ public class HallRoute
             clearFlag = "F_BASTET_ENDING_DONE",
             returnedFlag = "F_HALL_BASTET_RETURNED",
             faceTitle = "큐브의 두 번째 면 - 고양이",
-            nextScene = "Puzzle_Horus_Test",
+            nextScene = "Puzzle_Horus_Tilemap", // 메뉴 PharaohCube -> Horus -> 호루스 타일맵 씬 만들기 로 생기는 씬
             nextPrompt = "호루스의 신전으로",
             objective = "북쪽 문으로 호루스의 신전에 들어가자",
             cubeLines = new[]

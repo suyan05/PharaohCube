@@ -45,6 +45,10 @@ public class ConstellationChartPuzzle : PuzzleBase
     [SerializeField] private int memoryGuideFromStage = 3;
     [SerializeField] private float memoryGuideSeconds = 4f;
 
+    [Header("성좌 도판 (단계별 그림, 흐린 선과 같이 보였다 사라짐. 비우면 안 씀)")]
+    [SerializeField] private UnityEngine.UI.Image chartCard;
+    [SerializeField] private List<Sprite> stageCards = new List<Sprite>();
+
     [Header("꺼진 별 자리와 별 조각 (기획서 4.1)")]
     [SerializeField] private List<StarSocket> sockets = DefaultSockets();
 
@@ -201,6 +205,7 @@ public class ConstellationChartPuzzle : PuzzleBase
             busy = false;
             if (guide != null) guide.HideAll();
             OnSuccessInternal();
+            ShowCard(false);
             yield break;
         }
         LoadStage(stageIndex + 1);
@@ -282,6 +287,7 @@ public class ConstellationChartPuzzle : PuzzleBase
         if (guide == null) return;
         StopMemoryRoutine();
         guide.ShowGuide(answer);
+        ShowCard(true);
         if (IsMemoryStage && isActiveAndEnabled) memoryRoutine = StartCoroutine(MemoryGuideRoutine());
     }
 
@@ -290,6 +296,16 @@ public class ConstellationChartPuzzle : PuzzleBase
         yield return new WaitForSeconds(memoryGuideSeconds);
         memoryRoutine = null;
         if (guide != null) guide.HideGuide();
+        ShowCard(false);
+    }
+
+    // 지금 단계 도판 그림 (stageCards 순서 = 단계 순서)
+    private void ShowCard(bool show)
+    {
+        if (chartCard == null) return;
+        bool has = stageIndex >= 0 && stageIndex < stageCards.Count && stageCards[stageIndex] != null;
+        chartCard.gameObject.SetActive(show && has && !IsCleared);
+        if (has) chartCard.sprite = stageCards[stageIndex];
     }
 
     private void HandleSegment(string edgeKey)
@@ -297,6 +313,7 @@ public class ConstellationChartPuzzle : PuzzleBase
         if (!IsMemoryStage || guide == null) return;
         StopMemoryRoutine();
         guide.HideGuide();
+        ShowCard(false);
     }
 
     private void StopMemoryRoutine()

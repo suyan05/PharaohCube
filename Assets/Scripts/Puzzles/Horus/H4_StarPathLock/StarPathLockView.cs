@@ -17,6 +17,12 @@ public class StarPathLockView : MonoBehaviour
     [SerializeField] private Vector2 cutSize = new Vector2(230f, 120f);
     [SerializeField] private float cutSpacing = 250f;
 
+    [Header("그림 (비우면 색 네모 + 글자 - 예전 그대로)")]
+    [SerializeField] private Sprite sealSprite;
+    [Tooltip("4컷이 한 장에 이어진 벽화 (H4_03)")]
+    [SerializeField] private Sprite muralSprite;
+    [SerializeField] private Vector2 muralSize = new Vector2(800f, 240f);
+
     private static readonly string[] CutTexts =
     {
         "동쪽 지평선에서\n매가 떠오른다",
@@ -31,7 +37,9 @@ public class StarPathLockView : MonoBehaviour
     private Image sealCover;
     private Font font;
     private bool built;
-    private Color cutColor, gold, paper, red, lapis;
+    private Color cutColor, gold, paper, red, lapis, hintGlow;
+
+    private bool HasMural => muralSprite != null;
 
     private void Start()
     {
@@ -73,6 +81,7 @@ public class StarPathLockView : MonoBehaviour
         paper = HorusUiFactory.Hex("#F6F1E7");
         red = new Color(0.70f, 0.23f, 0.23f, 0.85f);
         lapis = HorusUiFactory.Hex("#3E7BD6");
+        hintGlow = new Color(0.91f, 0.70f, 0.23f, 0.45f);
     }
 
     private void Build()
@@ -96,8 +105,14 @@ public class StarPathLockView : MonoBehaviour
 
     private void BuildMural()
     {
+        float titleY = HasMural ? muralY + muralSize.y / 2f + 22f : muralY + 95f;
         HorusUiFactory.CreateText(boardRoot, font, "남쪽 벽화 - 매의 비행", 22,
-            new Vector2(0f, muralY + 95f), new Vector2(600f, 36f), gold);
+            new Vector2(0f, titleY), new Vector2(600f, 36f), gold);
+        if (HasMural)
+        {
+            BuildMuralArt();
+            return;
+        }
         for (int i = 0; i < cutImages.Length; i++)
         {
             Vector2 pos = new Vector2((i - 1.5f) * cutSpacing, muralY);
@@ -110,11 +125,34 @@ public class StarPathLockView : MonoBehaviour
         }
     }
 
+    // 벽화 그림 한 장 + 그 위에 투명한 4칸 (힌트 때 해당 칸만 금빛으로 비침). 방위 글자는 그림 아래
+    private void BuildMuralArt()
+    {
+        Image strip = HorusUiFactory.CreateRect(boardRoot, "MuralArt", new Vector2(0f, muralY), muralSize, Color.white);
+        strip.sprite = muralSprite;
+        strip.preserveAspect = true;
+        float w = muralSize.x / cutImages.Length;
+        for (int i = 0; i < cutImages.Length; i++)
+        {
+            Vector2 pos = new Vector2((i - 1.5f) * w, muralY);
+            cutImages[i] = HorusUiFactory.CreateRect(boardRoot, $"MuralCut_{i}", pos, new Vector2(w, muralSize.y), Color.clear);
+            HorusUiFactory.CreateText(boardRoot, font, CutLabels[i], 16, pos + new Vector2(0f, -muralSize.y / 2f - 14f),
+                new Vector2(w, 24f), paper);
+        }
+    }
+
     // 잠겨 있을 때 별판을 덮는 붉은 봉인 (클릭도 막음)
     private void BuildSeal()
     {
         sealCover = HorusUiFactory.CreateRect(boardRoot, "SetSeal", Vector2.zero, new Vector2(420f, 420f), red);
         sealCover.raycastTarget = true;
+        if (sealSprite != null)
+        {
+            sealCover.sprite = sealSprite;
+            sealCover.color = Color.white;
+            sealCover.preserveAspect = true;
+            return;
+        }
         HorusUiFactory.CreateText(sealCover.rectTransform, font, "세트의 붉은 봉인", 30,
             Vector2.zero, new Vector2(400f, 60f), paper);
     }
@@ -125,7 +163,9 @@ public class StarPathLockView : MonoBehaviour
         sealCover.gameObject.SetActive(!puzzle.IsUnlocked);
         for (int i = 0; i < cutImages.Length; i++)
         {
-            cutImages[i].color = puzzle.HintCut == i ? gold : cutColor;
+            Color normal = HasMural ? Color.clear : cutColor;
+            Color hint = HasMural ? hintGlow : gold;
+            cutImages[i].color = puzzle.HintCut == i ? hint : normal;
         }
     }
 
