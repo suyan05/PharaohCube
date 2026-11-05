@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 // 아래 글자 그림이 곧 맵 (작업 도면 Horus_Map_Plan.png와 같은 데이터). 맨 윗줄 = y 17, 맨 왼칸 = x -9
 //   '#' 벽 윗면 (Title_12)        'B' 벽 앞면 벽돌 (Title_07 (2))
 //   '.' 본당 바닥  'a' 입구 전실 바닥  'g' 매의 회랑 바닥  'D' 북문 자리 바닥
-//   'H' 숨은 통로 바닥 (위에 막힌 벽 오브젝트 OBJ_HG0_HiddenWall을 따로 둠)  ' ' 빈칸
+//   ' ' 빈칸. 매의 회랑은 여기 없음 -> 열릴 때 HorusHiddenGallery가 칠함 (처음엔 안 보이게)
 // 바닥은 라의 방처럼 3종을 섞음 (Title_09 많이, Title_10 가끔, Title_11 조금)
 public static class HorusRoomMap
 {
@@ -21,16 +21,16 @@ public static class HorusRoomMap
         "        #BBBBBBBBBBBDDBBBBBBBBBBB#",
         "        #........................#",
         "        #........................#",
-        "#########........................#",
-        "#BBBBBBB#........................#",
-        "#ggggggg#........................#",
-        "#ggggggg#........................#",
-        "#ggggggg#........................#",
-        "#gggggggH........................#",
-        "#gggggggH........................#",
-        "#ggggggg#........................#",
-        "#ggggggg#........................#",
-        "#########........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
+        "        #........................#",
         "        #........................#",
         "        #........................#",
         "        #........................#",
@@ -44,7 +44,6 @@ public static class HorusRoomMap
         "                #aaaaaaaa#        ",
         "                #aaaaaaaa#        ",
         "                ##########        "
-
     };
 
     public static Tilemap Build(string layer, int order)
@@ -54,7 +53,7 @@ public static class HorusRoomMap
         Tilemap wall = Create(grid.transform, "Wall", layer, order - 9, true);
         TileBase top = Load("Title_12_0");
         TileBase face = Load("Title_07 (2)_0");
-        TileBase[] floors = { Load("Title_09_0"), Load("Title_10_0"), Load("Title_11_0") };
+        TileBase[] floors = FloorTiles();
         var rng = new System.Random(21);
         for (int r = 0; r < Rows.Length; r++)
         {
@@ -87,7 +86,13 @@ public static class HorusRoomMap
         return go.GetComponent<Tilemap>();
     }
 
-    private static TileBase Load(string name)
+    public static TileBase[] FloorTiles() => new[] { Load("Title_09_0"), Load("Title_10_0"), Load("Title_11_0") };
+
+    public static TileBase WallTop() => Load("Title_12_0");
+
+    public static TileBase WallFace() => Load("Title_07 (2)_0");
+
+    public static TileBase Load(string name)
     {
         TileBase tile = AssetDatabase.LoadAssetAtPath<TileBase>(TileDir + name + ".asset");
         if (tile == null) Debug.LogWarning($"[HorusRoomMap] 타일 없음: {TileDir}{name}.asset");

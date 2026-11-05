@@ -147,7 +147,8 @@ public class DemoCheat : MonoBehaviour
             return;
         }
         SetFlags(HorusFlags);
-        Toast("[치트] 호루스 메인 퍼즐로 (북쪽 매의 제단)");
+        GrantItem(HorusItemIds.WedjatAmulet); // 매의 회랑(히든 방) 확인용 (원래는 토트의 방 보상)
+        Toast("[치트] 호루스 메인 퍼즐로 (북쪽 매의 제단) + 우자트 부적");
     }
 
     private void CheatRa()

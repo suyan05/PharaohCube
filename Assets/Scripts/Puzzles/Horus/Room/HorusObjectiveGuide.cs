@@ -47,6 +47,9 @@ public class HorusObjectiveGuide : MonoBehaviour
     private readonly Dictionary<SpriteRenderer, Color> originalColors = new Dictionary<SpriteRenderer, Color>();
     private Text objectiveText;
     private HorusObjectiveStep current;
+
+    // [추가] 지금 목표 퍼즐 (HorusGoalMarker가 그 위에 별을 띄움)
+    public SpriteRenderer CurrentTarget => current != null ? current.target : null;
     private bool subscribed;
 
     private void Start()

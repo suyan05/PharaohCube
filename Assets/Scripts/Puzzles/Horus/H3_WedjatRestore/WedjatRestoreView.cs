@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -263,6 +264,25 @@ public class WedjatRestoreView : MonoBehaviour
     public void Click(int index)
     {
         if (built) puzzle.Rotate(index);
+    }
+
+    // [추가] 은빛 실 전(잠김)에 조각을 잡으면: 조각이 덜덜 떨고 안내 문구
+    public void NotifyLocked(int index)
+    {
+        if (!built || puzzle.IsUnlocked || puzzle.IsCleared || index < 0 || index >= pieceRects.Length) return;
+        puzzle.ExplainLocked();
+        StartCoroutine(Wiggle(pieceRects[index]));
+    }
+
+    private IEnumerator Wiggle(RectTransform rt)
+    {
+        Vector2 start = rt.anchoredPosition;
+        for (float t = 0f; t < 0.3f; t += Time.unscaledDeltaTime)
+        {
+            rt.anchoredPosition = start + new Vector2(Mathf.Sin(t * 70f) * 6f, 0f);
+            yield return null;
+        }
+        rt.anchoredPosition = start;
     }
 
     private void PlaceInSlot(int index, int slot)

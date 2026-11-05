@@ -9,7 +9,9 @@ public static class HorusWorldArt
 {
     private const string Slate = "Assets/image/Test/Object/Slate.png";
     private const string Door = "Assets/image/Test/Object/Door_top.png";
-    private const string Pillar = "Assets/image/Ra/Object/pillar-Horus.png";
+    private const string Pillar = "Assets/image/Hall/World/Hall_Obj_Pillar.png"; // 중앙 홀과 같은 돌기둥
+    public const string MuralMosaic = "H4/H4_03_Mosaic";                        // 벽화를 픽셀로 뭉갠 흐릿한 모자이크 (E로 보면 원본)
+    public static readonly Vector2 MuralSize = new Vector2(2.8f, 0.84f);
     private static readonly Color Lapis = new Color(0.55f, 0.7f, 1f, 1f);
 
     public static int Apply()
@@ -20,12 +22,12 @@ public static class HorusWorldArt
         n += Fit("H3_WedjatRestore", "H3/H3_01", new Vector2(2.4f, 1.8f));
         n += Fit("H4_StarPathLock", "H4/H4_01", new Vector2(2.8f, 2.8f));
         n += Fit("H5_SkyAlign", "H5/H5_01", new Vector2(3.2f, 2.4f));
-        n += Fit("OBJ_H08_Mural", "H4/H4_03", new Vector2(3.5f, 1.05f));
+        n += Fit("OBJ_H08_Mural", MuralMosaic, MuralSize);
         n += Fit("OBJ_H04_MoonEyeMount", "Object/Object_02", new Vector2(0.8f, 0.8f));
         n += Fit("OBJ_H02_GuideStone", Slate, new Vector2(0.9f, 1.3f));
         n += Fit("OBJ_H11_WarningSlab", Slate, new Vector2(1f, 1.4f));
         n += Fit("OBJ_H13_NorthDoor", Door, new Vector2(2.4f, 2f));
-        foreach (string p in new[] { "Pillar_NW", "Pillar_NE", "Pillar_SW", "Pillar_SE" }) n += Fit(p, Pillar, new Vector2(1f, 2.4f));
+        foreach (string p in new[] { "Pillar_NW", "Pillar_NE", "Pillar_SW", "Pillar_SE" }) n += Fit(p, Pillar, new Vector2(0.9f, 2.7f));
         n += LapisStars();
         return n;
     }

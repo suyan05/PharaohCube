@@ -9,6 +9,9 @@ public static class HorusItemIds
     public const string SealFalcon = "ITEM_SEAL_FALCON";      // 매 인장 (H2-3 보상 -> H4 사용)
     public const string StarFrag3 = "HO_STAR_FRAG_3";         // 별 조각 3 (H4 보상 -> 성도 D3)
 
+    // [확인 필요] 우자트 부적 = 토트의 방 메인 보상 -> 호루스 매 석상에 끼우면 매의 회랑이 열림. ID는 토트 쪽과 맞추기
+    public const string WedjatAmulet = "ITEM_WEDJAT_AMULET";
+
     public const string PlateHorus = "PLATE_HORUS";           // 호루스 형판 (H5 보상 -> 큐브 장착). F5 목록 제외
 
     public static readonly string[] All =

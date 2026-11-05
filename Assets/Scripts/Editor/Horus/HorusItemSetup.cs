@@ -18,7 +18,9 @@ public static class HorusItemSetup
         { HorusItemIds.SilverThread, "은빛 실", "은빛 실은 찢긴 것을 다시 잇는다.", "Object/Object_03" },
         { HorusItemIds.MoonEye, "달의 눈", "장착대에 끼우면 이후 긋는 선이 은빛이 된다.", "Object/Object_02" },
         { HorusItemIds.SealFalcon, "매 인장", "세트의 봉인은 매의 인장만이 연다.", "Object/Object_01" },
-        { HorusItemIds.PlateHorus, "하늘 형판", "하늘의 형판을 큐브의 면에 장착하라.", "H5/H5_08" }
+        { HorusItemIds.PlateHorus, "하늘 형판", "하늘의 형판을 큐브의 면에 장착하라.", "H5/H5_08" },
+        // [확인 필요] 토트의 방 보상. 아이콘은 임시 (우자트 성좌)
+        { HorusItemIds.WedjatAmulet, "우자트 부적", "토트가 고쳐 준 호루스의 눈. 어딘가 비어 있는 눈 자리에 꼭 맞을 것 같다.", "H5/H5_05" }
     };
 
     public static int Apply()

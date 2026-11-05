@@ -47,6 +47,7 @@ public static class HorusArtSetup
     public static Sprite Art(string name)
     {
         string path = name.StartsWith("Assets/") ? name : ArtRoot + name + ".png";
+        MakeSprite(path);
         Sprite best = null;
         foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(path))
         {
@@ -57,6 +58,18 @@ public static class HorusArtSetup
     }
 
     private static float Area(Sprite s) => s.rect.width * s.rect.height;
+
+    // 새로 넣은 그림이 일반 텍스처로 들어와 있으면 Sprite로 바꿈 (예: H4_03_Mosaic)
+    private static void MakeSprite(string path)
+    {
+        if (!(AssetImporter.GetAtPath(path) is TextureImporter importer)) return;
+        if (importer.textureType == TextureImporterType.Sprite) return;
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Single;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled = false;
+        importer.SaveAndReimport();
+    }
 
     // ================= 씬에서 찾기 (꺼진 오브젝트 포함) =================
     public static GameObject Find(string objName)

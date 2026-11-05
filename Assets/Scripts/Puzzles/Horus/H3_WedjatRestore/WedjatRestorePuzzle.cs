@@ -207,6 +207,12 @@ public class WedjatRestorePuzzle : PuzzleBase
         ItemInventory.Instance.Grant(itemId);
     }
 
+    // [추가] 잠긴 상태에서 조각을 잡았을 때 (WedjatRestoreView가 부름)
+    public void ExplainLocked()
+    {
+        Message("조각이 석판에 붙어 꿈쩍도 않는다. 찢긴 것을 다시 이을 무언가가 필요하다. (성도판 2단계 보상)");
+    }
+
     private void Message(string text)
     {
         LastMessage = text;

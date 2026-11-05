@@ -2,38 +2,42 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-// 호루스 타일맵 씬에 새로 놓는 물건 (HorusRoomBuilder가 부름). 위치는 작업 도면 그대로
-// - 입구 전실: 신화 책 독서대(HA1), 횃불 제단(HA2)
-// - 본당: 별화로 3개(HL1~3, 횃불로 켜는 불), 매 석상 2개(H12)
-// - 매의 회랑(숨은 공간): 막힌 벽(HG0), 히든 자리 표시(HG1), 파피루스 조각 자리(HG2)
+// 호루스 타일맵 씬에 새로 놓거나 바꾸는 물건 (HorusRoomBuilder가 부름). 위치는 작업 도면 그대로
+// - 입구 전실: 신화 책 독서대(HA1), 횃불 제단(HA2), 벽돌 벽의 벽화 모자이크(H08)
+// - 본당: 별 횃불 3개(HL1~3) + 옆 단서 비석 3개(HS1~3), 입구 비석/경고 석판을 단서 비석으로 바꿈
+// - 매 석상, 매의 회랑, 연출 감독, 목표 표시는 HorusGalleryBuild
 // 아트가 없는 것은 기본 도형(사각형, 원) + 색으로 임시 제작 -> 나중에 그림만 바꾸면 됨
 public static class HorusRoomObjects
 {
     private const string TorchAltarPrefab = "Assets/Prefabs/Common/TorchAltar.prefab";
-    private const string BrazierOff = "Assets/image/Hall/World/Hall_Obj_Brazier_Off.png";
-    private const string BrazierOn = "Assets/image/Hall/World/Hall_Obj_Brazier_On.png";
+    private const string TorchOff = "Assets/image/Test/Object/Light_off.png";
+    private const string TorchOn = "Assets/image/Test/Object/Light_on.png";
 
-    private static Sprite square, circle;
-    private static string layer;
+    public static Sprite Square { get; private set; }
+    public static Sprite Circle { get; private set; }
+    public static string Layer { get; private set; }
 
     public static void Build(Sprite squareSprite, Sprite circleSprite, string sortingLayer)
     {
-        square = squareSprite;
-        circle = circleSprite;
-        layer = sortingLayer;
+        Square = squareSprite;
+        Circle = circleSprite;
+        Layer = sortingLayer;
         Transform root = new GameObject("HorusRoom").transform;
+        HorusClueSetup.EnsurePanel();
         BuildAntechamber(root);
-        Brazier(root, "OBJ_HL1_StarBrazier", new Vector2(1.5f, 14.5f), "HO_1");
-        Brazier(root, "OBJ_HL2_StarBrazier", new Vector2(22.5f, 14.5f), "HO_2");
-        Brazier(root, "OBJ_HL3_StarBrazier", new Vector2(1.5f, 1.5f), "HO_3");
-        BuildStatues(root);
-        BuildGallery(root);
+        BuildMural();
+        WallTorch t1 = Torch(root, "OBJ_HL1_StarTorch", new Vector2(0.6f, 10.6f), "HO_1");
+        WallTorch t2 = Torch(root, "OBJ_HL2_StarTorch", new Vector2(21f, 14.8f), "HO_2");
+        WallTorch t3 = Torch(root, "OBJ_HL3_StarTorch", new Vector2(3f, 0.6f), "HO_3");
+        BuildPuzzleSteles(root, t1, t2, t3);
+        ConvertNotes();
+        HorusGalleryBuild.Build(root);
     }
 
     // ================= 입구 전실 =================
     private static void BuildAntechamber(Transform root)
     {
-        GameObject book = Shape(root, "OBJ_HA1_MythBook", new Vector2(9.5f, -4f), square, new Vector2(0.9f, 0.7f), new Color(0.55f, 0.4f, 0.24f));
+        GameObject book = Shape(root, "OBJ_HA1_MythBook", new Vector2(9.5f, -4f), Square, new Vector2(0.9f, 0.7f), new Color(0.55f, 0.4f, 0.24f));
         book.AddComponent<BoxCollider2D>();
         Inspect(book, "HO_MYTH_BOOK", "신화 책 읽기", MythLines());
 
@@ -60,24 +64,39 @@ public static class HorusRoomObjects
         };
     }
 
-    // ================= 별화로 (WallTorch: 내 횃불로 E 길게 -> 켜짐 -> 주변이 밝아짐) =================
-    private static void Brazier(Transform root, string objName, Vector2 pos, string torchId)
+    // ================= 벽화: 바닥을 막던 판 -> 전실 벽돌 벽의 흐릿한 모자이크 (E = 크게 보기 + 수첩) =================
+    private static void BuildMural()
     {
-        Sprite off = HorusArtSetup.Art(BrazierOff);
-        GameObject go = Shape(root, objName, pos, off != null ? off : circle, Vector2.one, Color.white);
-        go.AddComponent<BoxCollider2D>().size = new Vector2(0.8f, 0.6f);
+        GameObject mural = HorusArtSetup.Find("OBJ_H08_Mural");
+        if (mural == null) return;
+        mural.transform.position = new Vector3(9.5f, -1.5f, 0f); // 전실 북쪽 벽돌 벽 왼쪽 칸 (x 8~10, y -2~-1)
+        HorusWorldArt.Fit("OBJ_H08_Mural", HorusWorldArt.MuralMosaic, HorusWorldArt.MuralSize);
+        BoxCollider2D box = mural.GetComponent<BoxCollider2D>();
+        if (box != null) box.isTrigger = true; // 벽에 붙은 그림이라 길을 막지 않음 (조사만)
+        HorusClueSetup.ConvertNoteStone("OBJ_H08_Mural", "MURAL", "남쪽 벽화 - 매의 비행", "H4/H4_03", Layer);
+    }
+
+    // ================= 별 횃불 (WallTorch: 내 횃불로 E 길게 -> 켜짐 -> 옆 단서 비석이 읽힘) =================
+    private static WallTorch Torch(Transform root, string objName, Vector2 pos, string torchId)
+    {
+        Sprite off = HorusArtSetup.Art(TorchOff);
+        GameObject go = Shape(root, objName, pos, off != null ? off : Circle, Vector2.one, Color.white);
+        if (off != null) HorusWorldArt.FitObject(go, off, new Vector2(0.6f, 1.2f), Color.white);
+        go.AddComponent<BoxCollider2D>(); // 그림 크기에 자동으로 맞음
         Light2D light = PointLight(go.transform, new Color(1f, 0.75f, 0.45f), 4.5f);
+        light.transform.position = go.transform.position + Vector3.up * 0.45f; // 불꽃 자리
         WallTorch torch = go.AddComponent<WallTorch>();
         var so = new SerializedObject(torch);
         HorusArtSetup.Prop(so, "torchId").stringValue = torchId;
         HorusArtSetup.Prop(so, "target").objectReferenceValue = go.GetComponent<SpriteRenderer>();
         HorusArtSetup.Prop(so, "offSprite").objectReferenceValue = off;
-        HorusArtSetup.Prop(so, "onSprite").objectReferenceValue = HorusArtSetup.Art(BrazierOn);
+        HorusArtSetup.Prop(so, "onSprite").objectReferenceValue = HorusArtSetup.Art(TorchOn);
         HorusArtSetup.Prop(so, "lightSource").objectReferenceValue = light;
         HorusArtSetup.Prop(so, "dayAutoFlag").stringValue = "";
         HorusArtSetup.Prop(so, "nightAutoFlag").stringValue = "";
         HorusArtSetup.Prop(so, "nightFlag").stringValue = "F_HO_NO_NIGHT"; // 호루스 방엔 낮/밤이 없음 (아무도 안 켜는 플래그)
         so.ApplyModifiedPropertiesWithoutUndo();
+        return torch;
     }
 
     private static Light2D PointLight(Transform parent, Color color, float radius)
@@ -93,46 +112,40 @@ public static class HorusRoomObjects
         return light;
     }
 
-    // ================= 매 석상 (기획서 OBJ_H12). 왼쪽 = 한쪽 눈이 빈 석상 (우자트를 끼우는 곳) =================
-    private static void BuildStatues(Transform root)
+    // ================= 퍼즐 단서 비석 (옆 별 횃불을 켜야 읽힘) =================
+    private static void BuildPuzzleSteles(Transform root, WallTorch t1, WallTorch t2, WallTorch t3)
     {
-        Sprite falcon = HorusArtSetup.Art("H1/H1_03");
-        Color stone = new Color(0.85f, 0.78f, 0.62f);
-        GameObject left = Statue(root, "OBJ_H12_FalconStatue_L", new Vector2(9.5f, 12.8f), falcon, stone);
-        Statue(root, "OBJ_H12_FalconStatue_R", new Vector2(14.5f, 12.8f), falcon, stone);
-        // [확인 필요] 우자트(토트의 방 보상)를 끼우면 회랑이 열리는 연출은 토트 방이 붙은 뒤에 만듦. 지금은 조사 대사만
-        Inspect(left, "HO_FALCON_STATUE", "매 석상 조사", new[,] { { "나", "매 석상의 한쪽 눈이 비어 있다. 무언가를 끼울 수 있을 것 같다." } });
+        Stele(root, "OBJ_HS1_ClueStele", new Vector2(1.7f, 10.6f), t1, 11, "S1", "반쪽 날개", "H1/H1_01",
+            "반쪽 날개로는 날 수 없다. 몸통을 거울 삼아 남은 반쪽을 똑같이 그려라.");
+        Stele(root, "OBJ_HS2_ClueStele", new Vector2(22.2f, 14.6f), t2, 12, "S2", "별의 길", "H2/H2_05",
+            "별은 한 번 걸은 길을 다시 걷지 않는다. 선이 홀수 개 모이는 별에서 시작해, 그런 별에서 끝난다.");
+        Stele(root, "OBJ_HS3_ClueStele", new Vector2(4.2f, 0.6f), t3, 13, "S3", "찢긴 눈", "H3/H3_02",
+            "세트는 아들의 눈을 여섯 조각으로 찢었다. 눈썹, 눈동자, 흰자 둘, 나선 꼬리, 눈물선. 조각은 은빛 실로만 다시 이어진다.");
     }
 
-    // 그림 크기를 먼저 맞추고 충돌 상자를 붙임 (붙일 때 그림 크기에 자동으로 맞음)
-    private static GameObject Statue(Transform root, string objName, Vector2 pos, Sprite art, Color tint)
+    private static void Stele(Transform root, string objName, Vector2 pos, WallTorch torch, int noteId,
+        string id, string title, string art, string body)
     {
-        GameObject go = Shape(root, objName, pos, art != null ? art : square, Vector2.one, tint);
-        if (art != null) HorusWorldArt.FitObject(go, art, new Vector2(1.4f, 1f), tint);
+        Sprite slate = HorusArtSetup.Art(HorusClueSetup.Slate);
+        GameObject go = Shape(root, objName, pos, slate != null ? slate : Square, Vector2.one, Color.white);
+        if (slate != null) HorusWorldArt.FitObject(go, slate, new Vector2(0.75f, 1.1f), Color.white);
         go.AddComponent<BoxCollider2D>();
-        return go;
+        ClueData data = HorusClueSetup.Data(id, title, body, art);
+        HorusClueSetup.AddStele(go, data, torch, $"F_HO_CLUE_{id}_READ", noteId, body, Layer);
     }
 
-    // ================= 매의 회랑 (숨은 공간) =================
-    private static void BuildGallery(Transform root)
+    // 입구 비석(노트 1), 경고 석판(노트 4): 로그만 남던 NoteStone -> 단서 패널이 뜨는 비석
+    private static void ConvertNotes()
     {
-        // 막힌 벽: 벽 윗면 그림을 1 x 2칸으로 늘림 + 본당 쪽에 금색 선 (조사하면 열리는 벽 표시)
-        Sprite wallTop = HorusRoomMap.WallTopSprite();
-        Sprite art = wallTop != null ? wallTop : square;
-        GameObject wall = Shape(root, "OBJ_HG0_HiddenWall", new Vector2(-0.5f, 8f), art, Vector2.one, new Color(0.9f, 0.82f, 0.66f));
-        Vector2 b = art.bounds.size;
-        wall.transform.localScale = new Vector3(1f / b.x, 2f / b.y, 1f);
-        wall.AddComponent<BoxCollider2D>();
-        Shape(root, "OBJ_HG0_GoldEdge", new Vector2(-0.04f, 8f), square, new Vector2(0.08f, 2f), new Color(0.91f, 0.70f, 0.23f));
-
-        // 히든 아이템은 다른 개발자가 연결 -> 자리 표시만 (금색 원 = 히든, 종이색 사각형 = 파피루스 조각)
-        Shape(root, "HiddenItemSpot_Horus", new Vector2(-5f, 10f), circle, new Vector2(0.5f, 0.5f), new Color(1f, 0.85f, 0.35f, 0.8f));
-        Shape(root, "PapyrusSpot_Horus_2", new Vector2(-7f, 6f), square, new Vector2(0.4f, 0.3f), new Color(0.93f, 0.87f, 0.72f));
+        HorusWorldArt.Fit("OBJ_H02_GuideStone", HorusClueSetup.Slate, new Vector2(0.9f, 1.3f));
+        HorusWorldArt.Fit("OBJ_H11_WarningSlab", HorusClueSetup.Slate, new Vector2(1f, 1.4f));
+        HorusClueSetup.ConvertNoteStone("OBJ_H02_GuideStone", "ENTRY", "입구 비석", "", Layer);
+        HorusClueSetup.ConvertNoteStone("OBJ_H11_WarningSlab", "WARNING", "붉은 별의 경고", "H5/H5_07", Layer);
     }
 
     // ================= 도우미 =================
-    // 기본 도형(square, circle)은 1 x 1칸 그림이라 scale = 월드 크기
-    private static GameObject Shape(Transform parent, string objName, Vector2 pos, Sprite sprite, Vector2 scale, Color color)
+    // 기본 도형(Square, Circle)은 1 x 1칸 그림이라 scale = 월드 크기
+    public static GameObject Shape(Transform parent, string objName, Vector2 pos, Sprite sprite, Vector2 scale, Color color)
     {
         var go = new GameObject(objName, typeof(SpriteRenderer));
         go.transform.SetParent(parent, false);
@@ -141,12 +154,12 @@ public static class HorusRoomObjects
         SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
         sr.sprite = sprite;
         sr.color = color;
-        sr.sortingLayerName = layer;
+        sr.sortingLayerName = Layer;
         return go;
     }
 
     // 조사하면 대사가 나오는 물건 (몇 번이든 다시 읽을 수 있게)
-    private static void Inspect(GameObject go, string objectId, string prompt, string[,] lines)
+    public static void Inspect(GameObject go, string objectId, string prompt, string[,] lines)
     {
         Inspectable ins = go.AddComponent<Inspectable>();
         var so = new SerializedObject(ins);

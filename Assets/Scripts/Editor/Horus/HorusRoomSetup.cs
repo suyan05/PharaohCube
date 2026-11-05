@@ -13,7 +13,7 @@ public static class HorusRoomSetup
 
     private static readonly string[] PlaceholderWalls = { "Floor", "Wall_North", "Wall_South", "Wall_West", "Wall_East" };
     private static readonly string[] FloorDecals = { "Plaza", "StarPathSpine", "Path_East", "Path_West", "Path_SouthWest", "Path_SouthEast" };
-    private static readonly string[] SortRoots = { "Interactables", "Puzzles", "Environment", "HorusRoom" };
+    private static readonly string[] SortRoots = { "Interactables", "Puzzles", "Environment", "HorusRoom", "HorusGallery" };
 
     // 지우기 전에 임시 사각형/원 그림을 챙겨 둠 (기본 도형용)
     public static Sprite TakeSprite(string objName)
@@ -118,7 +118,7 @@ public static class HorusRoomSetup
         if (guide == null) return;
         var so = new SerializedObject(guide);
         SetColor(so, "pathDim", new Color(0.24f, 0.48f, 0.84f, 0f));
-        SetColor(so, "pathLit", new Color(0.24f, 0.48f, 0.84f, 0.4f));
+        SetColor(so, "pathLit", new Color(0.35f, 0.6f, 1f, 0.6f)); // 목표 길은 어둠 속에서도 보이게
         SetColor(so, "targetLocked", new Color(0.55f, 0.5f, 0.6f, 1f)); // 그림이 들어가서 예전처럼 거의 검게 하지 않음
         so.ApplyModifiedPropertiesWithoutUndo();
     }
