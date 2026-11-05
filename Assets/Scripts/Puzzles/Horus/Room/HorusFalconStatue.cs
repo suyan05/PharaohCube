@@ -17,7 +17,8 @@ public class HorusFalconStatue : MonoBehaviour, IInteractable
     [SerializeField] private DialogueLine[] emptyEyeLines =
     {
         new DialogueLine("나", "매 석상의 한쪽 눈이 비어 있다."),
-        new DialogueLine("나", "눈 모양의 무언가를 끼울 수 있을 것 같은데... 지금은 가진 게 없어.")
+        new DialogueLine("나", "눈 모양의 무언가를 끼울 수 있을 것 같은데... 지금은 가진 게 없어."),
+        new DialogueLine("나", "그런데 이 석상... 고개가 서쪽 벽 쪽으로 돌아가 있네.")
     };
     [SerializeField] private DialogueLine[] openedLines =
     {

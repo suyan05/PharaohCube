@@ -11,8 +11,9 @@ using UnityEngine.Rendering.Universal;
 public static class HorusRoomObjects
 {
     private const string TorchAltarPrefab = "Assets/Prefabs/Common/TorchAltar.prefab";
-    private const string TorchOff = "Assets/image/Test/Object/Light_off.png";
-    private const string TorchOn = "Assets/image/Test/Object/Light_on.png";
+    // [수정] 예전엔 테스트용 횃불(Light_off/on, 막대 위 네모)이라 바닥에 세운 것처럼 보였음 -> 기둥에 박힌 청동 횃대 도트 그림
+    private const string TorchOff = "Assets/image/Horus/Object/HO_Sconce_Off.png";
+    private const string TorchOn = "Assets/image/Horus/Object/HO_Sconce_On.png";
 
     public static Sprite Square { get; private set; }
     public static Sprite Circle { get; private set; }
@@ -85,9 +86,9 @@ public static class HorusRoomObjects
     {
         GameObject pillar = HorusArtSetup.Find(pillarName);
         Vector2 pos = pillar != null ? (Vector2)pillar.transform.position + new Vector2(0f, 0.35f) : Vector2.zero;
-        Sprite off = HorusArtSetup.Art(TorchOff);
+        Sprite off = HorusArtSetup.Pixel(TorchOff);
         GameObject go = Shape(root, objName, pos, off != null ? off : Circle, Vector2.one, Color.white);
-        if (off != null) HorusWorldArt.FitObject(go, off, new Vector2(0.42f, 0.85f), Color.white);
+        if (off != null) HorusWorldArt.FitObject(go, off, new Vector2(0.56f, 0.94f), Color.white);
         go.GetComponent<SpriteRenderer>().sortingOrder = 1;
         SconceCollider(go);
         Light2D light = PointLight(go.transform, new Color(1f, 0.75f, 0.45f), 4.5f);
@@ -97,7 +98,7 @@ public static class HorusRoomObjects
         HorusArtSetup.Prop(so, "torchId").stringValue = torchId;
         HorusArtSetup.Prop(so, "target").objectReferenceValue = go.GetComponent<SpriteRenderer>();
         HorusArtSetup.Prop(so, "offSprite").objectReferenceValue = off;
-        HorusArtSetup.Prop(so, "onSprite").objectReferenceValue = HorusArtSetup.Art(TorchOn);
+        HorusArtSetup.Prop(so, "onSprite").objectReferenceValue = HorusArtSetup.Pixel(TorchOn);
         HorusArtSetup.Prop(so, "lightSource").objectReferenceValue = light;
         HorusArtSetup.Prop(so, "dayAutoFlag").stringValue = "";
         HorusArtSetup.Prop(so, "nightAutoFlag").stringValue = "";

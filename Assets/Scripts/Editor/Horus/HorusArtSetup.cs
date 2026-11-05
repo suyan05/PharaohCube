@@ -59,6 +59,36 @@ public static class HorusArtSetup
 
     private static float Area(Sprite s) => s.rect.width * s.rect.height;
 
+    // 코드로 그린 도트 그림용 (HO_Sconce, HO_Isis 등): 32px = 1칸, 픽셀 또렷하게(Point), 압축 없음
+    public static Sprite Pixel(string path)
+    {
+        try
+        {
+            if (AssetImporter.GetAtPath(path) is TextureImporter imp && NeedsPixelImport(imp))
+            {
+                imp.textureType = TextureImporterType.Sprite;
+                imp.spriteImportMode = SpriteImportMode.Single;
+                imp.spritePixelsPerUnit = 32f;
+                imp.filterMode = FilterMode.Point;
+                imp.textureCompression = TextureImporterCompression.Uncompressed;
+                imp.alphaIsTransparency = true;
+                imp.mipmapEnabled = false;
+                imp.SaveAndReimport();
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[HorusArtSetup] 도트 그림 설정 오류 ({path}): {e}");
+        }
+        return Art(path);
+    }
+
+    private static bool NeedsPixelImport(TextureImporter imp)
+    {
+        return imp.textureType != TextureImporterType.Sprite || imp.filterMode != FilterMode.Point
+            || !Mathf.Approximately(imp.spritePixelsPerUnit, 32f) || imp.textureCompression != TextureImporterCompression.Uncompressed;
+    }
+
     // 새로 넣은 그림이 일반 텍스처로 들어와 있으면 Sprite로 바꿈 (예: H4_03_Mosaic)
     private static void MakeSprite(string path)
     {

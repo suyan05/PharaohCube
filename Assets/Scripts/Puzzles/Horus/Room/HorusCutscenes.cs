@@ -5,7 +5,8 @@ using UnityEngine.Rendering;
 
 // 호루스의 방 연출 장면들 (HorusDirector가 순서를 정해서 부름)
 // 쓰는 기법: 위아래 검은 바, 타이틀 자막, 암전, 꿈 화면 효과(스핑크스와 같은 Volume: 일렁임/번짐) + 낮은 울림,
-//            빛 덩어리로만 보이는 이시스, 신전을 울리는 호루스의 목소리, 매가 날아와 방을 한 바퀴 돌고 앉음,
+//            눈물/물결/깃털 속에서 날개 펴며 나타나는 이시스의 유령(HorusIsisGhost), 신전을 울리는 호루스의 목소리,
+//            매가 하늘 틈에서 뛰어들어 방을 돌고 제단에 앉음(클로즈업 -> 천천히 밀기 -> 뒤로 빠지기),
 //            카메라 밀기/당기기/흔들기, 화면 번쩍임, 천장 별 반짝임, 머리 위 "!", 형판이 떠올라 내 손으로, 방 전체가 밝아짐
 public static class HorusCutscenes
 {
@@ -69,7 +70,34 @@ public static class HorusCutscenes
         Cine.End();
     }
 
+    // 이시스 유령 그림이 있으면 유령 연출, 없으면 예전 빛 덩어리 연출
     private static IEnumerator IsisSpeaks(HorusDirector d, Vector3 pos)
+    {
+        if (d.IsisSprite != null) return IsisGhostScene(d, pos);
+        return IsisGlowScene(d, pos);
+    }
+
+    // 카메라: 살짝 넓게 시작 -> 눈물이 떨어지고 모습이 생기는 동안 천천히 다가감(돌리 인)
+    //         -> 말할 땐 얼굴 가까이 -> 사라질 땐 흩어지는 깃털을 따라 위(본당 쪽)로 올라감
+    private static IEnumerator IsisGhostScene(HorusDirector d, Vector3 pos)
+    {
+        Vector3 face = pos + Vector3.up * 2.1f;
+        CineCamera.Focus(face);
+        CineCamera.Zoom(5.2f);
+        yield return DreamIn(d);
+        HorusIsisGhost isis = HorusIsisGhost.Create(pos, d.IsisSprite, d.IsisWing, d.FeatherSprite, d.RippleSprite);
+        CineCamera.Zoom(3.3f, 2.4f);
+        if (isis != null) yield return isis.Appear();
+        CineCamera.Focus(face + Vector3.down * 0.5f); // 대사창에 안 가리게 살짝 위에 걸리도록
+        yield return Cine.Say(IsisLines());
+        CineCamera.Zoom(4.6f, 1.2f);
+        CineCamera.Focus(pos + Vector3.up * 3.5f);
+        if (isis != null) yield return isis.Vanish(pos + Vector3.up * 10f);
+        yield return DreamOut(d);
+        CineCamera.Release();
+    }
+
+    private static IEnumerator IsisGlowScene(HorusDirector d, Vector3 pos)
     {
         CineCamera.Focus(pos);
         CineCamera.Zoom(4f);
@@ -93,6 +121,7 @@ public static class HorusCutscenes
             new DialogueLine("이시스", "...잠든 모래 너머에서, 낯선 숨결이 들리는구나."),
             new DialogueLine("이시스", "나는 이시스. 흩어진 남편을 찾아 나일의 끝까지 헤맨 자."),
             new DialogueLine("이시스", "이곳은 내 아들의 하늘. 그 아이는 한쪽 눈을 잃은 뒤로 별을 보지 못한다."),
+            new DialogueLine("이시스", "서쪽 벽 너머에서도 바람이 운다... 아들의 눈을 되찾은 자만이 그 길을 걸으리라."),
             new DialogueLine("이시스", "기억은 글에 머물고, 길은 돌 위에 새겨지지... 읽고, 보거라.")
         };
     }
@@ -138,25 +167,84 @@ public static class HorusCutscenes
     }
 
     // ================= 2. 본당 첫 입장: 신전이 울리고 호루스의 매가 날아옴 =================
+    // 카메라 콘티: (1) 넓게 - 신전 전체가 울림 -> (2) 하늘 틈으로 휙 - 매가 뛰어듦, 카메라가 앞질러 따라감
+    //              -> (3) 넓게 - 매가 방을 크게 돎 -> (4) 제단 위에 착지, 빠른 줌인 클로즈업 + 날개 활짝
+    //              -> 말하는 동안 천천히 더 밀기 -> 마지막 대사에 뒤로 쭉 빠져 방 전체 공개 -> (5) 첫 목적지로 출발
     private static IEnumerator AwakenScene(HorusDirector d)
     {
         Cine.Begin(true);
         HorusFx.MatchPlayer();
-        CineLight.Dim(0.6f, 0.6f);
-        CineCamera.Focus(HallCenter);
-        CineCamera.Zoom(7.5f);
-        GameAudio.Play("sfx_rumble", 0.7f, 0.7f);
-        CineCamera.Shake(0.8f, 0.06f);
-        yield return Cine.Wait(0.8f);
-        yield return HorusVoice(d, "누가... 나의 하늘을 밟는가.");
-        if (d.Falcon != null) yield return d.Falcon.ArriveFrom(new Vector3(26f, 17f, 0f), HallCenter + Vector3.up);
-        HorusFx.StarBurst(HallCenter, HallHalf, 40, StarBlue);
-        CineCamera.Zoom(5f);
-        yield return HorusVoice(d, "나는 호루스. 두 땅의 주인, 하늘을 가르는 매.", "세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.", "별을 되살려라, 인간이여. 나의 매가 길을 보여 주리라.");
+        yield return AwakenEstablish(d);
+        yield return AwakenFalconEntry(d);
+        yield return AwakenCloseUp(d);
+        yield return AwakenTakeOff(d);
         CineLight.Restore(0.8f);
         HorusDirector.SetFlag(d.AwakenFlag);
         CineCamera.Release();
         Cine.End();
+    }
+
+    // (1) 넓은 화면: 땅울림이 점점 세지고 천장에서 금빛 먼지 + 어디선가 들리는 목소리
+    private static IEnumerator AwakenEstablish(HorusDirector d)
+    {
+        CineLight.Dim(0.6f, 0.6f);
+        CineCamera.Focus(HallCenter);
+        CineCamera.Zoom(7.5f);
+        GameAudio.Play("sfx_rumble", 0.7f, 0.7f);
+        HorusFx.StarBurst(HallCenter + Vector3.up * 5f, new Vector2(HallHalf.x, 1.2f), 18, Gold);
+        yield return CineCamera.Rumble(0.9f, 0.02f, 0.07f);
+        yield return HorusVoice(d, "누가... 나의 하늘을 밟는가.");
+    }
+
+    // (2)(3) 하늘 틈(오른쪽 위)으로 카메라가 휙 -> 매가 뛰어들어 방 가운데로 -> 넓게 빠지며 방을 한 바퀴
+    private static IEnumerator AwakenFalconEntry(HorusDirector d)
+    {
+        if (d.Falcon == null) yield break;
+        Vector3 sky = new Vector3(23f, 16.5f, 0f);
+        CineCamera.Focus(sky + new Vector3(-2.5f, -1.5f, 0f));
+        CineCamera.Zoom(4f, 0.2f);
+        yield return Cine.Wait(0.45f);
+        GameAudio.Play("sfx_wind_gust", 0.8f, 0.9f);
+        StartCoroutineSafe(d, ScreenTintUI.Flash(new Color(1f, 0.9f, 0.6f, 0.3f), 0.03f, 0.05f, 0.35f));
+        yield return d.Falcon.DiveIn(sky, HallCenter + new Vector3(3f, 1f, 0f));
+        CineCamera.Focus(HallCenter + Vector3.up);
+        CineCamera.Zoom(7f, 0.6f);
+        HorusFx.StarBurst(HallCenter, HallHalf, 40, StarBlue);
+        yield return d.Falcon.CircleAround(HallCenter + Vector3.up, 3.2f, 2f, false);
+    }
+
+    // (4) 제단 위 착지 -> 빠른 줌인 + 번쩍 + 날개 활짝 -> 말하며 천천히 밀기 -> 마지막 대사에 뒤로 빠짐
+    private static IEnumerator AwakenCloseUp(HorusDirector d)
+    {
+        Vector3 perch = TopOf("H5_SkyAlign", new Vector3(12f, 13.4f, 0f));
+        if (d.Falcon != null) yield return d.Falcon.PerchAt(perch, true);
+        CineCamera.Focus(perch + Vector3.down * 0.6f); // 대사창 위쪽 가운데에 매가 오게
+        CineCamera.Zoom(2.6f, 0.25f);
+        GameAudio.Play("sfx_discover", 0.7f, 0.8f);
+        CineCamera.Shake(0.3f, 0.05f);
+        if (d.Falcon != null) d.StartCoroutine(d.Falcon.Spread(1.4f));
+        yield return ScreenTintUI.Flash(new Color(1f, 0.85f, 0.5f, 0.4f), 0.03f, 0.08f, 0.5f);
+        yield return HorusVoice(d, "나는 호루스. 두 땅의 주인, 하늘을 가르는 매.");
+        CineCamera.Zoom(2.2f, 3f);
+        yield return HorusVoice(d, "세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.");
+        CineCamera.Zoom(6f, 1f);
+        CineCamera.Focus(HallCenter + Vector3.up * 2f);
+        HorusFx.StarBurst(HallCenter, HallHalf, 30, StarBlue);
+        yield return HorusVoice(d, "별을 되살려라, 인간이여. 나의 매가 길을 보여 주리라.");
+    }
+
+    // (5) 매가 첫 목적지로 출발 (카메라가 따라감)
+    private static IEnumerator AwakenTakeOff(HorusDirector d)
+    {
+        if (d.Falcon == null) yield break;
+        CineCamera.Zoom(5f, 0.8f);
+        yield return d.Falcon.FlyToCurrent(true);
+        yield return Cine.Wait(0.5f);
+    }
+
+    private static void StartCoroutineSafe(HorusDirector d, IEnumerator routine)
+    {
+        if (d != null && routine != null) d.StartCoroutine(routine);
     }
 
     // 호루스가 말할 때: 낮은 울림 + 살짝 흔들림 (위엄)
@@ -264,6 +352,16 @@ public static class HorusCutscenes
     {
         GameObject go = GameObject.Find(objName);
         return go != null ? go.transform.position : fallback;
+    }
+
+    // 그 물건 그림의 맨 위 (매가 앉을 자리)
+    private static Vector3 TopOf(string objName, Vector3 fallback)
+    {
+        GameObject go = GameObject.Find(objName);
+        SpriteRenderer sr = go != null ? go.GetComponent<SpriteRenderer>() : null;
+        if (sr == null && go != null) sr = go.GetComponentInChildren<SpriteRenderer>();
+        if (sr == null) return go != null ? go.transform.position + Vector3.up : fallback;
+        return new Vector3(sr.bounds.center.x, sr.bounds.max.y + 0.3f, 0f);
     }
 
     private static bool HasItem(string id) => ItemInventory.Instance != null && ItemInventory.Instance.Has(id);

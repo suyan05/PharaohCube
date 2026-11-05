@@ -18,6 +18,12 @@ public class HorusDirector : MonoBehaviour
     [SerializeField] private Sprite plateSprite;
     [SerializeField] private Sprite emoteSprite;
 
+    [Header("이시스 유령 그림 (빌더가 채움, 비어 있으면 빛 덩어리 연출)")]
+    [SerializeField] private Sprite isisSprite;
+    [SerializeField] private Sprite isisWing;
+    [SerializeField] private Sprite featherSprite;
+    [SerializeField] private Sprite rippleSprite;
+
     [Header("매 길잡이 / 꿈 화면 효과 (이시스가 말할 때만 켜짐)")]
     [SerializeField] private HorusFalconGuide falcon;
     [SerializeField] private Volume dreamVolume;
@@ -42,6 +48,10 @@ public class HorusDirector : MonoBehaviour
     public Sprite FalconSprite => falconSprite;
     public Sprite PlateSprite => plateSprite;
     public Sprite EmoteSprite => emoteSprite;
+    public Sprite IsisSprite => isisSprite;
+    public Sprite IsisWing => isisWing;
+    public Sprite FeatherSprite => featherSprite;
+    public Sprite RippleSprite => rippleSprite;
     public HorusFalconGuide Falcon => falcon;
     public Volume DreamVolume => dreamVolume;
     public float ClearIntensity => clearIntensity;

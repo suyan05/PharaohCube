@@ -9,6 +9,8 @@ using UnityEngine.Tilemaps;
 public static class HorusGalleryBuild
 {
     private const string Bubble = "Assets/image/ui/UI_Prompt_New.png";
+    private const string ObjectArt = "Assets/image/Horus/Object/";
+    private const string CrackArt = ObjectArt + "HO_Wall_Crack.png";
     private static readonly Color Stone = new Color(0.85f, 0.78f, 0.62f);
     private static readonly string[] Overlays = { "H1_WingOverlay", "H2_ChartOverlay", "H3_WedjatOverlay", "H4_PathOverlay", "H5_SkyOverlay" };
 
@@ -37,14 +39,17 @@ public static class HorusGalleryBuild
     }
 
     // 서쪽 벽(-1, 7~8)의 금 간 자국. 벽 타일 위에 그림 (바닥 타일 순서보다 위, 물건보다 아래)
+    // [수정] 예전엔 어두운 바닥 무늬라 거의 안 보였음 -> 푸른빛이 새는 금(HO_Wall_Crack) + 숨 쉬는 빛 + 먼지 (HorusWallWhisper)
     private static GameObject WallCrack(Transform root)
     {
-        Sprite cracked = HorusTileArt.SpriteOf(HorusTileArt.FloorC);
-        Sprite s = cracked != null ? cracked : HorusRoomObjects.Square;
-        GameObject go = HorusRoomObjects.Shape(root, "OBJ_HG0_WallCrack", new Vector2(-0.5f, 8f), s, Vector2.one, new Color(0.45f, 0.38f, 0.32f));
+        Sprite glow = HorusArtSetup.Pixel(CrackArt);
+        Sprite fallback = HorusTileArt.SpriteOf(HorusTileArt.FloorC);
+        Sprite s = glow != null ? glow : (fallback != null ? fallback : HorusRoomObjects.Square);
+        GameObject go = HorusRoomObjects.Shape(root, "OBJ_HG0_WallCrack", new Vector2(-0.5f, 8f), s, Vector2.one, glow != null ? Color.white : new Color(0.45f, 0.38f, 0.32f));
         Vector2 b = s.bounds.size;
         go.transform.localScale = new Vector3(1f / b.x, 2f / b.y, 1f);
         go.GetComponent<SpriteRenderer>().sortingOrder = -8;
+        Whisper(go);
         go.AddComponent<BoxCollider2D>().isTrigger = true; // 벽 타일이 막고 있으니 이건 조사용
         HorusRoomObjects.Inspect(go, "HO_WALL_CRACK", "벽 틈 살펴보기", new[,]
         {
@@ -52,6 +57,26 @@ public static class HorusGalleryBuild
             { "나", "그러고 보니 저 매 석상, 아까부터 이쪽 벽을 보고 있는 것 같은데?" }
         });
         return go;
+    }
+
+    // 틈 사이로 새는 푸른빛 + 먼지 + 처음 다가가면 혼잣말 (숨은 방 복선)
+    private static void Whisper(GameObject crack)
+    {
+        var lightGo = new GameObject("CrackLeak", typeof(UnityEngine.Rendering.Universal.Light2D));
+        lightGo.transform.SetParent(crack.transform, false);
+        lightGo.transform.position = crack.transform.position + Vector3.right * 0.4f;
+        var light = lightGo.GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+        light.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+        light.color = new Color(0.5f, 0.75f, 1f);
+        light.intensity = 0.5f;
+        light.pointLightOuterRadius = 2.6f;
+        light.pointLightInnerRadius = 0.3f;
+        HorusWallWhisper w = crack.AddComponent<HorusWallWhisper>();
+        var so = new SerializedObject(w);
+        HorusArtSetup.Prop(so, "crack").objectReferenceValue = crack.GetComponent<SpriteRenderer>();
+        HorusArtSetup.Prop(so, "leak").objectReferenceValue = light;
+        HorusArtSetup.Prop(so, "emoteSprite").objectReferenceValue = HorusArtSetup.Art(Bubble);
+        so.ApplyModifiedPropertiesWithoutUndo();
     }
 
     private static HorusHiddenGallery Gallery(Transform statue, GameObject crack, Sprite falcon)
@@ -108,6 +133,10 @@ public static class HorusGalleryBuild
         HorusArtSetup.Prop(so, "plateSprite").objectReferenceValue = HorusArtSetup.Art("H5/H5_08");
         HorusArtSetup.Prop(so, "emoteSprite").objectReferenceValue = HorusArtSetup.Art(Bubble);
         HorusArtSetup.Prop(so, "dreamVolume").objectReferenceValue = dream;
+        HorusArtSetup.Prop(so, "isisSprite").objectReferenceValue = HorusArtSetup.Pixel(ObjectArt + "HO_Isis_Ghost.png");
+        HorusArtSetup.Prop(so, "isisWing").objectReferenceValue = HorusArtSetup.Pixel(ObjectArt + "HO_Isis_Wing.png");
+        HorusArtSetup.Prop(so, "featherSprite").objectReferenceValue = HorusArtSetup.Pixel(ObjectArt + "HO_Feather.png");
+        HorusArtSetup.Prop(so, "rippleSprite").objectReferenceValue = HorusArtSetup.Pixel(ObjectArt + "HO_Ripple.png");
         SerializedProperty list = HorusArtSetup.Prop(so, "overlays");
         list.arraySize = Overlays.Length;
         for (int i = 0; i < Overlays.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = HorusArtSetup.Find(Overlays[i]);

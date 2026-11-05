@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 // 호루스의 매 = 길잡이 (스토리 기획서: 신의 동물이 길을 안내)
 // - 지금 목표(HorusObjectiveGuide.CurrentTarget) 위에 앉아 있음. 목표가 바뀌면 푸드덕 날아가 새 목표 위에 앉음
-// - 목표가 화면 밖이면 화면 가장자리에 매 아이콘 + 화살표
+// - 목표가 화면 밖이면 화면 가장자리에 매 아이콘만 (화살표 없음 - 매가 고개를 그쪽으로 돌림)
 // - 어두운 방에서도 보이게: 몸은 Unlit + 금빛 후광 + 작은 빛, 날 때는 바닥에 그림자
 // - 본당 첫 입장 연출(HorusCutscenes)이 ArriveFrom으로 처음 불러옴 -> 그 전엔 안 보임
 // [임시] 그림은 금색 매(H1_03). 동물 아트가 오면 Falcon Sprite 칸만 바꾸면 됨
@@ -30,7 +30,7 @@ public class HorusFalconGuide : MonoBehaviour
     private SpriteRenderer perchedOn;
     private bool flying, shown;
     private float idleTimer;
-    private Image edgeIcon, edgeArrow;
+    private Image edgeIcon;
 
     public bool Flying => flying;
     public Vector3 Position => root != null ? root.position : transform.position;
@@ -69,12 +69,11 @@ public class HorusFalconGuide : MonoBehaviour
     {
         RectTransform canvas = UIBuild.CreateCanvas(transform, "FalconEdgeCanvas", 80, out GameObject canvasGo);
         canvasGo.GetComponent<GraphicRaycaster>().enabled = false;
-        edgeArrow = UIBuild.Image(canvas, "Arrow", Vector2.zero, new Vector2(40f, 40f), HorusFx.ArrowSprite(), glowColor);
-        edgeArrow.color = new Color(1f, 0.85f, 0.4f, 1f);
-        edgeIcon = UIBuild.Image(canvas, "Falcon", Vector2.zero, new Vector2(64f, 64f), falconSprite, Color.white);
+        // [수정] 세모 화살표는 없애고 매 아이콘만 씀 (길잡이는 매 하나로 통일)
+        edgeIcon = UIBuild.Image(canvas, "Falcon", Vector2.zero, new Vector2(72f, 72f), falconSprite, Color.white);
         edgeIcon.preserveAspect = true;
         edgeIcon.color = Color.white;
-        edgeArrow.raycastTarget = edgeIcon.raycastTarget = false;
+        edgeIcon.raycastTarget = false;
         HideEdge(); // 처음엔 꺼 둠 (화면 밖일 때만 UpdateEdge가 켬)
     }
 
@@ -89,7 +88,6 @@ public class HorusFalconGuide : MonoBehaviour
     private void HideEdge()
     {
         if (edgeIcon != null) edgeIcon.enabled = false;
-        if (edgeArrow != null) edgeArrow.enabled = false;
     }
 
     // ================= 매 프레임 =================
@@ -98,7 +96,8 @@ public class HorusFalconGuide : MonoBehaviour
         if (!shown || root == null) return;
         if (!HorusDirector.HasFlag(appearFlag) && !flying) return;
         SpriteRenderer target = guide != null ? guide.CurrentTarget : null;
-        if (!flying && target != null && target != perchedOn && !HorusFocus.PanelOpen) StartCoroutine(FlyToTarget(target, false));
+        // 연출 중엔 연출이 매를 직접 움직임 (제단 위에 앉혀 둔 걸 마음대로 데려가지 않게)
+        if (!flying && !Cine.Running && target != null && target != perchedOn && !HorusFocus.PanelOpen) StartCoroutine(FlyToTarget(target, false));
         if (!flying) Idle();
         UpdateEdge();
     }
@@ -145,10 +144,17 @@ public class HorusFalconGuide : MonoBehaviour
             root.position = Vector3.Lerp(from, to, k) + Vector3.up * Mathf.Sin(k * Mathf.PI) * arcHeight;
             Flap(t, to.x - from.x);
             shadow.transform.position = ground;
-            if (followCamera) CineCamera.Focus(root.position);
+            if (followCamera) CineCamera.Focus(root.position + Lead(to));
             yield return null;
         }
         Land(to);
+    }
+
+    // 카메라가 매보다 살짝 앞(가는 방향)을 비춤 -> 매가 화면 가운데에서 앞으로 나아가는 느낌
+    private Vector3 Lead(Vector3 to)
+    {
+        Vector3 d = to - root.position;
+        return d.magnitude < 0.01f ? Vector3.zero : d.normalized * Mathf.Min(1.2f, d.magnitude * 0.5f);
     }
 
     private void Flap(float t, float dx)
@@ -177,6 +183,38 @@ public class HorusFalconGuide : MonoBehaviour
         yield return FlyTo(circleCenter + Vector3.right * 3f, circleCenter.y - 2f, true);
         yield return CircleAround(circleCenter, 3f, 1.8f, true);
         yield return FlyToCurrent(true);
+    }
+
+    // 본당 첫 입장 연출: 하늘 틈에서 뛰어들 듯 날아옴 (카메라가 따라가며 점점 넓게)
+    public IEnumerator DiveIn(Vector3 from, Vector3 to)
+    {
+        SetShown(true);
+        root.position = from;
+        CineCamera.Zoom(6.5f, 1.4f);
+        yield return FlyTo(to, to.y - 2f, true);
+    }
+
+    // 목표가 아닌 곳(제단 위 등)에 앉힘. 연출이 끝나면 Update/FlyToCurrent가 다시 목표로 데려감
+    public IEnumerator PerchAt(Vector3 at, bool followCamera)
+    {
+        perchedOn = null;
+        yield return FlyTo(at, at.y - 0.8f, followCamera);
+    }
+
+    // 날개를 활짝 펴고 빛남 (위엄 포즈)
+    public IEnumerator Spread(float seconds)
+    {
+        if (body == null) yield break;
+        StartCoroutine(HorusFx.Pulse(root.position, size * 3f, glowColor, seconds));
+        float t = 0f;
+        while (t < seconds && !Cine.Skipping)
+        {
+            t += Time.deltaTime;
+            float k = Mathf.Sin(Mathf.Clamp01(t / seconds) * Mathf.PI);
+            body.transform.localScale = new Vector3(baseScale.x * (1f + 0.45f * k), baseScale.y * (1f + 0.1f * k), 1f);
+            yield return null;
+        }
+        body.transform.localScale = baseScale;
     }
 
     public IEnumerator CircleAround(Vector3 center, float radius, float seconds, bool followCamera)
@@ -213,15 +251,17 @@ public class HorusFalconGuide : MonoBehaviour
         Vector3 vp = cam.WorldToViewportPoint(root.position);
         bool inside = vp.x > 0.03f && vp.x < 0.97f && vp.y > 0.03f && vp.y < 0.97f;
         bool show = !inside && !HorusFocus.PanelOpen;
-        edgeIcon.enabled = edgeArrow.enabled = show;
+        edgeIcon.enabled = show;
         if (!show) return;
         Vector2 center = new Vector2(Screen.width, Screen.height) * 0.5f;
         Vector2 dir = ((Vector2)cam.WorldToScreenPoint(root.position) - center).normalized;
         Vector2 half = center - Vector2.one * 80f;
         float k = Mathf.Min(Mathf.Abs(half.x / Mathf.Max(Mathf.Abs(dir.x), 0.001f)), Mathf.Abs(half.y / Mathf.Max(Mathf.Abs(dir.y), 0.001f)));
         Vector2 pos = center + dir * k;
-        edgeIcon.rectTransform.position = pos;
-        edgeArrow.rectTransform.position = pos + dir * 44f;
-        edgeArrow.rectTransform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
+        // 매가 가야 할 쪽을 바라보게 좌우 뒤집기 + 둥실 + 살짝 커졌다 작아짐 (눈에 띄게)
+        float bob = Mathf.Sin(Time.unscaledTime * 4f);
+        edgeIcon.rectTransform.position = pos + Vector2.up * bob * 6f;
+        float pulse = 1f + Mathf.Abs(bob) * 0.12f;
+        edgeIcon.rectTransform.localScale = new Vector3((dir.x < 0f ? -1f : 1f) * pulse, pulse, 1f);
     }
 }
