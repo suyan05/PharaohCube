@@ -111,14 +111,14 @@ public static class HorusRoomSetup
         if (floorPlate != null) SetHint(floorPlate, YSortHint.Mode.AlwaysBelow);
     }
 
-    // 목표 안내: 길은 평소엔 안 보이고 지금 목표 길만 은은하게 빛남 (타일 위에 덮이지 않게)
+    // 목표 안내: 바닥 길 표시는 끔 (매 길잡이가 안내). 목표 문구 HUD는 그대로
     public static void SetupObjectiveGuide()
     {
         HorusObjectiveGuide guide = Object.FindFirstObjectByType<HorusObjectiveGuide>(FindObjectsInactive.Include);
         if (guide == null) return;
         var so = new SerializedObject(guide);
         SetColor(so, "pathDim", new Color(0.24f, 0.48f, 0.84f, 0f));
-        SetColor(so, "pathLit", new Color(0.35f, 0.6f, 1f, 0.6f)); // 목표 길은 어둠 속에서도 보이게
+        SetColor(so, "pathLit", new Color(0.24f, 0.48f, 0.84f, 0f)); // 반짝이는 길 대신 매 길잡이 + 바닥 금 별 행렬길이 안내
         SetColor(so, "targetLocked", new Color(0.55f, 0.5f, 0.6f, 1f)); // 그림이 들어가서 예전처럼 거의 검게 하지 않음
         so.ApplyModifiedPropertiesWithoutUndo();
     }

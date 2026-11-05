@@ -36,6 +36,17 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     [Tooltip("반경이 바뀔 때 부드럽게 (초당 유닛)")]
     [SerializeField] private float radiusLerpSpeed = 6f;
 
+    [Header("[추가] 원뿔 빛: 바라보는(걸어가는) 방향으로 길게 + 발밑은 작은 둥근 빛")]
+    [SerializeField] private bool coneLight = true;
+    [Range(10f, 180f)] [SerializeField] private float coneOuterAngle = 80f;
+    [Range(5f, 170f)] [SerializeField] private float coneInnerAngle = 35f;
+    [Tooltip("원뿔 길이 = 지금 반경 x 이 값")]
+    [SerializeField] private float coneLengthMul = 1.8f;
+    [Tooltip("발밑 둥근 빛 반경 (원뿔 뒤쪽이 깜깜하지 않게)")]
+    [SerializeField] private float glowRadius = 1.6f;
+    [Tooltip("방향 바꿀 때 도는 속도 (도/초)")]
+    [SerializeField] private float turnSpeed = 540f;
+
     [Header("배율")]
     [SerializeField] private float litMul = 1.0f;
     [SerializeField] private float litEmberMul = 1.3f;
@@ -60,6 +71,9 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     private float burnLeft;
     private float holdTimer;
     private float currentRadius;
+    private Light2D glowLight;
+    private Rigidbody2D body;
+    private float facingAngle = -90f; // 처음엔 아래(화면 앞)를 봄
 
     public bool HasTorch => torchOwned;
     public bool IsLit => lit;
@@ -75,6 +89,8 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     private void Awake()
     {
         if (torchLight == null) torchLight = CreateLight();
+        body = GetComponent<Rigidbody2D>();
+        if (coneLight) glowLight = CreateLight("TorchGlow");
     }
 
     private void OnEnable() => TorchLink.Register(this);
@@ -102,9 +118,9 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
         ApplyLight(true);
     }
 
-    private Light2D CreateLight()
+    private Light2D CreateLight(string objName = "TorchLight")
     {
-        var go = new GameObject("TorchLight");
+        var go = new GameObject(objName);
         go.transform.SetParent(transform, false);
         var l = go.AddComponent<Light2D>();
         l.lightType = Light2D.LightType.Point;
@@ -138,7 +154,18 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
             HoldRingUI.Hide();
         }
 
+        UpdateFacing();
         ApplyLight(false);
+    }
+
+    // [추가] 움직이는 방향을 바라봄 (멈추면 마지막 방향 유지)
+    private void UpdateFacing()
+    {
+        if (!coneLight || body == null) return;
+        Vector2 v = body.linearVelocity;
+        if (v.sqrMagnitude < 0.04f) return;
+        float target = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
+        facingAngle = Mathf.MoveTowardsAngle(facingAngle, target, turnSpeed * Time.deltaTime);
     }
 
     private void ApplyLight(bool instant)
@@ -150,6 +177,23 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
         torchLight.pointLightInnerRadius = currentRadius * 0.35f;
         torchLight.color = lit ? flameColor : emberColor;
         torchLight.intensity = intensity;
+        if (coneLight) ApplyCone();
+    }
+
+    // [추가] 횃불이 켜져 있으면 원뿔로 길게, 꺼져 있으면(불씨만) 발밑 빛만
+    private void ApplyCone()
+    {
+        // Light 2D의 원뿔은 오브젝트 위쪽(+Y)을 향함 -> 바라보는 각도에서 90도 빼서 돌림
+        torchLight.transform.localRotation = Quaternion.Euler(0f, 0f, facingAngle - 90f);
+        torchLight.pointLightOuterAngle = lit ? coneOuterAngle : 360f;
+        torchLight.pointLightInnerAngle = lit ? coneInnerAngle : 360f;
+        torchLight.pointLightOuterRadius = lit ? currentRadius * coneLengthMul : currentRadius;
+        torchLight.pointLightInnerRadius = currentRadius * 0.2f;
+        if (glowLight == null) return;
+        glowLight.pointLightOuterRadius = glowRadius * (lit ? 1f : 0.6f);
+        glowLight.pointLightInnerRadius = glowRadius * 0.2f;
+        glowLight.color = lit ? flameColor : emberColor;
+        glowLight.intensity = lit ? intensity * 0.55f : 0f;
     }
 
     private float TargetMul()

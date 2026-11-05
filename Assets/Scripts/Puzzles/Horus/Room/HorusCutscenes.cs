@@ -1,41 +1,44 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 // 호루스의 방 연출 장면들 (HorusDirector가 순서를 정해서 부름)
-// 쓰는 기법: 위아래 검은 바, 타이틀 자막, 암전, 카메라 밀기/당기기/흔들기, 화면 번쩍임,
-//            빛 덩어리(이시스), 바닥을 가로지르는 거대한 매 그림자, 천장 별 반짝임, 머리 위 "!" 말풍선,
-//            형판이 떠올라 내 손으로 빨려 들어옴, 방 전체 밝기 변화(하늘을 되찾음)
+// 쓰는 기법: 위아래 검은 바, 타이틀 자막, 암전, 꿈 화면 효과(스핑크스와 같은 Volume: 일렁임/번짐) + 낮은 울림,
+//            빛 덩어리로만 보이는 이시스, 신전을 울리는 호루스의 목소리, 매가 날아와 방을 한 바퀴 돌고 앉음,
+//            카메라 밀기/당기기/흔들기, 화면 번쩍임, 천장 별 반짝임, 머리 위 "!", 형판이 떠올라 내 손으로, 방 전체가 밝아짐
 public static class HorusCutscenes
 {
     public const string Intro = "INTRO";
     public const string Awaken = "AWAKEN";
     public const string Ending = "ENDING";
+    public const string LapisAll = "F_HO_LAPIS_ALL";
 
+    private const string EmberItem = "ITEM_RA_EMBER";
     private static readonly Vector3 HallCenter = new Vector3(12f, 8f, 0f);
     private static readonly Vector2 HallHalf = new Vector2(11f, 7f);
     private static readonly Color Gold = new Color(1f, 0.82f, 0.4f, 0.9f);
     private static readonly Color StarBlue = new Color(0.65f, 0.8f, 1f, 1f);
-    private static readonly Color IsisLight = new Color(0.75f, 0.85f, 1f, 0.85f);
-    private static readonly Color Shadow = new Color(0f, 0f, 0f, 0.45f);
+    private static readonly Color IsisLight = new Color(0.78f, 0.86f, 1f, 0.8f);
 
-    // 퍼즐을 풀면: 호루스 한마디 + 다음 목적지 (기획서 4.2 플래그 순서)
+    // 퍼즐을 풀면: 호루스 한마디 (답을 대놓고 말하지 않게) + 매가 다음 목적지로 날아감
     private struct Reaction
     {
         public string line;
-        public string next;
-        public Reaction(string line, string next) { this.line = line; this.next = next; }
+        public bool flyNext;
+        public Reaction(string line, bool flyNext) { this.line = line; this.flyNext = flyNext; }
     }
 
     private static readonly Dictionary<string, Reaction> Reactions = new Dictionary<string, Reaction>
     {
-        { "F_HO_CHART_1", new Reaction("메스케티우가 깨어났다. 서쪽 관측대로 가라. 반쪽 날개로는 날 수 없다.", "H1_MirrorWing") },
-        { "F_HO_H1_DONE", new Reaction("날개가 온전해졌구나. 얻은 별 조각을 성도판의 꺼진 별에 끼워라.", "H2_ConstellationChart") },
-        { "F_HO_CHART_2", new Reaction("사흐가 떠올랐다. 은빛 실로 찢긴 눈을 이어라.", "H3_WedjatRestore") },
-        { "F_HO_H3_DONE", new Reaction("찢긴 눈도 다시 하늘을 본다. 달의 눈을 성도판 앞에 걸어라.", "OBJ_H04_MoonEyeMount") },
-        { "F_HO_CHART_3", new Reaction("소프데트가 뒤따른다. 매 인장으로 세트의 봉인을 풀어라.", "H4_StarPathLock") },
-        { "F_HO_H4_DONE", new Reaction("매는 동쪽에서 떠올라 중심에 앉는다. 마지막 별 조각을 성도판에 끼워라.", "H2_ConstellationChart") },
-        { "F_HO_CHART_4", new Reaction("네 별자리가 모두 빛난다. 아이여, 제단으로 오라.", "H5_SkyAlign") }
+        { "F_HO_CHART_1", new Reaction("메스케티우... 지지 않는 별이 다시 눈을 떴다. 반쪽 날개가 너를 기다린다.", true) },
+        { "F_HO_H1_DONE", new Reaction("날개는 거울 속에서 온전해지는 법. 빛의 조각을 하늘로 돌려보내라.", true) },
+        { "F_HO_CHART_2", new Reaction("두 번째 별이 떠올랐다. 찢긴 것은 은빛으로 꿰매어라.", true) },
+        { "F_HO_H3_DONE", new Reaction("보아라, 나의 눈이 다시 형태를 얻었다. 달의 눈을 하늘 앞에 걸어라.", true) },
+        { "F_HO_CHART_3", new Reaction("세 번째 별이 뒤따른다. 이제 세트의 붉은 봉인을 깨뜨려라.", true) },
+        { "F_HO_H4_DONE", new Reaction("매는 동쪽에서 떠올라 중심에 앉는다. 마지막 조각을 하늘에 바쳐라.", true) },
+        { "F_HO_CHART_4", new Reaction("네 별이 모였다. 제단으로 오라, 인간이여. 하늘의 순서를 증명하라.", true) },
+        { LapisAll, new Reaction("밤하늘의 조각을 모두 모았구나... 매가 너를 인정한다.", false) }
     };
 
     public static bool HasReaction(string flag) => Reactions.ContainsKey(flag);
@@ -48,78 +51,123 @@ public static class HorusCutscenes
         return ReactionScene(d, Reactions[key]);
     }
 
-    // ================= 1. 입구 전실: 이시스의 목소리 =================
+    // ================= 1. 입구 전실: 꿈결 같은 이시스의 목소리 =================
     private static IEnumerator IntroScene(HorusDirector d)
     {
         Cine.Begin(true);
         HorusFx.MatchPlayer();
         Transform p = CineActor.Player();
         ScreenFader.SetBlack();
-        yield return TitleCardUI.Show("호루스의 신전", "하늘을 잃은 매의 방", 1.8f);
+        yield return TitleCardUI.Show("호루스의 신전", "하늘을 잃은 매", 1.8f);
         yield return ScreenFader.FadeIn(Cine.Skipping ? 0.2f : 1.2f);
         if (p != null) yield return CineActor.WalkTo(p, new Vector2(12f, -5.6f), 2.2f);
         yield return IsisSpeaks(d, new Vector3(12f, -3.6f, 0f));
         if (p != null) d.StartCoroutine(HorusFx.Emote(p, d.EmoteSprite, 1f));
-        yield return Cine.Say("나", "방금... 누구 목소리였지? 이시스라고?");
+        yield return Cine.Say("나", "...방금 그 목소리. 스핑크스의 꿈에서 들은 것처럼 아득했어.");
+        if (HasItem(EmberItem)) yield return Cine.Say("나", "라의 불씨가 아직 따뜻해. 이 어둠 속에서도 횃불은 꺼지지 않겠어.");
         HorusDirector.SetFlag(d.IntroFlag);
         Cine.End();
     }
 
-    // 모습 없이 빛 덩어리로만 나타나는 이시스 (스토리 기획서: 아트가 없으면 목소리 + 빛)
     private static IEnumerator IsisSpeaks(HorusDirector d, Vector3 pos)
     {
         CineCamera.Focus(pos);
         CineCamera.Zoom(4f);
-        GameAudio.Play("sfx_dream_shimmer", 0.6f);
-        SpriteRenderer glow = RaGlowFx.Glow(null, pos, 2.2f, IsisLight, HorusFx.Layer, HorusFx.Above - 1);
-        RaGlowFx.PointLight(glow.transform, Vector3.zero, IsisLight, 3.5f, 0.9f);
-        HorusFx.StarBurst(pos, new Vector2(0.5f, 0.5f), 14, StarBlue);
+        yield return DreamIn(d);
+        SpriteRenderer glow = RaGlowFx.Glow(null, pos, 3f, IsisLight, HorusFx.Layer, HorusFx.Above - 1);
+        RaGlowFx.PointLight(glow.transform, Vector3.zero, IsisLight, 4f, 0.9f);
+        d.StartCoroutine(Breathe(glow, 3f));
+        HorusFx.StarBurst(pos, new Vector2(0.6f, 0.6f), 16, StarBlue);
         yield return Cine.Say(IsisLines());
-        HorusFx.StarBurst(pos, new Vector2(0.4f, 0.4f), 10, StarBlue);
+        HorusFx.StarBurst(pos, new Vector2(0.5f, 0.5f), 12, StarBlue);
         Object.Destroy(glow.gameObject);
+        yield return DreamOut(d);
         CineCamera.Release();
     }
 
+    // 여신의 말투: 직접 시키지 않고, 신화와 은유로
     private static DialogueLine[] IsisLines()
     {
         return new[]
         {
-            new DialogueLine("이시스", "...들리니, 낯선 이여. 나는 이시스."),
-            new DialogueLine("이시스", "이곳은 내 아들 호루스의 신전. 내 아들은 눈을 잃고도 싸움을 멈추지 않았다."),
-            new DialogueLine("이시스", "옆의 책을 읽어 보렴. 그 아이가 왜 하늘을 잃었는지 알게 될 거야."),
-            new DialogueLine("이시스", "그리고 벽에 남은 그림도 잘 보렴. 매가 날아간 길이 새겨져 있단다.")
+            new DialogueLine("이시스", "...잠든 모래 너머에서, 낯선 숨결이 들리는구나."),
+            new DialogueLine("이시스", "나는 이시스. 흩어진 남편을 찾아 나일의 끝까지 헤맨 자."),
+            new DialogueLine("이시스", "이곳은 내 아들의 하늘. 그 아이는 한쪽 눈을 잃은 뒤로 별을 보지 못한다."),
+            new DialogueLine("이시스", "기억은 글에 머물고, 길은 돌 위에 새겨지지... 읽고, 보거라.")
         };
     }
 
-    // ================= 2. 본당 첫 입장: 호루스가 깨어남 =================
+    // 빛 덩어리가 숨 쉬듯 커졌다 작아짐 (지워지면 멈춤)
+    private static IEnumerator Breathe(SpriteRenderer glow, float size)
+    {
+        while (glow != null)
+        {
+            glow.transform.localScale = Vector3.one * size * (1f + Mathf.Sin(Time.time * 2.2f) * 0.12f);
+            yield return null;
+        }
+    }
+
+    // 스핑크스 꿈과 같은 효과: 꿈 Volume을 서서히 켜고 + 낮은 웅웅 소리 + 화면 출렁
+    private static IEnumerator DreamIn(HorusDirector d)
+    {
+        CineAudio.Loop(GameAudio.Or(null, "sfx_dream_drone_loop"), 0.45f);
+        GameAudio.Play("sfx_dream_shimmer", 0.6f);
+        DreamFX.Ripple(1.8f, 0.3f);
+        yield return Weight(d.DreamVolume, 1f, 1.2f);
+        DreamFX.SetHaze(0.25f);
+    }
+
+    private static IEnumerator DreamOut(HorusDirector d)
+    {
+        DreamFX.SetHaze(0f);
+        yield return Weight(d.DreamVolume, 0f, 1f);
+        yield return CineAudio.StopLoop(1f);
+    }
+
+    private static IEnumerator Weight(Volume v, float to, float seconds)
+    {
+        if (v == null) yield break;
+        float from = v.weight, t = 0f;
+        while (t < seconds && !Cine.Skipping)
+        {
+            t += Time.deltaTime;
+            v.weight = Mathf.Lerp(from, to, t / seconds);
+            yield return null;
+        }
+        v.weight = to;
+    }
+
+    // ================= 2. 본당 첫 입장: 신전이 울리고 호루스의 매가 날아옴 =================
     private static IEnumerator AwakenScene(HorusDirector d)
     {
         Cine.Begin(true);
         HorusFx.MatchPlayer();
-        CineLight.Dim(0.5f, 0.6f);
+        CineLight.Dim(0.6f, 0.6f);
         CineCamera.Focus(HallCenter);
-        CineCamera.Zoom(9.5f);
-        yield return Cine.Wait(1f);
-        yield return ShadowSweep(d);
+        CineCamera.Zoom(7.5f);
+        GameAudio.Play("sfx_rumble", 0.7f, 0.7f);
+        CineCamera.Shake(0.8f, 0.06f);
+        yield return Cine.Wait(0.8f);
+        yield return HorusVoice(d, "누가... 나의 하늘을 밟는가.");
+        if (d.Falcon != null) yield return d.Falcon.ArriveFrom(new Vector3(26f, 17f, 0f), HallCenter + Vector3.up);
         HorusFx.StarBurst(HallCenter, HallHalf, 40, StarBlue);
-        yield return Cine.Say(Horus(d, "하늘을 잃은 아이여...", "나의 눈을 되찾아 다오."));
+        CineCamera.Zoom(5f);
+        yield return HorusVoice(d, "나는 호루스. 두 땅의 주인, 하늘을 가르는 매.", "세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.", "별을 되살려라, 인간이여. 나의 매가 길을 보여 주리라.");
         CineLight.Restore(0.8f);
-        yield return ShowNext(d, "H2_ConstellationChart", "동쪽 벽의 성도판에서 별을 이어라. 첫 별자리가 길을 열 것이다.");
         HorusDirector.SetFlag(d.AwakenFlag);
         CineCamera.Release();
         Cine.End();
     }
 
-    // 거대한 매 그림자가 바닥을 동쪽에서 서쪽으로 쓸고 지나감 + 바람 + 흔들림
-    private static IEnumerator ShadowSweep(HorusDirector d)
+    // 호루스가 말할 때: 낮은 울림 + 살짝 흔들림 (위엄)
+    private static IEnumerator HorusVoice(HorusDirector d, params string[] lines)
     {
-        GameAudio.Play("sfx_wind_gust", 0.8f);
-        CineCamera.Shake(0.7f, 0.05f);
-        d.StartCoroutine(HorusFx.Fly(d.FalconSprite, new Vector3(27f, 12f, 0f), new Vector3(-3f, 5f, 0f), 2.4f, 7f, Shadow, HorusFx.Floor, 0f, false));
-        yield return Cine.Wait(1.6f);
+        GameAudio.Play("sfx_sphinx_voice", 0.75f);
+        CineCamera.Shake(0.4f, 0.03f);
+        yield return Cine.Say(Horus(d, lines));
     }
 
-    // ================= 3. 퍼즐을 풀 때마다 =================
+    // ================= 3. 퍼즐을 풀 때마다: 별 반짝 + 호루스 + 매가 다음 목적지로 =================
     private static IEnumerator ReactionScene(HorusDirector d, Reaction r)
     {
         Cine.Begin(true);
@@ -128,23 +176,16 @@ public static class HorusCutscenes
         CineCamera.Shake(0.3f, 0.03f);
         HorusFx.StarBurst(HallCenter, HallHalf, 24, StarBlue);
         yield return ScreenTintUI.Flash(new Color(1f, 0.85f, 0.5f, 0.25f), 0.05f, 0.05f, 0.4f);
-        yield return ShowNext(d, r.next, r.line);
+        if (r.flyNext && d.Falcon != null)
+        {
+            CineCamera.Zoom(6f);
+            yield return d.Falcon.FlyToCurrent(true);
+            CineCamera.Zoom(4.5f);
+            yield return Cine.Wait(0.3f);
+        }
+        yield return HorusVoice(d, r.line);
         CineCamera.Release();
         Cine.End();
-    }
-
-    // 다음 목적지를 카메라로 비추고 빛나게 한 뒤 호루스가 말함
-    private static IEnumerator ShowNext(HorusDirector d, string objName, string line)
-    {
-        GameObject go = GameObject.Find(objName);
-        if (go != null)
-        {
-            CineCamera.Focus(go.transform.position);
-            CineCamera.Zoom(4.5f);
-            d.StartCoroutine(HorusFx.Pulse(go.transform.position, 2.2f, Gold, 2.4f));
-            yield return Cine.Wait(0.6f);
-        }
-        yield return Cine.Say(Horus(d, line));
     }
 
     // ================= 4. H5 클리어: 하늘을 되찾음 =================
@@ -178,16 +219,16 @@ public static class HorusCutscenes
         yield return HorusFx.Rise(plate, 1.4f, 1.6f);
     }
 
-    // 방 전체가 밝아지고 별이 쏟아짐 + 매 그림자 한 번 더 + 호루스
+    // 방 전체가 밝아지고 별이 쏟아짐 + 매가 방을 크게 돎 + 호루스 (마지막엔 세트에 대한 경고)
     private static IEnumerator SkyReturns(HorusDirector d)
     {
         CineCamera.Focus(HallCenter);
-        CineCamera.Zoom(9.5f);
+        CineCamera.Zoom(8f);
         d.StartCoroutine(HorusFx.LightTo(d.ClearIntensity, d.ClearColor, 2.5f));
         HorusFx.StarBurst(HallCenter, HallHalf, 60, StarBlue);
-        yield return ShadowSweep(d);
-        yield return Cine.Say(Horus(d, "보아라... 하늘이 다시 빛난다.", "이제 하늘은 다시 나의 것이다!"));
-        yield return Cine.Say(Horus(d, "고맙다, 아이여. 그 형판을 큐브의 면에 끼워라.", "아버지 오시리스께서 다시 눈을 뜨실 것이다."));
+        if (d.Falcon != null) d.StartCoroutine(d.Falcon.CircleAround(HallCenter, 4f, 2.6f, false));
+        yield return HorusVoice(d, "보아라... 하늘이 다시 빛난다.", "이제 하늘은 다시 나의 것이다!");
+        yield return HorusVoice(d, "인간이여, 그 형판을 큐브에 바쳐라. 아버지 오시리스께서 다시 눈을 뜨실 것이다.", "...세트는 오늘을 잊지 않겠지. 그의 붉은 눈이 너를 지켜볼 것이다.");
     }
 
     private static IEnumerator PlateToPlayer(SpriteRenderer plate)
@@ -224,4 +265,6 @@ public static class HorusCutscenes
         GameObject go = GameObject.Find(objName);
         return go != null ? go.transform.position : fallback;
     }
+
+    private static bool HasItem(string id) => ItemInventory.Instance != null && ItemInventory.Instance.Has(id);
 }

@@ -1,8 +1,9 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Tilemaps;
 
-// 매 석상 + 매의 회랑(같은 씬 안에서 열리는 숨은 공간) + 연출 감독 + 목표 표시 (HorusRoomObjects가 부름)
+// 매 석상 + 매의 회랑(같은 씬 안에서 열리는 숨은 공간) + 연출 감독 + 매 길잡이 (HorusRoomObjects가 부름)
 // - 회랑 타일은 처음엔 없음. 서쪽 벽 틈(조사 대사)만 보임 -> 우자트 부적을 왼쪽 매 석상에 끼우면 열림 (HorusHiddenGallery)
 // - 회랑 안 히든 자리 표시는 열리기 전엔 꺼져 있음 (히든 아이템은 다른 개발자가 연결)
 public static class HorusGalleryBuild
@@ -23,7 +24,7 @@ public static class HorusGalleryBuild
         HorusArtSetup.Prop(so, "gallery").objectReferenceValue = gallery;
         so.ApplyModifiedPropertiesWithoutUndo();
         Director(falcon);
-        GoalMarker();
+        FalconGuide(falcon);
     }
 
     // 그림 크기를 먼저 맞추고 충돌 상자를 붙임 (붙일 때 그림 크기에 자동으로 맞음)
@@ -38,8 +39,8 @@ public static class HorusGalleryBuild
     // 서쪽 벽(-1, 7~8)의 금 간 자국. 벽 타일 위에 그림 (바닥 타일 순서보다 위, 물건보다 아래)
     private static GameObject WallCrack(Transform root)
     {
-        Tile cracked = HorusRoomMap.Load("Title_11_0") as Tile;
-        Sprite s = cracked != null ? cracked.sprite : HorusRoomObjects.Square;
+        Sprite cracked = HorusTileArt.SpriteOf(HorusTileArt.FloorC);
+        Sprite s = cracked != null ? cracked : HorusRoomObjects.Square;
         GameObject go = HorusRoomObjects.Shape(root, "OBJ_HG0_WallCrack", new Vector2(-0.5f, 8f), s, Vector2.one, new Color(0.45f, 0.38f, 0.32f));
         Vector2 b = s.bounds.size;
         go.transform.localScale = new Vector3(1f / b.x, 2f / b.y, 1f);
@@ -99,23 +100,42 @@ public static class HorusGalleryBuild
     private static void Director(Sprite falcon)
     {
         HorusDirector d = new GameObject("HorusDirector").AddComponent<HorusDirector>();
+        Volume dream = DreamVolume(d.transform);
         var so = new SerializedObject(d);
         HorusArtSetup.Prop(so, "horusPortrait").objectReferenceValue = HorusArtSetup.Art("H5/H5_06"); // [임시] 호루스 초상화가 오면 바꾸기
         HorusArtSetup.Prop(so, "falconSprite").objectReferenceValue = falcon;
         HorusArtSetup.Prop(so, "plateSprite").objectReferenceValue = HorusArtSetup.Art("H5/H5_08");
         HorusArtSetup.Prop(so, "emoteSprite").objectReferenceValue = HorusArtSetup.Art(Bubble);
+        HorusArtSetup.Prop(so, "dreamVolume").objectReferenceValue = dream;
         SerializedProperty list = HorusArtSetup.Prop(so, "overlays");
         list.arraySize = Overlays.Length;
         for (int i = 0; i < Overlays.Length; i++) list.GetArrayElementAtIndex(i).objectReferenceValue = HorusArtSetup.Find(Overlays[i]);
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    private static void GoalMarker()
+    // 스핑크스 꿈과 같은 후처리 Volume. 평소엔 무게 0 (안 보임) -> 이시스가 말할 때만 켜짐
+    private static Volume DreamVolume(Transform parent)
     {
-        HorusGoalMarker m = new GameObject("HorusGoalMarker").AddComponent<HorusGoalMarker>();
-        var so = new SerializedObject(m);
+        DreamVolumeBuilder.Create(parent);
+        Camera cam = Object.FindFirstObjectByType<Camera>();
+        if (cam != null) DreamVolumeBuilder.EnablePostProcessing(cam);
+        Volume v = parent.GetComponentInChildren<Volume>(true);
+        if (v != null) v.weight = 0f;
+        return v;
+    }
+
+    // 매 길잡이 (지금 목표 위에 앉아 있고, 목표가 바뀌면 날아감)
+    private static void FalconGuide(Sprite falcon)
+    {
+        HorusFalconGuide g = new GameObject("HorusFalconGuide").AddComponent<HorusFalconGuide>();
+        var so = new SerializedObject(g);
         HorusArtSetup.Prop(so, "guide").objectReferenceValue = Object.FindFirstObjectByType<HorusObjectiveGuide>(FindObjectsInactive.Include);
-        HorusArtSetup.Prop(so, "markerSprite").objectReferenceValue = HorusArtSetup.Art("H2/H2_star_on");
+        HorusArtSetup.Prop(so, "falconSprite").objectReferenceValue = falcon;
         so.ApplyModifiedPropertiesWithoutUndo();
+        HorusDirector d = Object.FindFirstObjectByType<HorusDirector>();
+        if (d == null) return;
+        var dso = new SerializedObject(d);
+        HorusArtSetup.Prop(dso, "falcon").objectReferenceValue = g;
+        dso.ApplyModifiedPropertiesWithoutUndo();
     }
 }

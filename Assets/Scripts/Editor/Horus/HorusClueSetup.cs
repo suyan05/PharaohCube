@@ -4,7 +4,7 @@ using UnityEngine;
 // 호루스 단서 (라의 방 파란 비석 방식, HorusRoomObjects가 부름)
 // - ClueStele + CluePanel: E -> 그림과 글이 크게 뜨는 단서 패널, 안 읽은 비석 위에 "!"
 // - HorusClueNote: 읽는 순간 고고학 수첩 메모에 남김
-// - 퍼즐 비석(HS1~3)은 옆 별 횃불을 켜야 글씨가 보임. 입구 비석/경고 석판/벽화는 바로 읽힘
+// - 비석 글은 상형문자 -> 렌즈로 비춰 해독 (벽화는 그림이라 바로 보임). 퍼즐 비석(HS1~3)은 옆 별 횃불도 켜야 보임
 // - 단서 글은 Assets/Scripts/Data/Horus_Data/Clue_HO_*.asset (Inspector에서 고치면 됨. 메뉴를 다시 누르면 아래 글로 덮어씀)
 public static class HorusClueSetup
 {
@@ -66,7 +66,8 @@ public static class HorusClueSetup
     }
 
     // ================= 비석 붙이기 =================
-    public static void AddStele(GameObject go, ClueData data, WallTorch torch, string flagOnRead, int noteId, string noteText, string layer)
+    // lensDecode: 처음엔 상형문자 -> 렌즈(스핑크스에게 받은 돋보기)로 비춰야 읽힘
+    public static void AddStele(GameObject go, ClueData data, WallTorch torch, string flagOnRead, int noteId, string noteText, string layer, bool lensDecode)
     {
         ClueStele stele = go.GetComponent<ClueStele>();
         if (stele == null) stele = go.AddComponent<ClueStele>();
@@ -79,7 +80,8 @@ public static class HorusClueSetup
         SerializedProperty torches = HorusArtSetup.Prop(so, "roomTorches");
         torches.arraySize = torch != null ? 1 : 0;
         if (torch != null) torches.GetArrayElementAtIndex(0).objectReferenceValue = torch;
-        HorusArtSetup.Prop(so, "lensDecodeAtNight").boolValue = false; // 호루스 방엔 렌즈 해독 없음
+        HorusArtSetup.Prop(so, "lensDecodeAtNight").boolValue = false; // 밤 규칙(라의 방) 대신 아래 칸을 씀
+        HorusArtSetup.Prop(so, "alwaysLensDecode").boolValue = lensDecode;
         SetDarkLine(HorusArtSetup.Prop(so, "darkLines"));
         so.ApplyModifiedPropertiesWithoutUndo();
         AddNote(go, flagOnRead, noteId, noteText);
@@ -127,7 +129,7 @@ public static class HorusClueSetup
 
     // ================= NoteStone(로그만 남던 비석) -> 단서 비석으로 바꾸기 =================
     // 노트 번호, 글, 읽음 플래그는 원래 NoteStone 것을 그대로 씀
-    public static void ConvertNoteStone(string objName, string id, string title, string illustration, string layer)
+    public static void ConvertNoteStone(string objName, string id, string title, string illustration, string layer, bool lensDecode)
     {
         GameObject go = HorusArtSetup.Find(objName);
         if (go == null) return;
@@ -141,6 +143,6 @@ public static class HorusClueSetup
         flag = nso.FindProperty("flagOnRead").stringValue;
         Object.DestroyImmediate(note);
         if (string.IsNullOrEmpty(flag)) flag = $"F_HO_CLUE_{id}_READ";
-        AddStele(go, Data(id, title, text, illustration), null, flag, noteId, text, layer);
+        AddStele(go, Data(id, title, text, illustration), null, flag, noteId, text, layer, lensDecode);
     }
 }

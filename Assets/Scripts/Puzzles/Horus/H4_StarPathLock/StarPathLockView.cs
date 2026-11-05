@@ -23,6 +23,12 @@ public class StarPathLockView : MonoBehaviour
     [SerializeField] private Sprite muralSprite;
     [SerializeField] private Vector2 muralSize = new Vector2(800f, 240f);
 
+    [Header("[추가] 벽화를 퍼즐 화면에 같이 띄울지 (끄면 방 안 벽화 단서를 보고 풀어야 함)")]
+    [SerializeField] private bool showMural = true;
+    [Tooltip("봉인 덮개 크기 = 판 그림 크기로 맞추면 네모 위에 동그라미가 겹쳐 보이지 않음")]
+    [SerializeField] private Vector2 sealSize = new Vector2(420f, 420f);
+    [SerializeField] private Vector2 sealOffset = Vector2.zero;
+
     private static readonly string[] CutTexts =
     {
         "동쪽 지평선에서\n매가 떠오른다",
@@ -87,7 +93,7 @@ public class StarPathLockView : MonoBehaviour
     private void Build()
     {
         BuildCompass();
-        BuildMural();
+        if (showMural) BuildMural();
         BuildSeal();
         built = true;
     }
@@ -144,7 +150,7 @@ public class StarPathLockView : MonoBehaviour
     // 잠겨 있을 때 별판을 덮는 붉은 봉인 (클릭도 막음)
     private void BuildSeal()
     {
-        sealCover = HorusUiFactory.CreateRect(boardRoot, "SetSeal", Vector2.zero, new Vector2(420f, 420f), red);
+        sealCover = HorusUiFactory.CreateRect(boardRoot, "SetSeal", sealOffset, sealSize, red);
         sealCover.raycastTarget = true;
         if (sealSprite != null)
         {
@@ -163,6 +169,7 @@ public class StarPathLockView : MonoBehaviour
         sealCover.gameObject.SetActive(!puzzle.IsUnlocked);
         for (int i = 0; i < cutImages.Length; i++)
         {
+            if (cutImages[i] == null) continue; // 벽화를 안 띄운 경우
             Color normal = HasMural ? Color.clear : cutColor;
             Color hint = HasMural ? hintGlow : gold;
             cutImages[i].color = puzzle.HintCut == i ? hint : normal;

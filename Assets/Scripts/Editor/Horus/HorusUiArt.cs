@@ -17,6 +17,7 @@ public static class HorusUiArt
         count += LinkBoard("H1_WingOverlay", "H1/H1_01", new Vector2(501f, 401f), Vector2.zero, 90f, 0f, 40f);
         count += LinkBoard("H2_ChartOverlay", "H2/H2_01", new Vector2(630f, 630f), new Vector2(3f, 0f), 80f, 0f, 46f);
         count += LinkBoard("H4_PathOverlay", "H4/H4_01", new Vector2(535f, 535f), new Vector2(3f, -5f), 110f, 93.3f, 54f);
+        count += ClearOverlayPanels();
         count += LinkChartCards();
         count += LinkWingCovers();
         count += LinkPathLock();
@@ -54,6 +55,21 @@ public static class HorusUiArt
         }
         Debug.LogWarning($"[HorusUiArt] {overlay} 의 StarBoardView를 못 찾음");
         return null;
+    }
+
+    // 퍼즐 화면 뒤 파란 네모 판을 투명하게 (판 그림이 이미 테두리를 가짐 -> 네모 위에 동그라미가 겹쳐 보이던 것)
+    private static int ClearOverlayPanels()
+    {
+        int n = 0;
+        foreach (string name in new[] { "H1_WingOverlay", "H2_ChartOverlay", "H4_PathOverlay" })
+        {
+            GameObject go = HorusArtSetup.Find(name);
+            Image img = go != null ? go.GetComponent<Image>() : null;
+            if (img == null) continue;
+            img.color = Color.clear;
+            n++;
+        }
+        return n;
     }
 
     // ================= H2 성좌 도판 (메스케티우, 사흐, 소프데트, 우자트) =================
@@ -124,6 +140,9 @@ public static class HorusUiArt
         HorusArtSetup.SetSprite(so, "muralSprite", "H4/H4_03");
         HorusArtSetup.SetVector(so, "muralSize", new Vector2(800f, 240f));
         HorusArtSetup.SetFloat(so, "muralY", -400f);
+        HorusArtSetup.Prop(so, "showMural").boolValue = false; // 벽화는 방 안 H4 옆 단서로 (퍼즐 화면엔 안 띄움)
+        HorusArtSetup.SetVector(so, "sealSize", new Vector2(535f, 535f)); // 판 그림과 같은 크기 -> 네모/동그라미가 안 겹쳐 보임
+        HorusArtSetup.SetVector(so, "sealOffset", new Vector2(3f, -5f));
         HorusArtSetup.SetFloat(so, "compassOffset", 300f);
         so.ApplyModifiedPropertiesWithoutUndo();
         return 1;

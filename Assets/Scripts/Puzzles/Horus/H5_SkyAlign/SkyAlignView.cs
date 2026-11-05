@@ -86,7 +86,7 @@ public class SkyAlignView : MonoBehaviour
         BuildAltar();
         BuildPanels();
         statusText = HorusUiFactory.CreateText(boardRoot, font, "", 26, new Vector2(0f, -330f), new Vector2(1500f, 50f), white);
-        HorusUiFactory.CreateText(boardRoot, font, "별을 순서대로 클릭  |  뒤로 : 마지막 입력 취소  |  E / Esc : 닫기", 20,
+        HorusUiFactory.CreateText(boardRoot, font, "별을 순서대로 클릭  |  뒤로 : 마지막 입력 취소  |  E : 닫기", 20,
             new Vector2(0f, -380f), new Vector2(1400f, 40f), paper);
         BuildBackButton();
         built = true;

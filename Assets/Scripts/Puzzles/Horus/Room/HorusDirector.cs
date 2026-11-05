@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 // 호루스의 방 연출 감독 (씬에 1개)
 // - 처음 들어오면: 입구 전실 연출 (이시스의 목소리)
-// - 본당에 처음 발을 들이면: 매의 그림자가 천장을 가로지르고 호루스가 깨어남
-// - 성좌/퍼즐을 풀 때마다: 천장 별이 반짝 + 호루스 한마디 + 카메라가 다음 목적지를 비춰 줌 (길 안내)
+// - 본당에 처음 발을 들이면: 신전이 울리고 호루스의 매가 날아와 방을 돌고 첫 목적지에 앉음
+// - 성좌/퍼즐을 풀 때마다: 천장 별이 반짝 + 호루스 한마디 + 매가 다음 목적지로 날아가 앉음 (길 안내)
 // - H5 클리어: 하늘을 되찾는 엔딩 (형판이 떠오르고 방 전체가 밝아짐 -> 북문)
 // 퍼즐 화면이 열려 있거나 대사/연출 중이면 끝날 때까지 기다렸다가 차례로 보여줌
 // 실제 장면은 HorusCutscenes에 있음
@@ -16,6 +17,10 @@ public class HorusDirector : MonoBehaviour
     [SerializeField] private Sprite falconSprite;
     [SerializeField] private Sprite plateSprite;
     [SerializeField] private Sprite emoteSprite;
+
+    [Header("매 길잡이 / 꿈 화면 효과 (이시스가 말할 때만 켜짐)")]
+    [SerializeField] private HorusFalconGuide falcon;
+    [SerializeField] private Volume dreamVolume;
 
     [Header("퍼즐 화면 (하나라도 켜져 있으면 연출을 미룸)")]
     [SerializeField] private GameObject[] overlays;
@@ -37,6 +42,8 @@ public class HorusDirector : MonoBehaviour
     public Sprite FalconSprite => falconSprite;
     public Sprite PlateSprite => plateSprite;
     public Sprite EmoteSprite => emoteSprite;
+    public HorusFalconGuide Falcon => falcon;
+    public Volume DreamVolume => dreamVolume;
     public float ClearIntensity => clearIntensity;
     public Color ClearColor => clearColor;
     public string IntroFlag => introFlag;
@@ -52,6 +59,8 @@ public class HorusDirector : MonoBehaviour
         try
         {
             cluePanel = FindFirstObjectByType<CluePanel>(FindObjectsInactive.Include);
+            HorusFocus.SetOverlays(overlays);
+            if (dreamVolume != null) dreamVolume.weight = 0f;
             if (HasFlag(endingFlag)) RestoreSky();
             if (!HasFlag(introFlag)) queue.Add(HorusCutscenes.Intro);
             if (GameManager.Instance == null) return;

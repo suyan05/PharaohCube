@@ -46,6 +46,7 @@ public class HorusObjectiveGuide : MonoBehaviour
 
     private readonly Dictionary<SpriteRenderer, Color> originalColors = new Dictionary<SpriteRenderer, Color>();
     private Text objectiveText;
+    private GameObject hudRoot; // [추가] 패널/퍼즐/연출 중엔 숨김
     private HorusObjectiveStep current;
 
     // [추가] 지금 목표 퍼즐 (HorusGoalMarker가 그 위에 별을 띄움)
@@ -138,6 +139,7 @@ public class HorusObjectiveGuide : MonoBehaviour
     // 현재 목표의 길과 퍼즐만 천천히 밝아졌다 어두워졌다 함
     private void Update()
     {
+        if (hudRoot != null) hudRoot.SetActive(!HorusFocus.PanelOpen);
         if (current == null) return;
         float t = 0.5f + 0.5f * Mathf.Sin(Time.time * pulseSpeed);
         if (current.pathToLight != null)
@@ -162,6 +164,7 @@ public class HorusObjectiveGuide : MonoBehaviour
     {
         var canvasGo = new GameObject("ObjectiveCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
         canvasGo.transform.SetParent(transform, false);
+        hudRoot = canvasGo;
 
         var canvas = canvasGo.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;

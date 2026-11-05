@@ -166,4 +166,25 @@ public static class HorusFx
         sr.transform.position = start + Vector3.up * height;
         sr.transform.localScale = full;
     }
+
+    // 오른쪽을 가리키는 삼각형 그림 (코드로 한 번만 만듦, 화면 가장자리 화살표용)
+    private static Sprite arrow;
+
+    public static Sprite ArrowSprite()
+    {
+        if (arrow != null) return arrow;
+        const int n = 32;
+        var tex = new Texture2D(n, n, TextureFormat.RGBA32, false) { filterMode = FilterMode.Bilinear };
+        for (int y = 0; y < n; y++)
+        {
+            for (int x = 0; x < n; x++)
+            {
+                float half = (1f - x / (float)n) * n * 0.5f;
+                tex.SetPixel(x, y, Mathf.Abs(y - n * 0.5f) < half ? Color.white : Color.clear);
+            }
+        }
+        tex.Apply();
+        arrow = Sprite.Create(tex, new Rect(0, 0, n, n), new Vector2(0.5f, 0.5f), n);
+        return arrow;
+    }
 }

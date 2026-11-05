@@ -309,7 +309,7 @@ public class ShadowClockStation : MonoBehaviour, IInteractable
         }
 
         statusText = CreateText(root, "", 28, new Vector2(0, -390), new Vector2(1200, 60), paper);
-        CreateText(root, "그림자를 보고 지금 시간의 기호를 클릭  |  E / Esc : 닫기", 22,
+        CreateText(root, "그림자를 보고 지금 시간의 기호를 클릭  |  E : 닫기", 22,
             new Vector2(0, -450), new Vector2(1200, 40), wallColor);
     }
 

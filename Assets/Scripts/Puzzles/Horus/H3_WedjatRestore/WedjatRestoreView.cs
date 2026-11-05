@@ -111,7 +111,7 @@ public class WedjatRestoreView : MonoBehaviour
             slotImages[i] = CreateRect(boardRoot, $"Slot_{i}", SlotPos(i), SlotSize(i), HasArt ? Color.clear : slotColor);
         }
         statusText = CreateText(boardRoot, "", 26, new Vector2(0, -360), new Vector2(1400, 50), paper);
-        CreateText(boardRoot, "드래그 = 조각 옮기기  |  클릭 = 90도 회전  |  E / Esc : 닫기", 20,
+        CreateText(boardRoot, "드래그 = 조각 옮기기  |  클릭 = 90도 회전  |  E : 닫기", 20,
             new Vector2(0, -410), new Vector2(1400, 40), sand);
         for (int i = 0; i < count; i++) CreatePiece(i, puzzle.Pieces[i]);
         built = true;

@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 // 호루스 타일맵 씬에 새로 놓거나 바꾸는 물건 (HorusRoomBuilder가 부름). 위치는 작업 도면 그대로
-// - 입구 전실: 신화 책 독서대(HA1), 횃불 제단(HA2), 벽돌 벽의 벽화 모자이크(H08)
+// - 입구 전실: 신화 책 독서대(HA1), 횃불 제단(HA2, 라의 불씨가 있으면 사라짐)
+// - H4 옆: 벽화 모자이크(H08, E = 원본 벽화 + 수첩)
 // - 본당: 별 횃불 3개(HL1~3) + 옆 단서 비석 3개(HS1~3), 입구 비석/경고 석판을 단서 비석으로 바꿈
 // - 매 석상, 매의 회랑, 연출 감독, 목표 표시는 HorusGalleryBuild
 // 아트가 없는 것은 기본 도형(사각형, 원) + 색으로 임시 제작 -> 나중에 그림만 바꾸면 됨
@@ -50,6 +51,7 @@ public static class HorusRoomObjects
         var altar = (GameObject)PrefabUtility.InstantiatePrefab(prefab, root);
         altar.name = "OBJ_HA2_TorchAltar";
         altar.transform.position = new Vector3(14.5f, -4f, 0f);
+        altar.AddComponent<HorusEmberSkip>(); // 라의 방에서 불씨(히든)를 가져왔으면 필요 없음
     }
 
     // 스토리 기획서 5.4 신화 책 '호루스와 세트'. 오시리스·이시스가 호루스의 부모라는 걸 여기서 알려줌 (H5 노트 4·5와 이어짐)
@@ -64,16 +66,16 @@ public static class HorusRoomObjects
         };
     }
 
-    // ================= 벽화: 바닥을 막던 판 -> 전실 벽돌 벽의 흐릿한 모자이크 (E = 크게 보기 + 수첩) =================
+    // ================= 벽화: H4 바닥 별판 바로 옆(남쪽)의 흐릿한 모자이크 (E = 원본 벽화 + 수첩) =================
     private static void BuildMural()
     {
         GameObject mural = HorusArtSetup.Find("OBJ_H08_Mural");
         if (mural == null) return;
-        mural.transform.position = new Vector3(9.5f, -1.5f, 0f); // 전실 북쪽 벽돌 벽 왼쪽 칸 (x 8~10, y -2~-1)
+        mural.transform.position = new Vector3(17.8f, 0.6f, 0f); // H4 별판(17.8, 3.4) 바로 아래 남쪽 벽 앞 -> 퍼즐 앞에서 보고 풀 수 있게
         HorusWorldArt.Fit("OBJ_H08_Mural", HorusWorldArt.MuralMosaic, HorusWorldArt.MuralSize);
         BoxCollider2D box = mural.GetComponent<BoxCollider2D>();
         if (box != null) box.isTrigger = true; // 벽에 붙은 그림이라 길을 막지 않음 (조사만)
-        HorusClueSetup.ConvertNoteStone("OBJ_H08_Mural", "MURAL", "남쪽 벽화 - 매의 비행", "H4/H4_03", Layer);
+        HorusClueSetup.ConvertNoteStone("OBJ_H08_Mural", "MURAL", "남쪽 벽화 - 매의 비행", "H4/H4_03", Layer, false);
     }
 
     // ================= 별 횃불 (WallTorch: 내 횃불로 E 길게 -> 켜짐 -> 옆 단서 비석이 읽힘) =================
@@ -131,7 +133,7 @@ public static class HorusRoomObjects
         if (slate != null) HorusWorldArt.FitObject(go, slate, new Vector2(0.75f, 1.1f), Color.white);
         go.AddComponent<BoxCollider2D>();
         ClueData data = HorusClueSetup.Data(id, title, body, art);
-        HorusClueSetup.AddStele(go, data, torch, $"F_HO_CLUE_{id}_READ", noteId, body, Layer);
+        HorusClueSetup.AddStele(go, data, torch, $"F_HO_CLUE_{id}_READ", noteId, body, Layer, true);
     }
 
     // 입구 비석(노트 1), 경고 석판(노트 4): 로그만 남던 NoteStone -> 단서 패널이 뜨는 비석
@@ -139,8 +141,25 @@ public static class HorusRoomObjects
     {
         HorusWorldArt.Fit("OBJ_H02_GuideStone", HorusClueSetup.Slate, new Vector2(0.9f, 1.3f));
         HorusWorldArt.Fit("OBJ_H11_WarningSlab", HorusClueSetup.Slate, new Vector2(1f, 1.4f));
-        HorusClueSetup.ConvertNoteStone("OBJ_H02_GuideStone", "ENTRY", "입구 비석", "", Layer);
-        HorusClueSetup.ConvertNoteStone("OBJ_H11_WarningSlab", "WARNING", "붉은 별의 경고", "H5/H5_07", Layer);
+        HorusClueSetup.ConvertNoteStone("OBJ_H02_GuideStone", "ENTRY", "입구 비석", "", Layer, true);
+        HorusClueSetup.ConvertNoteStone("OBJ_H11_WarningSlab", "WARNING", "붉은 별의 경고", "H5/H5_07", Layer, true);
+        LapisStars();
+    }
+
+    // 청금석 별 3개: E로 줍는 수집 요소 (FUN-4)
+    private static void LapisStars()
+    {
+        for (int i = 1; i <= 3; i++)
+        {
+            GameObject go = HorusArtSetup.Find($"OBJ_H16_LapisStar_{i}");
+            if (go == null) continue;
+            if (go.GetComponent<Collider2D>() == null) go.AddComponent<CircleCollider2D>().isTrigger = true;
+            HorusLapisStar star = go.GetComponent<HorusLapisStar>();
+            if (star == null) star = go.AddComponent<HorusLapisStar>();
+            var so = new SerializedObject(star);
+            HorusArtSetup.Prop(so, "starId").intValue = i;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
     }
 
     // ================= 도우미 =================

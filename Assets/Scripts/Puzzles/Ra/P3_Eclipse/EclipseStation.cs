@@ -200,7 +200,7 @@ public class EclipseStation : MonoBehaviour, IInteractable
         CreateText(sunImage.rectTransform, "태양", 30, Vector2.zero, new Vector2(136, 136), paper);
 
         statusText = CreateText(root, "", 28, new Vector2(0, -300), new Vector2(1200, 60), paper);
-        CreateText(root, "회전 조각(A·B·C) 클릭 = 90° 시계 회전  |  E / Esc : 닫기", 22,
+        CreateText(root, "회전 조각(A·B·C) 클릭 = 90° 시계 회전  |  E : 닫기", 22,
             new Vector2(0, -360), new Vector2(1200, 40), sand);
     }
 
