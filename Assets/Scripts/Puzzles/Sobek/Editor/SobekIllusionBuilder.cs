@@ -9,70 +9,112 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// 메뉴: Tools/Sobek/5. 착시 퍼즐 1 만들기 (Sobek_Illusion1)
-// 데이터(SobekIllusion_1) + 머티리얼 2개 + 테스트 씬을 처음부터 만들고 Build Profiles 씬 목록에 추가
-// 퍼즐 배치는 파이썬 검증 도구(BFS)로 확인한 값: 착시 길 5번 + 각도 4개 모두 써야 풀림
+// 메뉴: Tools/Sobek/5. 착시 퍼즐 씬 만들기 (서브 S1~S4 + 메인)
+// 퍼즐 데이터 7개(SobekIllusion_S1~S4, M1~M3) + 머티리얼 + 씬 5개를 처음부터 만들고 Build Profiles 씬 목록에 추가
+// - 서브: 씬 하나에 판 하나 (풀면 부적 -> 허브의 그 섬 게이트 앞으로)
+// - 메인: 씬 하나에 구역 3개, 지금 구역만 보이게 (풀면 형판 공개·큐브 -> 허브에서 물 빠짐)
+// 퍼즐 배치는 SobekIllusionDesigns (설계 도구 + BFS 검증 값)
 public static class SobekIllusionBuilder
 {
     private const string Folder = SobekDataSetup.DataRoot + "/Illusion";
-    private const string LevelPath = Folder + "/SobekIllusion_1.asset";
     private const string BlockMatPath = Folder + "/Mat_SobekIllusion_Block.mat";
     private const string MarkerMatPath = Folder + "/Mat_SobekIllusion_Marker.mat";
-    private const string ScenePath = "Assets/Scenes/Puzzle_Test/" + SobekIds.IllusionScene1 + ".unity";
+    private const string SceneFolder = "Assets/Scenes/Puzzle_Test";
     private const string PlayerPrefabPath = "Assets/Prefabs/Player/Player.prefab";
 
-    [MenuItem("Tools/Sobek/5. 착시 퍼즐 1 만들기 (Sobek_Illusion1)", priority = 5)]
-    public static void Build()
+
+    private class Def
+    {
+        public string key, title, intro, design, clearText;
+        public float camSize = 9f;
+    }
+
+    private static readonly Def[] Subs =
+    {
+        new Def { key = "S1", title = "소용돌이 섬", design = SobekIllusionDesigns.S1,
+            intro = "청록 돌을 밟으면 섬의 팔이 돈다. 신전을 돌려 끊어진 길이 맞닿는 자리를 찾자.",
+            clearText = "소용돌이가 잦아들고, 섬의 팔이 제단을 가리킨다." },
+        new Def { key = "S2", title = "악어 등 다리", design = SobekIllusionDesigns.S2,
+            intro = "주황 돌을 밟을 때마다 악어 등 다리가 한 걸음씩 헤엄친다.",
+            clearText = "악어가 등을 내어 주었다." },
+        new Def { key = "S3", title = "범람하는 나일", design = SobekIllusionDesigns.S3,
+            intro = "파랑 돌이 물높이를 바꾼다. 물이 오르면 뗏목도 오르고, 낮은 길은 잠긴다.",
+            clearText = "나일의 물이 제자리를 찾았다." },
+        new Def { key = "S4", title = "두 개의 수면", design = SobekIllusionDesigns.S4,
+            intro = "장치는 없다. 오직 보는 자리만이 길을 잇는다.",
+            clearText = "물 위의 길과 물에 비친 길이 하나가 되었다." },
+    };
+
+    private static readonly Def[] Mains =
+    {
+        new Def { key = "M1", title = "범람기", design = SobekIllusionDesigns.M1, camSize = 9.5f,
+            clearText = "범람의 물길이 열렸다." },
+        new Def { key = "M2", title = "건기의 미궁", design = SobekIllusionDesigns.M2, camSize = 9.5f,
+            clearText = "미궁의 다리가 이어졌다." },
+        new Def { key = "M3", title = "소베크-라의 탑", design = SobekIllusionDesigns.M3, camSize = 9.5f,
+            clearText = "소베크-라의 제단에 닿았다!" },
+    };
+
+    private static readonly string[][] MainLines =
+    {
+        new[] { "소베크의 입 안쪽, 범람기의 신전. 물과 섬이 함께 움직인다.", "네 섬에서 배운 것을 모두 떠올리자." },
+        new[] { "물이 빠진 아래층, 건기의 미궁. 악어 등 다리와 소용돌이 섬이 길을 막는다." },
+        new[] { "소베크-라의 탑. 섬, 악어, 물, 그리고 보는 자리… 모두 맞아야 제단에 닿는다." },
+    };
+
+    [MenuItem("Tools/Sobek/5. 착시 퍼즐 씬 만들기 (서브 S1~S4 + 메인)", priority = 5)]
+    public static void BuildMenu()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-        if (System.IO.File.Exists(ScenePath) &&
-            !EditorUtility.DisplayDialog("착시 퍼즐", $"{ScenePath} 가 이미 있습니다.\n새로 만들면 그 씬에서 고친 내용이 사라집니다. 덮어쓸까요?", "덮어쓰기", "취소"))
+        if (!EditorUtility.DisplayDialog("착시 퍼즐", "Sobek_S1~S4, Sobek_Main 씬을 새로 만듭니다.\n그 씬들에서 직접 고친 내용은 사라집니다. 계속할까요?", "만들기", "취소"))
             return;
+        BuildAll();
+    }
 
+    // 전체 한 번에(0번 메뉴)에서도 부름 (물어보지 않음)
+    public static void BuildAll()
+    {
         var log = new List<string>();
         SobekDataSetup.EnsureFolder(Folder);
-        SobekDataSetup.EnsureFolder("Assets/Scenes/Puzzle_Test");
-
-        SobekIllusionLevel level = EnsureLevel(log);
+        SobekDataSetup.EnsureFolder(SceneFolder);
         Material block = EnsureMaterial(BlockMatPath, false, log);
         Material marker = EnsureMaterial(MarkerMatPath, true, log);
         if (block == null || marker == null) return;
-        AssetDatabase.SaveAssets();
 
-        BuildScene(level, block, marker, log);
+        string[] scenes = { SobekIds.SubScene1, SobekIds.SubScene2, SobekIds.SubScene3, SobekIds.SubScene4 };
+        string[] rewards = { SobekIds.AmuletRotate, SobekIds.AmuletLift, SobekIds.AmuletWater, SobekIds.AmuletMirror };
+        string[] flags = { SobekIds.FlagS1Clear, SobekIds.FlagS2Clear, SobekIds.FlagS3Clear, SobekIds.FlagS4Clear };
+        for (int i = 0; i < Subs.Length; i++)
+        {
+            SobekIllusionLevel lv = EnsureLevel(Subs[i], log);
+            BuildSubScene(scenes[i], Subs[i], lv, rewards[i], flags[i], block, marker, log);
+        }
+
+        var levels = new List<SobekIllusionLevel>();
+        foreach (Def d in Mains) levels.Add(EnsureLevel(d, log));
+        AssetDatabase.SaveAssets();
+        BuildMainScene(levels, block, marker, log);
         Debug.Log("[SobekIllusionBuilder] 완료\n- " + string.Join("\n- ", log));
     }
 
     // ================= 데이터 =================
-    // 끊어진 수로: 물가 부두(시작, 높이 0)에서 소베크의 제단(높이 5)까지
-    // 정답 (15수): 135° -> 45° -> 135° -> 225° -> 315° -> 225° 순서로 착시 길 5번
-    private static SobekIllusionLevel EnsureLevel(List<string> log)
+    private static SobekIllusionLevel EnsureLevel(Def d, List<string> log)
     {
-        var level = AssetDatabase.LoadAssetAtPath<SobekIllusionLevel>(LevelPath);
+        string path = $"{Folder}/SobekIllusion_{d.key}.asset";
+        var level = AssetDatabase.LoadAssetAtPath<SobekIllusionLevel>(path);
         bool created = level == null;
         if (created) level = ScriptableObject.CreateInstance<SobekIllusionLevel>();
-
-        var segs = new List<SobekIllusionLevel.Segment>
-        {
-            Seg(4, 0, -1, true, 2),   // 시작 부두
-            Seg(2, 2, 2, false, 3),   // 낮은 수로
-            Seg(0, 2, -2, true, 2),   // 갈림 수로
-            Seg(0, 3, -4, true, 2),   // 뒤쪽 계단참
-            Seg(-4, 4, 1, true, 4),   // 높은 수로
-            Seg(4, 5, -3, false, 4),  // 제단 길 (끝 = 제단)
-        };
-        level.EditorSet("착시의 수로", "신전을 돌려 보자. 끊어진 길도 보는 자리에 따라 이어진다.",
-            segs, new Vector3Int(4, 0, -1), new Vector3Int(4, 5, 0), 2, 8.5f);
-        if (created) AssetDatabase.CreateAsset(level, LevelPath);
+        level.EditorParse(d.title, d.intro ?? "", d.design, d.camSize);
+        if (created) AssetDatabase.CreateAsset(level, path);
         else EditorUtility.SetDirty(level);
 
-        var sol = level.BuildGraph().Solve(level.Start, level.Goal, level.StartYaw, out int states);
-        log.Add($"{LevelPath} -> 정답 {(sol == null ? "없음!" : (sol.Count - 1) + "수")} (상태 {states}개)");
+        SobekIllusionModel m = level.BuildModel();
+        var sol = m.Solve(level.StartYaw, out int states);
+        int ill = 0, plates = 0;
+        if (sol != null) foreach (var s in sol) { if (s.action.StartsWith("illusion")) ill++; if (s.action.EndsWith("+plate")) plates++; }
+        log.Add($"{path}: {(sol == null ? "<color=red>정답 없음!</color>" : $"정답 {sol.Count - 1}수 (착시 길 {ill} · 발판 {plates}, 상태 {states}개)")}");
         return level;
     }
-
-    private static SobekIllusionLevel.Segment Seg(int x, int y, int z, bool alongX, int len) =>
-        new SobekIllusionLevel.Segment { start = new Vector3Int(x, y, z), alongX = alongX, length = len, pillar = true };
 
     private static Material EnsureMaterial(string path, bool transparent, List<string> log)
     {
@@ -95,17 +137,48 @@ public static class SobekIllusionBuilder
         mat.SetFloat("_ZWrite", transparent ? 0f : 1f);
         mat.renderQueue = transparent ? 3000 : 2000;
         EditorUtility.SetDirty(mat);
-        log.Add($"머티리얼: {path}");
         return mat;
     }
 
     // ================= 씬 =================
-    private static void BuildScene(SobekIllusionLevel level, Material block, Material marker, List<string> log)
+    private static void BuildSubScene(string sceneName, Def d, SobekIllusionLevel level, string reward, string flag, Material block, Material marker, List<string> log)
     {
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        TMP_FontAsset font = FindFont();
+        TMP_FontAsset font = SobekSceneBuilder.FindFontPublic();
+        SobekIllusionCamera rig = Common(font, level);
 
-        // 매니저 (다른 소베크 씬과 같은 구성)
+        var root = new GameObject("SobekPuzzle");
+        SobekIllusionBoard board = Board(root.transform, "Board_" + d.key, level, rig, block, marker, font, "", d.clearText);
+        var flow = root.AddComponent<SobekIllusionFlow>();
+        flow.EditorSetup(new[] { board }, new[] { new[] { level.Intro } }, $"F_SOBEK_{d.key}_STAGE_", reward, flag, false, null, d.key);
+
+        Save(scene, sceneName, log);
+    }
+
+    private static void BuildMainScene(List<SobekIllusionLevel> levels, Material block, Material marker, List<string> log)
+    {
+        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+        TMP_FontAsset font = SobekSceneBuilder.FindFontPublic();
+        SobekIllusionCamera rig = Common(font, levels[0]);
+
+        var root = new GameObject("SobekPuzzle");
+        var boards = new SobekIllusionBoard[levels.Count];
+        for (int i = 0; i < levels.Count; i++)
+        {
+            boards[i] = Board(root.transform, $"Stage{i + 1}_{Mains[i].key}", levels[i], rig, block, marker, font, $"구역 {i + 1}/{levels.Count} · ", Mains[i].clearText);
+            boards[i].gameObject.SetActive(i == 0); // 지금 구역만 보이게 (실행 중에는 SobekIllusionFlow가 켜고 끔)
+        }
+        BastetEnding ending = SobekSceneBuilder.AddSobekEnding(root.transform, font, log);
+        var flow = root.AddComponent<SobekIllusionFlow>();
+        flow.EditorSetup(boards, MainLines, "F_SOBEK_MAIN_STAGE_", "", "", true, ending, "");
+        log.Add("메인: 구역 3개 (범람기 = 섬+물 / 건기의 미궁 = 악어 다리+섬 / 소베크-라의 탑 = 섬+악어 다리+물), 지금 구역만 보임");
+
+        Save(scene, SobekIds.MainScene, log);
+    }
+
+    // 매니저 · 조명 · 대사 · 카메라 (착시 씬 공통)
+    private static SobekIllusionCamera Common(TMP_FontAsset font, SobekIllusionLevel first)
+    {
         new GameObject("GameManager_Sobek").AddComponent<GameManager>();
         var managers = new GameObject("Managers");
         managers.AddComponent<ItemInventory>();
@@ -114,43 +187,51 @@ public static class SobekIllusionBuilder
         var es = new GameObject("EventSystem");
         es.AddComponent<EventSystem>();
         es.AddComponent<InputSystemUIInputModule>();
+        SobekSceneBuilder.AddStoryPublic();
 
         // 2D 조명 (캐릭터·제단 스프라이트가 Sprite-Lit이라 전역 조명 필요. 블록은 조명 안 받음)
         var light = new GameObject("Global Light 2D").AddComponent<Light2D>();
         light.lightType = Light2D.LightType.Global;
         light.intensity = 1f;
 
-        // 카메라 (회전 중심 + 자식 카메라)
         var rigGo = new GameObject("IllusionCameraRig");
-        rigGo.transform.position = level.Center();
+        rigGo.transform.position = first.Center();
         var camGo = new GameObject("Main Camera");
         camGo.tag = "MainCamera";
         camGo.transform.SetParent(rigGo.transform, false);
         var cam = camGo.AddComponent<Camera>();
         cam.clearFlags = CameraClearFlags.SolidColor;
-        cam.backgroundColor = level.BackgroundColor;
+        cam.backgroundColor = first.BackgroundColor;
         camGo.AddComponent<AudioListener>();
         var rig = rigGo.AddComponent<SobekIllusionCamera>();
-        rig.EditorSetup(cam, level.CameraSize);
-        rig.SetYawImmediate(level.StartYaw);
+        rig.EditorSetup(cam, first.CameraSize);
+        rig.SetYawImmediate(first.StartYaw);
+        return rig;
+    }
 
-        // 퍼즐
-        var boardGo = new GameObject("SobekIllusion");
-        var board = boardGo.AddComponent<SobekIllusionBoard>();
+    private static SobekIllusionBoard Board(Transform parent, string objName, SobekIllusionLevel level, SobekIllusionCamera rig, Material block, Material marker, TMP_FontAsset font, string prefix, string clearText)
+    {
+        var go = new GameObject(objName);
+        go.transform.SetParent(parent, false);
+        var board = go.AddComponent<SobekIllusionBoard>();
+        SpriteRenderer avatar = MakeSprite(go.transform, "Avatar", PlayerSprite(), 20);
+        SpriteRenderer goal = MakeSprite(go.transform, "GoalAltar", SobekDataSetup.World("Sobek_Obj_Altar"), 10);
+        board.EditorSetup(level, rig, block, marker, avatar, goal, font, prefix, clearText);
+        return board;
+    }
 
-        SpriteRenderer avatar = MakeSprite(boardGo.transform, "Avatar", PlayerSprite(), 20);
-        SpriteRenderer goal = MakeSprite(boardGo.transform, "GoalAltar", SobekDataSetup.World("Sobek_Obj_Altar"), 10);
-        board.EditorSetup(level, rig, block, marker, avatar, goal, font);
-
-        EditorSceneManager.SaveScene(scene, ScenePath);
+    private static void Save(Scene scene, string sceneName, List<string> log)
+    {
+        string path = $"{SceneFolder}/{sceneName}.unity";
+        EditorSceneManager.SaveScene(scene, path);
         var scenes = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (!scenes.Exists(s => s.path == ScenePath))
+        if (!scenes.Exists(s => s.path == path))
         {
-            scenes.Add(new EditorBuildSettingsScene(ScenePath, true));
+            scenes.Add(new EditorBuildSettingsScene(path, true));
             EditorBuildSettings.scenes = scenes.ToArray();
-            log.Add($"Build Profiles 씬 목록에 추가: {ScenePath}");
+            log.Add($"Build Profiles 씬 목록에 추가: {path}");
         }
-        log.Add($"씬 저장: {ScenePath} (Play 하면 바로 테스트)");
+        log.Add($"씬 저장: {path}");
     }
 
     private static SpriteRenderer MakeSprite(Transform parent, string name, Sprite sprite, int order)
@@ -171,16 +252,6 @@ public static class SobekIllusionBuilder
         if (prefab == null) return null;
         var sr = prefab.GetComponentInChildren<SpriteRenderer>(true);
         return sr != null ? sr.sprite : null;
-    }
-
-    private static TMP_FontAsset FindFont()
-    {
-        foreach (string guid in AssetDatabase.FindAssets("MonoplexKR-Regular SDF t:TMP_FontAsset"))
-        {
-            var f = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(guid));
-            if (f != null) return f;
-        }
-        return null;
     }
 
     private static void SetObj(Object target, string prop, Object value)

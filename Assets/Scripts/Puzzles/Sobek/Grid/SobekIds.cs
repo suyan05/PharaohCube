@@ -16,7 +16,6 @@ public static class SobekIds
     public const string FlagS2Clear = "F_SOBEK_S2_CLEAR";
     public const string FlagS3Clear = "F_SOBEK_S3_CLEAR";
     public const string FlagS4Clear = "F_SOBEK_S4_CLEAR";
-    public const string FlagIllusion1Clear = "F_SOBEK_ILLUSION1_CLEAR"; // 착시 퍼즐 1 (끊어진 수로)
     public const string FlagDoorOpen = "F_SOBEK_DOOR_OPEN";       // 큰 문에 부적 4개를 넣음
     public const string FlagMainADone = "F_SOBEK_MAIN_A_DONE";    // 첫 구역(범람기) 통과
     public const int MainZoneA = 0;
@@ -40,7 +39,8 @@ public static class SobekIds
     // 씬 이름 (Build Profiles -> Scene List에 있어야 함)
     public const string HubScene = "Sobek_Hub";
     public const string MainScene = "Sobek_Main";
-    public const string IllusionScene1 = "Sobek_Illusion1";
+    // 착시 퍼즐 씬 (허브 섬 게이트 -> 여기, Tools/Sobek/5가 만듦)
+    public const string SubScene1 = "Sobek_S1", SubScene2 = "Sobek_S2", SubScene3 = "Sobek_S3", SubScene4 = "Sobek_S4";
     public const string AnubisScene = "Puzzle_Test_Anubis_Tutorial";
     public const string CentralHallScene = "CentralRoom_Temp"; // 기획서: 신전을 깨면 중앙 홀로 돌아감 (지금 빌드 목록의 중앙 홀 [확인 필요])
 }

@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78f1d1367410f7349b81d09ed00f6967, type: 3}
+  m_Name: SobekIllusion_M1
+  m_EditorClassIdentifier: Assembly-CSharp::SobekIllusionLevel
+  displayName: "\uBC94\uB78C\uAE30"
+  intro: 
+  segments:
+  - start: {x: 4, y: 1, z: -3}
+    alongX: 1
+    length: 2
+    pillar: 1
+  - start: {x: 4, y: 3, z: 2}
+    alongX: 0
+    length: 2
+    pillar: 1
+  - start: {x: -2, y: 0, z: 5}
+    alongX: 1
+    length: 4
+    pillar: 1
+  - start: {x: -5, y: 2, z: 4}
+    alongX: 1
+    length: 2
+    pillar: 1
+  - start: {x: 0, y: 2, z: -1}
+    alongX: 1
+    length: 5
+    pillar: 1
+  - start: {x: -2, y: 3, z: -5}
+    alongX: 1
+    length: 2
+    pillar: 1
+  - start: {x: -1, y: 3, z: 1}
+    alongX: 1
+    length: 0
+    pillar: 1
+  extraBlocks: []
+  mechs:
+  - kind: 0
+    cells:
+    - {x: -1, y: 4, z: 1}
+    - {x: 0, y: 4, z: 1}
+    - {x: 1, y: 4, z: 1}
+    - {x: 2, y: 4, z: 1}
+    pivot: {x: -1, y: 4, z: 1}
+    offsets: []
+    count: 4
+    startState: 0
+  - kind: 2
+    cells:
+    - {x: -3, y: -1, z: -3}
+    - {x: -3, y: -1, z: -2}
+    - {x: -3, y: -1, z: -1}
+    pivot: {x: 0, y: 0, z: 0}
+    offsets: []
+    count: 3
+    startState: 0
+  plates:
+  - cell: {x: 5, y: 1, z: -3}
+    mech: 0
+  - cell: {x: -5, y: 2, z: 4}
+    mech: 1
+  pillarBottomY: -2
+  start: {x: 0, y: 0, z: 5}
+  goal: {x: -2, y: 3, z: -5}
+  startYaw: 0
+  cameraSize: 9.5
+  waterY: -0.55
+  topColor: {r: 0.93, g: 0.84, b: 0.62, a: 1}
+  sideColor: {r: 0.72, g: 0.55, b: 0.37, a: 1}
+  mossColor: {r: 0.33, g: 0.47, b: 0.36, a: 1}
+  startColor: {r: 0.52, g: 0.86, b: 0.62, a: 1}
+  goalColor: {r: 1, g: 0.78, b: 0.25, a: 1}
+  waterColor: {r: 0.12, g: 0.36, b: 0.42, a: 1}
+  backgroundColor: {r: 0.07, g: 0.12, b: 0.16, a: 1}

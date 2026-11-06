@@ -25,19 +25,19 @@ public class SobekHubState : MonoBehaviour
     [Range(0.5f, 6f)] [SerializeField] private float drainTime = 3f;
     [SerializeField] private CameraFollow2D cameraFollow;
     [TextArea(1, 2)]
-    [SerializeField] private string drainMessage = "신전의 물이 빠진다… 물 밑에 잠겨 있던 수로 바닥과 수위계 기둥이 드러났다.";
+    [SerializeField] private string drainMessage = "신전의 물이 빠진다… 물 밑에 잠겨 있던 수로 바닥과 아누비스의 문이 드러났다.";
 
     [Header("대사 (이름, 글 짝)")]
     [SerializeField] private string[] introLines =
     {
-        SobekStory.Khepri, "여기는 소베크의 신전, 셰데트야. 물이 신전 한가운데까지 차 있어.",
-        SobekStory.Me, "벽마다 악어 부조… 저 큰 문은 악어 입 모양이다. 홈이 네 개 비어 있다.",
-        SobekStory.Khepri, "네 개의 시험을 지나면 부적을 줄 거야. 비석을 먼저 읽어 봐. 시험의 힌트가 새겨져 있어.",
+        SobekStory.Khepri, "여기는 소베크의 신전, 셰데트야. 신전이 온통 물에 잠겨 있어.",
+        SobekStory.Me, "물 위로 좁은 길과 섬 네 개만 떠 있다… 저 큰 문은 악어 입 모양이다. 홈이 네 개 비어 있다.",
+        SobekStory.Khepri, "섬마다 시험의 문이 있어. 네 시험을 지나면 부적을 줄 거야. 비석에 힌트가 새겨져 있어.",
     };
     [SerializeField] private string[] drainedLines =
     {
-        SobekStory.Khepri, "물이 빠졌어! 수로 바닥이 드러났고… 수위계 기둥에도 이제 손이 닿겠다.",
-        SobekStory.Khepri, "형판은 얻었어. 숨은 것을 더 찾고 싶으면 둘러보고, 다 됐으면 남쪽 출구로 중앙 홀에 돌아가자.",
+        SobekStory.Khepri, "물이 빠졌어! 물속에 잠겨 있던 문이 드러났어. 저 아래가 아누비스의 신전이야.",
+        SobekStory.Khepri, "숨은 것을 더 찾고 싶으면 둘러보고, 다 됐으면 그 문으로 내려가자. (남쪽 출구는 중앙 홀)",
     };
 
     private static bool HasFlag(string f) => GameManager.Instance != null && GameManager.Instance.HasFlag(f);

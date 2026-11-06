@@ -10,34 +10,85 @@ using UnityEngine.InputSystem.UI;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// 메뉴: Tools/Sobek/2. 허브 씬 만들기, 3. 메인 씬 만들기, 0. 전체 한 번에
-// 새 씬 파일을 처음부터 만듦 (카메라, 조명, 플레이어 프리팹, 매니저, 판, 문, 물, 출구) + Build Profiles 씬 목록에 추가
-// v3: 소베크 도트 그림(Assets/image/Sobek/World)으로 바닥·벽·물·석상·수위계·악어·숨은 방까지 배치
+// 메뉴: Tools/Sobek/2. 허브 씬 만들기, 0. 전체 한 번에 (퍼즐 씬은 5번 SobekIllusionBuilder)
+// 허브(Sobek_Hub) = 2D 탐험 방: 물에 잠긴 본당 + 좁은 길 + 퍼즐 섬 4개(게이트) + 소베크의 입(메인)
+// 퍼즐은 각자 다른 씬(Sobek_S1~S4, Sobek_Main)의 2.5D 착시 퍼즐. 메인을 풀면 허브 물이 빠지고 물속 아누비스의 문이 드러남
 // 허브 맵은 스프라이트 바닥 (나중에 수연님 타일맵으로 바꿔도 판·문·비석 오브젝트는 그대로 옮겨 쓰면 됨)
 public static class SobekSceneBuilder
 {
     private const string SceneFolder = "Assets/Scenes/Puzzle_Test";
     private const string HubPath = SceneFolder + "/" + SobekIds.HubScene + ".unity";
-    private const string MainPath = SceneFolder + "/" + SobekIds.MainScene + ".unity";
     private const string PlayerPrefabPath = "Assets/Prefabs/Player/Player.prefab";
 
     // 허브 크기 (유닛 = 칸)
     private const float HubW = 46f, HubH = 32f; // 본당 크기 (유닛)
+    private const float HallBottom = 8f;        // 이 아래는 마른 전실, 위는 물에 잠긴 본당
 
-    [MenuItem("Tools/Sobek/0. 전체 한 번에 (데이터 -> 허브 -> 메인)", priority = 0)]
+    // 물 위로 걸을 수 있는 곳 (가운데, 크기). 나머지 본당은 전부 물 (물 막이 콜라이더)
+    private struct Walk { public string name; public Vector2 center, size; public bool island; }
+    private static readonly Walk[] Walkways =
+    {
+        new Walk { name = "Landing", center = new Vector2(23f, 8.5f), size = new Vector2(12f, 2f) },
+        new Walk { name = "Spine", center = new Vector2(23f, 18.5f), size = new Vector2(2f, 18f) },
+        new Walk { name = "GaugeIsland", center = new Vector2(23f, 15f), size = new Vector2(6f, 5f), island = true },
+        new Walk { name = "StatueIsland", center = new Vector2(23f, 23.5f), size = new Vector2(8f, 5f), island = true },
+        new Walk { name = "DoorLedge", center = new Vector2(23f, 29.5f), size = new Vector2(12f, 4f) },
+        new Walk { name = "Bridge_S1", center = new Vector2(15f, 25f), size = new Vector2(8f, 2f) },
+        new Walk { name = "Bridge_S2", center = new Vector2(31f, 25f), size = new Vector2(8f, 2f) },
+        new Walk { name = "Bridge_S3", center = new Vector2(15.5f, 15f), size = new Vector2(9f, 2f) },
+        new Walk { name = "Bridge_S4", center = new Vector2(30.5f, 15f), size = new Vector2(9f, 2f) },
+        new Walk { name = "Island_S1", center = new Vector2(7f, 25f), size = new Vector2(8f, 8f), island = true },
+        new Walk { name = "Island_S2", center = new Vector2(39f, 25f), size = new Vector2(8f, 8f), island = true },
+        new Walk { name = "Island_S3", center = new Vector2(7f, 15f), size = new Vector2(8f, 8f), island = true },
+        new Walk { name = "Island_S4", center = new Vector2(39f, 15f), size = new Vector2(8f, 8f), island = true },
+    };
+
+    private static bool OnWalkway(Vector2 p)
+    {
+        foreach (Walk w in Walkways)
+            if (Mathf.Abs(p.x - w.center.x) <= w.size.x * 0.5f && Mathf.Abs(p.y - w.center.y) <= w.size.y * 0.5f) return true;
+        return false;
+    }
+
+    // 본당을 1칸 격자로 보고, 길이 아닌 칸을 가로로 이어 붙인 박스 콜라이더로 막음
+    private static void BuildWaterBlockers(Transform parent, out Collider2D[] result)
+    {
+        var go = new GameObject("WaterBlockers");
+        go.transform.SetParent(parent, false);
+        var list = new List<Collider2D>();
+        for (int y = (int)HallBottom; y < (int)HubH; y++)
+        {
+            int runStart = -1;
+            for (int x = 0; x <= (int)HubW; x++)
+            {
+                bool water = x < (int)HubW && !OnWalkway(new Vector2(x + 0.5f, y + 0.5f));
+                if (water && runStart < 0) runStart = x;
+                if (!water && runStart >= 0)
+                {
+                    var col = go.AddComponent<BoxCollider2D>();
+                    col.size = new Vector2(x - runStart, 1f);
+                    col.offset = new Vector2((runStart + x) * 0.5f, y + 0.5f);
+                    list.Add(col);
+                    runStart = -1;
+                }
+            }
+        }
+        result = list.ToArray();
+    }
+
+    [MenuItem("Tools/Sobek/0. 전체 한 번에 (데이터 -> 착시 퍼즐 씬 -> 허브)", priority = 0)]
     public static void All()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         SobekDataSetup.Run(true);
-        BuildMain(false);
+        SobekIllusionBuilder.BuildAll(); // 서브 S1~S4 + 메인 (착시 2.5D)
         BuildHub(false); // 마지막에 허브를 열어 둠
     }
 
     [MenuItem("Tools/Sobek/2. 허브 씬 만들기 (Sobek_Hub)", priority = 2)]
     public static void BuildHubMenu() => BuildHub(true);
 
-    [MenuItem("Tools/Sobek/3. 메인 씬 만들기 (Sobek_Main)", priority = 3)]
-    public static void BuildMainMenu() => BuildMain(true);
+    // 메인 씬은 이제 착시 퍼즐: Tools/Sobek/5 (SobekIllusionBuilder)가 서브와 함께 만듦
 
     // ================= 허브 (본당 = 수로 신전) =================
     // 배치 (유닛): 아래 전실(y 0~7) / 본당 왼쪽 S1·S3, 오른쪽 S2·S4 / 가운데 물 찬 수로 + 수위계 기둥 / 위 소베크의 입
@@ -48,8 +99,6 @@ public static class SobekSceneBuilder
         var log = new List<string>();
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         TMP_FontAsset font = FindFont();
-        SobekTheme theme = SobekDataSetup.LoadTheme();
-
         GameObject player = BuildCommon(new Vector3(23f, 3f, 0f), font, 7f);
         AddStory(log);
         CluePanel panel = EnsureCluePanel(log);
@@ -59,9 +108,21 @@ public static class SobekSceneBuilder
         Sprite floor = W("Sobek_Tile_Floor"), floorB = W("Sobek_Tile_FloorB"), wall = W("Sobek_Tile_Wall"), top = W("Sobek_Tile_WallTop");
         Sprite water = W("Sobek_Tile_Water"), water2 = W("Sobek_Tile_Water2"), mud = W("Sobek_Tile_Mud");
 
-        // ---- 바닥 · 벽 ----
-        Tiled(r, "Floor", floor, new Vector2(HubW * 0.5f, HubH * 0.5f), new Vector2(HubW, HubH), Color.white, -40, false);
-        Tiled(r, "Floor_Aisle", floorB, new Vector2(23f, 19f), new Vector2(4f, 22f), Color.white, -39, false); // 가운데 길 (악어 비늘 판석)
+        // ---- 물에 잠긴 본당: 진흙 바닥(물 빠지면 보임) 위에 물이 가득, 좁은 길과 섬만 물 위로 ----
+        Vector2 hallC = new Vector2(HubW * 0.5f, (HallBottom + HubH) * 0.5f), hallS = new Vector2(HubW, HubH - HallBottom);
+        Tiled(r, "Hall_Mud", mud, hallC, hallS, new Color(0.85f, 0.8f, 0.72f), -41, false);
+        var pool = Tiled(r, "FloodWater", water, hallC, hallS, Color.white, -30, false);
+        Anim(pool, 1.5f, water, water2);
+        Tiled(r, "Floor_Ante", floor, new Vector2(HubW * 0.5f, HallBottom * 0.5f), new Vector2(HubW, HallBottom), Color.white, -40, false);
+        foreach (var w in Walkways)
+        {
+            Sprite spr = w.island ? W("Sobek_Tile_Island") : floorB;
+            Tiled(r, "Path_" + w.name, spr != null ? spr : floor, w.center, w.size, Color.white, w.island ? -27 : -26, false);
+        }
+        BuildWaterBlockers(r, out Collider2D[] blockers);
+        log.Add($"본당: 물 가득 + 좁은 길·섬 {Walkways.Length}개, 물 막이 콜라이더 {blockers.Length}개 (물 빠지면 꺼짐)");
+
+        // 벽
         Tiled(r, "Wall_N", wall, new Vector2(HubW * 0.5f, HubH + 0.5f), new Vector2(HubW + 2f, 1f), Color.white, -38, true);
         Tiled(r, "Wall_S", top, new Vector2(HubW * 0.5f, -0.5f), new Vector2(HubW + 2f, 1f), Color.white, -38, true);
         Tiled(r, "Wall_W", top, new Vector2(-0.5f, HubH * 0.5f), new Vector2(1f, HubH + 2f), Color.white, -38, true);
@@ -70,24 +131,39 @@ public static class SobekSceneBuilder
         Tiled(r, "Wall_Ante_L", wall, new Vector2(10.5f, 7.5f), new Vector2(21f, 1f), Color.white, -38, true);
         Tiled(r, "Wall_Ante_R", wall, new Vector2(35.5f, 7.5f), new Vector2(21f, 1f), Color.white, -38, true);
         Label(r, "전실", new Vector2(23f, 6.4f), font);
-        for (int i = 0; i < 4; i++) // 기둥 장식
+        Prop(r, "Pillar_0", W("Sobek_Obj_Pillar"), new Vector2(18f, 8.4f), true);
+        Prop(r, "Pillar_1", W("Sobek_Obj_Pillar"), new Vector2(28f, 8.4f), true);
+        Prop(r, "Pillar_2", W("Sobek_Obj_Pillar"), new Vector2(18f, 28.4f), true);
+        Prop(r, "Pillar_3", W("Sobek_Obj_Pillar"), new Vector2(28f, 28.4f), true);
+
+        // ---- 서브 퍼즐 섬 4개: 게이트(E: 착시 퍼즐 씬으로) + 비석 + 장치 발판 장식 ----
+        var islands = new[]
         {
-            Prop(r, $"Pillar_{i}", W("Sobek_Obj_Pillar"), new Vector2(18f + (i % 2) * 10f, i < 2 ? 8.2f : 27.2f), true);
+            (id: "S1", scene: SobekIds.SubScene1, title: "소용돌이 섬", flag: SobekIds.FlagS1Clear, c: new Vector2(7f, 25f), plate: "Sobek_Plate_Rotate", clue: "SOBEK_S1"),
+            (id: "S2", scene: SobekIds.SubScene2, title: "악어 등 다리", flag: SobekIds.FlagS2Clear, c: new Vector2(39f, 25f), plate: "Sobek_Plate_Lift", clue: "SOBEK_S2"),
+            (id: "S3", scene: SobekIds.SubScene3, title: "범람하는 나일", flag: SobekIds.FlagS3Clear, c: new Vector2(7f, 15f), plate: "Sobek_Plate_Water", clue: "SOBEK_S3"),
+            (id: "S4", scene: SobekIds.SubScene4, title: "두 개의 수면", flag: SobekIds.FlagS4Clear, c: new Vector2(39f, 15f), plate: "Sobek_Plate_Mirror", clue: "SOBEK_S4"),
+        };
+        foreach (var isl in islands)
+        {
+            var gateGo = Prop(r, "Gate_" + isl.id, W("Sobek_Obj_Gate"), isl.c + new Vector2(0f, 1.6f), false);
+            var gateCol = gateGo.AddComponent<BoxCollider2D>();
+            gateCol.size = new Vector2(2f, 1.2f);
+            gateCol.offset = new Vector2(0f, 0.6f);
+            var spawnPt = MakePoint(r, "GateSpawn_" + isl.id, isl.c + new Vector2(0f, 0.4f));
+            TextMeshPro gateLabel = WorldText(gateGo.transform, isl.title, new Vector2(0f, 2.9f), font, 3.5f);
+            gateLabel.rectTransform.sizeDelta = new Vector2(8f, 1.2f);
+            gateGo.AddComponent<SobekPuzzleGate>().EditorSetup(isl.id, isl.scene, isl.title, isl.flag, spawnPt, gateLabel);
+            var deco = Prop(r, "PlateDeco_" + isl.id, W(isl.plate), isl.c + new Vector2(0f, -1.8f), false);
+            deco.GetComponent<SpriteRenderer>().sortingLayerName = "Ground";
+            deco.GetComponent<SpriteRenderer>().sortingOrder = -20;
+            Stele(r, "Stele_" + isl.id, isl.c + new Vector2(-2.6f, 1.2f), isl.clue, panel, "");
+            Prop(r, "IslandPillar_" + isl.id, W("Sobek_Obj_Pillar"), isl.c + new Vector2(2.8f, 2f), true);
         }
-
-        // ---- 서브 퍼즐 4개 + 비석 (이야기 + 힌트) ----
-        SobekBoard s1 = Board(r, "Board_S1", SobekDataSetup.S1, new Vector2(3f, 21f), theme, font, true, log);
-        SobekBoard s2 = Board(r, "Board_S2", SobekDataSetup.S2, new Vector2(30f, 21f), theme, font, true, log);
-        SobekBoard s3 = Board(r, "Board_S3", SobekDataSetup.S3, new Vector2(3f, 10f), theme, font, true, log);
-        SobekBoard s4 = Board(r, "Board_S4", SobekDataSetup.S4, new Vector2(30f, 9f), theme, font, true, log);
-        Stele(r, "Stele_S1", new Vector2(1f, 30.6f), "SOBEK_S1", panel, "");
-        Stele(r, "Stele_S2", new Vector2(33f, 19.2f), "SOBEK_S2", panel, "");
-        Stele(r, "Stele_S3", new Vector2(1f, 17.6f), "SOBEK_S3", panel, "");
-        Stele(r, "Stele_S4", new Vector2(28.9f, 15.6f), "SOBEK_S4", panel, "");
         Stele(r, "Stele_Hall", new Vector2(26.5f, 3.2f), "SOBEK_HALL", panel, "");
-        log.Add("비석 5개 (전실 + 서브 S1~S4): 이야기 + 퍼즐 힌트, 처음엔 렌즈 해독");
+        log.Add("서브 퍼즐 섬 4개: 게이트(E -> Sobek_S1~S4 착시 퍼즐 씬, 돌아오면 같은 게이트 앞) + 비석");
 
-        // ---- 소베크의 입 (큰 문) ----
+        // ---- 소베크의 입 (큰 문 -> 메인 착시 퍼즐) ----
         var door = Sprite2D(r, "SobekHubDoor", W("Sobek_Obj_Door"), new Vector2(23f, 30.6f), new Vector2(3f, 2f), Color.white, 0, "Objects");
         door.AddComponent<BoxCollider2D>().size = new Vector2(3f, 2f);
         door.AddComponent<SobekHubDoor>();
@@ -97,7 +173,7 @@ public static class SobekSceneBuilder
         spawn.SetParent(r, false);
         spawn.position = new Vector3(23f, 28.6f, 0f);
 
-        // ---- 소베크 석상 + 갈대 (단서 3) ----
+        // ---- 소베크 석상 + 갈대 (단서 3) : 가운데 섬 ----
         Prop(r, "Sobek_Statue", W("Sobek_Obj_Statue"), new Vector2(23f, 23.2f), true);
         var reedsR = Prop(r, "Reeds_R", W("Sobek_Obj_Reeds"), new Vector2(25.6f, 23.6f), false);
         Anim(reedsR, 0.8f, W("Sobek_Obj_Reeds"), W("Sobek_Obj_Reeds_Shake"));
@@ -110,12 +186,7 @@ public static class SobekSceneBuilder
         clue3.EditorSetup(3, SobekIds.FlagDrainPlayed, "갈대가 빽빽하다. 바람도 없는데 가끔 흔들린다…",
             "갈대 덤불 속 조각", "밤의 일곱째 시간, 뱀이 강을 마셔 배가 멈췄다.", new string[0], 0, true);
 
-        // ---- 수로 (물 -> 빠지면 진흙 바닥) ----
-        Vector2 poolC = new Vector2(23f, 16f), poolS = new Vector2(10f, 10f);
-        Tiled(r, "Channel_Mud", mud, poolC, poolS, Color.white, -37, false);
-        var pool = Tiled(r, "FloodWater", water, poolC, poolS, Color.white, -30, true);
-        Anim(pool, 1.5f, water, water2);
-        var puddle = Prop(r, "Puddle", W("Sobek_Obj_Puddle"), new Vector2(26.5f, 13f), false);
+        var puddle = Prop(r, "Puddle", W("Sobek_Obj_Puddle"), new Vector2(26.5f, 11f), false);
         puddle.GetComponent<SpriteRenderer>().sortingLayerName = "Ground";
         puddle.GetComponent<SpriteRenderer>().sortingOrder = -29;
 
@@ -124,11 +195,20 @@ public static class SobekSceneBuilder
         AddTrigger(clue1, 1f).gameObject.AddComponent<SobekClueItem>().EditorSetup(1, "", "",
             "범람 비석 조각", "나일이 넘치면 검은 흙이 남고, 땅은 다시 산다.",
             new[] { SobekStory.Khepri, "비석 조각이야. 이 신전 어딘가에 맞는 홈이 있을 거야." }, 0, false);
-        var clue2 = Prop(r, "Clue2_MudShard", W("Sobek_Obj_ClueShard"), new Vector2(19.8f, 12.6f), false);
+        var clue2 = Prop(r, "Clue2_MudShard", W("Sobek_Obj_ClueShard"), new Vector2(17.8f, 12.2f), false);
         clue2.GetComponent<SpriteRenderer>().color = new Color(0.75f, 0.62f, 0.48f);
         clue2.GetComponent<SpriteRenderer>().sortingOrder = -20;
         AddTrigger(clue2, 1f).gameObject.AddComponent<SobekClueItem>().EditorSetup(2, SobekIds.FlagDrainPlayed, "",
             "진흙 속 조각", "소베크는 강에 던져진 호루스의 두 손을 건져 올렸다.", new string[0], 0, false);
+
+        // ---- 물속에 잠긴 아누비스의 문 (메인을 풀어 물이 빠지면 드러남) ----
+        var anubis = Sprite2D(r, "Exit_ToAnubis", W("Sobek_Obj_StairsDown"), new Vector2(31f, 19.5f), new Vector2(2.4f, 2f), new Color(0.8f, 0.85f, 1f), -20, "Ground");
+        var anubisCol = anubis.AddComponent<BoxCollider2D>();
+        anubisCol.isTrigger = true;
+        anubisCol.size = new Vector2(2f, 1.4f);
+        anubis.AddComponent<SobekSceneExit>().EditorSetup(SobekIds.AnubisScene, "물이 빠진 수로 바닥… 자칼의 신전으로 내려간다.");
+        Label(anubis.transform, "아누비스의 신전", new Vector2(0f, 1.6f), font);
+        log.Add("물속 아누비스의 문: 메인 클리어 -> 물 빠짐 연출 -> 드러남 -> " + SobekIds.AnubisScene);
 
         // ---- 수위계 기둥 (소켓) + 돌판 -> 계단 + 아펩 그림자 ----
         var gauge = Prop(r, "WaterGauge_Socket", W("Sobek_Obj_Gauge_0"), new Vector2(23f, 15.2f), true);
@@ -210,8 +290,8 @@ public static class SobekSceneBuilder
         var state = root.AddComponent<SobekHubState>();
         var so = new SerializedObject(state);
         SetArray(so, "waterRenderers", pool.GetComponent<SpriteRenderer>());
-        SetArray(so, "waterBlockers", pool.GetComponent<Collider2D>());
-        SetArrayMany(so, "showWhenDrained", puddle, exit);
+        SetArrayMany(so, "waterBlockers", blockers);
+        SetArrayMany(so, "showWhenDrained", puddle, exit, anubis);
         so.FindProperty("returnSpawn").objectReferenceValue = spawn;
         so.ApplyModifiedPropertiesWithoutUndo();
         root.AddComponent<SobekClueHud>().EditorSetup(new[] { U("Common_Icon_SobekClue1"), U("Common_Icon_SobekClue2"), U("Common_Icon_SobekClue3") }, font);
@@ -221,35 +301,12 @@ public static class SobekSceneBuilder
         Debug.Log("[SobekSceneBuilder] 허브 씬 완료\n- " + string.Join("\n- ", log));
     }
 
-    // ================= 메인 (셰데트 신전 3구역 + 형판 공개·큐브) =================
-    private static void BuildMain(bool askSave)
+    // ================= 메인 마무리 연출 (형판 공개·큐브) =================
+    // 메인 씬은 착시 퍼즐(SobekIllusionBuilder)이 만들고, 마지막 연출만 여기서 붙임 (바스테트와 같은 BastetEnding, 칸 = 소베크)
+    public static BastetEnding AddSobekEnding(Transform parent, TMP_FontAsset font, List<string> log)
     {
-        if (!Prepare(askSave, MainPath)) return;
-        var log = new List<string>();
-        Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        TMP_FontAsset font = FindFont();
-        SobekTheme theme = SobekDataSetup.LoadTheme();
-
-        BuildCommon(new Vector3(1.5f, 1.5f, 0f), font, 6f);
-        AddStory(log);
-
-        var root = new GameObject("SobekMain");
-        // 구역 3개 (서로 멀리 떨어뜨려 두고 화면 전환으로 이동) + 판 둘레 벽 그림
-        SobekBoard a = Board(root.transform, "Zone1_Flood", SobekDataSetup.MainA, new Vector2(0f, 0f), theme, font, false, log);
-        SobekBoard b = Board(root.transform, "Zone2_DryMaze", SobekDataSetup.MainB, new Vector2(30f, 0f), theme, font, false, log);
-        SobekBoard c = Board(root.transform, "Zone3_Tower", SobekDataSetup.MainC, new Vector2(60f, 0f), theme, font, false, log);
-        foreach (SobekBoard z in new[] { a, b, c }) Frame(z, root.transform);
-        var flow = root.AddComponent<SobekMainFlow>();
-        flow.EditorSetup(new[] { a, b, c }, new[]
-        {
-            new[] { "아펩이 저승의 강을 삼키기 전, 소베크는 마지막 범람의 물을 이 신전에 가둬 두었다.", "물이 찬 신전을 지나 소베크의 입으로 들어가자." },
-            new[] { "소베크의 입을 지나 물이 빠진 아래층으로 내려왔다.", "악어 무덤의 미궁… 수면에 비친 반대편 방을 오가야 한다." },
-            new[] { "미궁 끝, 소용돌이 섬들이 소베크-라의 탑을 둘러싸고 있다.", "섬을 돌려 길을 이어 제단까지 가자." },
-        });
-
-        // 형판 공개 · 중앙 홀 큐브 연출 (바스테트와 같은 BastetEnding, 칸 = 소베크)
         var endGo = new GameObject("SobekEnding");
-        endGo.transform.SetParent(root.transform, false);
+        endGo.transform.SetParent(parent, false);
         var ending = endGo.AddComponent<BastetEnding>();
         var faces = new Sprite[6];
         string[] faceFiles = { "Ra.jpg", "Bastet.jpg", "Thoth.jpg", "Horus.jpg", "Sobek.jpg", "Anubis.jpg" };
@@ -270,14 +327,10 @@ public static class SobekSceneBuilder
         eso.FindProperty("playerInventoryFace").intValue = 4; // [확인 필요] 팀 PlayerInventory 번호
         eso.FindProperty("plateGivenFlag").stringValue = SobekIds.FlagPlateGiven;
         eso.FindProperty("endingDoneFlag").stringValue = SobekIds.FlagEndingDone;
-        eso.FindProperty("exitMessage").stringValue = "물이 빠진 신전으로 돌아간다…";
+        eso.FindProperty("exitMessage").stringValue = "물이 빠지는 소리가 들린다… 신전으로 돌아간다.";
         eso.ApplyModifiedPropertiesWithoutUndo();
-        flow.EditorSetupEnding(ending);
-        log.Add("메인 클리어: 소베크 대사(초상화) -> 형판 공개(악어 형판) -> 중앙 홀 큐브 소베크 칸 -> 허브(물 빠짐)");
-
-        Selection.activeGameObject = root;
-        Save(scene, MainPath, log);
-        Debug.Log("[SobekSceneBuilder] 메인 씬 완료\n- " + string.Join("\n- ", log));
+        log.Add("메인 클리어: 소베크 대사(초상화) -> 형판 공개(악어 형판) -> 중앙 홀 큐브 소베크 칸 -> 허브(물 빠짐 연출)");
+        return ending;
     }
 
     // ================= v3 도우미 =================
@@ -297,6 +350,9 @@ public static class SobekSceneBuilder
         foreach (Object o in AssetDatabase.LoadAllAssetRepresentationsAtPath(path)) if (o is Sprite sp) return sp;
         return null;
     }
+
+    public static TMP_FontAsset FindFontPublic() => FindFont();
+    public static void AddStoryPublic() => AddStory(new List<string>());
 
     private static void AddStory(List<string> log)
     {
@@ -417,16 +473,6 @@ public static class SobekSceneBuilder
         return tmp;
     }
 
-    // 메인 판 둘레를 신전 벽으로 감쌈 (판 밖이 검은 화면으로 안 보이게)
-    private static void Frame(SobekBoard board, Transform parent)
-    {
-        if (board == null || board.Data == null) return;
-        Vector2 o = board.transform.position;
-        float w = board.Data.Width, h = board.Data.Height;
-        Tiled(parent, board.name + "_Frame", W("Sobek_Tile_WallTop"), o + new Vector2(w * 0.5f, h * 0.5f), new Vector2(w + 6f, h + 6f), Color.white, -60, false);
-        Tiled(parent, board.name + "_FrameTop", W("Sobek_Tile_Wall"), o + new Vector2(w * 0.5f, h + 0.5f), new Vector2(w + 2f, 1f), Color.white, -59, false);
-    }
-
     private static void SetStrings(SerializedObject so, string prop, string[] values)
     {
         SerializedProperty p = so.FindProperty(prop);
@@ -487,48 +533,6 @@ public static class SobekSceneBuilder
         camGo.AddComponent<AudioListener>();
         camGo.AddComponent<CameraFollow2D>();
         return player;
-    }
-
-    // ================= 판 하나 =================
-    private static SobekBoard Board(Transform parent, string objName, string dataName, Vector2 origin, SobekTheme theme,
-        TMP_FontAsset font, bool hub, List<string> log)
-    {
-        SobekBoardData data = SobekDataSetup.LoadBoard(dataName);
-        var go = new GameObject(objName);
-        go.transform.SetParent(parent, false);
-        go.transform.position = origin;
-        var board = go.AddComponent<SobekBoard>(); // SobekBoardView 자동 부착
-        if (data == null)
-        {
-            log.Add($"{objName}: 데이터 {dataName} 없음 (1번 메뉴 먼저)");
-            return board;
-        }
-        board.EditorSetup(data, hub);
-        var view = go.GetComponent<SobekBoardView>();
-        SetObj(view, "theme", theme);
-        SetObj(view, "labelFont", font);
-
-        int w = data.Width, h = data.Height;
-        if (hub)
-        {
-            // 판 위를 자유 이동으로 못 지나가게 막는 벽 (판 안에서는 칸 이동이라 상관없음)
-            var block = go.AddComponent<BoxCollider2D>();
-            block.size = new Vector2(w, h);
-            block.offset = new Vector2(w * 0.5f, h * 0.5f);
-
-            // 입구 돌 (E: 들어가기)
-            Vector2Int e = data.Entrance;
-            var ent = Sprite2D(go.transform, "Entrance", SobekDataSetup.LoadArt("Sobek_Obj_EntranceStone"),
-                Vector2.zero, Vector2.one, Color.white, -15, "Ground");
-            ent.transform.localPosition = new Vector3(e.x + 0.5f, h - 1 - e.y + 0.5f, 0f);
-            var col = ent.AddComponent<BoxCollider2D>();
-            col.isTrigger = true;
-            col.size = Vector2.one;
-            ent.AddComponent<SobekBoardEntrance>().EditorSetup(board);
-            Label(go.transform, data.DisplayName, new Vector2(w * 0.5f, h + 0.6f), font);
-        }
-        log.Add($"{objName} ({data.DisplayName}, {w}x{h}) 위치 {origin}");
-        return board;
     }
 
     // ================= 작은 도우미 =================
