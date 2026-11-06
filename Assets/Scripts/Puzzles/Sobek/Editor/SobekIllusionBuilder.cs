@@ -215,7 +215,9 @@ public static class SobekIllusionBuilder
         go.transform.SetParent(parent, false);
         var board = go.AddComponent<SobekIllusionBoard>();
         SpriteRenderer avatar = MakeSprite(go.transform, "Avatar", PlayerSprite(), 20);
-        SpriteRenderer goal = MakeSprite(go.transform, "GoalAltar", SobekDataSetup.World("Sobek_Obj_Altar"), 10);
+        // 아트팀 퍼즐용 제단(128x160)이 있으면 그것, 없으면 맵 제단 그림
+        Sprite altar = SobekDataSetup.World("Sobek_Illusion_Altar") ?? SobekDataSetup.World("Sobek_Obj_Altar");
+        SpriteRenderer goal = MakeSprite(go.transform, "GoalAltar", altar, 10);
         board.EditorSetup(level, rig, block, marker, avatar, goal, font, prefix, clearText);
         return board;
     }
