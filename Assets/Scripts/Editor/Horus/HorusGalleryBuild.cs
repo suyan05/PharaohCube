@@ -17,8 +17,9 @@ public static class HorusGalleryBuild
     public static void Build(Transform root)
     {
         Sprite falcon = HorusArtSetup.Art("H1/H1_03");
-        GameObject left = Statue(root, "OBJ_H12_FalconStatue_L", new Vector2(9.5f, 12.8f), falcon);
-        Statue(root, "OBJ_H12_FalconStatue_R", new Vector2(14.5f, 12.8f), falcon);
+        // [수정] 제단 둘레를 별이 돌게 되면서(H5 HorusSkyRing) 별 궤도와 겹치지 않게 북쪽 벽 가까이로
+        GameObject left = Statue(root, "OBJ_H12_FalconStatue_L", new Vector2(9.2f, 14.4f), falcon);
+        Statue(root, "OBJ_H12_FalconStatue_R", new Vector2(14.8f, 14.4f), falcon);
         GameObject crack = WallCrack(root);
         HorusHiddenGallery gallery = Gallery(left.transform, crack, falcon);
         HorusFalconStatue statue = left.AddComponent<HorusFalconStatue>();

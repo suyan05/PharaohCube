@@ -129,6 +129,7 @@ public static class HorusRoomSetup
         SetClearFlag<MirrorWingPuzzle>("F_HO_H1_DONE");
         SetClearFlag<WedjatRestorePuzzle>("F_HO_H3_DONE");
         SetClearFlag<StarPathLockPuzzle>("F_HO_H4_DONE");
+        SetClearFlag<HorusSealWalk>("F_HO_H4_DONE"); // H4는 이제 이 퍼즐로 품 (HorusWorldPuzzles)
         SetClearFlag<SkyAlignPuzzle>("F_HO_H5_DONE");
     }
 

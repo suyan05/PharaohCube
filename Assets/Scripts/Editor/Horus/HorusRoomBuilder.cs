@@ -34,6 +34,7 @@ public static class HorusRoomBuilder
             HorusRoomSetup.SetupNightLight();
             HorusRoomObjects.Build(square, circle, layer);
             HorusArtSetup.Apply();
+            HorusWorldPuzzles.Apply(); // H4, H5를 몸으로 푸는 퍼즐로 (그림 크기를 맞춘 뒤에)
             HorusRoomSetup.FinishSorting(layer);
             HorusRoomSetup.SetupObjectiveGuide();
             HorusRoomSetup.FixPuzzleFlags();
