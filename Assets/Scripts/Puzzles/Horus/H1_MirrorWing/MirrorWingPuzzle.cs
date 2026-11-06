@@ -41,6 +41,7 @@ public class MirrorWingPuzzle : PuzzleBase
     public event Action<string> OnMessage;
     public event Action<string> OnTitleChanged;
 
+    private const string DoneFlag = "F_HO_H1_DONE";
     private const string FixedLayer = "fixed";
     private const string AxisLayer = "axis";
 
@@ -120,7 +121,7 @@ public class MirrorWingPuzzle : PuzzleBase
             pendingWrong = WrongEdges();
             failCount++;
             Message(pendingWrong.Count > 0
-                ? "거울에 비친 모양과 다른 선이 있다 - 붉은 선을 지운다."
+                ? "거울에 비친 모양과 다른 선이 있다 - 날개가 흩어졌다. 처음부터 다시 그리자."
                 : "아직 비어 있는 깃이 있다. 왼쪽 날개를 다시 보자.");
             OnFailInternal();
         }
@@ -130,12 +131,21 @@ public class MirrorWingPuzzle : PuzzleBase
         }
     }
 
+    // [수정] 이미 그려진 고정선(몸통, 왼날개) 위에 덧그은 선은 판정에서 뺌 (틀린 선으로 치지 않음)
     protected override bool Validate()
     {
-        return answer.SetEquals(drawer.DrawnEdges);
+        return answer.SetEquals(PlayerEdges());
     }
 
-    // 실패 시: 틀린 선만 빨갛게 했다가 지움, 맞은 선은 유지
+    private HashSet<string> PlayerEdges()
+    {
+        var mine = new HashSet<string>(drawer.DrawnEdges);
+        mine.ExceptWith(StarGraph.BuildEdgeSet(fixedEdges));
+        return mine;
+    }
+
+    // 실패 시: 틀린 선을 빨갛게 보여준 뒤 [수정] 그린 선을 전부 지움 (틀린 선만 지우면 아무 선이나 긋고 확정을 반복해서 풀 수 있었음)
+    //        빈 깃만 있으면(틀린 선 없음) 그린 선은 그대로 둠
     // Unity 에디터가 자동으로 부르는 Reset과 이름이 같아서, 게임 중이 아닐 땐 아무것도 안 함
     public override void Reset()
     {
@@ -188,7 +198,7 @@ public class MirrorWingPuzzle : PuzzleBase
 
     private HashSet<string> WrongEdges()
     {
-        var wrong = new HashSet<string>(drawer.DrawnEdges);
+        var wrong = PlayerEdges();
         wrong.ExceptWith(answer);
         return wrong;
     }
@@ -199,7 +209,7 @@ public class MirrorWingPuzzle : PuzzleBase
         drawer.SetInputEnabled(false);
         drawer.TintEdges(pendingWrong, wrongColor);
         yield return new WaitForSeconds(0.6f);
-        drawer.RemoveEdges(pendingWrong);
+        if (pendingWrong.Count > 0) drawer.ClearAll();
         pendingWrong.Clear();
         drawer.SetInputEnabled(true);
         busy = false;
@@ -219,6 +229,8 @@ public class MirrorWingPuzzle : PuzzleBase
         drawer.SetInputEnabled(false);
         guide.HideLayer(AxisLayer);
         OnSuccessInternal();
+        // [추가] 씬의 Clear Flag 칸이 비어 있어도 완료가 기록되게 (목표 안내, 매 길잡이, H5 노트 3이 이 플래그를 봄)
+        if (GameManager.Instance != null && !GameManager.Instance.HasFlag(DoneFlag)) GameManager.Instance.SetFlag(DoneFlag);
         if (ItemInventory.Instance != null && !string.IsNullOrEmpty(rewardItem))
         {
             ItemInventory.Instance.Grant(rewardItem);

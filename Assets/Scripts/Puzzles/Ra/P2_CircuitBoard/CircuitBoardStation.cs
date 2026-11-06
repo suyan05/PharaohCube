@@ -147,8 +147,8 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     {
         if (helpText == null) return;
         helpText.text = puzzle.IsLocked
-            ? "E / Esc: 닫기"
-            : "거울 클릭: 회전\n깜빡이는 문양에 빛을 보내자\nE / Esc: 닫기";
+            ? "E: 닫기"
+            : "거울 클릭: 회전\n깜빡이는 문양에 빛을 보내자\nE: 닫기";
     }
 
     // 줄바꿈되는 왼쪽 정렬 글자

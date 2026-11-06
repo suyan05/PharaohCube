@@ -238,6 +238,8 @@ public class DialogueBox : MonoBehaviour
         if (string.IsNullOrEmpty(speaker)) return "sfx_blip_low";
         if (speaker == "나") return "sfx_blip_mid";
         if (speaker.Contains("스핑크스")) return "sfx_blip_low";
+        if (speaker == "이시스") return "sfx_blip_isis";   // [추가] 몽환적인 여신 목소리 (높은 종소리 + 긴 울림)
+        if (speaker == "호루스") return "sfx_blip_horus";  // [추가] 낮고 울리는 신의 목소리
         if (speaker == "라" || speaker == "???") return "sfx_blip_ra";
         return "sfx_blip_high";
     }

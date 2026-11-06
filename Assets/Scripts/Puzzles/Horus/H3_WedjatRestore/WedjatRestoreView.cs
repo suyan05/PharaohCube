@@ -1,7 +1,18 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+
+// [추가] 조각 그림 하나 + 석판 그림 위에서의 자리/크기 (조각 순서 = 퍼즐 조각 순서)
+[Serializable]
+public class WedjatPieceArt
+{
+    public Sprite sprite;
+    public Vector2 slotPos;
+    public Vector2 size = new Vector2(100f, 100f);
+}
 
 // H3 오버레이 화면: 슬롯 윤곽과 조각을 코드로 생성 (라의 방 EclipseStation 화면 구성 방식)
 public class WedjatRestoreView : MonoBehaviour
@@ -13,6 +24,17 @@ public class WedjatRestoreView : MonoBehaviour
     [Header("스냅 거리 (슬롯 긴 변 대비, 기획서 0.5)")]
     [SerializeField] private float snapRatio = 0.5f;
 
+    [Header("그림 (석판 그림 + 조각 6개가 다 있어야 씀, 아니면 색 네모 - 예전 그대로)")]
+    [Tooltip("윤곽만 보이는 석판 (H3_02)")]
+    [SerializeField] private Sprite tabletSprite;
+    [Tooltip("완성된 눈 석판 (H3_01, 클리어 후)")]
+    [SerializeField] private Sprite tabletDoneSprite;
+    [SerializeField] private Vector2 tabletCenter = new Vector2(0f, 80f);
+    [SerializeField] private Vector2 tabletSize = new Vector2(720f, 540f);
+    [SerializeField] private List<WedjatPieceArt> pieceArt = new List<WedjatPieceArt>();
+    [Tooltip("아래 받침대에 있을 때 조각 크기 비율")]
+    [SerializeField] private float trayScale = 0.45f;
+
     private Image[] slotImages;
     private Image[] pieceBorders;
     private Image[] pieceInners;
@@ -22,6 +44,7 @@ public class WedjatRestoreView : MonoBehaviour
     private Text statusText;
     private Font font;
     private bool built;
+    private Image tabletImage;
 
     private Color frameColor, slotColor, paper, borderColor, gold, red, lapis, sand;
 
@@ -81,35 +104,74 @@ public class WedjatRestoreView : MonoBehaviour
         freePos = new Vector2[count];
 
         titleText = CreateText(boardRoot, "", 40, new Vector2(0, 400), new Vector2(900, 60), gold);
-        CreateRect(boardRoot, "EyeFrame", new Vector2(0, 40), new Vector2(560, 400), frameColor);
+        BuildFrame();
         for (int i = 0; i < count; i++)
         {
-            WedjatPieceDef def = puzzle.Pieces[i];
-            slotImages[i] = CreateRect(boardRoot, $"Slot_{i}", def.slotPos, def.size, slotColor);
+            // 그림이 있으면 석판 그림이 윤곽 역할 -> 슬롯은 투명 (자리 판정용으로만 남김)
+            slotImages[i] = CreateRect(boardRoot, $"Slot_{i}", SlotPos(i), SlotSize(i), HasArt ? Color.clear : slotColor);
         }
         statusText = CreateText(boardRoot, "", 26, new Vector2(0, -360), new Vector2(1400, 50), paper);
-        CreateText(boardRoot, "드래그 = 조각 옮기기  |  클릭 = 90도 회전  |  E / Esc : 닫기", 20,
+        CreateText(boardRoot, "드래그 = 조각 옮기기  |  클릭 = 90도 회전  |  E : 닫기", 20,
             new Vector2(0, -410), new Vector2(1400, 40), sand);
         for (int i = 0; i < count; i++) CreatePiece(i, puzzle.Pieces[i]);
         built = true;
     }
 
+    private void BuildFrame()
+    {
+        if (!HasArt)
+        {
+            CreateRect(boardRoot, "EyeFrame", new Vector2(0, 40), new Vector2(560, 400), frameColor);
+            return;
+        }
+        tabletImage = CreateRect(boardRoot, "EyeTablet", tabletCenter, tabletSize, Color.white);
+        tabletImage.sprite = tabletSprite;
+        tabletImage.preserveAspect = true;
+    }
+
     private void CreatePiece(int index, WedjatPieceDef def)
     {
-        Image border = CreateRect(boardRoot, $"Piece_{index}", def.trayPos, def.size, borderColor);
+        Image border = CreateRect(boardRoot, $"Piece_{index}", def.trayPos, SlotSize(index), borderColor);
         border.raycastTarget = true;
         WedjatPiece handle = border.gameObject.AddComponent<WedjatPiece>();
         handle.Init(this, index);
 
         RectTransform rt = border.rectTransform;
-        pieceInners[index] = CreateRect(rt, "Inner", Vector2.zero, def.size - new Vector2(8, 8), paper);
-        CreateRect(rt, "Notch", new Vector2(0, def.size.y / 2f - 8f), new Vector2(18, 10), lapis);
-        CreateText(rt, def.fraction, 18, Vector2.zero, def.size, borderColor);
+        if (HasArt) DecoratePieceArt(border, index, def);
+        else
+        {
+            pieceInners[index] = CreateRect(rt, "Inner", Vector2.zero, def.size - new Vector2(8, 8), paper);
+            CreateRect(rt, "Notch", new Vector2(0, def.size.y / 2f - 8f), new Vector2(18, 10), lapis);
+            CreateText(rt, "", 18, Vector2.zero, def.size, borderColor); // [수정] 난이도: 몫(분수)을 조각에 쓰지 않음 (비석의 감각 단서로 추리)
+        }
 
         pieceBorders[index] = border;
         pieceRects[index] = rt;
         freePos[index] = def.trayPos;
     }
+
+    // 조각 그림 + 분수 글자 (그림 아래쪽에 작게)
+    private void DecoratePieceArt(Image piece, int index, WedjatPieceDef def)
+    {
+        piece.sprite = pieceArt[index].sprite;
+        piece.preserveAspect = true;
+        piece.color = Color.white;
+        Vector2 size = SlotSize(index);
+        CreateText(piece.rectTransform, "", 22, new Vector2(0, -size.y / 2f - 14f), new Vector2(160, 30), paper); // [수정] 몫 표시 숨김
+    }
+
+    // ================= 그림 배치 =================
+    private bool HasArt => tabletSprite != null && pieceArt != null && pieceArt.Count == puzzle.Pieces.Count && AllPieceSprites();
+
+    private bool AllPieceSprites()
+    {
+        foreach (WedjatPieceArt a in pieceArt) if (a == null || a.sprite == null) return false;
+        return true;
+    }
+
+    private Vector2 SlotPos(int i) => HasArt ? pieceArt[i].slotPos : puzzle.Pieces[i].slotPos;
+
+    private Vector2 SlotSize(int i) => HasArt ? pieceArt[i].size : puzzle.Pieces[i].size;
 
     // ================= 화면 갱신 =================
     private void Refresh()
@@ -117,17 +179,36 @@ public class WedjatRestoreView : MonoBehaviour
         if (!built) return;
         bool unlocked = puzzle.IsUnlocked;
         for (int i = 0; i < slotImages.Length; i++) slotImages[i].enabled = unlocked;
+        RefreshTablet(unlocked);
         for (int i = 0; i < pieceRects.Length; i++) RefreshPiece(i);
+    }
+
+    // 은빛 실 전: 윤곽이 흐릿 / 후: 또렷 / 클리어: 완성된 눈 그림 + 조각 숨김
+    private void RefreshTablet(bool unlocked)
+    {
+        if (tabletImage == null) return;
+        bool done = puzzle.IsCleared && tabletDoneSprite != null;
+        tabletImage.sprite = done ? tabletDoneSprite : tabletSprite;
+        tabletImage.color = unlocked || done ? Color.white : new Color(1f, 1f, 1f, 0.35f);
+        for (int i = 0; i < pieceRects.Length; i++) pieceRects[i].gameObject.SetActive(!done);
     }
 
     private void RefreshPiece(int i)
     {
         int slot = puzzle.SlotOf(i);
-        pieceRects[i].anchoredPosition = slot >= 0 ? puzzle.Pieces[slot].slotPos : freePos[i];
+        pieceRects[i].anchoredPosition = slot >= 0 ? SlotPos(slot) : freePos[i];
         pieceRects[i].localRotation = Quaternion.Euler(0, 0, -90f * puzzle.RotationOf(i));
         bool correct = puzzle.IsCorrect(i);
+        bool wrongHint = puzzle.HintActive && !correct;
+        if (HasArt)
+        {
+            float s = slot >= 0 ? 1f : trayScale;
+            pieceRects[i].localScale = new Vector3(s, s, 1f);
+            pieceBorders[i].color = correct ? new Color(1f, 0.88f, 0.55f) : wrongHint ? new Color(1f, 0.45f, 0.45f) : Color.white;
+            return;
+        }
         pieceInners[i].color = correct ? gold : paper;
-        pieceBorders[i].color = (puzzle.HintActive && !correct) ? red : borderColor;
+        pieceBorders[i].color = wrongHint ? red : borderColor;
     }
 
     private void ShowStatus(string text)
@@ -185,6 +266,25 @@ public class WedjatRestoreView : MonoBehaviour
         if (built) puzzle.Rotate(index);
     }
 
+    // [추가] 은빛 실 전(잠김)에 조각을 잡으면: 조각이 덜덜 떨고 안내 문구
+    public void NotifyLocked(int index)
+    {
+        if (!built || puzzle.IsUnlocked || puzzle.IsCleared || index < 0 || index >= pieceRects.Length) return;
+        puzzle.ExplainLocked();
+        StartCoroutine(Wiggle(pieceRects[index]));
+    }
+
+    private IEnumerator Wiggle(RectTransform rt)
+    {
+        Vector2 start = rt.anchoredPosition;
+        for (float t = 0f; t < 0.3f; t += Time.unscaledDeltaTime)
+        {
+            rt.anchoredPosition = start + new Vector2(Mathf.Sin(t * 70f) * 6f, 0f);
+            yield return null;
+        }
+        rt.anchoredPosition = start;
+    }
+
     private void PlaceInSlot(int index, int slot)
     {
         int occupant = puzzle.PieceInSlot(slot);
@@ -201,9 +301,9 @@ public class WedjatRestoreView : MonoBehaviour
         float bestDist = float.MaxValue;
         for (int i = 0; i < puzzle.Pieces.Count; i++)
         {
-            WedjatPieceDef def = puzzle.Pieces[i];
-            float radius = Mathf.Max(def.size.x, def.size.y) * snapRatio;
-            float d = Vector2.Distance(p, def.slotPos);
+            Vector2 size = SlotSize(i);
+            float radius = Mathf.Max(size.x, size.y) * snapRatio;
+            float d = Vector2.Distance(p, SlotPos(i));
             if (d <= radius && d < bestDist)
             {
                 bestDist = d;

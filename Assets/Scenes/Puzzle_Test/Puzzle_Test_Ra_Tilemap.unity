@@ -2751,7 +2751,8 @@ MonoBehaviour:
     objective: "\uAC70\uC6B8 \uC870\uAC01 1\uC744 \uB4E4\uACE0 \uD68C\uB85C\uD310
       \uBE48 \uC2AC\uB86F\uC5D0 \uB07C\uC6B0\uC790"
   - doneFlag: F_RA_P3_DONE
-    objective: "\uCCAD\uC0C9 \uC548\uB8CC\uB97C \uB4E4\uACE0 \uBD81\uC11C\uCABD \uC77C\uC2DD \uC11D\uD0C1\uC73C\uB85C \uAC00\uC790"
+    objective: "\uCCAD\uC0C9 \uC548\uB8CC\uB97C \uB4E4\uACE0 \uBD81\uC11C\uCABD \uC77C\uC2DD
+      \uC11D\uD0C1\uC73C\uB85C \uAC00\uC790"
   - doneFlag: F_RA_CIRCUIT_3
     objective: "\uAC70\uC6B8 \uC870\uAC01 2\uC640 \uD504\uB9AC\uC998\uC744 \uB4E4\uACE0
       \uD68C\uB85C\uD310\uC73C\uB85C \uB3CC\uC544\uAC00\uC790"
@@ -2775,7 +2776,8 @@ MonoBehaviour:
       \uBC1D\uD788\uBA70\n\uB3D9\uCABD \uBC29 \uBC24\uC758 \uADF8\uB9BC\uC790\uB97C
       \uC77D\uC790"
   - doneFlag: F_RA_NIGHT_P3_DONE
-    objective: "\uBD81\uC11C\uCABD \uC77C\uC2DD \uC11D\uD0C1\uC5D0\uC11C \uAC1C\uAE30 \uC77C\uC2DD\uC744 \uC644\uC131\uD558\uC790"
+    objective: "\uBD81\uC11C\uCABD \uC77C\uC2DD \uC11D\uD0C1\uC5D0\uC11C \uAC1C\uAE30
+      \uC77C\uC2DD\uC744 \uC644\uC131\uD558\uC790"
   - doneFlag: F_RA_NIGHT_P4_DONE
     objective: "\uB0A8\uC11C\uCABD \uCE74\uB4DC \uBCA4\uCE58\uC5D0 \uC8FD\uC740 \uC655\uC758
       \uD558\uB8E8\uB97C \uC0C8\uAE30\uC790"
@@ -8487,6 +8489,15 @@ MonoBehaviour:
   showMuralHint: 0
   showNameLabel: 1
   hideWhileOpen: []
+  dayMuralSprite: {fileID: 0}
+  muralClueId: RA_P4
+  nightHintAfterFails: 2
+  dayTitle: "\uD0DC\uC591\uC758 \uD558\uB8E8"
+  daySubtitle: "\uBCBD\uD654\uC5D0 \uADF8\uB824\uC9C4 \uD558\uB8E8\uC758 \uC21C\uC11C\uB300\uB85C,
+    \uC67C\uCABD\uBD80\uD130 \uCE74\uB4DC\uB97C \uB193\uC790"
+  nightTitle: "\uC8FD\uC740 \uC655\uC758 \uD558\uB8E8"
+  nightSubtitle: "\uBC24\uC758 \uBCBD\uD654\uB97C \uC77D\uACE0, \uADF8 \uC21C\uC11C\uB300\uB85C
+    \uC67C\uCABD\uBD80\uD130 \uCE74\uB4DC\uB97C \uB193\uC790"
 --- !u!1 &435486422
 GameObject:
   m_ObjectHideFlags: 0
@@ -11725,7 +11736,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &919613780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13515,13 +13526,8 @@ MonoBehaviour:
   playerInventory: {fileID: 24222499}
   cubeFaceManager: {fileID: 24222496}
   plateGivenFlag: F_RA_PLATE_GIVEN
-  plateSprite: {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
-  plateLabel: "\uD0DC\uC591 \uD615\uD310"
-  plateDropTime: 0.7
-  plateDropHeight: 320
-  nextSceneName: Puzzle_Test_Bastet_Tutorial
+  hallSceneName: 
   fadeTime: 0.8
-  mountTime: 2
 --- !u!1 &1330986871
 GameObject:
   m_ObjectHideFlags: 0

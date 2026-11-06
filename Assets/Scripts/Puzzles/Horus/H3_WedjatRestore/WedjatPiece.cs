@@ -16,7 +16,12 @@ public class WedjatPiece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (view == null || !view.CanDrag(index)) return;
+        if (view == null) return;
+        if (!view.CanDrag(index))
+        {
+            view.NotifyLocked(index); // [추가] 왜 안 움직이는지 알려줌
+            return;
+        }
         dragging = true;
         view.BeginDrag(index);
     }
@@ -36,6 +41,7 @@ public class WedjatPiece : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.dragging || view == null) return;
+        if (!view.CanDrag(index)) view.NotifyLocked(index);
         view.Click(index);
     }
 }

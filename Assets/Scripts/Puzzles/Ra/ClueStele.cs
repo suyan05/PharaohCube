@@ -45,6 +45,10 @@ public class ClueStele : MonoBehaviour, IInteractable
     [SerializeField] private WallTorch[] roomTorches;
     [Tooltip("Room Torches가 비었을 때만: 이 반경 안의 벽 횃불이 켜져 있으면 밝음")]
     [SerializeField] private float lightRadius = 6.5f;
+
+    [Header("[추가] 낮/밤 상관없이 항상 상형문자 -> 렌즈로 해독 (호루스의 방 비석)")]
+    [SerializeField] private bool alwaysLensDecode = false;
+    [SerializeField] private string lensItem = "TOOL_LENS";
     [SerializeField] private DialogueLine[] darkLines = { new DialogueLine("나", "너무 어두워서 글씨가 보이지 않는다. 이 방 벽 횃불부터 밝히자.") };
 
     [Header("[추가] 밤: 손상된 글을 렌즈로 해독")]
@@ -222,6 +226,7 @@ public class ClueStele : MonoBehaviour, IInteractable
                 panel.Hide();
                 return;
             }
+            if (panel.ClosedFrame == Time.frameCount) return; // [추가] 방금 같은 E로 패널이 닫힘 -> 다시 열지 않음
 
             // [추가] 어두우면 못 읽음
             if (!IsLitHere())
@@ -230,10 +235,10 @@ public class ClueStele : MonoBehaviour, IInteractable
                 return;
             }
 
-            // [추가] 밤: 처음 한 번은 렌즈로 해독
-            if (RaPhaseState.IsNight && lensDecodeAtNight && !HasFlag(DecodedFlag))
+            // [추가] 밤: 처음 한 번은 렌즈로 해독 / [추가] alwaysLensDecode면 낮에도
+            if (NeedsDecode && !HasFlag(DecodedFlag))
             {
-                StartCoroutine(DecodeThenShow(who));
+                StartCoroutine(HasLens ? DecodeThenShow(who) : ShowGlyphsOnly());
                 return;
             }
 
@@ -244,6 +249,21 @@ public class ClueStele : MonoBehaviour, IInteractable
         {
             Debug.LogError($"[{name}] 비석 상호작용 오류: {e}");
         }
+    }
+
+    private bool NeedsDecode => alwaysLensDecode || (RaPhaseState.IsNight && lensDecodeAtNight);
+
+    private bool HasLens => !alwaysLensDecode || (ItemInventory.Instance != null && ItemInventory.Instance.Has(lensItem));
+
+    // [추가] 렌즈가 없으면: 상형문자만 보여주고 못 읽음
+    private IEnumerator ShowGlyphsOnly()
+    {
+        decoding = true;
+        PlayerLock.Lock(this);
+        ClueData.ClueContent c = data.Get(false);
+        yield return SteleDecodeUI.ShowUnreadable(c.title, RaNightClueText.ToLines(c.body, 12), "빼곡한 상형문자... 렌즈로 비추면 읽을 수 있을 것 같다.");
+        PlayerLock.Unlock(this);
+        decoding = false;
     }
 
     // [추가] 밤에는 손상된 글(몇 글자 "?")로 보여줌. 그림은 그대로

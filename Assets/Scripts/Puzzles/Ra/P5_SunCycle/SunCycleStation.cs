@@ -234,7 +234,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         BuildBackButton(root);
 
         statusText = CreateText(root, "", 28, new Vector2(0, -415), new Vector2(1200, 50), paper);
-        CreateText(root, "버튼을 순서대로 5번 클릭  |  뒤로: 마지막 입력 취소  |  E / Esc : 닫기", 20,
+        CreateText(root, "버튼을 순서대로 5번 클릭  |  뒤로: 마지막 입력 취소  |  E : 닫기", 20,
             new Vector2(0, -470), new Vector2(1400, 30), sand);
     }
 

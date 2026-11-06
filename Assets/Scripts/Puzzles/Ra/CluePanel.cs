@@ -31,15 +31,22 @@ public class CluePanel : MonoBehaviour
     private Color paper, darkBrown, sand, sandDark;
 
     private ClueStele owner;
+    private int openedFrame = -1;
+
+    // [추가] 이번 프레임에 E로 닫혔는지 (비석이 같은 E로 바로 다시 열지 않게)
+    public int ClosedFrame { get; private set; } = -1;
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
 
     public bool IsOpen => root != null && root.activeSelf;
     public bool IsOpenFor(ClueStele stele) => IsOpen && owner == stele;
 
+    // [수정] E로 닫기 (패널이 열려 있으면 비석 상호작용이 E를 못 받는 경우가 있어서 패널이 직접 받음). Esc도 그대로 닫힘
     private void Update()
     {
-        if (IsOpen && Input.GetKeyDown(KeyCode.Escape)) Hide();
+        if (!IsOpen) return;
+        bool eKey = Input.GetKeyDown(KeyCode.E) && Time.frameCount != openedFrame;
+        if (eKey || Input.GetKeyDown(KeyCode.Escape)) Hide();
     }
 
     private void OnDisable()
@@ -57,6 +64,7 @@ public class CluePanel : MonoBehaviour
             Fill(content);
 
             LockPlayer(player);
+            openedFrame = Time.frameCount;
             SetOtherUIHidden(true);
             transform.SetAsLastSibling(); // 다른 퍼즐 화면보다 위에
             root.SetActive(true);
@@ -69,6 +77,7 @@ public class CluePanel : MonoBehaviour
 
     public void Hide()
     {
+        if (root != null && root.activeSelf) ClosedFrame = Time.frameCount;
         if (root != null) root.SetActive(false);
         owner = null;
         SetOtherUIHidden(false);
@@ -194,7 +203,7 @@ public class CluePanel : MonoBehaviour
         bodyText.verticalOverflow = VerticalWrapMode.Overflow;
         bodyText.lineSpacing = 1.25f;
 
-        CreateText(parent, "Help", 22, new Vector2(0f, -450f), new Vector2(800f, 36f), sand).text = "E / Esc : 닫기";
+        CreateText(parent, "Help", 22, new Vector2(0f, -450f), new Vector2(800f, 36f), sand).text = "E : 닫기";
     }
 
     // ================= 도우미 함수 =================

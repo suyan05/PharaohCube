@@ -41,6 +41,14 @@ public class ConstellationChartPuzzle : PuzzleBase
     [SerializeField] private Color goldColor = new Color(0.91f, 0.70f, 0.23f);
     [SerializeField] private Color silverColor = new Color(0.79f, 0.83f, 0.88f);
 
+    [Header("안내선 기억형: 이 단계부터 흐린 선을 잠깐만 보여줌 (1단계 = 1, 0이면 끔)")]
+    [SerializeField] private int memoryGuideFromStage = 3;
+    [SerializeField] private float memoryGuideSeconds = 4f;
+
+    [Header("성좌 도판 (단계별 그림, 흐린 선과 같이 보였다 사라짐. 비우면 안 씀)")]
+    [SerializeField] private UnityEngine.UI.Image chartCard;
+    [SerializeField] private List<Sprite> stageCards = new List<Sprite>();
+
     [Header("꺼진 별 자리와 별 조각 (기획서 4.1)")]
     [SerializeField] private List<StarSocket> sockets = DefaultSockets();
 
@@ -58,6 +66,7 @@ public class ConstellationChartPuzzle : PuzzleBase
     private int stageIndex;
     private bool busy;
     private bool subscribed;
+    private Coroutine memoryRoutine;
 
     private ConstellationStage Current => stages[Mathf.Clamp(stageIndex, 0, stages.Count - 1)];
 
@@ -79,6 +88,7 @@ public class ConstellationChartPuzzle : PuzzleBase
     private void OnDisable()
     {
         Subscribe(false);
+        memoryRoutine = null; // 꺼지면 코루틴도 같이 멈춤 -> 다시 열 때(Open) 안내선을 새로 보여줌
     }
 
     private void Subscribe(bool on)
@@ -93,12 +103,14 @@ public class ConstellationChartPuzzle : PuzzleBase
         if (on)
         {
             drawer.OnStrokeEnded += HandleStroke;
+            drawer.OnSegmentAdded += HandleSegment;
             drawer.OnRejected += Message;
             drawer.OnBlockedStarPressed += HandleBlockedStar;
             board.OnBuilt += ApplyStageVisuals;
             return;
         }
         drawer.OnStrokeEnded -= HandleStroke;
+        drawer.OnSegmentAdded -= HandleSegment;
         drawer.OnRejected -= Message;
         drawer.OnBlockedStarPressed -= HandleBlockedStar;
         board.OnBuilt -= ApplyStageVisuals;
@@ -179,6 +191,7 @@ public class ConstellationChartPuzzle : PuzzleBase
     private IEnumerator StageClearRoutine()
     {
         busy = true;
+        StopMemoryRoutine();
         drawer.SetInputEnabled(false);
         ConstellationStage done = Current;
         if (!string.IsNullOrEmpty(done.clearFlag)) GameManager.Instance.SetFlag(done.clearFlag);
@@ -192,6 +205,7 @@ public class ConstellationChartPuzzle : PuzzleBase
             busy = false;
             if (guide != null) guide.HideAll();
             OnSuccessInternal();
+            ShowCard(false);
             yield break;
         }
         LoadStage(stageIndex + 1);
@@ -230,7 +244,7 @@ public class ConstellationChartPuzzle : PuzzleBase
             drawer.SetLineColor(IsMoonEyeMounted() ? silverColor : goldColor);
             if (guide != null)
             {
-                guide.ShowGuide(answer);
+                ShowGuideForStage();
                 if (Current.tutorial) guide.ShowStartMarkers(StarGraph.OddDegreeStars(answer));
                 else guide.HideStartMarkers();
             }
@@ -252,9 +266,60 @@ public class ConstellationChartPuzzle : PuzzleBase
                 : "꺼진 별이 있다 - 별 조각을 끼워야 그릴 수 있다";
         }
         if (Current.requireSilver && !IsMoonEyeMounted()) return "은빛 선이 필요하다 - 달의 눈을 장착하자";
+        string text = ReadyMessage();
+        return IsMemoryStage ? text + " 흐린 선은 곧 사라진다 - 모양을 기억해 두자." : text;
+    }
+
+    private string ReadyMessage()
+    {
         if (Current.maxStrokes > 1) return $"이번 성좌는 한 번에 그릴 수 없다. 손을 떼고 {Current.maxStrokes}번까지 나눠 그려도 된다.";
         if (Current.tutorial) return "빛나는 별에서 시작해서, 흐린 선을 손 떼지 말고 한 번에 따라 그려 보세요.";
         return "흐린 선을 따라 성좌를 그려 보자. 어디서 시작할지가 중요하다.";
+    }
+
+    // ================= 안내선 기억형 (3단계부터) =================
+    // 단계에 들어올 때 / 성도판을 열 때 / 별 조각을 끼울 때 -> memoryGuideSeconds 동안만 흐린 선 표시
+    // 선을 긋기 시작하면 바로 숨김. 다시 보고 싶으면 성도판을 닫았다 열면 됨
+    private bool IsMemoryStage => memoryGuideFromStage > 0 && memoryGuideSeconds > 0f && stageIndex + 1 >= memoryGuideFromStage;
+
+    private void ShowGuideForStage()
+    {
+        if (guide == null) return;
+        StopMemoryRoutine();
+        guide.ShowGuide(answer);
+        ShowCard(true);
+        if (IsMemoryStage && isActiveAndEnabled) memoryRoutine = StartCoroutine(MemoryGuideRoutine());
+    }
+
+    private IEnumerator MemoryGuideRoutine()
+    {
+        yield return new WaitForSeconds(memoryGuideSeconds);
+        memoryRoutine = null;
+        if (guide != null) guide.HideGuide();
+        ShowCard(false);
+    }
+
+    // 지금 단계 도판 그림 (stageCards 순서 = 단계 순서)
+    private void ShowCard(bool show)
+    {
+        if (chartCard == null) return;
+        bool has = stageIndex >= 0 && stageIndex < stageCards.Count && stageCards[stageIndex] != null;
+        chartCard.gameObject.SetActive(show && has && !IsCleared);
+        if (has) chartCard.sprite = stageCards[stageIndex];
+    }
+
+    private void HandleSegment(string edgeKey)
+    {
+        if (!IsMemoryStage || guide == null) return;
+        StopMemoryRoutine();
+        guide.HideGuide();
+        ShowCard(false);
+    }
+
+    private void StopMemoryRoutine()
+    {
+        if (memoryRoutine != null) StopCoroutine(memoryRoutine);
+        memoryRoutine = null;
     }
 
     private int MissingSocketCount()
@@ -317,6 +382,7 @@ public class ConstellationChartPuzzle : PuzzleBase
         if (litSockets.Contains(coord)) return false;
         litSockets.Add(coord);
         if (board != null && board.IsBuilt) board.SetStarLit(coord);
+        if (IsMemoryStage && board != null && board.IsBuilt && !IsCleared) ShowGuideForStage(); // 별이 켜지면 모양 다시 보여줌
         Message($"별 조각을 끼웠다 - ({coord.x},{coord.y}) 별에 빛이 들어왔다");
         return true;
     }

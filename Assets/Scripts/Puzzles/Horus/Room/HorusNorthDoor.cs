@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 // OBJ_H13 북쪽 중앙방 문: H5 클리어 후 개방 (라의 방 NorthDoor와 같은 구조, 열림 플래그만 Inspector에서 지정)
@@ -7,11 +8,16 @@ public class HorusNorthDoor : MonoBehaviour, IInteractable
     [Header("이 플래그가 켜지면 문이 열림")]
     [SerializeField] private string openFlag = "F_HO_H5_DONE";
 
-    [Header("연결 (비워두면 들어갈 때 로그만 찍음 - 중앙방 연결은 추후)")]
+    [Header("연결 (예비용. 비워두면 아래 '갈 곳'으로 바로 이동 - DemoEnding은 라 형판을 등록하니 호루스엔 안 씀)")]
     [SerializeField] private DemoEnding ending;
+
+    [Header("갈 곳 (비우면 중앙 홀 CentralRoom_Temp)")]
+    [SerializeField] private string hallSceneName = "";
+    [SerializeField] private float fadeTime = 0.8f;
 
     private SpriteRenderer sr;
     private bool isOpen;
+    private bool leaving;
     private bool subscribed;
     private Color closedColor, openColor;
 
@@ -61,11 +67,43 @@ public class HorusNorthDoor : MonoBehaviour, IInteractable
                 return;
             }
             if (ending != null) ending.Play(player);
-            else Debug.Log("[호루스 북문] 중앙방 연결 예정 (호루스 형판 장착 엔딩은 추후 구현)");
+            else if (!leaving) StartCoroutine(GoToHall(player));
         }
         catch (Exception e)
         {
             Debug.LogError($"[호루스 북문] Interact 오류: {e}");
         }
+    }
+
+    // 암전 -> 중앙 홀 (홀에서 HallRoute 호루스 칸이 돌아온 연출을 보여줌)
+    private IEnumerator GoToHall(GameObject player)
+    {
+        leaving = true;
+        LockPlayer(player);
+        GameAudio.Play("sfx_rumble", 0.7f);
+        yield return ScreenFader.FadeOut(fadeTime);
+        try
+        {
+            string scene = string.IsNullOrEmpty(hallSceneName) ? DemoEnding.DefaultHallScene : hallSceneName;
+            Debug.Log($"[호루스 북문] 중앙 홀로 이동: {scene}");
+            SceneFlow.LoadByNameOrNext(scene);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[호루스 북문] 중앙 홀 이동 오류: {e}");
+            leaving = false;
+        }
+    }
+
+    // 암전 중에 움직이거나 E로 문이 다시 눌리지 않게 (DemoEnding과 같은 방식)
+    private static void LockPlayer(GameObject player)
+    {
+        if (player == null) return;
+        var controller = player.GetComponent<PlayerController2D>();
+        var interaction = player.GetComponent<InteractionSystem>();
+        var rb = player.GetComponent<Rigidbody2D>();
+        if (controller != null) controller.enabled = false;
+        if (interaction != null) interaction.enabled = false;
+        if (rb != null) rb.linearVelocity = Vector2.zero;
     }
 }

@@ -14,6 +14,13 @@ public class SkyAlignView : MonoBehaviour
     [SerializeField] private Vector2 altarCenter = new Vector2(0f, 30f);
     [SerializeField] private float starSize = 60f;
 
+    [Header("그림 (비우면 색 네모 - 예전 그대로)")]
+    [SerializeField] private Sprite altarSprite;
+    [SerializeField] private Vector2 altarSize = new Vector2(853f, 640f);
+    [Tooltip("제단 별 그림 (Stars 순서: 메스케티우, 사흐, 소프데트, 우자트, 붉은 별, 매)")]
+    [SerializeField] private List<Sprite> starSprites = new List<Sprite>();
+    [SerializeField] private float artStarSize = 104f;
+
     private Image[] starImages;
     private RectTransform[] starRects;
     private Vector2[] starPos;
@@ -79,7 +86,7 @@ public class SkyAlignView : MonoBehaviour
         BuildAltar();
         BuildPanels();
         statusText = HorusUiFactory.CreateText(boardRoot, font, "", 26, new Vector2(0f, -330f), new Vector2(1500f, 50f), white);
-        HorusUiFactory.CreateText(boardRoot, font, "별을 순서대로 클릭  |  뒤로 : 마지막 입력 취소  |  E / Esc : 닫기", 20,
+        HorusUiFactory.CreateText(boardRoot, font, "별을 순서대로 클릭  |  뒤로 : 마지막 입력 취소  |  E : 닫기", 20,
             new Vector2(0f, -380f), new Vector2(1400f, 40f), paper);
         BuildBackButton();
         built = true;
@@ -87,7 +94,13 @@ public class SkyAlignView : MonoBehaviour
 
     private void BuildAltar()
     {
-        HorusUiFactory.CreateRect(boardRoot, "AltarFrame", altarCenter, new Vector2(600f, 560f), frame);
+        if (altarSprite != null)
+        {
+            Image altar = HorusUiFactory.CreateRect(boardRoot, "AltarArt", altarCenter, altarSize, Color.white);
+            altar.sprite = altarSprite;
+            altar.preserveAspect = true;
+        }
+        else HorusUiFactory.CreateRect(boardRoot, "AltarFrame", altarCenter, new Vector2(600f, 560f), frame);
         var layerGo = new GameObject("Lines", typeof(RectTransform));
         lineLayer = layerGo.GetComponent<RectTransform>();
         lineLayer.SetParent(boardRoot, false);
@@ -106,13 +119,20 @@ public class SkyAlignView : MonoBehaviour
         SkyStar star = puzzle.Stars[index];
         float rad = star.angle * Mathf.Deg2Rad;
         Vector2 pos = altarCenter + new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * star.radius;
-        Image img = HorusUiFactory.CreateRect(boardRoot, $"SkyStar_{index}", pos, new Vector2(starSize, starSize), gold);
+        Sprite art = StarSprite(index);
+        float size = art != null ? artStarSize : starSize;
+        Image img = HorusUiFactory.CreateRect(boardRoot, $"SkyStar_{index}", pos, new Vector2(size, size), gold);
         img.raycastTarget = true;
+        if (art != null)
+        {
+            img.sprite = art;
+            img.preserveAspect = true;
+        }
         Button btn = img.gameObject.AddComponent<Button>();
         btn.targetGraphic = img;
         int captured = index;
         btn.onClick.AddListener(() => puzzle.SelectStar(captured));
-        HorusUiFactory.CreateText(boardRoot, font, star.label, 22, pos + new Vector2(0f, -50f), new Vector2(200f, 30f), white);
+        HorusUiFactory.CreateText(boardRoot, font, star.label, 22, pos + new Vector2(0f, -size / 2f - 20f), new Vector2(200f, 30f), white);
         starImages[index] = img;
         starRects[index] = img.rectTransform;
         starPos[index] = pos;
@@ -154,10 +174,23 @@ public class SkyAlignView : MonoBehaviour
         for (int i = 0; i < starImages.Length; i++)
         {
             bool selected = Contains(puzzle.Input, i);
-            if (!puzzle.IsAwake) starImages[i].color = dim;
+            if (StarSprite(i) != null) starImages[i].color = ArtTint(selected);
+            else if (!puzzle.IsAwake) starImages[i].color = dim;
             else if (selected) starImages[i].color = white;
             else starImages[i].color = puzzle.Stars[i].isTrap ? red : gold;
         }
+    }
+
+    // 그림 별: 그림 색은 그대로 두고 상태만 곱해서 표시 (잠김 = 어둡게, 고름 = 금빛)
+    private Color ArtTint(bool selected)
+    {
+        if (!puzzle.IsAwake) return new Color(0.35f, 0.35f, 0.42f, 1f);
+        return selected ? new Color(1f, 0.85f, 0.45f, 1f) : Color.white;
+    }
+
+    private Sprite StarSprite(int index)
+    {
+        return starSprites != null && index >= 0 && index < starSprites.Count ? starSprites[index] : null;
     }
 
     private void RebuildLines()

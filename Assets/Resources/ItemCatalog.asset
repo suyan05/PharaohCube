@@ -137,3 +137,58 @@ MonoBehaviour:
       \uC218 \uC788\uAC8C \uD574 \uC8FC\uB294 \uC545\uC5B4 \uC774\uBE68"
     icon: {fileID: 21300000, guid: a214f2bb29fdbda4a812546a56057f6a, type: 3}
     hidden: 1
+  - id: ITEM_FEATHER
+    displayName: "\uB9E4\uC758 \uAE43\uD138"
+    description: "\uAE43\uD138\uB85C \uBA3C\uC9C0\uB97C \uD138\uBA74 \uBC18\uCABD
+      \uB0A0\uAC1C\uAC00 \uB4DC\uB7EC\uB09C\uB2E4."
+    icon: {fileID: -7569922496043100032, guid: b23141d671d44aa4b9e95a63995e76df, type: 3}
+    hidden: 0
+  - id: HO_STAR_FRAG_1
+    displayName: "\uBCC4 \uC870\uAC01"
+    description: "\uC131\uB3C4\uD310\uC758 \uAEBC\uC9C4 \uBCC4\uC5D0 \uB07C\uC6B0\uBA74
+      \uBE5B\uC774 \uB4E4\uC5B4\uC628\uB2E4."
+    icon: {fileID: -8396750207946666164, guid: f61efbc73bd858244b34642280db2978, type: 3}
+    hidden: 0
+  - id: HO_STAR_FRAG_2
+    displayName: "\uBCC4 \uC870\uAC01"
+    description: "\uC131\uB3C4\uD310\uC758 \uAEBC\uC9C4 \uBCC4\uC5D0 \uB07C\uC6B0\uBA74
+      \uBE5B\uC774 \uB4E4\uC5B4\uC628\uB2E4."
+    icon: {fileID: -8396750207946666164, guid: f61efbc73bd858244b34642280db2978, type: 3}
+    hidden: 0
+  - id: HO_STAR_FRAG_3
+    displayName: "\uBCC4 \uC870\uAC01"
+    description: "\uC131\uB3C4\uD310\uC758 \uAEBC\uC9C4 \uBCC4\uC5D0 \uB07C\uC6B0\uBA74
+      \uBE5B\uC774 \uB4E4\uC5B4\uC628\uB2E4."
+    icon: {fileID: -8396750207946666164, guid: f61efbc73bd858244b34642280db2978, type: 3}
+    hidden: 0
+  - id: ITEM_SILVER_THREAD
+    displayName: "\uC740\uBE5B \uC2E4"
+    description: "\uC740\uBE5B \uC2E4\uC740 \uCC22\uAE34 \uAC83\uC744 \uB2E4\uC2DC
+      \uC787\uB294\uB2E4."
+    icon: {fileID: 1523426352553798611, guid: 91bd11237aadeb0428e331cefbe23601, type: 3}
+    hidden: 0
+  - id: ITEM_MOON_EYE
+    displayName: "\uB2EC\uC758 \uB208"
+    description: "\uC7A5\uCC29\uB300\uC5D0 \uB07C\uC6B0\uBA74 \uC774\uD6C4 \uAE0B\uB294
+      \uC120\uC774 \uC740\uBE5B\uC774 \uB41C\uB2E4."
+    icon: {fileID: 1774115933487892222, guid: 4bf5523663f4e494e8c8648568df0c56, type: 3}
+    hidden: 0
+  - id: ITEM_SEAL_FALCON
+    displayName: "\uB9E4 \uC778\uC7A5"
+    description: "\uC138\uD2B8\uC758 \uBD09\uC778\uC740 \uB9E4\uC758 \uC778\uC7A5\uB9CC\uC774
+      \uC5F0\uB2E4."
+    icon: {fileID: 8902506699672982600, guid: aba30378862d4fc42844236906a2f54e, type: 3}
+    hidden: 0
+  - id: PLATE_HORUS
+    displayName: "\uD558\uB298 \uD615\uD310"
+    description: "\uD558\uB298\uC758 \uD615\uD310\uC744 \uD050\uBE0C\uC758 \uBA74\uC5D0
+      \uC7A5\uCC29\uD558\uB77C."
+    icon: {fileID: 6545610991886885856, guid: 8fc67070f6887ce4ba3d88f8ffffb757, type: 3}
+    hidden: 0
+  - id: ITEM_WEDJAT_AMULET
+    displayName: "\uC6B0\uC790\uD2B8 \uBD80\uC801"
+    description: "\uD1A0\uD2B8\uAC00 \uACE0\uCCD0 \uC900 \uD638\uB8E8\uC2A4\uC758
+      \uB208. \uC5B4\uB518\uAC00 \uBE44\uC5B4 \uC788\uB294 \uB208 \uC790\uB9AC\uC5D0
+      \uAF2D \uB9DE\uC744 \uAC83 \uAC19\uB2E4."
+    icon: {fileID: 6849059424106506041, guid: 0cc05d2c66ced3f4386b6eeb0c5966c3, type: 3}
+    hidden: 0

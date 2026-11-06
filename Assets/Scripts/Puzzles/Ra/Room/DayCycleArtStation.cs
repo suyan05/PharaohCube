@@ -255,7 +255,7 @@ public class DayCycleArtStation : MonoBehaviour, IInteractable
         CreateButton(root, "취소(초기화)", new Vector2(115, -330), paper, OnCancelClicked);
 
         statusText = CreateText(root, "", 28, new Vector2(0, -435), new Vector2(1200, 60), paper);
-        CreateText(root, "카드를 끌어서 자리 바꾸기  |  확정: 판정  |  취소: 다시 섞기  |  E / Esc : 닫기", 20,
+        CreateText(root, "카드를 끌어서 자리 바꾸기  |  확정: 판정  |  취소: 다시 섞기  |  E : 닫기", 20,
             new Vector2(0, -485), new Vector2(1400, 30), sand);
     }
 

@@ -29,6 +29,15 @@ public class StarPoint : MonoBehaviour, IPointerDownHandler
         if (image != null) image.color = color;
     }
 
+    // [추가] 그림이 있으면 그림으로 (color는 그림 위에 곱해지는 색, 보통 흰색)
+    public void SetState(StarState state, Color color, Sprite sprite)
+    {
+        SetState(state, color);
+        if (image == null || sprite == null) return;
+        image.sprite = sprite;
+        image.preserveAspect = true;
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         // 디버그용: 어떤 별이 눌렸는지 확인 (문제 해결 후 지워도 됨)

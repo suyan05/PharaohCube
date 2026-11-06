@@ -45,6 +45,7 @@ public class WedjatRestorePuzzle : PuzzleBase
     private float hintTimer;
     private bool timerRunning;
     private bool justUnlocked;
+    private int scatterCount;
 
     private void Awake()
     {
@@ -140,8 +141,41 @@ public class WedjatRestorePuzzle : PuzzleBase
 
     private void AfterChange()
     {
+        if (BrokeOrder())
+        {
+            Scatter();
+            return;
+        }
         OnStateChanged?.Invoke();
         Submit();
+    }
+
+    // [추가] 난이도: 토트는 가장 큰 조각(1/2)부터 작은 조각(1/64) 순서로 이었다
+    // 조각 i(0 = 1/2 ... 5 = 1/64)가 제자리에 맞았는데 더 큰 조각이 아직 안 맞았으면 -> 순서 어김
+    private bool BrokeOrder()
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            if (!IsCorrect(i)) continue;
+            for (int j = 0; j < i; j++) if (!IsCorrect(j)) return true;
+        }
+        return false;
+    }
+
+    // 순서를 어기면 맞춰 둔 조각까지 전부 튕겨 나가고 처음 방향으로 돌아감
+    private void Scatter()
+    {
+        for (int i = 0; i < pieces.Count; i++)
+        {
+            slotOf[i] = -1;
+            rotation[i] = ((pieces[i].startRotation % 4) + 4) % 4;
+        }
+        scatterCount++;
+        Message(scatterCount >= 2
+            ? "조각이 다시 튕겨 나갔다... 토트는 '가장 큰 몫'부터 이었다. 감각마다 몫이 다르다고 했지."
+            : "조각을 끼우자 눈 전체가 흩어졌다! 이을 순서가 있는 것 같다.");
+        Debug.Log("[노트 7] 토트는 찢긴 눈을 가장 큰 몫부터 작은 몫의 순서로 이었다.");
+        OnStateChanged?.Invoke();
     }
 
     // ================= 상태 조회 =================
@@ -187,7 +221,7 @@ public class WedjatRestorePuzzle : PuzzleBase
             return "은빛 실이 조각 사이를 잇자 눈의 윤곽이 드러났다!";
         }
         if (HintActive) return "어긋난 조각의 테두리가 붉게 빛난다...";
-        return "조각을 모양이 같은 자리로 끌어다 놓자. 클릭하면 90도 회전한다.";
+        return "조각을 모양이 같은 자리로 끌어다 놓자. 클릭하면 90도 회전한다. (잇는 순서가 있다 - 비석의 글을 떠올리자)";
     }
 
     private void Complete()
@@ -205,6 +239,12 @@ public class WedjatRestorePuzzle : PuzzleBase
     {
         if (string.IsNullOrEmpty(itemId) || ItemInventory.Instance == null) return;
         ItemInventory.Instance.Grant(itemId);
+    }
+
+    // [추가] 잠긴 상태에서 조각을 잡았을 때 (WedjatRestoreView가 부름)
+    public void ExplainLocked()
+    {
+        Message("조각이 석판에 붙어 꿈쩍도 않는다. 찢긴 것을 다시 이을 무언가가 필요하다. (성도판 2단계 보상)");
     }
 
     private void Message(string text)
