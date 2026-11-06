@@ -8,12 +8,13 @@ using UnityEngine.Tilemaps;
 //   'a' 입구 전실 바닥 (모래빛 돌)   'D' 북문 자리 바닥   ' ' 빈칸
 //   매의 회랑은 여기 없음 -> 열릴 때 HorusHiddenGallery가 칠함 (처음엔 안 보이게)
 // [추가] 퍼즐 방 2개 (본당이 물건으로 막혀서 큰 퍼즐은 각자 방으로 뺌 - 라의 방처럼)
-//   해의 방 (H1 매의 거울): 본당 북서쪽 위. 바닥 x 0~9, y 18~26. 본당 북쪽 벽 (1~2, 16~17)이 문
-//   나일의 방 (H4 돌배 경주): 본당 동쪽. 바닥 x 25~36, y 0~9. 본당 동쪽 벽 (24, 2~3)이 문
+//   해의 방 (H1 매의 거울): 본당 북서쪽 위. 바닥 x 0~13, y 18~31. 본당 북쪽 벽 (1~2, 16~17)이 문
+//   나일의 방 (H4 돌배 경주): 본당 동쪽. 바닥 x 25~40, y 0~12. 본당 동쪽 벽 (24, 2~3)이 문
+//   [수정] 두 방 모두 퍼즐 칸을 1.5칸 간격으로 넓혀서 방도 키움 (물건 사이로 지나가기 쉽게)
 public static class HorusRoomMap
 {
-    public static readonly RectInt SunRoom = new RectInt(0, 18, 10, 9);   // x 0~9, y 18~26
-    public static readonly RectInt NileRoom = new RectInt(25, 0, 12, 10); // x 25~36, y 0~9
+    public static readonly RectInt SunRoom = new RectInt(0, 18, 14, 14);  // x 0~13, y 18~31
+    public static readonly RectInt NileRoom = new RectInt(25, 0, 16, 13); // x 25~40, y 0~12
     private static readonly Vector2Int[] Doors =
     {
         new Vector2Int(1, 16), new Vector2Int(2, 16), new Vector2Int(1, 17), new Vector2Int(2, 17),

@@ -24,6 +24,9 @@ public static class HorusWorldPuzzles
             SkyRings();
             MoveNeighbors();
             Objectives();
+            SolidPillars();
+            SteleOrder();
+            RoomSconces();
         }
         catch (System.Exception e)
         {
@@ -34,8 +37,8 @@ public static class HorusWorldPuzzles
     // ================= H1 =================
     private static void SunMirrors()
     {
-        // 해의 방: 거울 격자 왼쪽 아래 = (0, 19). 매의 눈 = 격자 (3, 3) 칸
-        GameObject h1 = Prepare("H1_MirrorWing", new Vector2(3.5f, 22.5f), Px("HO_EyeStand_Dust"), new Vector2(1.1f, 1.2f));
+        // 해의 방: 거울 격자 왼쪽 아래 = (0, 19), 칸 1.5. 매의 눈 = 격자 (3, 3) 칸 = (5.25, 24.25)
+        GameObject h1 = Prepare("H1_MirrorWing", new Vector2(5.25f, 24.25f), Px("HO_EyeStand_Dust"), new Vector2(1.1f, 1.2f));
         if (h1 == null) return;
         Remove<MirrorWingStation>(h1);
         HorusSunMirrors p = Add<HorusSunMirrors>(h1);
@@ -67,7 +70,7 @@ public static class HorusWorldPuzzles
     {
         // 세트의 붉은 봉인 그림(H4_02)을 작게 = 경주의 비석
         // 나일의 방: 경기장 왼쪽 아래 = (27, 1), 입구 = (27, 2). 비석은 경기장 왼쪽 빈 줄 (문에서 들어오는 길은 비움)
-        GameObject h4 = Prepare("H4_StarPathLock", new Vector2(25.9f, 6.2f), HorusArtSetup.Art("H4/H4_02"), new Vector2(0.9f, 0.9f));
+        GameObject h4 = Prepare("H4_StarPathLock", new Vector2(25.9f, 7.2f), HorusArtSetup.Art("H4/H4_02"), new Vector2(0.9f, 0.9f));
         if (h4 == null) return;
         Remove<StarPathLockStation>(h4);
         Remove<HorusSealWalk>(h4);
@@ -112,9 +115,73 @@ public static class HorusWorldPuzzles
     {
         Move("OBJ_H08_Mural", new Vector2(9.0f, 0.75f)); // 남쪽 벽, 입구 서쪽 (돌배 경기장 입구 앞 길을 비움)
         Move("OBJ_H04_MoonEyeMount", new Vector2(19.5f, 7.6f));
-        Move("OBJ_H16_LapisStar_2", new Vector2(21.6f, 7.8f));
+        Move("OBJ_H16_LapisStar_2", new Vector2(20.6f, 6.4f)); // 성도판을 안쪽으로 옮기면서 겹치지 않게
+        Move("H2_ConstellationChart", new Vector2(22.5f, 8f)); // [수정] 동쪽 벽 너머가 나일의 방이 되면서 벽에 걸쳐 보이던 것 -> 본당 안쪽으로
         GameObject mount = HorusArtSetup.Find("OBJ_H04_MoonEyeMount");
         if (mount != null) HorusWorldArt.FitObject(mount, HorusArtSetup.Art("Object/Object_02"), new Vector2(0.7f, 0.7f), Color.white);
+    }
+
+    // [추가] 기둥: 몸통 전체를 막음 (예전엔 밑동만 막혀서 기둥 위로 지나가는 것처럼 보였음)
+    private static void SolidPillars()
+    {
+        foreach (string n in new[] { "Pillar_NW", "Pillar_NE", "Pillar_SW", "Pillar_SE" })
+        {
+            GameObject go = HorusArtSetup.Find(n);
+            if (go == null) continue;
+            foreach (Collider2D c in go.GetComponents<Collider2D>()) Object.DestroyImmediate(c);
+            float k = Mathf.Max(go.transform.localScale.x, 0.001f);
+            BoxCollider2D box = go.AddComponent<BoxCollider2D>();
+            box.size = new Vector2(0.8f, 2.5f) / k;
+            box.offset = new Vector2(0f, -0.05f) / k;
+            EditorUtility.SetDirty(go);
+        }
+    }
+
+    // [추가] 단서 비석은 매가 안내하는 차례가 와야 '!'가 뜨고 읽힘 (ClueStele.requiredFlag)
+    // 순서: 성좌1 -> H1 -> 성좌2 -> H3 -> 성좌3 -> H4 -> 성좌4 -> H5
+    private static void SteleOrder()
+    {
+        SetRequired("OBJ_HS2_ClueStele", "");             // 별의 길 (성도판 처음부터)
+        SetRequired("OBJ_HS1_ClueStele", "F_HO_CHART_1");  // 해의 눈 (H1 차례)
+        SetRequired("OBJ_HS3_ClueStele", "F_HO_CHART_2");  // 찢긴 눈 (H3 차례)
+        SetRequired("OBJ_H11_WarningSlab", "F_HO_CHART_4"); // 경고 석판 (H5 차례)
+    }
+
+    private static void SetRequired(string objName, string flag)
+    {
+        GameObject go = HorusArtSetup.Find(objName);
+        ClueStele stele = go != null ? go.GetComponent<ClueStele>() : null;
+        if (stele == null) return;
+        var so = new SerializedObject(stele);
+        SerializedProperty p = so.FindProperty("requiredFlag");
+        if (p == null) return;
+        p.stringValue = flag;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // [추가] 퍼즐 방 북쪽 벽의 켜진 횃대 (어두워서 안 보이던 문제). 장식이라 끌 수 없음
+    private static void RoomSconces()
+    {
+        Sprite on = Px("HO_Sconce_On");
+        foreach (Vector2 p in new[] { new Vector2(2f, 31.7f), new Vector2(7f, 31.7f), new Vector2(12f, 31.7f),
+                                      new Vector2(28f, 12.7f), new Vector2(33f, 12.7f), new Vector2(38f, 12.7f) })
+        {
+            var go = new GameObject("HO_RoomSconce");
+            go.transform.position = p;
+            SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = on;
+            sr.sortingLayerName = string.IsNullOrEmpty(HorusRoomObjects.Layer) ? "Default" : HorusRoomObjects.Layer; // 플레이어와 같은 레이어
+            sr.sortingOrder = 21; // 벽 장식 (항상 위)
+            if (on != null) go.transform.localScale = Vector3.one * (0.56f / on.bounds.size.x);
+            var light = new GameObject("Light", typeof(UnityEngine.Rendering.Universal.Light2D)).GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+            light.transform.position = p + Vector2.up * 0.3f;
+            light.transform.SetParent(go.transform, true);
+            light.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+            light.color = new Color(1f, 0.78f, 0.5f);
+            light.intensity = 1f;
+            light.pointLightOuterRadius = 7f;
+            light.pointLightInnerRadius = 0.5f;
+        }
     }
 
     // 목표 문구를 새 퍼즐에 맞게

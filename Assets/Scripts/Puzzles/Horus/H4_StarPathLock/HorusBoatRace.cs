@@ -32,6 +32,8 @@ public class HorusBoatRace : PuzzleBase, IInteractable
 
     [Header("연결 (빌더가 채움)")]
     [SerializeField] private Vector2 origin = new Vector2(27f, 1f);
+    [Tooltip("[수정] 칸 하나의 크기 (월드). 1이면 배/바위 사이 길이 좁아서 지나가다 걸림 -> 1.5")]
+    [SerializeField] private float cell = 1.5f;
     [SerializeField] private Sprite rockSprite, waterSprite, sunkSprite, socketSprite, woodSprite, setSprite, sealSprite;
 
     [Header("진행")]
@@ -93,12 +95,12 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     {
         Vector3 pos = World(cell);
         map[cell] = ch == 'B' || ch == 'S' || ch == 'G' ? '.' : ch;
-        if (ch == '#') HorusWorld.Prop(root, "H4_Rock", rockSprite, pos, 1f, new Vector2(0.96f, 0.96f));
+        if (ch == '#') HorusWorld.Prop(root, "H4_Rock", rockSprite, pos, this.cell * 0.95f, new Vector2(this.cell, this.cell)); // 바위 사이로 빠져나가지 않게 충돌은 한 칸 꽉
         else if (ch == '~') AddWater(cell, pos);
         else if (ch == 'o')
         {
             sockets.Add(cell);
-            HorusWorld.Floor(root, "H4_Socket", socketSprite, pos, 1f, 1);
+            HorusWorld.Floor(root, "H4_Socket", socketSprite, pos, this.cell * 0.9f, 1);
         }
         else if (ch == 'B' || ch == 'S') AddBoat(cell, ch == 'S');
         else if (ch == 'G') BuildGate(pos);
@@ -107,30 +109,30 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private void AddWater(Vector2Int cell, Vector3 pos)
     {
         water.Add(cell);
-        SpriteRenderer sr = HorusWorld.Floor(root, "H4_Water", waterSprite, pos, 1f, 0);
+        SpriteRenderer sr = HorusWorld.Floor(root, "H4_Water", waterSprite, pos, this.cell, 0);
         waterTiles[cell] = sr;
-        waterBlocks[cell] = HorusWorld.AddBox(sr.gameObject, new Vector2(1f, 1f), sr.transform.localScale.x, false);
+        waterBlocks[cell] = HorusWorld.AddBox(sr.gameObject, new Vector2(this.cell, this.cell), sr.transform.localScale.x, false);
         ((BoxCollider2D)waterBlocks[cell]).offset = Vector2.zero;
     }
 
     private void AddBoat(Vector2Int cell, bool set)
     {
-        SpriteRenderer sr = HorusWorld.Prop(root, set ? "H4_SetBoat" : "H4_HorusBoat", set ? setSprite : woodSprite, World(cell), 0.95f, Vector2.zero);
+        SpriteRenderer sr = HorusWorld.Prop(root, set ? "H4_SetBoat" : "H4_HorusBoat", set ? setSprite : woodSprite, World(cell), this.cell * 0.85f, Vector2.zero);
         BoxCollider2D box = sr.gameObject.AddComponent<BoxCollider2D>();
-        box.size = new Vector2(0.9f, 0.9f) / sr.transform.localScale.x;
+        box.size = new Vector2(this.cell * 0.8f, this.cell * 0.8f) / sr.transform.localScale.x;
         boats.Add(new Boat { sr = sr, cell = cell, set = set, scale = sr.transform.localScale });
     }
 
     // 입구를 막은 세트의 봉인 (매의 인장으로 풂)
     private void BuildGate(Vector3 pos)
     {
-        gate = HorusWorld.Prop(root, "H4_SetSealGate", sealSprite, pos, 1f, new Vector2(1f, 1f));
+        gate = HorusWorld.Prop(root, "H4_SetSealGate", sealSprite, pos, cell * 0.8f, new Vector2(cell, cell));
         RaGlowFx.Glow(gate.transform, Vector3.up * 0.5f / gate.transform.localScale.x, 1.6f / gate.transform.localScale.x, new Color(1f, 0.25f, 0.2f, 0.35f), HorusFx.Layer, 1);
     }
 
-    private Vector3 World(Vector2Int cell) => new Vector3(origin.x + cell.x + 0.5f, origin.y + cell.y + 0.5f, 0f);
+    private Vector3 World(Vector2Int c) => new Vector3(origin.x + (c.x + 0.5f) * cell, origin.y + (c.y + 0.5f) * cell, 0f);
 
-    private Vector2Int CellOf(Vector3 p) => new Vector2Int(Mathf.FloorToInt(p.x - origin.x), Mathf.FloorToInt(p.y - origin.y));
+    private Vector2Int CellOf(Vector3 p) => new Vector2Int(Mathf.FloorToInt((p.x - origin.x) / cell), Mathf.FloorToInt((p.y - origin.y) / cell));
 
     // ================= 매 프레임: 밀기 / 되돌리기 =================
     private void Update()
@@ -196,7 +198,7 @@ public class HorusBoatRace : PuzzleBase, IInteractable
             if (b.sunk) continue;
             Vector2 d = (Vector2)(World(b.cell) - p);
             float along = Vector2.Dot(d, dir), side = Mathf.Abs(Vector2.Dot(d, new Vector2(dir.y, dir.x)));
-            if (along > 0.2f && along < 1.05f && side < 0.45f) return b;
+            if (along > 0.2f && along < cell * 0.5f + 0.75f && side < cell * 0.35f) return b;
         }
         return null;
     }

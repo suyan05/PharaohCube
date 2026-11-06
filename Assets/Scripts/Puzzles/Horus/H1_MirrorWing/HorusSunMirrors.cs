@@ -19,6 +19,8 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
     [Header("격자 (칸 (0,0) 왼쪽 아래 = origin)")]
     [SerializeField] private Vector2 origin = new Vector2(0f, 5f);
     [SerializeField] private Vector2Int size = new Vector2Int(8, 8);
+    [Tooltip("[수정] 칸 하나의 크기 (월드). 1이면 거울 사이가 좁아서 지나가다 걸림 -> 1.5")]
+    [SerializeField] private float cell = 1.5f;
 
     [Header("연결 (빌더가 채움)")]
     [SerializeField] private SpriteRenderer eyeStand;
@@ -69,7 +71,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
 
     private void BuildProps()
     {
-        sun = HorusWorld.Prop(root, "H1_WingedSun", sunSprite, World(Sun) + new Vector3(0.45f, 0.2f, 0f), 1.4f, Vector2.zero);
+        sun = HorusWorld.Prop(root, "H1_WingedSun", sunSprite, World(Sun) + new Vector3(0.45f * cell, 0.2f, 0f), 1.4f, Vector2.zero);
         sun.sortingOrder = 25; // 벽에 걸린 장식 (항상 위)
         for (int i = 0; i < MirrorCells.Length; i++)
         {
@@ -95,7 +97,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         return lr;
     }
 
-    private Vector3 World(Vector2Int c) => new Vector3(origin.x + c.x + 0.5f, origin.y + c.y + 0.5f, 0f);
+    private Vector3 World(Vector2Int c) => new Vector3(origin.x + (c.x + 0.5f) * cell, origin.y + (c.y + 0.5f) * cell, 0f);
 
     // ================= 빛 따라가기 =================
     // 거울을 돌릴 때마다 다시 계산. 결과: 목표에 닿음 / 붉은 돌 / 막힘 / 밖
@@ -109,7 +111,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
             beam.positionCount = 0;
             return;
         }
-        var pts = new List<Vector3> { World(Sun) + Vector3.right * 0.45f };
+        var pts = new List<Vector3> { World(Sun) + Vector3.right * 0.45f * cell };
         Hit hit = Walk(pts);
         beam.positionCount = pts.Count;
         beam.SetPositions(pts.ToArray());
@@ -123,9 +125,9 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         for (int step = 0; step < 200; step++)
         {
             p += d;
-            if (p.x < 0 || p.y < 0 || p.x >= size.x || p.y >= size.y) { pts.Add(World(p - d) + (Vector3)(Vector2)d * 0.5f); return Hit.None; }
+            if (p.x < 0 || p.y < 0 || p.x >= size.x || p.y >= size.y) { pts.Add(World(p - d) + (Vector3)(Vector2)d * 0.5f * cell); return Hit.None; }
             if (p == Target) { pts.Add(World(p)); return Hit.Target; }
-            if (Array.IndexOf(Blocks, p) >= 0) { pts.Add(World(p) - (Vector3)(Vector2)d * 0.45f); return Hit.None; }
+            if (Array.IndexOf(Blocks, p) >= 0) { pts.Add(World(p) - (Vector3)(Vector2)d * 0.45f * cell); return Hit.None; }
             if (Array.IndexOf(SetStones, p) >= 0) { pts.Add(World(p)); return Hit.Red; }
             int m = Array.IndexOf(MirrorCells, p);
             if (m < 0 || mirrors[m].State == Flat) continue;

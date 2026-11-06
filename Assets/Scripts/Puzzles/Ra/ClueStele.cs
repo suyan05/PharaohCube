@@ -54,6 +54,11 @@ public class ClueStele : MonoBehaviour, IInteractable
     [Header("[추가] 밤: 손상된 글을 렌즈로 해독")]
     [SerializeField] private bool lensDecodeAtNight = true;
 
+    [Header("[추가] 순서 잠금 (비우면 처음부터 읽힘)")]
+    [Tooltip("이 플래그가 켜지기 전엔 '!'도 안 뜨고 읽히지도 않음 (호루스: 매가 안내하는 차례가 와야 읽힘)")]
+    [SerializeField] private string requiredFlag = "";
+    [SerializeField] private DialogueLine[] notYetLines = { new DialogueLine("나", "글자가 아직 희미하게 잠들어 있다... 지금은 읽히지 않아. 다른 곳부터 가 보자.") };
+
     private bool wasLit;
     private bool decoding;
 
@@ -156,7 +161,7 @@ public class ClueStele : MonoBehaviour, IInteractable
         if (lit && !wasLit) RevealSparkle();
         wasLit = lit;
 
-        bool show = valid && lit && !IsRead() && IsPlayerInRoom();
+        bool show = valid && lit && Unlocked() && !IsRead() && IsPlayerInRoom();
         if (!show)
         {
             newBubble.enabled = false;
@@ -182,6 +187,12 @@ public class ClueStele : MonoBehaviour, IInteractable
         {
             RaGlowFx.Spark(transform.position + new Vector3(0f, 0.5f + i * 0.08f, 0f), new Color(0.55f, 0.75f, 1f), sr.sortingLayerName, sr.sortingOrder + 1);
         }
+    }
+
+    // [추가] 순서 잠금이 풀렸는지 (requiredFlag가 비어 있으면 항상 풀림)
+    private bool Unlocked()
+    {
+        return string.IsNullOrEmpty(requiredFlag) || (GameManager.Instance != null && GameManager.Instance.HasFlag(requiredFlag));
     }
 
     private bool IsRead()
@@ -211,7 +222,7 @@ public class ClueStele : MonoBehaviour, IInteractable
     {
         if (decoding) return null;
         if (valid && panel.IsOpenFor(this)) return "E: 닫기";
-        if (!IsLitHere()) return "E: 살펴보기";
+        if (!IsLitHere() || !Unlocked()) return "E: 살펴보기";
         return "E: 비석 읽기";
     }
 
@@ -227,6 +238,13 @@ public class ClueStele : MonoBehaviour, IInteractable
                 return;
             }
             if (panel.ClosedFrame == Time.frameCount) return; // [추가] 방금 같은 E로 패널이 닫힘 -> 다시 열지 않음
+
+            // [추가] 순서가 아직 안 왔으면 못 읽음
+            if (!Unlocked())
+            {
+                if (!DialogueBox.IsOpen && DialogueBox.ClosedFrame != Time.frameCount) DialogueBox.Play(notYetLines);
+                return;
+            }
 
             // [추가] 어두우면 못 읽음
             if (!IsLitHere())
