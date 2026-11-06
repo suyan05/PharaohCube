@@ -7,8 +7,19 @@ using UnityEngine.Tilemaps;
 //   '.' 본당 바닥 (청금석, 가끔 금 별가루 / 금 간 돌)   'S' 행렬길 + 제단 고리 (금 별 상감)
 //   'a' 입구 전실 바닥 (모래빛 돌)   'D' 북문 자리 바닥   ' ' 빈칸
 //   매의 회랑은 여기 없음 -> 열릴 때 HorusHiddenGallery가 칠함 (처음엔 안 보이게)
+// [추가] 퍼즐 방 2개 (본당이 물건으로 막혀서 큰 퍼즐은 각자 방으로 뺌 - 라의 방처럼)
+//   해의 방 (H1 매의 거울): 본당 북서쪽 위. 바닥 x 0~9, y 18~26. 본당 북쪽 벽 (1~2, 16~17)이 문
+//   나일의 방 (H4 돌배 경주): 본당 동쪽. 바닥 x 25~36, y 0~9. 본당 동쪽 벽 (24, 2~3)이 문
 public static class HorusRoomMap
 {
+    public static readonly RectInt SunRoom = new RectInt(0, 18, 10, 9);   // x 0~9, y 18~26
+    public static readonly RectInt NileRoom = new RectInt(25, 0, 12, 10); // x 25~36, y 0~9
+    private static readonly Vector2Int[] Doors =
+    {
+        new Vector2Int(1, 16), new Vector2Int(2, 16), new Vector2Int(1, 17), new Vector2Int(2, 17),
+        new Vector2Int(24, 2), new Vector2Int(24, 3)
+    };
+
     public const int Left = -9;
     public const int Top = 17;
 
@@ -60,7 +71,34 @@ public static class HorusRoomMap
                 else if (c != ' ') ground.SetTile(cell, FloorFor(c, rng));
             }
         }
+        PaintRoom(ground, wall, SunRoom, rng);
+        PaintRoom(ground, wall, NileRoom, rng);
+        foreach (Vector2Int d in Doors) OpenDoor(ground, wall, d, rng);
         return ground;
+    }
+
+    // 방 하나: 바닥 + 둘레 벽 (북쪽은 벽 앞면 + 윗면 두 줄, 나머지는 윗면 한 줄)
+    private static void PaintRoom(Tilemap ground, Tilemap wall, RectInt room, System.Random rng)
+    {
+        for (int x = room.xMin - 1; x <= room.xMax; x++)
+        {
+            for (int y = room.yMin - 1; y <= room.yMax + 1; y++)
+            {
+                var cell = new Vector3Int(x, y, 0);
+                bool inside = x >= room.xMin && x < room.xMax && y >= room.yMin && y < room.yMax;
+                if (inside) ground.SetTile(cell, HallFloor(rng));
+                else if (y == room.yMax && x >= room.xMin && x < room.xMax) wall.SetTile(cell, WallFaceAt(x));
+                else if (wall.GetTile(cell) == null && ground.GetTile(cell) == null) wall.SetTile(cell, WallTop());
+            }
+        }
+    }
+
+    // 벽에 문 구멍 (벽 타일을 지우고 바닥을 깖)
+    private static void OpenDoor(Tilemap ground, Tilemap wall, Vector2Int d, System.Random rng)
+    {
+        var cell = new Vector3Int(d.x, d.y, 0);
+        wall.SetTile(cell, null);
+        ground.SetTile(cell, HorusTileArt.Get(HorusTileArt.FloorStar));
     }
 
     private static TileBase FloorFor(char c, System.Random rng)

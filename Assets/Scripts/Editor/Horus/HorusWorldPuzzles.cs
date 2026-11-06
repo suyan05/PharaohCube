@@ -9,6 +9,7 @@ using Object = UnityEngine.Object;
 // - H5 하늘의 고리: 제단 + HorusSkyRings (고리 4겹, 레버 4개는 실행 중에 생김)
 // - 예전 퍼즐 스크립트/화면(오버레이)은 지우지 않음. E로 화면을 여는 Station만 빼고 화면은 꺼 둠
 // - 큰 퍼즐 그림이 방 안에 그대로 보이던 문제(이질감) -> 방 안엔 작은 도트 소품만
+// - [수정] 본당이 물건으로 막혀서 H1은 '해의 방'(북서쪽), H4는 '나일의 방'(동쪽)으로 옮김 (HorusRoomMap.SunRoom / NileRoom)
 public static class HorusWorldPuzzles
 {
     private const string Obj = "Assets/image/Horus/Object/";
@@ -33,7 +34,8 @@ public static class HorusWorldPuzzles
     // ================= H1 =================
     private static void SunMirrors()
     {
-        GameObject h1 = Prepare("H1_MirrorWing", new Vector2(3.5f, 8.5f), Px("HO_EyeStand_Dust"), new Vector2(1.1f, 1.2f));
+        // 해의 방: 거울 격자 왼쪽 아래 = (0, 19). 매의 눈 = 격자 (3, 3) 칸
+        GameObject h1 = Prepare("H1_MirrorWing", new Vector2(3.5f, 22.5f), Px("HO_EyeStand_Dust"), new Vector2(1.1f, 1.2f));
         if (h1 == null) return;
         Remove<MirrorWingStation>(h1);
         HorusSunMirrors p = Add<HorusSunMirrors>(h1);
@@ -47,6 +49,8 @@ public static class HorusWorldPuzzles
         Ref(so, "mirrorFlat", Px("HO_Mirror_Flat"));
         Ref(so, "sunSprite", Px("HO_SunDisc"));
         Ref(so, "setStoneSprite", Px("HO_SetStone"));
+        Ref(so, "blockSprite", Px("HO_Column"));
+        HorusArtSetup.SetVector(so, "origin", new Vector2(0f, 19f));
         Str(so, "clearFlag", "F_HO_H1_DONE");
         so.ApplyModifiedPropertiesWithoutUndo();
         Hide("H1_WingOverlay");
@@ -62,7 +66,8 @@ public static class HorusWorldPuzzles
     private static void BoatRace()
     {
         // 세트의 붉은 봉인 그림(H4_02)을 작게 = 경주의 비석
-        GameObject h4 = Prepare("H4_StarPathLock", new Vector2(15.0f, 2.1f), HorusArtSetup.Art("H4/H4_02"), new Vector2(0.9f, 0.9f));
+        // 나일의 방: 경기장 왼쪽 아래 = (27, 1), 입구 = (27, 2). 비석은 경기장 왼쪽 빈 줄 (문에서 들어오는 길은 비움)
+        GameObject h4 = Prepare("H4_StarPathLock", new Vector2(25.9f, 6.2f), HorusArtSetup.Art("H4/H4_02"), new Vector2(0.9f, 0.9f));
         if (h4 == null) return;
         Remove<StarPathLockStation>(h4);
         Remove<HorusSealWalk>(h4);
@@ -75,6 +80,7 @@ public static class HorusWorldPuzzles
         Ref(so, "woodSprite", Px("HO_Boat_Wood"));
         Ref(so, "setSprite", Px("HO_Boat_Set"));
         Ref(so, "sealSprite", Px("HO_SetStone"));
+        HorusArtSetup.SetVector(so, "origin", new Vector2(27f, 1f));
         Str(so, "clearFlag", "F_HO_H4_DONE");
         so.ApplyModifiedPropertiesWithoutUndo();
         Hide("H4_PathOverlay");
@@ -124,8 +130,8 @@ public static class HorusWorldPuzzles
             SerializedProperty step = steps.GetArrayElementAtIndex(i);
             string flag = step.FindPropertyRelative("doneFlag").stringValue;
             SerializedProperty text = step.FindPropertyRelative("objective");
-            if (flag == "F_HO_H1_DONE") text.stringValue = "깃털로 서쪽 관측대를 닦고, 거울 석상을 돌려 해의 빛을 매의 눈에 모으자";
-            else if (flag == "F_HO_H4_DONE") text.stringValue = "매의 인장으로 남동쪽 경기장을 열고, 나무배 두 척을 별 자리까지 밀자";
+            if (flag == "F_HO_H1_DONE") text.stringValue = "북서쪽 '해의 방'에서 깃털로 관측대를 닦고, 거울을 돌려 해의 빛을 매의 눈에 모으자";
+            else if (flag == "F_HO_H4_DONE") text.stringValue = "동쪽 '나일의 방'에서 매의 인장으로 경기장을 열고, 나무배 두 척을 강 건너 별 자리로 밀자";
             else if (flag == "F_HO_H5_DONE") text.stringValue = "제단 둘레 레버로 하늘 고리를 돌려, 별이 떠오른 순서대로 북쪽 선에 세우자";
         }
         so.ApplyModifiedPropertiesWithoutUndo();

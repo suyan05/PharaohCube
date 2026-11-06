@@ -11,7 +11,10 @@ using UnityEngine;
 // 3. 호루스의 나무배(흰 돌색): 물에 못 들어감 / 세트의 돌배(붉은): 물 칸에 밀어 넣으면 가라앉아 그 칸이 땅이 됨
 // 4. 나무배 두 척을 별 자리 두 곳에 대면 승리 -> 별 조각 3 + 노트 5
 // 5. R: 한 수 되돌리기 (사람도 그 자리로) / 경기장 옆 비석 E: 처음부터
-// 판 데이터는 Rows (설계: 최소 15번 밀기, 세트의 돌배를 가라앉히지 않으면 못 품 - 컴퓨터로 확인함)
+// 판 데이터는 Rows (설계: 최소 9번 밀기, 세트의 돌배로 강에 다리를 놓지 않으면 못 품 - 컴퓨터로 확인함)
+// [수정] 너무 어려웠던 판(15번)을 쉽게: 강(물 한 줄)이 경기장을 가르고, 돌배 1척 = 다리 1개
+//        가라앉은 돌배 칸은 땅 그림으로 바뀌어서 사람도 배도 지나갈 수 있음 (처음 가라앉을 때 대사로 알려줌)
+// 경기장은 본당 동쪽 '나일의 방' 안 (HorusRoomMap.NileRoom)
 public class HorusBoatRace : PuzzleBase, IInteractable
 {
     // 위가 북쪽. 글자 하나 = 1칸. 왼쪽 아래 칸 = (Origin.x, Origin.y)
@@ -19,16 +22,16 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private static readonly string[] Rows =
     {
         "########",
-        "p..~~o.#",
-        "p.B.#..#",
-        "p..S#B.#",
-        "#.#..~.#",
-        "G...S~o#",
-        "#......#"
+        "#..~.o.#",
+        "#.B~...#",
+        "#..~.B.#",
+        "#.S~...#",
+        "G..~.o.#",
+        "#..~...#"
     };
 
     [Header("연결 (빌더가 채움)")]
-    [SerializeField] private Vector2 origin = new Vector2(16f, 0f);
+    [SerializeField] private Vector2 origin = new Vector2(27f, 1f);
     [SerializeField] private Sprite rockSprite, waterSprite, sunkSprite, socketSprite, woodSprite, setSprite, sealSprite;
 
     [Header("진행")]
@@ -52,7 +55,7 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private Transform root, player;
     private float holdTimer;
     private Vector2Int holdDir;
-    private bool sliding, done, toldRules;
+    private bool sliding, done, toldRules, toldBridge;
 
     private bool Unlocked => IsFlagOn(unlockedFlag);
     private bool Paused => DialogueBox.IsOpen || Cine.Running || HorusFocus.PanelOpen || ItemPopup.IsShowing;
@@ -162,8 +165,9 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     {
         if (toldRules) return;
         toldRules = true;
-        HorusWorld.Say("호루스와 세트의 '돌배 경주'... 나무배 두 척을 별 자리까지 밀어 보내면 되겠어.",
-            "붉은 배는 세트의 진짜 돌배. 물에 밀어 넣으면 가라앉겠지. (R: 한 수 되돌리기)");
+        HorusWorld.Say("호루스와 세트의 '돌배 경주'... 흰 나무배 두 척을 강 건너 금빛 별 자리 두 곳까지 밀어 보내면 돼.",
+            "강물은 사람도 배도 못 건너. 붉은 배는 세트의 진짜 돌배라 물에 밀어 넣으면 가라앉아 다리가 되겠지.",
+            "배는 몸을 대고 그 방향키를 꾹 누르면 한 칸씩 밀려. 당길 수는 없어. (R: 한 수 되돌리기 / 비석 E: 처음부터)");
     }
 
     // 배에 붙어서 그 방향으로 pushHold초 동안 밀면 한 칸
@@ -238,6 +242,9 @@ public class HorusBoatRace : PuzzleBase, IInteractable
             yield return null;
         }
         SetSunk(boat, cell, true);
+        if (toldBridge) yield break;
+        toldBridge = true;
+        HorusWorld.Say("세트의 돌배가 가라앉아 강 위에 다리가 됐다! 이제 그 위로 걸어서도, 배를 밀어서도 건널 수 있어.");
     }
 
     private void SetSunk(Boat boat, Vector2Int cell, bool sunk)

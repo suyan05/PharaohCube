@@ -23,7 +23,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
     [Header("연결 (빌더가 채움)")]
     [SerializeField] private SpriteRenderer eyeStand;
     [SerializeField] private Sprite dustySprite, cleanSprite, litSprite;
-    [SerializeField] private Sprite mirrorA, mirrorB, mirrorFlat, sunSprite, setStoneSprite;
+    [SerializeField] private Sprite mirrorA, mirrorB, mirrorFlat, sunSprite, setStoneSprite, blockSprite;
 
     [Header("진행")]
     [SerializeField] private string unlockedFlag = "F_HO_H1_UNLOCKED";
@@ -33,7 +33,8 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
     private static readonly Vector2Int Sun = new Vector2Int(-1, 6), SunDir = new Vector2Int(1, 0), Target = new Vector2Int(3, 3);
     private static readonly Vector2Int[] MirrorCells = { new Vector2Int(5, 6), new Vector2Int(1, 1), new Vector2Int(3, 0), new Vector2Int(1, 0), new Vector2Int(5, 1) };
     private static readonly Vector2Int[] SetStones = { new Vector2Int(4, 0), new Vector2Int(1, 5) };
-    private static readonly Vector2Int[] Blocks = { new Vector2Int(6, 5), new Vector2Int(7, 4), new Vector2Int(7, 5), new Vector2Int(7, 6), new Vector2Int(7, 0) }; // 비석 HS1, 북서/남서 기둥
+    // 빛을 막는 돌기둥 (예전 본당 비석/기둥 자리 그대로라 정답이 같음). [수정] 해의 방으로 옮기면서 실제 돌기둥 소품을 놓음
+    private static readonly Vector2Int[] Blocks = { new Vector2Int(6, 5), new Vector2Int(7, 4), new Vector2Int(7, 5), new Vector2Int(7, 6), new Vector2Int(7, 0) };
 
     private readonly List<HorusMirror> mirrors = new List<HorusMirror>();
     private LineRenderer beam;
@@ -76,6 +77,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
             mirrors.Add(m);
         }
         foreach (Vector2Int c in SetStones) HorusWorld.Prop(root, "H1_SetStone", setStoneSprite, World(c), 0.75f, new Vector2(0.6f, 0.4f));
+        foreach (Vector2Int c in Blocks) HorusWorld.Prop(root, "H1_StoneColumn", blockSprite, World(c), 0.7f, new Vector2(0.6f, 0.4f));
     }
 
     private LineRenderer BuildBeam()
