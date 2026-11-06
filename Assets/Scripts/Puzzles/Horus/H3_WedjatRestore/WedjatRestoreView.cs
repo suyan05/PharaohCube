@@ -142,7 +142,7 @@ public class WedjatRestoreView : MonoBehaviour
         {
             pieceInners[index] = CreateRect(rt, "Inner", Vector2.zero, def.size - new Vector2(8, 8), paper);
             CreateRect(rt, "Notch", new Vector2(0, def.size.y / 2f - 8f), new Vector2(18, 10), lapis);
-            CreateText(rt, def.fraction, 18, Vector2.zero, def.size, borderColor);
+            CreateText(rt, "", 18, Vector2.zero, def.size, borderColor); // [수정] 난이도: 몫(분수)을 조각에 쓰지 않음 (비석의 감각 단서로 추리)
         }
 
         pieceBorders[index] = border;
@@ -157,7 +157,7 @@ public class WedjatRestoreView : MonoBehaviour
         piece.preserveAspect = true;
         piece.color = Color.white;
         Vector2 size = SlotSize(index);
-        CreateText(piece.rectTransform, def.fraction, 22, new Vector2(0, -size.y / 2f - 14f), new Vector2(160, 30), paper);
+        CreateText(piece.rectTransform, "", 22, new Vector2(0, -size.y / 2f - 14f), new Vector2(160, 30), paper); // [수정] 몫 표시 숨김
     }
 
     // ================= 그림 배치 =================

@@ -107,8 +107,9 @@ public static class HorusRoomSetup
             if (root == null) continue;
             foreach (SpriteRenderer sr in root.GetComponentsInChildren<SpriteRenderer>(true)) sr.sortingLayerName = layer;
         }
-        GameObject floorPlate = HorusArtSetup.Find("H4_StarPathLock"); // 바닥에 깔린 별판
-        if (floorPlate != null) SetHint(floorPlate, YSortHint.Mode.AlwaysBelow);
+        // [수정] H4는 이제 바닥 별판이 아니라 서 있는 '경주의 비석' -> 다른 물건처럼 발밑 높이로 정렬 (HorusWorldPuzzles)
+        GameObject raceStone = HorusArtSetup.Find("H4_StarPathLock");
+        if (raceStone != null) SetHint(raceStone, YSortHint.Mode.Sort);
     }
 
     // 목표 안내: 바닥 길 표시는 끔 (매 길잡이가 안내). 목표 문구 HUD는 그대로
@@ -129,7 +130,10 @@ public static class HorusRoomSetup
         SetClearFlag<MirrorWingPuzzle>("F_HO_H1_DONE");
         SetClearFlag<WedjatRestorePuzzle>("F_HO_H3_DONE");
         SetClearFlag<StarPathLockPuzzle>("F_HO_H4_DONE");
-        SetClearFlag<HorusSealWalk>("F_HO_H4_DONE"); // H4는 이제 이 퍼즐로 품 (HorusWorldPuzzles)
+        SetClearFlag<HorusSealWalk>("F_HO_H4_DONE");
+        SetClearFlag<HorusSunMirrors>("F_HO_H1_DONE"); // 개편된 퍼즐들 (HorusWorldPuzzles)
+        SetClearFlag<HorusBoatRace>("F_HO_H4_DONE");
+        SetClearFlag<HorusSkyRings>("F_HO_H5_DONE");
         SetClearFlag<SkyAlignPuzzle>("F_HO_H5_DONE");
     }
 

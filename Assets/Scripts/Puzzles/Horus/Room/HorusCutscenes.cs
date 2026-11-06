@@ -33,11 +33,11 @@ public static class HorusCutscenes
     private static readonly Dictionary<string, Reaction> Reactions = new Dictionary<string, Reaction>
     {
         { "F_HO_CHART_1", new Reaction("메스케티우... 지지 않는 별이 다시 눈을 떴다. 반쪽 날개가 너를 기다린다.", true) },
-        { "F_HO_H1_DONE", new Reaction("날개는 거울 속에서 온전해지는 법. 빛의 조각을 하늘로 돌려보내라.", true) },
+        { "F_HO_H1_DONE", new Reaction("해의 빛이 다시 나의 눈에 닿았다... 빛의 조각을 하늘로 돌려보내라.", true) },
         { "F_HO_CHART_2", new Reaction("두 번째 별이 떠올랐다. 찢긴 것은 은빛으로 꿰매어라.", true) },
         { "F_HO_H3_DONE", new Reaction("보아라, 나의 눈이 다시 형태를 얻었다. 달의 눈을 하늘 앞에 걸어라.", true) },
         { "F_HO_CHART_3", new Reaction("세 번째 별이 뒤따른다. 이제 세트의 붉은 봉인을 깨뜨려라.", true) },
-        { "F_HO_H4_DONE", new Reaction("매는 동쪽에서 떠올라 중심에 앉는다. 마지막 조각을 하늘에 바쳐라.", true) },
+        { "F_HO_H4_DONE", new Reaction("세트의 돌배는 강바닥에 잠들었다. 꾀로 이긴 자가 강을 건넌다. 마지막 조각을 하늘에 바쳐라.", true) },
         { "F_HO_CHART_4", new Reaction("네 별이 모였다. 제단으로 오라, 인간이여. 하늘의 순서를 증명하라.", true) },
         { LapisAll, new Reaction("밤하늘의 조각을 모두 모았구나... 매가 너를 인정한다.", false) }
     };
@@ -202,7 +202,7 @@ public static class HorusCutscenes
         if (d.Falcon == null) yield break;
         Vector3 sky = new Vector3(23f, 16.5f, 0f);
         CineCamera.Focus(sky + new Vector3(-2.5f, -1.5f, 0f));
-        CineCamera.Zoom(4f, 0.2f);
+        CineCamera.Zoom(HorusWorld.SafeZoom(sky + new Vector3(-2.5f, -1.5f, 0f), 4f), 0.2f);
         yield return Cine.Wait(0.45f);
         GameAudio.Play("sfx_wind_gust", 0.8f, 0.9f);
         StartCoroutineSafe(d, ScreenTintUI.Flash(new Color(1f, 0.9f, 0.6f, 0.3f), 0.03f, 0.05f, 0.35f));
@@ -239,7 +239,8 @@ public static class HorusCutscenes
         if (d.Falcon == null) yield break;
         CineCamera.Zoom(5f, 0.8f);
         yield return d.Falcon.FlyToCurrent(true);
-        yield return Cine.Wait(0.5f);
+        HorusWorld.SafeFocus(d.Falcon.Position, 4.2f);
+        yield return Cine.Wait(0.7f);
     }
 
     private static void StartCoroutineSafe(HorusDirector d, IEnumerator routine)
@@ -268,8 +269,8 @@ public static class HorusCutscenes
         {
             CineCamera.Zoom(6f);
             yield return d.Falcon.FlyToCurrent(true);
-            CineCamera.Zoom(4.5f);
-            yield return Cine.Wait(0.3f);
+            HorusWorld.SafeFocus(d.Falcon.Position, 4.2f); // [수정] 맵 끝(동쪽 벽 성도판 등)에서도 매가 화면 안쪽에 오게 가까이
+            yield return Cine.Wait(0.5f);
         }
         yield return HorusVoice(d, r.line);
         CineCamera.Release();

@@ -133,12 +133,14 @@ public static class HorusRoomObjects
     // ================= 퍼즐 단서 비석 (옆 별 횃불을 켜야 읽힘) =================
     private static void BuildPuzzleSteles(Transform root, WallTorch t1, WallTorch t2, WallTorch t3)
     {
-        Stele(root, "OBJ_HS1_ClueStele", new Vector2(6.8f, 10.0f), t1, 11, "S1", "반쪽 날개", "H1/H1_01",
-            "반쪽 날개로는 날 수 없다. 몸통을 거울 삼아 남은 반쪽을 똑같이 그려라.");
+        // [수정] H1이 '매의 거울(빛 반사)'로 바뀌어서 단서도 바꿈
+        Stele(root, "OBJ_HS1_ClueStele", new Vector2(6.8f, 10.0f), t1, 11, "S1", "해의 눈", "H1/H1_01",
+            "호루스의 오른 눈은 해다. 해의 빛은 곧게 날아가고, 매의 거울만이 그 길을 꺾는다. 세트의 붉은 돌은 빛을 삼킨다. 빛은 제 길을 한 번 가로질러야 매의 눈에 닿는다.");
         Stele(root, "OBJ_HS2_ClueStele", new Vector2(17.2f, 10.0f), t2, 12, "S2", "별의 길", "H2/H2_05",
             "별은 한 번 걸은 길을 다시 걷지 않는다. 선이 홀수 개 모이는 별에서 시작해, 그런 별에서 끝난다.");
+        // [수정] H3 난이도: 잇는 순서(큰 몫부터) + 감각으로 몫을 알아내야 함 (실제 우자트 분수 신화)
         Stele(root, "OBJ_HS3_ClueStele", new Vector2(9.2f, 4.0f), t3, 13, "S3", "찢긴 눈", "H3/H3_02",
-            "세트는 아들의 눈을 여섯 조각으로 찢었다. 눈썹, 눈동자, 흰자 둘, 나선 꼬리, 눈물선. 조각은 은빛 실로만 다시 이어진다.");
+            "세트는 아들의 눈을 여섯 몫으로 찢었다. 냄새는 2분의 1, 보는 것은 4분의 1, 생각은 8분의 1, 듣는 것은 16분의 1, 맛은 32분의 1, 닿는 것은 64분의 1. 토트는 가장 큰 몫부터 이었다. 코에 가까운 흰자는 냄새를, 귀에 가까운 흰자는 소리를 맡고, 눈썹 아래에서 생각이 자란다. 싹 트는 나선은 맛, 땅을 딛는 눈물선은 닿음이다.");
     }
 
     private static void Stele(Transform root, string objName, Vector2 pos, WallTorch torch, int noteId,

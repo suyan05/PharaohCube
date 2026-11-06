@@ -17,9 +17,11 @@ public static class HorusGalleryBuild
     public static void Build(Transform root)
     {
         Sprite falcon = HorusArtSetup.Art("H1/H1_03");
-        // [수정] 제단 둘레를 별이 돌게 되면서(H5 HorusSkyRing) 별 궤도와 겹치지 않게 북쪽 벽 가까이로
-        GameObject left = Statue(root, "OBJ_H12_FalconStatue_L", new Vector2(9.2f, 14.4f), falcon);
-        Statue(root, "OBJ_H12_FalconStatue_R", new Vector2(14.8f, 14.4f), falcon);
+        Sprite statueArt = HorusArtSetup.Pixel(ObjectArt + "HO_FalconStatue.png"); // [수정] 매 석상 도트 (받침 위에 앉은 매)
+        Sprite s = statueArt != null ? statueArt : falcon;
+        // 제단 둘레(H5 레버/고리)와 겹치지 않게 북쪽 벽 가까이
+        GameObject left = Statue(root, "OBJ_H12_FalconStatue_L", new Vector2(9.2f, 14.4f), s);
+        Statue(root, "OBJ_H12_FalconStatue_R", new Vector2(14.8f, 14.4f), s);
         GameObject crack = WallCrack(root);
         HorusHiddenGallery gallery = Gallery(left.transform, crack, falcon);
         HorusFalconStatue statue = left.AddComponent<HorusFalconStatue>();
@@ -34,8 +36,10 @@ public static class HorusGalleryBuild
     private static GameObject Statue(Transform root, string objName, Vector2 pos, Sprite art)
     {
         GameObject go = HorusRoomObjects.Shape(root, objName, pos, art != null ? art : HorusRoomObjects.Square, Vector2.one, Stone);
-        if (art != null) HorusWorldArt.FitObject(go, art, new Vector2(1.4f, 1f), Stone);
-        go.AddComponent<BoxCollider2D>();
+        if (art != null) HorusWorldArt.FitObject(go, art, new Vector2(1.0f, 1.4f), Color.white);
+        HorusWorld.AddBox(go, new Vector2(0.9f, 0.45f), go.transform.localScale.x, false); // 발밑만 막음 (뒤로 지나가면 가려짐)
+        BoxCollider2D reach = go.AddComponent<BoxCollider2D>();
+        reach.isTrigger = true; // E가 닿는 조사 상자 (그림 전체)
         return go;
     }
 
@@ -97,6 +101,7 @@ public static class HorusGalleryBuild
         HorusArtSetup.Prop(so, "contents").objectReferenceValue = contents;
         HorusArtSetup.Prop(so, "wallCrack").objectReferenceValue = crack;
         HorusArtSetup.Prop(so, "statue").objectReferenceValue = statue;
+        HorusArtSetup.Prop(so, "eyeOffset").vector3Value = new Vector3(0.05f, 0.5f, 0f); // 도트 석상의 눈 자리
         HorusArtSetup.Prop(so, "falconSprite").objectReferenceValue = falcon;
         HorusArtSetup.Prop(so, "emoteSprite").objectReferenceValue = HorusArtSetup.Art(Bubble);
         so.ApplyModifiedPropertiesWithoutUndo();

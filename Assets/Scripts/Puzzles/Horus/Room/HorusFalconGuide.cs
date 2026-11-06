@@ -24,6 +24,10 @@ public class HorusFalconGuide : MonoBehaviour
     [SerializeField] private float arcHeight = 1.6f;
     [SerializeField] private Color glowColor = new Color(1f, 0.82f, 0.4f, 0.55f);
 
+    [Header("도착하면 사라짐")]
+    [Tooltip("플레이어가 매가 앉은 목표에 이만큼 가까워지면 매가 사라짐 (다음 목표로 바뀌면 다시 나타남)")]
+    [SerializeField] private float reachRadius = 2.2f;
+
     private SpriteRenderer body, shadow;
     private Transform root;
     private Vector3 baseScale;
@@ -31,6 +35,10 @@ public class HorusFalconGuide : MonoBehaviour
     private bool flying, shown;
     private float idleTimer;
     private Image edgeIcon;
+    private SpriteRenderer[] parts;
+    private UnityEngine.Rendering.Universal.Light2D glowLight;
+    private SpriteRenderer reachedTarget;
+    private float alpha = 1f;
 
     public bool Flying => flying;
     public Vector3 Position => root != null ? root.position : transform.position;
@@ -63,6 +71,8 @@ public class HorusFalconGuide : MonoBehaviour
         RaGlowFx.PointLight(root, Vector3.zero, new Color(1f, 0.85f, 0.5f), 2.2f, 0.7f);
         shadow = HorusFx.Spawn("Shadow", FxSprites.Soft, root.position, size * 0.9f, new Color(0f, 0f, 0f, 0.45f), HorusFx.Floor);
         shadow.transform.SetParent(transform, true);
+        parts = root.GetComponentsInChildren<SpriteRenderer>(true);
+        glowLight = root.GetComponentInChildren<UnityEngine.Rendering.Universal.Light2D>(true);
     }
 
     private void BuildEdge()
@@ -99,7 +109,26 @@ public class HorusFalconGuide : MonoBehaviour
         // 연출 중엔 연출이 매를 직접 움직임 (제단 위에 앉혀 둔 걸 마음대로 데려가지 않게)
         if (!flying && !Cine.Running && target != null && target != perchedOn && !HorusFocus.PanelOpen) StartCoroutine(FlyToTarget(target, false));
         if (!flying) Idle();
+        UpdateReach(target);
         UpdateEdge();
+    }
+
+    // [추가] 플레이어가 매가 앉은 목표에 도착하면 매가 스르륵 사라짐 (목표 그림과 겹쳐 보이던 문제)
+    // 다음 목표로 날아갈 때 다시 나타남
+    private void UpdateReach(SpriteRenderer target)
+    {
+        Transform p = CineActor.Player();
+        if (!flying && perchedOn != null && perchedOn == target && p != null && Vector2.Distance(p.position, perchedOn.bounds.center) <= reachRadius) reachedTarget = perchedOn;
+        bool hide = !flying && reachedTarget != null && reachedTarget == perchedOn && !Cine.Running;
+        alpha = Mathf.MoveTowards(alpha, hide ? 0f : 1f, Time.deltaTime * 2.5f);
+        foreach (SpriteRenderer sr in parts)
+        {
+            if (sr == null) continue;
+            Color c = sr.color;
+            sr.color = new Color(c.r, c.g, c.b, sr == body ? alpha : glowColor.a * alpha);
+        }
+        if (shadow != null) shadow.color = new Color(0f, 0f, 0f, 0.45f * alpha);
+        if (glowLight != null) glowLight.intensity = 0.7f * alpha;
     }
 
     // 앉아 있을 때: 살짝 숨 쉬듯 + 가끔 날개 한 번 퍼덕
@@ -250,7 +279,7 @@ public class HorusFalconGuide : MonoBehaviour
         if (cam == null || edgeIcon == null) return;
         Vector3 vp = cam.WorldToViewportPoint(root.position);
         bool inside = vp.x > 0.03f && vp.x < 0.97f && vp.y > 0.03f && vp.y < 0.97f;
-        bool show = !inside && !HorusFocus.PanelOpen;
+        bool show = !inside && !HorusFocus.PanelOpen && alpha > 0.5f;
         edgeIcon.enabled = show;
         if (!show) return;
         Vector2 center = new Vector2(Screen.width, Screen.height) * 0.5f;
