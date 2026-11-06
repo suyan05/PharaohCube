@@ -2,7 +2,9 @@ using System.Collections;
 using UnityEngine;
 
 // 허브 진행 상태 (씬 시작 때 한 번 확인)
-// - 메인을 깼으면(F_SOBEK_MAIN_DONE): 큰 문 앞에 플레이어를 두고, 신전의 물이 빠지는 연출 1번 -> 아누비스 문 열림
+// - 처음 들어오면: 케프리·나 대사로 방의 목표(부적 4개 -> 소베크의 입)와 물에 잠긴 수위계 기둥을 알려줌
+// - 메인을 깼으면(F_SOBEK_MAIN_DONE): 큰 문 앞에 플레이어를 두고, 신전의 물이 빠지는 연출 1번
+//   -> 수로 바닥(단서 2)·남은 웅덩이(악어)·중앙 홀로 가는 출구가 드러남
 // - 다시 들어오면 연출 없이 바로 물 빠진 상태
 // 붙이는 곳: 허브 씬의 SobekHub 오브젝트
 public class SobekHubState : MonoBehaviour
@@ -23,7 +25,20 @@ public class SobekHubState : MonoBehaviour
     [Range(0.5f, 6f)] [SerializeField] private float drainTime = 3f;
     [SerializeField] private CameraFollow2D cameraFollow;
     [TextArea(1, 2)]
-    [SerializeField] private string drainMessage = "신전의 물이 빠진다... 물 밑에 숨어 있던 아누비스의 문이 드러났다.";
+    [SerializeField] private string drainMessage = "신전의 물이 빠진다… 물 밑에 잠겨 있던 수로 바닥과 수위계 기둥이 드러났다.";
+
+    [Header("대사 (이름, 글 짝)")]
+    [SerializeField] private string[] introLines =
+    {
+        SobekStory.Khepri, "여기는 소베크의 신전, 셰데트야. 물이 신전 한가운데까지 차 있어.",
+        SobekStory.Me, "벽마다 악어 부조… 저 큰 문은 악어 입 모양이다. 홈이 네 개 비어 있다.",
+        SobekStory.Khepri, "네 개의 시험을 지나면 부적을 줄 거야. 비석을 먼저 읽어 봐. 시험의 힌트가 새겨져 있어.",
+    };
+    [SerializeField] private string[] drainedLines =
+    {
+        SobekStory.Khepri, "물이 빠졌어! 수로 바닥이 드러났고… 수위계 기둥에도 이제 손이 닿겠다.",
+        SobekStory.Khepri, "형판은 얻었어. 숨은 것을 더 찾고 싶으면 둘러보고, 다 됐으면 남쪽 출구로 중앙 홀에 돌아가자.",
+    };
 
     private static bool HasFlag(string f) => GameManager.Instance != null && GameManager.Instance.HasFlag(f);
 
@@ -33,7 +48,11 @@ public class SobekHubState : MonoBehaviour
 
         bool done = HasFlag(SobekIds.FlagMainDone);
         SetDrained(false, 1f);
-        if (!done) return;
+        if (!done)
+        {
+            if (!HasFlag(SobekIds.FlagHubIntro)) StartCoroutine(IntroRoutine());
+            return;
+        }
 
         if (returnSpawn != null) MovePlayer(returnSpawn.position);
         if (HasFlag(SobekIds.FlagDrainPlayed)) SetDrained(true, 0f);
@@ -54,7 +73,16 @@ public class SobekHubState : MonoBehaviour
         SetDrained(true, 0f);
         if (GameManager.Instance != null) GameManager.Instance.SetFlag(SobekIds.FlagDrainPlayed);
         PlayerLock.Unlock(this);
-        Debug.Log("[SobekHubState] 물 빠짐 -> 아누비스 문 열림", this);
+        Debug.Log("[SobekHubState] 물 빠짐 -> 수로 바닥·악어·출구 열림", this);
+        yield return new WaitForSeconds(0.3f);
+        SobekStory.Say(drainedLines);
+    }
+
+    private IEnumerator IntroRoutine()
+    {
+        yield return new WaitForSeconds(0.6f);
+        SobekStory.SetFlag(SobekIds.FlagHubIntro);
+        SobekStory.Say(introLines);
     }
 
     private void SetDrained(bool drained, float alpha)

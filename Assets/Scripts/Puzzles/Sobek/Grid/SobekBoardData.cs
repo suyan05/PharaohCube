@@ -15,7 +15,8 @@ public class SobekBoardData : ScriptableObject
     {
         [Tooltip("섬 가운데 칸 (회전 발판이 보통 여기)")]
         public Vector2Int center;
-        public bool north, east, south, west;
+        [Tooltip("방향별 팔 길이 (0 = 팔 없음, 최대 3칸)")]
+        [Range(0, 3)] public int north, east, south, west;
     }
 
     [Serializable]
@@ -150,8 +151,7 @@ public class SobekBoardData : ScriptableObject
         foreach (Vector2Int e in eggs) spec.Eggs.Add(C(e));
         foreach (IslandDef i in islands)
         {
-            int arms = (i.north ? 1 : 0) | (i.east ? 2 : 0) | (i.south ? 4 : 0) | (i.west ? 8 : 0);
-            spec.Islands.Add(new SobekBoardSpec.Island { Center = C(i.center), Arms = arms });
+            spec.Islands.Add(new SobekBoardSpec.Island { Center = C(i.center), Arm = new[] { i.north, i.east, i.south, i.west } });
         }
         foreach (PlateDef p in plates)
         {

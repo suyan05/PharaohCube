@@ -12,36 +12,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb1f23479baf8c94aab6040e7d47f144, type: 3}
   m_Name: SobekBoard_MainA_Flood
   m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
-  displayName: "\uC170\uB370\uD2B8 \uC2E0\uC804 \xB7 \uBC94\uB78C\uAE30"
+  displayName: "\uC170\uB370\uD2B8 \uC2E0\uC804 1 \xB7 \uBC94\uB78C\uAE30"
   intro: "\uBB3C\uC774 \uB192\uB2E4. \uBB3C \uBC1C\uD310\uC73C\uB85C \uBB3C\uC744
     \uBE7C\uBA74 \uB514\uB524\uB3CC\uC774 \uB4DC\uB7EC\uB09C\uB2E4."
-  map: '#############
+  map: '###############
 
-    #~~~....~~~~#
+    #~~~....~~~~###
 
-    #~~~....~~~~#
+    #~~~....~~~~###
 
-    #~~~~s..~~~~#
+    #~~~~s..~~~~###
 
-    #...~s~~~~~~#
+    #...~s~~~~~~###
 
-    #...~..~~~.~#
+    #...~..~~~.~###
 
-    #...~..~~~.~#
+    #...~..~~~.~###
 
-    #...~..~~~~~#
+    #...~..~~~.~###
 
-    #############'
+    ##########.####
+
+    #########..ss.#
+
+    ###############'
   dryPits: 0
   start: {x: 1, y: 7}
   entrance: {x: 1, y: 7}
-  goal: {x: 10, y: 6}
+  goal: {x: 13, y: 9}
   goalKind: 1
   allowExit: 0
   levelCount: 2
   startLevel: 1
   useTerraces: 0
   eggs:
+  - {x: 3, y: 6}
+  - {x: 5, y: 7}
   - {x: 2, y: 5}
   - {x: 2, y: 6}
   islands:
@@ -63,6 +69,14 @@ MonoBehaviour:
     kind: 2
     bridgeId: 
     spins: []
+  - cell: {x: 10, y: 8}
+    kind: 2
+    bridgeId: 
+    spins: []
+  - cell: {x: 9, y: 9}
+    kind: 2
+    bridgeId: 
+    spins: []
   - cell: {x: 10, y: 3}
     kind: 0
     bridgeId: 
@@ -79,7 +93,5 @@ MonoBehaviour:
   rewardItemId: 
   clearFlag: F_SOBEK_MAIN_A_DONE
   timeLimit: 300
-  hintAfterResets: 3
-  hint: "\uBB3C\uC744 \uBE7C\uAE30 \uC804\uC5D0 \uC54C\uC744 \uB514\uB524\uB3CC \uCABD\uC73C\uB85C
-    \uBC00\uBA74 \uBE60\uC9C4\uB2E4. \uB2E4\uB9AC X\uB294 \uB450 \uCE78\uC774\uB77C
-    \uB3CC\uC544\uC11C \uBC00 \uC218 \uC788\uB2E4."
+  hintAfterResets: 0
+  hint: 

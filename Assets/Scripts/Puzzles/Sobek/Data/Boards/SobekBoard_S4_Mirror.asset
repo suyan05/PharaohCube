@@ -13,44 +13,67 @@ MonoBehaviour:
   m_Name: SobekBoard_S4_Mirror
   m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
   displayName: "S4 \uB450 \uAC1C\uC758 \uC218\uBA74"
-  intro: "\uAC70 \uBC1C\uD310\uC744 \uBC1F\uC73C\uBA74 \uB124 \uC790\uB9AC\uB294
-    \uADF8\uB300\uB85C, \uBC29\uC774 \uC88C\uC6B0\uB85C \uB4A4\uC9D1\uD78C\uB2E4."
-  map: '#########
+  intro: "\uAC70\uC6B8 \uBC1C\uD310\uC744 \uBC1F\uC73C\uBA74 \uB124 \uC790\uB9AC\uB294
+    \uADF8\uB300\uB85C, \uBC29\uC774 \uAC00\uC6B4\uB370 \uCD95\uC744 \uAE30\uC900\uC73C\uB85C
+    \uC88C\uC6B0\uB85C \uB4A4\uC9D1\uD78C\uB2E4. \uB3CC \uC545\uC5B4\uC54C\uC774
+    \uAE38\uC744 \uB9C9\uB294\uB2E4."
+  map: '##~.#.###~#~#
 
-    ..#.....#
+    #.....#~~#..#
 
-    #....##.#
+    ......####..#
 
-    #....#.##
+    ~.###.#..#..#
 
-    #...#.#.#
+    .........#.##
 
-    #########'
+    ...~~.~..~.#~
+
+    #..~#~##.#..#
+
+    ....#~#.....#
+
+    #.#~##~##.#~~'
   dryPits: 0
-  start: {x: 1, y: 1}
-  entrance: {x: -1, y: 1}
-  goal: {x: 7, y: 4}
+  start: {x: 0, y: 7}
+  entrance: {x: -1, y: 7}
+  goal: {x: 11, y: 1}
   goalKind: 0
   allowExit: 1
   levelCount: 1
   startLevel: 0
   useTerraces: 0
-  eggs: []
+  eggs:
+  - {x: 10, y: 6}
+  - {x: 4, y: 4}
   islands: []
   plates:
   - cell: {x: 1, y: 4}
+    kind: 1
+    bridgeId: X
+    spins: []
+  - cell: {x: 1, y: 6}
     kind: 3
     bridgeId: 
     spins: []
-  - cell: {x: 1, y: 2}
+  - cell: {x: 12, y: 1}
     kind: 3
     bridgeId: 
     spins: []
-  bridges: []
+  - cell: {x: 7, y: 6}
+    kind: 3
+    bridgeId: 
+    spins: []
+  - cell: {x: 7, y: 3}
+    kind: 3
+    bridgeId: 
+    spins: []
+  bridges:
+  - cell: {x: 10, y: 4}
+    id: X
   rewardItemId: ITEM_SOBEK_AMULET_MIRROR
   clearFlag: F_SOBEK_S4_CLEAR
   timeLimit: 0
-  hintAfterResets: 3
-  hint: "\uAC70\uC6B8 \uC138\uACC4\uC5D0\uC11C \uBCF4\uC774\uB294 \uBAA9\uD45C\uB294
-    \uAC00\uC9DC. \uC9C4\uC9DC \uBAA9\uD45C\uB294 \uBC18\uB300\uCABD \uAC70\uC6B8
-    \uBC1C\uD310 \uBC11\uC5D0 \uC788\uB2E4."
+  hintAfterResets: 6
+  hint: "\uB4A4\uC9D1\uD78C \uB4A4 \uB0B4\uAC00 \uC124 \uC790\uB9AC\uAC00 \uBE44\uC5B4
+    \uC788\uC5B4\uC57C \uD55C\uB2E4."

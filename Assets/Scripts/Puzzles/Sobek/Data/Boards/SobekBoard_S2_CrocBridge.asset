@@ -16,50 +16,60 @@ MonoBehaviour:
   intro: "\uAE00\uC790 \uBC1C\uD310\uC5D0 \uB204\uAC00 \uC62C\uB77C\uAC00 \uC788\uB294
     \uB3D9\uC548\uB9CC \uAC19\uC740 \uAE00\uC790\uC758 \uC545\uC5B4 \uB2E4\uB9AC\uAC00
     \uB5A0 \uC788\uB2E4. \uB3CC \uC545\uC5B4\uC54C\uC740 \uBC00\uAE30\uB9CC \uB41C\uB2E4."
-  map: '..~...~..
+  map: '...~...~..~..
 
-    ..~...~..
+    ...~...~..~..
 
-    ..~...~..
+    ...~...~..~..
 
-    ..~...~..
+    ...~...~..~..
 
-    ..~...~..
+    ...~...~..~..
 
-    ..~...~..
+    ...~...~..~..
 
-    ..~...~..'
+    ...~...~..~..
+
+    ...~...~..~..
+
+    ...~...~..~..'
   dryPits: 0
-  start: {x: 1, y: 6}
-  entrance: {x: 1, y: 7}
-  goal: {x: 8, y: 4}
+  start: {x: 1, y: 8}
+  entrance: {x: 1, y: 9}
+  goal: {x: 12, y: 1}
   goalKind: 0
   allowExit: 1
   levelCount: 1
   startLevel: 0
   useTerraces: 0
   eggs:
+  - {x: 2, y: 6}
+  - {x: 2, y: 2}
   - {x: 0, y: 2}
-  - {x: 1, y: 4}
   islands: []
   plates:
-  - cell: {x: 0, y: 0}
+  - cell: {x: 0, y: 8}
     kind: 1
     bridgeId: X
     spins: []
-  - cell: {x: 4, y: 1}
+  - cell: {x: 6, y: 7}
     kind: 1
     bridgeId: Y
     spins: []
+  - cell: {x: 9, y: 3}
+    kind: 1
+    bridgeId: Z
+    spins: []
   bridges:
-  - cell: {x: 2, y: 2}
+  - cell: {x: 3, y: 2}
     id: X
-  - cell: {x: 6, y: 4}
+  - cell: {x: 7, y: 3}
     id: Y
+  - cell: {x: 10, y: 7}
+    id: Z
   rewardItemId: ITEM_SOBEK_AMULET_LIFT
   clearFlag: F_SOBEK_S2_CLEAR
   timeLimit: 0
-  hintAfterResets: 3
-  hint: "\uC54C \uD558\uB098\uB294 X \uBC1C\uD310\uC5D0 \uC62C\uB824 \uB450\uACE0,
-    \uB2E4\uB978 \uC54C\uC744 \uB2E4\uB9AC X \uB108\uBA38\uB85C \uBC00\uC5B4 Y \uBC1C\uD310\uC5D0
-    \uC62C\uB9AC\uC790."
+  hintAfterResets: 6
+  hint: "\uBCBD\uC5D0 \uBD99\uC778 \uC54C\uC740 \uB2E4\uC2DC \uAEBC\uB0BC \uC218
+    \uC5C6\uB2E4."

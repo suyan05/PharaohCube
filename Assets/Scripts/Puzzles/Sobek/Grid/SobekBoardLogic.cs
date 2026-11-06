@@ -7,6 +7,7 @@ using System.Text;
 // 칸 문자: '#' 벽, '.' 땅(가장 높음), '0'~'2' 높이가 있는 땅, '~' 물(건기는 구덩이), 's' 디딤돌(높이 0),
 //          'a' 계단 0-1, 'b' 계단 1-2, 'F' 뗏목(물 높이를 따라 뜸)
 // 발판 4종: 회전(섬 돌리기) / 승강(같은 글자 다리 올리기) / 수위(물 높이 바꾸기) / 거울(방 좌우 반전)
+// v2: 섬 팔 길이(1~3), 섬 위의 알은 섬과 함께 돎, 되돌리기용 스냅샷, 막힘 판정(살아 있는 상태 집합)
 
 public enum SobekPlateKind { Rotate, Lift, Water, Mirror }
 
@@ -38,13 +39,13 @@ public sealed class SobekBoardSpec
     public List<Bridge> Bridges = new List<Bridge>();
     public int LevelCount = 1;   // 수위 단계 수 (1이면 수위 없음)
     public int StartLevel;
-    public bool UseTerraces;     // 높이가 다른 땅은 계단으로만 오감 (S3)
+    public bool UseTerraces;     // 높이가 다른 땅은 계단으로만 오감
     public bool AllowExit = true; // 판 밖으로 걸어 나가면 퍼즐에서 나감
 
     public sealed class Island
     {
         public SobekCell Center;
-        public int Arms; // 비트: 1 북, 2 동, 4 남, 8 서
+        public int[] Arm = new int[4]; // 방향별 팔 길이 (0 북, 1 동, 2 남, 3 서), 0~3
     }
 
     public sealed class Plate
@@ -83,13 +84,39 @@ public sealed class SobekBoardLogic
         public SobekCell EggFrom;
         public SobekCell EggTo;
         public int SunkEgg;           // 가라앉은 알 번호 (-1 없음)
+        public SobekCell SunkAt;      // 가라앉은 자리
         public bool HasPlate;
         public SobekPlateKind PlateKind; // 밟은 발판 (회전/수위/거울만 기록, 승강은 상태로 판단)
+        public int PlateIndex;
+        public int LevelBefore;
+    }
+
+    // 되돌리기·정답 탐색용 상태 사본
+    public struct Snap
+    {
+        public SobekCell Player;
+        public SobekCell[] Eggs;
+        public int[] Rots;
+        public int Level;
+        public bool Mirror;
+
+        public string Key()
+        {
+            var sb = new StringBuilder(32);
+            sb.Append(Player.X).Append(',').Append(Player.Y).Append('|');
+            var sorted = (SobekCell[])Eggs.Clone();
+            Array.Sort(sorted, (a, b) => a.X != b.X ? a.X - b.X : a.Y - b.Y);
+            foreach (var e in sorted) sb.Append(e.X).Append(',').Append(e.Y).Append(';');
+            sb.Append('|');
+            foreach (int r in Rots) sb.Append(r);
+            sb.Append('|').Append(Level).Append(Mirror ? 'M' : '-');
+            return sb.ToString();
+        }
     }
 
     // 방향 (화면 기준): 0 북, 1 동, 2 남, 3 서
-    private static readonly int[] DX = { 0, 1, 0, -1 };
-    private static readonly int[] DY = { -1, 0, 1, 0 };
+    public static readonly int[] DX = { 0, 1, 0, -1 };
+    public static readonly int[] DY = { -1, 0, 1, 0 };
 
     private readonly SobekBoardSpec spec;
     private readonly char[,] terrain;
@@ -140,6 +167,22 @@ public sealed class SobekBoardLogic
         mirrored = false;
     }
 
+    public Snap Snapshot() => new Snap
+    {
+        Player = player, Eggs = eggs.ToArray(), Rots = (int[])islandRot.Clone(), Level = level, Mirror = mirrored
+    };
+
+    public void Restore(Snap s)
+    {
+        player = s.Player;
+        eggs.Clear(); eggs.AddRange(s.Eggs);
+        islandRot = (int[])s.Rots.Clone();
+        level = s.Level;
+        mirrored = s.Mirror;
+    }
+
+    public string StateKey() => Snapshot().Key();
+
     public SobekCell ToView(SobekCell real) => mirrored ? new SobekCell(Width - 1 - real.X, real.Y) : real;
 
     public bool InBounds(SobekCell c) => c.X >= 0 && c.Y >= 0 && c.X < Width && c.Y < Height;
@@ -154,6 +197,30 @@ public sealed class SobekBoardLogic
     }
     public bool TryGetBridge(SobekCell c, out string id) => bridgeAt.TryGetValue(c, out id);
     public int EggIndexAt(SobekCell c) => eggs.IndexOf(c);
+    public bool HasMirror
+    {
+        get { foreach (var p in spec.Plates) if (p.Kind == SobekPlateKind.Mirror) return true; return false; }
+    }
+
+    // ================= 섬 =================
+    // 회전 r번 했을 때 방향 d의 팔 길이
+    public int ArmLength(int island, int d, int rot)
+    {
+        int src = ((d - rot) % 4 + 4) % 4;
+        return spec.Islands[island].Arm[src];
+    }
+
+    // 섬이 차지하는 칸 목록 (회전 값 지정)
+    public List<SobekCell> IslandCells(int island, int rot)
+    {
+        var list = new List<SobekCell>();
+        var c = spec.Islands[island].Center;
+        list.Add(c);
+        for (int d = 0; d < 4; d++)
+            for (int k = 1; k <= ArmLength(island, d, rot); k++)
+                list.Add(new SobekCell(c.X + DX[d] * k, c.Y + DY[d] * k));
+        return list;
+    }
 
     // 이 칸이 섬의 일부면 섬 번호 (아니면 -1)
     public int IslandAt(SobekCell c) => IslandAt(c, islandRot);
@@ -162,28 +229,22 @@ public sealed class SobekBoardLogic
     {
         for (int i = 0; i < spec.Islands.Count; i++)
         {
-            var isl = spec.Islands[i];
-            if (isl.Center == c) return i;
-            int arms = RotateArms(isl.Arms, rots[i]);
-            for (int d = 0; d < 4; d++)
-            {
-                if ((arms & (1 << d)) == 0) continue;
-                if (isl.Center.X + DX[d] == c.X && isl.Center.Y + DY[d] == c.Y) return i;
-            }
+            var ctr = spec.Islands[i].Center;
+            int dx = c.X - ctr.X, dy = c.Y - ctr.Y;
+            if (dx == 0 && dy == 0) return i;
+            if (dx != 0 && dy != 0) continue;
+            int d = dy < 0 ? 0 : dx > 0 ? 1 : dy > 0 ? 2 : 3;
+            int k = Math.Abs(dx + dy);
+            if (k <= ArmLength(i, d, rots[i])) return i;
         }
         return -1;
     }
 
-    public static int RotateArms(int arms, int rot)
+    // 섬 가운데 기준으로 칸 하나를 90° 돌림 (dir +1 시계)
+    private static SobekCell RotateAround(SobekCell c, SobekCell ctr, int dir)
     {
-        rot = ((rot % 4) + 4) % 4;
-        for (int k = 0; k < rot; k++)
-        {
-            int n = 0;
-            for (int d = 0; d < 4; d++) if ((arms & (1 << d)) != 0) n |= 1 << ((d + 1) % 4); // 북->동->남->서
-            arms = n;
-        }
-        return arms;
+        int dx = c.X - ctr.X, dy = c.Y - ctr.Y;
+        return dir > 0 ? new SobekCell(ctr.X - dy, ctr.Y + dx) : new SobekCell(ctr.X + dy, ctr.Y - dx);
     }
 
     public bool IsBridgeRaised(string id) => Raised(id, player, eggs);
@@ -214,11 +275,14 @@ public sealed class SobekBoardLogic
         }
     }
 
-    // 물에 잠긴 땅인지 (화면 표시용)
-    public bool IsSubmerged(SobekCell c)
+    // 물에 잠긴 땅인지 (화면 표시용, 수위 지정 가능)
+    public bool IsSubmerged(SobekCell c) => IsSubmergedAt(c, level);
+
+    public bool IsSubmergedAt(SobekCell c, int lv)
     {
+        if (IslandAt(c) >= 0) return false;
         int h = HeightOf(TerrainAt(c));
-        return spec.LevelCount > 1 && h >= 0 && h < level;
+        return spec.LevelCount > 1 && h >= 0 && h < lv;
     }
 
     private bool Walk(SobekCell q, SobekCell who, List<SobekCell> eggList, int[] rots, int lv)
@@ -237,9 +301,11 @@ public sealed class SobekBoardLogic
 
     public bool IsWalkableNow(SobekCell q) => Walk(q, player, eggs, islandRot, level);
 
-    // 계단 규칙 (S3): 두 칸이 같은 높이를 하나라도 나눠 가져야 오갈 수 있음
-    private int HeightMask(char t, int lv)
+    // 계단 규칙: 두 칸이 같은 높이를 하나라도 나눠 가져야 오갈 수 있음 (섬·다리는 어디와도 이어짐)
+    private int HeightMask(SobekCell c, int lv, int[] rots)
     {
+        if (IslandAt(c, rots) >= 0 || bridgeAt.ContainsKey(c)) return 0b111;
+        char t = TerrainAt(c);
         switch (t)
         {
             case 'a': return 0b011;
@@ -255,7 +321,7 @@ public sealed class SobekBoardLogic
     // dir: 0 북, 1 동, 2 남, 3 서 (화면 기준). 거울 상태면 실제 좌우가 반대
     public StepResult TryStep(int dir)
     {
-        var res = new StepResult { Outcome = Outcome.Blocked, From = player, To = player, PushedEgg = -1, SunkEgg = -1 };
+        var res = new StepResult { Outcome = Outcome.Blocked, From = player, To = player, PushedEgg = -1, SunkEgg = -1, PlateIndex = -1, LevelBefore = level };
         int rdx = mirrored ? -DX[dir] : DX[dir];
         int dy = DY[dir];
         var nr = new SobekCell(player.X + rdx, player.Y + dy);
@@ -269,7 +335,7 @@ public sealed class SobekBoardLogic
 
         // 2) 갈 수 있는 칸인지
         if (!Walk(nr, player, eggs, islandRot, level)) return res;
-        if (spec.UseTerraces && (HeightMask(TerrainAt(player), level) & HeightMask(TerrainAt(nr), level)) == 0) return res;
+        if (spec.UseTerraces && (HeightMask(player, level, islandRot) & HeightMask(nr, level, islandRot)) == 0) return res;
 
         // 3) 알 밀기
         var newEggs = new List<SobekCell>(eggs);
@@ -277,11 +343,12 @@ public sealed class SobekBoardLogic
         if (egg >= 0)
         {
             var er = new SobekCell(nr.X + rdx, nr.Y + dy);
-            if (!InBounds(er) || TerrainAt(er) == '#' || newEggs.Contains(er)) return res; // 막힘
+            if (!InBounds(er) || TerrainAt(er) == '#' && IslandAt(er, islandRot) < 0 || newEggs.Contains(er)) return res; // 막힘
+            if (spec.UseTerraces && (HeightMask(nr, level, islandRot) & HeightMask(er, level, islandRot)) == 0) return res;
             res.PushedEgg = egg; res.EggFrom = nr; res.EggTo = er;
             if (!Walk(er, player, eggs, islandRot, level))
             {
-                res.Outcome = Outcome.EggSunk; res.SunkEgg = egg; // 물·구덩이로 밀어 넣음
+                res.Outcome = Outcome.EggSunk; res.SunkEgg = egg; res.SunkAt = er; // 물·구덩이로 밀어 넣음
                 return res;
             }
             newEggs[egg] = er;
@@ -290,14 +357,14 @@ public sealed class SobekBoardLogic
         // 4) 다리 위 알: 플레이어가 움직인 뒤에도 다리가 떠 있어야 함
         for (int i = 0; i < newEggs.Count; i++)
         {
-            if (bridgeAt.TryGetValue(newEggs[i], out string bid) && !Raised(bid, nr, newEggs))
+            if (bridgeAt.TryGetValue(newEggs[i], out string bid) && IslandAt(newEggs[i], islandRot) < 0 && !Raised(bid, nr, newEggs))
             {
-                res.Outcome = Outcome.EggSunk; res.SunkEgg = i;
+                res.Outcome = Outcome.EggSunk; res.SunkEgg = i; res.SunkAt = newEggs[i];
                 return res;
             }
         }
         // 5) 플레이어가 올라설 다리도 떠 있어야 함 (승강 발판에서 내려서 바로 건너기 금지)
-        if (bridgeAt.TryGetValue(nr, out string pb) && !Raised(pb, nr, newEggs)) return res;
+        if (bridgeAt.TryGetValue(nr, out string pb) && IslandAt(nr, islandRot) < 0 && !Raised(pb, nr, newEggs)) return res;
 
         // 6) 발판 효과
         var rots = (int[])islandRot.Clone();
@@ -306,10 +373,18 @@ public sealed class SobekBoardLogic
         if (plateAt.TryGetValue(nr, out int pi))
         {
             var plate = spec.Plates[pi];
+            res.PlateIndex = pi;
             switch (plate.Kind)
             {
                 case SobekPlateKind.Rotate:
-                    foreach (var s in plate.Spins) rots[s.Island] = (((rots[s.Island] + s.Dir) % 4) + 4) % 4;
+                    foreach (var s in plate.Spins)
+                    {
+                        // 섬 위의 알도 함께 돎
+                        var ctr = spec.Islands[s.Island].Center;
+                        for (int i = 0; i < newEggs.Count; i++)
+                            if (IslandAt(newEggs[i], islandRot) == s.Island) newEggs[i] = RotateAround(newEggs[i], ctr, s.Dir);
+                        rots[s.Island] = (((rots[s.Island] + s.Dir) % 4) + 4) % 4;
+                    }
                     res.HasPlate = true; res.PlateKind = plate.Kind;
                     break;
                 case SobekPlateKind.Water:
@@ -329,12 +404,14 @@ public sealed class SobekBoardLogic
         // 8) 바뀐 세계에서 플레이어가 설 수 있어야 함 (못 서면 이 걸음은 막힘)
         if (!Walk(np, np, newEggs, rots, lv)) return res;
 
-        // 9) 바뀐 세계에서 알이 모두 설 수 있어야 함 (아니면 가라앉음)
+        // 9) 바뀐 세계에서 알이 모두 설 수 있어야 함 (아니면 가라앉음) / 알끼리 겹치면 막힘
         for (int i = 0; i < newEggs.Count; i++)
         {
+            for (int j = i + 1; j < newEggs.Count; j++) if (newEggs[i] == newEggs[j]) return res;
+            if (newEggs[i] == np) return res;
             if (!Walk(newEggs[i], np, newEggs, rots, lv))
             {
-                res.Outcome = Outcome.EggSunk; res.SunkEgg = i;
+                res.Outcome = Outcome.EggSunk; res.SunkEgg = i; res.SunkAt = newEggs[i];
                 return res;
             }
         }
@@ -390,40 +467,60 @@ public sealed class SobekBoardLogic
         return path;
     }
 
-    private struct Snap
+    // ================= 막힘 판정 =================
+    // 시작에서 갈 수 있는 모든 상태 중 "아직 목표에 갈 수 있는" 상태의 키 집합.
+    // 처음으로/되돌리기로만 상태가 바뀌므로 게임 중 모든 상태가 이 그래프 안에 있음 -> 집합에 없으면 막힌 것
+    // reachable: 전체 상태 수 (통계용). maxStates를 넘으면 null (판정 끔)
+    public HashSet<string> ComputeAliveStates(out int reachable, int maxStates = 400000)
     {
-        public SobekCell Player;
-        public SobekCell[] Eggs;
-        public int[] Rots;
-        public int Level;
-        public bool Mirror;
+        var saved = Snapshot();
+        Reset();
+        var start = Snapshot();
+        var index = new Dictionary<string, int>();
+        var snaps = new List<Snap>();
+        var preds = new List<List<int>>();
+        var isGoalPred = new List<bool>(); // 이 상태에서 한 걸음에 목표
+        var q = new Queue<int>();
 
-        public string Key()
+        index[start.Key()] = 0; snaps.Add(start); preds.Add(new List<int>()); isGoalPred.Add(false); q.Enqueue(0);
+        bool overflow = false;
+        while (q.Count > 0)
         {
-            var sb = new StringBuilder();
-            sb.Append(Player.X).Append(',').Append(Player.Y).Append('|');
-            var sorted = (SobekCell[])Eggs.Clone();
-            Array.Sort(sorted, (a, b) => a.X != b.X ? a.X - b.X : a.Y - b.Y);
-            foreach (var e in sorted) sb.Append(e.X).Append(',').Append(e.Y).Append(';');
-            sb.Append('|');
-            foreach (int r in Rots) sb.Append(r);
-            sb.Append('|').Append(Level).Append(Mirror ? 'M' : '-');
-            return sb.ToString();
+            int i = q.Dequeue();
+            for (int d = 0; d < 4; d++)
+            {
+                Restore(snaps[i]);
+                var r = TryStep(d);
+                if (r.Outcome == Outcome.Goal) { isGoalPred[i] = true; continue; }
+                if (r.Outcome != Outcome.Moved) continue;
+                var s = Snapshot();
+                string k = s.Key();
+                if (!index.TryGetValue(k, out int j))
+                {
+                    if (snaps.Count >= maxStates) { overflow = true; continue; }
+                    j = snaps.Count;
+                    index[k] = j; snaps.Add(s); preds.Add(new List<int>()); isGoalPred.Add(false);
+                    q.Enqueue(j);
+                }
+                preds[j].Add(i);
+            }
         }
-    }
+        Restore(saved);
+        reachable = snaps.Count;
+        if (overflow) return null;
 
-    private Snap Snapshot() => new Snap
-    {
-        Player = player, Eggs = eggs.ToArray(), Rots = (int[])islandRot.Clone(), Level = level, Mirror = mirrored
-    };
-
-    private void Restore(Snap s)
-    {
-        player = s.Player;
-        eggs.Clear(); eggs.AddRange(s.Eggs);
-        islandRot = (int[])s.Rots.Clone();
-        level = s.Level;
-        mirrored = s.Mirror;
+        // 거꾸로: 목표 바로 앞 상태들에서 시작해 이전 상태로 퍼짐
+        var alive = new bool[snaps.Count];
+        var back = new Queue<int>();
+        for (int i = 0; i < snaps.Count; i++) if (isGoalPred[i]) { alive[i] = true; back.Enqueue(i); }
+        while (back.Count > 0)
+        {
+            int i = back.Dequeue();
+            foreach (int p in preds[i]) if (!alive[p]) { alive[p] = true; back.Enqueue(p); }
+        }
+        var set = new HashSet<string>();
+        foreach (var kv in index) if (alive[kv.Value]) set.Add(kv.Key);
+        return set;
     }
 
     private static int Clamp(int v, int lo, int hi) => v < lo ? lo : (v > hi ? hi : v);

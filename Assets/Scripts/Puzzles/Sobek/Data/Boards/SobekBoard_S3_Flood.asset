@@ -14,38 +14,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
   displayName: "S3 \uBC94\uB78C\uD558\uB294 \uB098\uC77C"
   intro: "\uBB3C \uBC1C\uD310: \uB0AE\uC74C \u2192 \uC911\uAC04 \u2192 \uB192\uC74C
-    \u2192 \uB0AE\uC74C. \uB5CF\uBAA9\uC740 \uBB3C\uC744 \uB530\uB77C \uB728\uACE0,
-    \uB192\uC774\uAC00 \uB2E4\uB974\uBA74 \uACC4\uB2E8\uC73C\uB85C\uB9CC \uC624\uAC04\uB2E4."
-  map: '########
+    \u2192 \uB0AE\uC74C. \uB5CF\uBAA9\uC740 \uBB3C \uB192\uC774\uB97C \uB530\uB77C
+    \uC624\uB974\uB0B4\uB9AC\uACE0, \uB192\uC774\uAC00 \uB2E4\uB974\uBA74 \uACC4\uB2E8\uC73C\uB85C\uB9CC
+    \uC624\uAC04\uB2E4."
+  map: '~11222~~~112
 
-    #000~22#
+    #1112#~~11F2
 
-    0000F22#
+    #1112221110~
 
-    #000F#b#
+    200F122b1000
 
-    #000~a1#
+    22221#2~#000
 
-    #####00#
+    2222222~0000
 
-    ########'
+    22~2~222~000'
   dryPits: 0
-  start: {x: 1, y: 2}
-  entrance: {x: -1, y: 2}
-  goal: {x: 5, y: 5}
+  start: {x: 1, y: 3}
+  entrance: {x: -1, y: 3}
+  goal: {x: 8, y: 5}
   goalKind: 0
   allowExit: 1
   levelCount: 3
   startLevel: 0
   useTerraces: 1
-  eggs: []
+  eggs:
+  - {x: 2, y: 5}
+  - {x: 4, y: 5}
   islands: []
   plates:
-  - cell: {x: 4, y: 3}
+  - cell: {x: 3, y: 3}
     kind: 2
     bridgeId: 
     spins: []
-  - cell: {x: 6, y: 2}
+  - cell: {x: 5, y: 0}
+    kind: 2
+    bridgeId: 
+    spins: []
+  - cell: {x: 10, y: 1}
     kind: 2
     bridgeId: 
     spins: []
@@ -53,7 +60,6 @@ MonoBehaviour:
   rewardItemId: ITEM_SOBEK_AMULET_WATER
   clearFlag: F_SOBEK_S3_CLEAR
   timeLimit: 0
-  hintAfterResets: 3
-  hint: "\uB5CF\uBAA9 \uC704\uC5D0\uC11C \uBB3C\uC744 \uB450 \uBC88 \uC62C\uB824
-    \uB192\uC740 \uC5B8\uB355\uC73C\uB85C \uAC74\uB108\uAC04 \uB4A4, \uC5B8\uB355
-    \uBC1C\uD310\uC73C\uB85C \uBB3C\uC744 \uBE7C\uC790."
+  hintAfterResets: 6
+  hint: "\uB5CF\uBAA9\uC774 \uC788\uB294 \uB192\uC774\uC5D0\uC11C\uB9CC \uB5CF\uBAA9\uC5D0
+    \uC624\uB97C \uC218 \uC788\uB2E4."

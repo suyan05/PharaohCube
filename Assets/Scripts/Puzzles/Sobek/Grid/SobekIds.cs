@@ -17,13 +17,28 @@ public static class SobekIds
     public const string FlagS3Clear = "F_SOBEK_S3_CLEAR";
     public const string FlagS4Clear = "F_SOBEK_S4_CLEAR";
     public const string FlagDoorOpen = "F_SOBEK_DOOR_OPEN";       // 큰 문에 부적 4개를 넣음
-    public const string FlagMainADone = "F_SOBEK_MAIN_A_DONE";    // 범람기 구역 통과
+    public const string FlagMainADone = "F_SOBEK_MAIN_A_DONE";    // 첫 구역(범람기) 통과
+    public const int MainZoneA = 0;
     public const string FlagMainDone = "F_SOBEK_MAIN_DONE";       // 소베크-라 제단 도착
     public const string FlagDrainPlayed = "F_SOBEK_DRAIN_PLAYED"; // 허브 물 빠짐 연출 봄
     public const string FlagPlateGiven = "F_SOBEK_PLATE_GIVEN";
+
+    // 숨은 방 · 단서 · 악어 (통합 길잡이 기획서 8.5 플래그 규칙: {ROOM} = SO)
+    public const string Room = "SO";
+    public static string ClueGot(int n) => $"F_SO_CLUE_{n}_GOT";   // 단서 n 주움
+    public static string ClueSet(int n) => $"F_SO_CLUE_{n}_SET";   // 단서 n을 수위계 기둥에 끼움
+    public const string FlagSocketSeen = "F_SO_SOCKET_SEEN";       // 물에 잠긴 수위계 기둥을 봄
+    public const string FlagGuideMet = "F_SO_GUIDE_MET";           // 악어 첫 만남
+    public static string GuideLegDone(int n) => $"F_SO_GUIDE_LEG{n}_DONE";
+    public const string FlagHiddenOpen = "F_SO_HIDDEN_OPEN";       // 숨은 방(물 빠진 하층) 열림
+    public const string FlagToothGot = "HIDDEN_SobekTooth_GOT";    // 히든 아이템 획득 (HiddenItemService 규칙)
+    public const string FlagTabletReady = "F_SO_TABLET_READY";     // 형판을 받음 -> 중앙 홀 받침에서 악어 석판
+    public const string FlagHubIntro = "F_SO_HUB_INTRO";           // 허브 첫 입장 대사 봄
+    public const string FlagEndingDone = "F_SOBEK_ENDING_DONE";    // 형판 공개·큐브 연출 끝
 
     // 씬 이름 (Build Profiles -> Scene List에 있어야 함)
     public const string HubScene = "Sobek_Hub";
     public const string MainScene = "Sobek_Main";
     public const string AnubisScene = "Puzzle_Test_Anubis_Tutorial";
+    public const string CentralHallScene = "CentralRoom_Temp"; // 기획서: 신전을 깨면 중앙 홀로 돌아감 (지금 빌드 목록의 중앙 홀 [확인 필요])
 }

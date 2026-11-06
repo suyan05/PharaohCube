@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb1f23479baf8c94aab6040e7d47f144, type: 3}
+  m_Name: SobekBoard_MainC_Tower
+  m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
+  displayName: "\uC170\uB370\uD2B8 \uC2E0\uC804 3 \xB7 \uC18C\uBCA0\uD06C-\uB77C\uC758
+    \uD0D1"
+  intro: "\uC18C\uC6A9\uB3CC\uC774 \uC12C\uB4E4\uC744 \uB3CC\uB824 \uC18C\uBCA0\uD06C-\uB77C\uC758
+    \uC81C\uB2E8\uAE4C\uC9C0."
+  map: '~~~~~~~~~~~~s.~
+
+    ~~~~~~~~~~~s~s~
+
+    ~~~~~~~~.~~.~s.
+
+    .~~~~~~~~~~.~..
+
+    .~~~ss.~.~.....
+
+    ..~~~~~~~~~~.s~
+
+    .~.~.~s~~s~.~~~
+
+    ~~..~s~s~~~~~~~
+
+    ~~sss.~~s~~~~~~
+
+    ~~~s~.ss~~~~~~~
+
+    ~~~~~.~~~~~~~~~'
+  dryPits: 0
+  start: {x: 0, y: 5}
+  entrance: {x: 0, y: 5}
+  goal: {x: 14, y: 4}
+  goalKind: 2
+  allowExit: 0
+  levelCount: 2
+  startLevel: 1
+  useTerraces: 0
+  eggs:
+  - {x: 6, y: 4}
+  - {x: 8, y: 2}
+  islands:
+  - center: {x: 6, y: 5}
+    north: 0
+    east: 0
+    south: 2
+    west: 0
+  - center: {x: 9, y: 7}
+    north: 2
+    east: 2
+    south: 0
+    west: 0
+  - center: {x: 3, y: 6}
+    north: 2
+    east: 0
+    south: 1
+    west: 2
+  - center: {x: 10, y: 3}
+    north: 1
+    east: 2
+    south: 1
+    west: 1
+  plates:
+  - cell: {x: 6, y: 5}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 0
+      clockwise: 1
+  - cell: {x: 9, y: 7}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 3
+      clockwise: 1
+    - island: 1
+      clockwise: 1
+  - cell: {x: 3, y: 6}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 2
+      clockwise: 1
+  - cell: {x: 10, y: 3}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 1
+      clockwise: 1
+    - island: 0
+      clockwise: 0
+  - cell: {x: 8, y: 4}
+    kind: 2
+    bridgeId: 
+    spins: []
+  bridges: []
+  rewardItemId: 
+  clearFlag: 
+  timeLimit: 420
+  hintAfterResets: 0
+  hint: 

@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 // 소베크 판 위에서만 쓰는 칸 단위 이동 (판에 들어가면 SobekBoard가 플레이어에 자동으로 붙임)
 // - 팀 PlayerController2D(자유 이동)는 판 위에서 꺼 둠 -> 판에서 나가면 다시 켬
-// - 방향키/WASD를 누르고 있으면 한 칸씩 계속 걸음, R = 이 판 처음으로
+// - 방향키/WASD를 누르고 있으면 한 칸씩 계속 걸음, Z(또는 Backspace) = 한 걸음 되돌리기, R = 이 판 처음으로
 // - 걷는 동안 Rigidbody2D 속도를 넣어서 팀 걷기 애니메이션(PlayerSpriteAnimator)이 그대로 돎
 [DisallowMultipleComponent]
 public class SobekGridMover : MonoBehaviour
@@ -95,6 +95,11 @@ public class SobekGridMover : MonoBehaviour
         if (kb.rKey.wasPressedThisFrame)
         {
             board.ResetByPlayer();
+            return;
+        }
+        if (kb.zKey.wasPressedThisFrame || kb.backspaceKey.wasPressedThisFrame)
+        {
+            board.UndoByPlayer();
             return;
         }
 

@@ -12,27 +12,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4266cce5853c04e4d96a3b180a0b7e71, type: 3}
   m_Name: SobekTheme
   m_EditorClassIdentifier: Assembly-CSharp::SobekTheme
-  floor: {fileID: 21300000, guid: 206e4166f5f77544bb18b2c77101f547, type: 3}
-  wall: {fileID: 21300000, guid: ef21d8aa533036a4a8d7151483451549, type: 3}
-  water: {fileID: 21300000, guid: da0ddaac69259704e8c134db4d6de247, type: 3}
-  pit: {fileID: 21300000, guid: f263740ec6c8be14b8388b63a9119f81, type: 3}
-  stone: {fileID: 21300000, guid: d44ec326045b93341b115b4c71c87e74, type: 3}
-  stairLow: {fileID: 21300000, guid: 13ecda26ff0480d409fc4c8886a36ed0, type: 3}
-  stairHigh: {fileID: 21300000, guid: b02c042e091a33e4dbc9e86f2aa2cd92, type: 3}
-  raft: {fileID: 21300000, guid: 744ffaa71c428e24f85aa3824a170af0, type: 3}
-  island: {fileID: 21300000, guid: bde6ce0c9500e60428336152ff50ca4d, type: 3}
-  bridgeUp: {fileID: 21300000, guid: 02d497fe940c7a5478a4dc130f170692, type: 3}
-  bridgeDown: {fileID: 21300000, guid: 580b8a72df2605649bed573829dfcf20, type: 3}
-  plateRotate: {fileID: 21300000, guid: a165ac415fc39cb42890b1ef8db3a5d6, type: 3}
-  plateLift: {fileID: 21300000, guid: b72c91f829adbf047a17b96476c58e68, type: 3}
-  plateWater: {fileID: 21300000, guid: 0ec3173633d45454faaade48de2fd2b8, type: 3}
-  plateMirror: {fileID: 21300000, guid: 00c908ceaa0b78d478f8fc725bd0674a, type: 3}
-  egg: {fileID: 21300000, guid: 52afe7b4836a3e348894f3601a4d8ed3, type: 3}
-  goal: {fileID: 21300000, guid: fa8f61fce6c6c7949bde783f8996835b, type: 3}
-  gate: {fileID: 21300000, guid: 6a1a4e29786b79040b03acd6847d5044, type: 3}
-  altar: {fileID: 21300000, guid: 4dd13116ff11d9648a87f9a132ce8e76, type: 3}
-  floorTop: {r: 0.92, g: 0.84, b: 0.66, a: 1}
-  floorLow: {r: 0.78, g: 0.66, b: 0.45, a: 1}
+  floor: {fileID: 21300000, guid: c3d3d21eedb34bc46a165d6dbe4bec6c, type: 3}
+  wall: {fileID: 21300000, guid: e756b2e8909d83f46b62fa1357ab404c, type: 3}
+  water: {fileID: 21300000, guid: 71780e4ebe14cae4cbae6cb3b30d6ee8, type: 3}
+  pit: {fileID: 21300000, guid: 7ed00863fdf31ec45a9f18cf6d24df7d, type: 3}
+  stone: {fileID: 21300000, guid: a947a322b017b844bb17f32691b442ac, type: 3}
+  stairLow: {fileID: 21300000, guid: b5c678a82ede96743bdd7c4709b0b05a, type: 3}
+  stairHigh: {fileID: 21300000, guid: 9863fb58df03f7c4eae547c4fd64e55d, type: 3}
+  raft: {fileID: 21300000, guid: cac2a230910dc6c48b0ca3dd0ebb5f77, type: 3}
+  island: {fileID: 21300000, guid: 8181d0ba5f7cafd429c639596673dec5, type: 3}
+  bridgeUp: {fileID: 21300000, guid: bd72dc862bbb3524eaf64d74b0f1474c, type: 3}
+  bridgeDown: {fileID: 21300000, guid: 35d5937906620f744acdbf55527327c3, type: 3}
+  plateRotate: {fileID: 21300000, guid: 2efb418fc850fdb45aa455b7b170cd8e, type: 3}
+  plateLift: {fileID: 21300000, guid: 32613cbb052ba9f4197386e922464a62, type: 3}
+  plateWater: {fileID: 21300000, guid: 3830b03d2a930434b8d6a4550106183f, type: 3}
+  plateMirror: {fileID: 21300000, guid: 9140f09cb89c5a545861067f9a6403f1, type: 3}
+  egg: {fileID: 21300000, guid: 51a4f72d56ab86942a9fbac730d1dfb5, type: 3}
+  goal: {fileID: 21300000, guid: b8eaba7b3b8af494a9904ee047c57c45, type: 3}
+  gate: {fileID: 21300000, guid: 9887968863077d845aba97583cd2915a, type: 3}
+  altar: {fileID: 21300000, guid: 5172a796bd28fe1448bccf4f9bdbd91b, type: 3}
+  floorTop: {r: 1, g: 0.97, b: 0.9, a: 1}
+  floorLow: {r: 0.72, g: 0.6, b: 0.42, a: 1}
   waterColor: {r: 0.45, g: 0.65, b: 0.8, a: 1}
   submergedTint: {r: 0.55, g: 0.72, b: 0.88, a: 1}
   pressedBrightness: 1.35

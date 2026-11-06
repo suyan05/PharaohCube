@@ -135,7 +135,7 @@ public class BastetEnding : MonoBehaviour
         yield return WaitAdvance(1.2f);
         yield return FlyPlateToSlot();
         int have = CountPlates();
-        hallStatus.text = $"큐브가 응답한다! 바스테트의 면이 빛난다.  (형판 {have} / 6)";
+        hallStatus.text = $"큐브가 응답한다! {GodNames[bastetSlot]}의 면이 빛난다.  (형판 {have} / 6)"; // [수정] 소베크도 같은 연출을 씀
         if (GameManager.Instance != null) GameManager.Instance.SetFlag(endingDoneFlag);
         Debug.Log($"[BastetEnding] 형판 장착 완료 ({have}/6)", this);
 

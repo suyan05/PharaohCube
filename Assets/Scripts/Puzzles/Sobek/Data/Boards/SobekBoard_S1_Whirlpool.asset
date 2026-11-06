@@ -13,63 +13,96 @@ MonoBehaviour:
   m_Name: SobekBoard_S1_Whirlpool
   m_EditorClassIdentifier: Assembly-CSharp::SobekBoardData
   displayName: "S1 \uC18C\uC6A9\uB3CC\uC774 \uC12C"
-  intro: "\uD68C \uBC1C\uD310\uC744 \uBC1F\uC744 \uB54C\uB9C8\uB2E4 \uC12C\uC774
-    90\xB0 \uB3C8\uB2E4. \uB9DE\uBB3C\uB9B0 \uC12C\uC740 \uBC18\uB300\uB85C \uB3C8\uB2E4."
-  map: '~~~~~~.~~
+  intro: "\uD68C\uC804 \uBC1C\uD310\uC744 \uBC1F\uC744 \uB54C\uB9C8\uB2E4 \uC774\uC5B4\uC9C4
+    \uC12C\uC774 90\xB0 \uB3C8\uB2E4. \uC12C \uC704\uC758 \uC54C\uB3C4 \uD568\uAED8
+    \uB3C8\uB2E4."
+  map: '~~~~~~~~~~~~~
 
-    ~~~.~~.~~
+    ~~~~~~~~~~~~~
 
-    ~~~~~~~~~
+    ~~~~~~~~~~~..
 
-    ..~~~~~~~
+    ~~~~.~~~.~...
 
-    ~~~~~~~~~
+    ..~~~~~~.~~~~
 
-    ~~~~~~.~~
+    .~~.~~~~~~~~~
 
-    ~~~~~~.~~'
+    ~~.~.~~~.~.~~
+
+    ~~.~~~~~~.~~~
+
+    ~~~.~~~~~~.~~'
   dryPits: 0
-  start: {x: 0, y: 3}
-  entrance: {x: -1, y: 3}
-  goal: {x: 6, y: 0}
+  start: {x: 0, y: 4}
+  entrance: {x: -1, y: 4}
+  goal: {x: 12, y: 3}
   goalKind: 0
   allowExit: 1
   levelCount: 1
   startLevel: 0
   useTerraces: 0
-  eggs: []
+  eggs:
+  - {x: 4, y: 6}
+  - {x: 8, y: 6}
   islands:
-  - center: {x: 3, y: 3}
+  - center: {x: 6, y: 4}
     north: 0
-    east: 0
-    south: 1
-    west: 1
-  - center: {x: 6, y: 3}
-    north: 1
     east: 1
+    south: 2
+    west: 0
+  - center: {x: 9, y: 6}
+    north: 2
+    east: 2
     south: 0
     west: 0
+  - center: {x: 3, y: 5}
+    north: 1
+    east: 1
+    south: 2
+    west: 2
+  - center: {x: 10, y: 2}
+    north: 0
+    east: 2
+    south: 1
+    west: 1
   plates:
-  - cell: {x: 3, y: 3}
+  - cell: {x: 6, y: 4}
     kind: 0
     bridgeId: 
     spins:
     - island: 0
       clockwise: 1
-    - island: 1
-      clockwise: 0
-  - cell: {x: 6, y: 3}
+  - cell: {x: 9, y: 6}
     kind: 0
     bridgeId: 
     spins:
     - island: 1
       clockwise: 1
-    - island: 0
-      clockwise: 0
-  bridges: []
+    - island: 3
+      clockwise: 1
+  - cell: {x: 3, y: 5}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 2
+      clockwise: 1
+  - cell: {x: 10, y: 2}
+    kind: 0
+    bridgeId: 
+    spins:
+    - island: 1
+      clockwise: 1
+  - cell: {x: 2, y: 7}
+    kind: 1
+    bridgeId: X
+    spins: []
+  bridges:
+  - cell: {x: 0, y: 0}
+    id: X
   rewardItemId: ITEM_SOBEK_AMULET_ROTATE
   clearFlag: F_SOBEK_S1_CLEAR
   timeLimit: 0
-  hintAfterResets: 3
-  hint: "\uD55C \uBC88 \uB3CC\uB9B0 \uB4A4 \uBD81\uCABD \uD314\uC5D0 \uC7A0\uAE50
-    \uB0B4\uB838\uB2E4\uAC00 \uB2E4\uC2DC \uAC00\uC6B4\uB370\uB97C \uBC1F\uC544 \uBCF4\uC790."
+  hintAfterResets: 6
+  hint: "\uD68C\uC804 \uBC1C\uD310\uC740 \uD55C \uBC88 \uBC1F\uC744 \uB54C\uB9C8\uB2E4
+    \uB3C8\uB2E4. \uC54C\uB3C4 \uC12C\uACFC \uD568\uAED8 \uB3C8\uB2E4."
