@@ -132,7 +132,9 @@ public static class HorusWorldPuzzles
             float k = Mathf.Max(go.transform.localScale.x, 0.001f);
             BoxCollider2D box = go.AddComponent<BoxCollider2D>();
             box.size = new Vector2(0.8f, 2.5f) / k;
-            box.offset = new Vector2(0f, -0.05f) / k;
+            // [수정] 기둥 그림의 기준점이 아래쪽이라 (0, 0) 근처에 두면 상자가 그림 아래로 내려감 -> 그림 한가운데에 맞춤
+            SpriteRenderer sr = go.GetComponent<SpriteRenderer>();
+            box.offset = sr != null && sr.sprite != null ? (Vector2)sr.sprite.bounds.center : Vector2.zero;
             EditorUtility.SetDirty(go);
         }
     }
