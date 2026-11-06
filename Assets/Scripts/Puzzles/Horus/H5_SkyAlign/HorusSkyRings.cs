@@ -66,9 +66,8 @@ public class HorusSkyRings : PuzzleBase, IInteractable
         {
             HorusFx.MatchPlayer();
             root = new GameObject("H5_SkyRings").transform;
-            for (int i = 0; i < 4; i++) offset[i] = shown[i] = StartOffset[i];
             done = IsFlagOn(ClearFlag);
-            if (done) for (int i = 0; i < 4; i++) offset[i] = shown[i] = Solved(i);
+            for (int i = 0; i < 4; i++) SetRing(i, done ? Solved(i) : StartOffset[i]);
             BuildBadges();
             BuildLevers();
             BuildTracks();
@@ -80,6 +79,13 @@ public class HorusSkyRings : PuzzleBase, IInteractable
             Debug.LogError($"[하늘 고리] 준비 오류: {e}");
             enabled = false;
         }
+    }
+
+    // [수정] int(칸)와 float(그려지는 각도)를 한 줄에 같이 넣어서 생긴 컴파일 오류 -> 따로 넣음
+    private void SetRing(int ring, int steps)
+    {
+        offset[ring] = steps;
+        shown[ring] = steps;
     }
 
     // 고리 i가 정답일 때의 칸 수
