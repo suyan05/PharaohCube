@@ -26,7 +26,9 @@ public static class HorusWorldPuzzles
             Objectives();
             SolidPillars();
             SteleOrder();
+            SteleNearPuzzles();
             RoomSconces();
+            IsisStatue();
         }
         catch (System.Exception e)
         {
@@ -98,7 +100,11 @@ public static class HorusWorldPuzzles
         Remove<HorusSkyRing>(h5);
         HorusSkyRings p = Add<HorusSkyRings>(h5);
         var so = new SerializedObject(p);
-        HorusArtSetup.SetSpriteList(so, "starSprites", new[] { "H5/H5_02", "H5/H5_03", "H5/H5_04", "H5/H5_05", "H5/H5_07" });
+        // [수정] 별자리 그림 -> 해/달/매/왕관/세트의 붉은 별 (순서: 0 왕관, 1 해, 2 달, 3 매, 4 붉은 별)
+        SerializedProperty stars = HorusArtSetup.Prop(so, "starSprites");
+        string[] icons = { "HO_Sym_Crown", "HO_Sym_Sun", "HO_Sym_Moon", "HO_Sym_Falcon", "HO_Sym_SetStar" };
+        stars.arraySize = icons.Length;
+        for (int i = 0; i < icons.Length; i++) stars.GetArrayElementAtIndex(i).objectReferenceValue = Px(icons[i]);
         Ref(so, "blankSprite", Px("HO_RingDot"));
         SerializedProperty levers = HorusArtSetup.Prop(so, "leverSprites");
         levers.arraySize = 4;
@@ -161,6 +167,99 @@ public static class HorusWorldPuzzles
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
+    // [수정] 비석이 어느 퍼즐 것인지 헷갈린다는 의견 -> 각 비석을 자기 퍼즐 바로 옆(방 입구)으로 옮기고 머리 위에 퍼즐 문양
+    // 기둥 횃불과 떨어지므로 '횃불을 켜야 읽힘'은 끄고, 순서는 매 안내(requiredFlag)로만 잠금
+    private static void SteleNearPuzzles()
+    {
+        SteleAt("OBJ_HS1_ClueStele", new Vector2(3.6f, 14.7f), "HO_Sym_Sun");      // H1: 해의 방 문(북서) 앞
+        SteleAt("OBJ_HS2_ClueStele", new Vector2(22.6f, 10.4f), "HO_Sym_Star");    // H2: 동쪽 벽 성도판 위
+        SteleAt("OBJ_HS3_ClueStele", new Vector2(4.3f, 4.4f), "HO_Sym_Eye");       // H3: 우자트 석탁 왼쪽
+        SteleAt("OBJ_H11_WarningSlab", new Vector2(10.0f, 8.4f), "HO_Sym_Crown");  // H5: 제단 남서쪽 (가운데 길은 비움)
+    }
+
+    private static void SteleAt(string objName, Vector2 pos, string emblem)
+    {
+        GameObject go = HorusArtSetup.Find(objName);
+        if (go == null)
+        {
+            Debug.LogWarning($"[HorusWorldPuzzles] {objName} 없음 - 비석 이동 건너뜀");
+            return;
+        }
+        go.transform.position = new Vector3(pos.x, pos.y, go.transform.position.z);
+        ClueStele stele = go.GetComponent<ClueStele>();
+        if (stele != null)
+        {
+            var so = new SerializedObject(stele);
+            SerializedProperty light = so.FindProperty("needLight");
+            if (light != null) light.boolValue = false;
+            SerializedProperty torches = so.FindProperty("roomTorches");
+            if (torches != null) torches.arraySize = 0;
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+        Emblem(go, emblem);
+        EditorUtility.SetDirty(go);
+    }
+
+    // 비석 머리 위에 떠 있는 작은 퍼즐 문양 (항상 위 정렬)
+    private static void Emblem(GameObject stele, string icon)
+    {
+        Sprite s = Px(icon);
+        SpriteRenderer host = stele.GetComponent<SpriteRenderer>();
+        if (s == null || host == null) return;
+        var go = new GameObject($"{stele.name}_Emblem");
+        go.transform.position = new Vector3(host.bounds.center.x, host.bounds.max.y + 0.3f, 0f);
+        go.transform.localScale = Vector3.one * (0.42f / s.bounds.size.x);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = s;
+        sr.sortingLayerName = host.sortingLayerName;
+        sr.sortingOrder = 21;
+    }
+
+    // [추가] 입구 전실 이시스 여신상: E -> 이시스가 짧게 나타나 벽화로 기억을 보여 줌 (들어오자마자 나오던 연출 대신)
+    // 자리: 전실 북서쪽 모서리 (북쪽 문 x 11~13을 막지 않게)
+    private static void IsisStatue()
+    {
+        Sprite art = Px("HO_IsisStatue");
+        var go = new GameObject("OBJ_HA0_IsisStatue");
+        go.transform.position = new Vector3(8.9f, -2.9f, 0f);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = art;
+        sr.sortingLayerName = string.IsNullOrEmpty(HorusRoomObjects.Layer) ? "Default" : HorusRoomObjects.Layer;
+        Vector2 size = new Vector2(0.95f, 1.9f);
+        if (art != null) HorusWorldArt.FitObject(go, art, size, Color.white);
+        float k = Mathf.Max(go.transform.localScale.x, 0.001f);
+        HorusWorld.AddBox(go, new Vector2(0.9f, 0.4f), k, false);
+        BoxCollider2D reach = go.AddComponent<BoxCollider2D>();
+        reach.isTrigger = true;
+        reach.size = (size + new Vector2(0.5f, 0.3f)) / k;
+        reach.offset = art != null ? (Vector2)art.bounds.center : Vector2.zero;
+        HorusIsisStatue statue = go.AddComponent<HorusIsisStatue>();
+        var so = new SerializedObject(statue);
+        Ref(so, "director", Object.FindFirstObjectByType<HorusDirector>(FindObjectsInactive.Include));
+        so.ApplyModifiedPropertiesWithoutUndo();
+        IsisObjective(sr);
+        EditorUtility.SetDirty(go);
+    }
+
+    // 목표 HUD 맨 앞에 '이시스 여신상 살펴보기' 단계 (이미 있으면 그대로)
+    private static void IsisObjective(SpriteRenderer statue)
+    {
+        HorusObjectiveGuide guide = Object.FindFirstObjectByType<HorusObjectiveGuide>(FindObjectsInactive.Include);
+        if (guide == null) return;
+        var so = new SerializedObject(guide);
+        SerializedProperty steps = HorusArtSetup.Prop(so, "steps");
+        if (steps == null) return;
+        for (int i = 0; i < steps.arraySize; i++)
+            if (steps.GetArrayElementAtIndex(i).FindPropertyRelative("doneFlag").stringValue == "F_HO_INTRO_PLAYED") return;
+        steps.InsertArrayElementAtIndex(0);
+        SerializedProperty step = steps.GetArrayElementAtIndex(0);
+        step.FindPropertyRelative("doneFlag").stringValue = "F_HO_INTRO_PLAYED";
+        step.FindPropertyRelative("objective").stringValue = "입구 전실의 이시스 여신상을 살펴보자";
+        step.FindPropertyRelative("pathToLight").objectReferenceValue = null;
+        step.FindPropertyRelative("target").objectReferenceValue = statue;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
     // [추가] 퍼즐 방 북쪽 벽의 켜진 횃대 (어두워서 안 보이던 문제). 장식이라 끌 수 없음
     private static void RoomSconces()
     {
@@ -201,7 +300,7 @@ public static class HorusWorldPuzzles
             SerializedProperty text = step.FindPropertyRelative("objective");
             if (flag == "F_HO_H1_DONE") text.stringValue = "북서쪽 '해의 방'에서 깃털로 관측대를 닦고, 거울을 돌려 해의 빛을 매의 눈에 모으자";
             else if (flag == "F_HO_H4_DONE") text.stringValue = "동쪽 '나일의 방'에서 매의 인장으로 경기장을 열고, 나무배 두 척을 강 건너 별 자리로 밀자";
-            else if (flag == "F_HO_H5_DONE") text.stringValue = "제단 둘레 레버로 하늘 고리를 돌려, 별이 떠오른 순서대로 북쪽 선에 세우자";
+            else if (flag == "F_HO_H5_DONE") text.stringValue = "제단 둘레 레버로 하늘 고리를 돌려, 북쪽 칸에 비치는 그림(해, 달, 매, 왕관)을 맞추자";
         }
         so.ApplyModifiedPropertiesWithoutUndo();
     }

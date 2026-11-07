@@ -11,6 +11,7 @@ using UnityEngine.Rendering;
 public static class HorusCutscenes
 {
     public const string Intro = "INTRO";
+    public const string Isis = "ISIS";
     public const string Awaken = "AWAKEN";
     public const string Ending = "ENDING";
     public const string LapisAll = "F_HO_LAPIS_ALL";
@@ -23,22 +24,24 @@ public static class HorusCutscenes
     private static readonly Color IsisLight = new Color(0.78f, 0.86f, 1f, 0.8f);
 
     // 퍼즐을 풀면: 호루스 한마디 (답을 대놓고 말하지 않게) + 매가 다음 목적지로 날아감
+    // mural: 매가 날아간 뒤 보여줄 벽화 컷신 (이시스의 기억, HorusMuralScenes). 없으면 null
     private struct Reaction
     {
         public string line;
         public bool flyNext;
-        public Reaction(string line, bool flyNext) { this.line = line; this.flyNext = flyNext; }
+        public string mural;
+        public Reaction(string line, bool flyNext, string mural = null) { this.line = line; this.flyNext = flyNext; this.mural = mural; }
     }
 
     private static readonly Dictionary<string, Reaction> Reactions = new Dictionary<string, Reaction>
     {
-        { "F_HO_CHART_1", new Reaction("메스케티우... 지지 않는 별이 다시 눈을 떴다. 반쪽 날개가 너를 기다린다.", true) },
+        { "F_HO_CHART_1", new Reaction("지지 않는 별이 다시 눈을 떴다. 나의 오른눈은 해... 해의 방에서 빛을 나의 눈에 돌려다오.", true) },
         { "F_HO_H1_DONE", new Reaction("해의 빛이 다시 나의 눈에 닿았다... 빛의 조각을 하늘로 돌려보내라.", true) },
-        { "F_HO_CHART_2", new Reaction("두 번째 별이 떠올랐다. 찢긴 것은 은빛으로 꿰매어라.", true) },
+        { "F_HO_CHART_2", new Reaction("두 번째 별이 떠올랐다. 찢긴 나의 눈이 석탁 위에서 기다린다.", true, HorusMuralScenes.EyeKey) },
         { "F_HO_H3_DONE", new Reaction("보아라, 나의 눈이 다시 형태를 얻었다. 달의 눈을 하늘 앞에 걸어라.", true) },
-        { "F_HO_CHART_3", new Reaction("세 번째 별이 뒤따른다. 이제 세트의 붉은 봉인을 깨뜨려라.", true) },
+        { "F_HO_CHART_3", new Reaction("세 번째 별이 뒤따른다. 나일의 방으로 가라. 세트의 돌배가 너의 다리가 되리라.", true, HorusMuralScenes.RaceKey) },
         { "F_HO_H4_DONE", new Reaction("세트의 돌배는 강바닥에 잠들었다. 꾀로 이긴 자가 강을 건넌다. 마지막 조각을 하늘에 바쳐라.", true) },
-        { "F_HO_CHART_4", new Reaction("네 별이 모였다. 제단으로 오라, 인간이여. 하늘의 순서를 증명하라.", true) },
+        { "F_HO_CHART_4", new Reaction("네 별이 모였다. 제단으로 오라, 인간이여. 해와 달, 매와 왕관... 안에서 밖으로 세워라.", true) },
         { LapisAll, new Reaction("밤하늘의 조각을 모두 모았구나... 매가 너를 인정한다.", false) }
     };
 
@@ -47,6 +50,7 @@ public static class HorusCutscenes
     public static IEnumerator For(HorusDirector d, string key)
     {
         if (key == Intro) return IntroScene(d);
+        if (key == Isis) return IsisStatueScene(d);
         if (key == Awaken) return AwakenScene(d);
         if (key == Ending) return EndingScene(d);
         return ReactionScene(d, Reactions[key]);
@@ -62,12 +66,73 @@ public static class HorusCutscenes
         yield return TitleCardUI.Show("호루스의 신전", "하늘을 잃은 매", 1.8f);
         yield return ScreenFader.FadeIn(Cine.Skipping ? 0.2f : 1.2f);
         if (p != null) yield return CineActor.WalkTo(p, new Vector2(12f, -5.6f), 2.2f);
-        yield return IsisSpeaks(d, new Vector3(12f, -3.6f, 0f));
+        // [수정] 예전엔 들어오자마자 이시스가 나왔음 -> 여신상만 보여 주고, 플레이어가 조사하면 나옴 (라/바스테트처럼)
+        CineCamera.Focus(StatuePos() + Vector3.up * 1f);
+        CineCamera.Zoom(3.6f, 0.8f);
+        yield return Cine.Wait(0.6f);
         if (p != null) d.StartCoroutine(HorusFx.Emote(p, d.EmoteSprite, 1f));
-        yield return Cine.Say("나", "...방금 그 목소리. 스핑크스의 꿈에서 들은 것처럼 아득했어.");
+        yield return Cine.Say("나", "날개를 단 여신상... 눈가에 물기가 맺힌 것 같아. 가까이 가서 살펴볼까.");
         if (HasItem(EmberItem)) yield return Cine.Say("나", "라의 불씨가 아직 따뜻해. 이 어둠 속에서도 횃불은 꺼지지 않겠어.");
+        HorusDirector.SetFlag(d.EnteredFlag);
+        CineCamera.Release();
+        Cine.End();
+    }
+
+    private static Vector3 StatuePos() => Pos("OBJ_HA0_IsisStatue", new Vector3(12f, -3.4f, 0f));
+
+    // ================= 1-1. 이시스 석상 조사: 짧게 나타난 이시스 -> 벽화로 보여주는 기억 -> 부탁 =================
+    private static IEnumerator IsisStatueScene(HorusDirector d)
+    {
+        Cine.Begin(true);
+        HorusFx.MatchPlayer();
+        Vector3 pos = StatuePos() + Vector3.up * 0.3f;
+        HorusIsisGhost isis = null;
+        yield return IsisRise(d, pos, g => isis = g);
+        yield return Cine.Say(IsisBeforeMural());
+        yield return MuralStage.Play(HorusMuralScenes.For(HorusMuralScenes.IsisKey));
+        CineCamera.Focus(pos + Vector3.up * 1.6f);
+        yield return Cine.Say(IsisAfterMural());
+        yield return IsisFade(d, isis, pos);
         HorusDirector.SetFlag(d.IntroFlag);
         Cine.End();
+    }
+
+    private static IEnumerator IsisRise(HorusDirector d, Vector3 pos, System.Action<HorusIsisGhost> made)
+    {
+        CineCamera.Focus(pos + Vector3.up * 1.6f);
+        CineCamera.Zoom(3.6f, 0.8f);
+        yield return DreamIn(d);
+        if (d.IsisSprite == null) yield break;
+        HorusIsisGhost isis = HorusIsisGhost.Create(pos, d.IsisSprite, d.IsisWing, d.FeatherSprite, d.RippleSprite);
+        made(isis);
+        if (isis != null) yield return isis.QuickAppear();
+    }
+
+    private static IEnumerator IsisFade(HorusDirector d, HorusIsisGhost isis, Vector3 pos)
+    {
+        CineCamera.Zoom(4.6f, 1.2f);
+        if (isis != null) yield return isis.Vanish(pos + Vector3.up * 10f);
+        yield return DreamOut(d);
+        CineCamera.Release();
+    }
+
+    private static DialogueLine[] IsisBeforeMural()
+    {
+        return new[]
+        {
+            new DialogueLine("이시스", "...잠든 모래 너머에서, 낯선 숨결이 들리는구나."),
+            new DialogueLine("이시스", "나는 이시스. 이 신전에 잠든 아이의 어미다. 내 기억을 보여 주마.")
+        };
+    }
+
+    private static DialogueLine[] IsisAfterMural()
+    {
+        return new[]
+        {
+            new DialogueLine("이시스", "그 아이는 지금도 한쪽 눈을 잃은 채 별을 보지 못한다."),
+            new DialogueLine("이시스", "본당 천장의 별을 다시 이어다오. 하늘이 열리면, 아이가 깨어날 것이다."),
+            new DialogueLine("나", "...벽화 속 이야기가 진짜였구나. 본당으로 가 보자.")
+        };
     }
 
     // 이시스 유령 그림이 있으면 유령 연출, 없으면 예전 빛 덩어리 연출
@@ -225,8 +290,10 @@ public static class HorusCutscenes
         if (d.Falcon != null) d.StartCoroutine(d.Falcon.Spread(1.4f));
         yield return ScreenTintUI.Flash(new Color(1f, 0.85f, 0.5f, 0.4f), 0.03f, 0.08f, 0.5f);
         yield return HorusVoice(d, "나는 호루스. 두 땅의 주인, 하늘을 가르는 매.");
+        yield return Cine.Say("나", "매가... 말을 해? 이시스 여신이 말한 그 아들이야?");
         CineCamera.Zoom(2.2f, 3f);
-        yield return HorusVoice(d, "세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.");
+        yield return HorusVoice(d, "어머니께서 너를 보내셨구나. 그렇다. 세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.");
+        yield return Cine.Say("나", "내가 뭘 하면 되는데?");
         CineCamera.Zoom(6f, 1f);
         CineCamera.Focus(HallCenter + Vector3.up * 2f);
         HorusFx.StarBurst(HallCenter, HallHalf, 30, StarBlue);
@@ -272,6 +339,7 @@ public static class HorusCutscenes
             HorusWorld.SafeFocus(d.Falcon.Position, 4.2f); // [수정] 맵 끝(동쪽 벽 성도판 등)에서도 매가 화면 안쪽에 오게 가까이
             yield return Cine.Wait(0.5f);
         }
+        if (!string.IsNullOrEmpty(r.mural)) yield return MuralStage.Play(HorusMuralScenes.For(r.mural));
         yield return HorusVoice(d, r.line);
         CineCamera.Release();
         Cine.End();
@@ -289,6 +357,7 @@ public static class HorusCutscenes
         SpriteRenderer plate = null;
         yield return PlateRises(d, altar, sr => plate = sr);
         yield return SkyReturns(d);
+        yield return MuralStage.Play(HorusMuralScenes.For(HorusMuralScenes.EndingKey));
         yield return PlateToPlayer(plate);
         yield return DoorOpens();
         HorusDirector.SetFlag(d.EndingFlag);
