@@ -3,6 +3,7 @@ using UnityEngine.Tilemaps;
 
 // 호루스의 방 바닥/벽 타일 (HorusRoomBuilder가 부름). 호루스 전용 밤하늘 신전 타일(HorusTileArt)을 씀
 // 아래 글자 그림이 곧 맵 (작업 도면 Horus_Map_Plan.png와 같은 데이터). 맨 윗줄 = y 17, 맨 왼칸 = x -9
+//   [추가] 'L' 벽 앞면 아랫줄 (금 띠 없음, 2줄 벽용)   'c' 입구 복도 바닥 (모래빛 돌)
 //   '#' 벽 윗면 (현무암 + 금 띠)       'B' 벽 앞면 (청금석 벽돌. 6칸마다 우자트 / 매 문양)
 //   '.' 본당 바닥 (청금석, 가끔 금 별가루 / 금 간 돌)   'S' 행렬길 + 제단 고리 (금 별 상감)
 //   'a' 입구 전실 바닥 (모래빛 돌)   'D' 북문 자리 바닥   ' ' 빈칸
@@ -52,8 +53,22 @@ public static class HorusRoomMap
         "                #aaaSSaaa#        ",
         "                #aaaSSaaa#        ",
         "                #aaaSSaaa#        ",
-        "                ##########        "
+        // [추가] 입구 복도 (서 -> 동으로 긴 복도). 북쪽 벽은 앞면 두 줄(B 위, L 아래) + 찢긴 벽화 4점 (Murals)
+        // 플레이어는 서쪽 끝에서 시작해 벽화를 지나 x 11~12 문으로 전실에 올라감
+        "####################aa#########", // y -9
+        "#BBBBBBBBBBBBBBBBBBBaaBBBBBBBB#", // y -10
+        "#LLLLLLLLLLLLLLLLLLLaaLLLLLLLL#", // y -11
+        "#ccccccccccccccccccccccccccccc#", // y -12
+        "#ccccccccccccccccccccccccccccc#", // y -13
+        "#ccccccccccccccccccccccccccccc#", // y -14
+        "###############################"  // y -15
     };
+
+    // 복도 북쪽 벽의 찢긴 벽화 (왼쪽 x, 4칸 x 2줄). HorusWorldPuzzles가 같은 자리에 조사 상자를 놓음
+    public static readonly int[] MuralX = { -6, -1, 4, 14 };
+    public const int MuralTopY = -10;
+    public static Vector2 MuralCenter(int i) => new Vector2(MuralX[i] + 2f, MuralTopY);
+    public static readonly Vector3 CorridorStart = new Vector3(-6.5f, -12.8f, 0f);
 
     public static Tilemap Build(string layer, int order)
     {
@@ -69,13 +84,31 @@ public static class HorusRoomMap
                 char c = Rows[r][i];
                 if (c == '#') wall.SetTile(cell, WallTop());
                 else if (c == 'B') wall.SetTile(cell, WallFaceAt(cell.x));
+                else if (c == 'L') wall.SetTile(cell, HorusTileArt.Get(HorusTileArt.WallFaceLow));
                 else if (c != ' ') ground.SetTile(cell, FloorFor(c, rng));
             }
         }
         PaintRoom(ground, wall, SunRoom, rng);
         PaintRoom(ground, wall, NileRoom, rng);
         foreach (Vector2Int d in Doors) OpenDoor(ground, wall, d, rng);
+        PaintMurals(wall);
         return ground;
+    }
+
+    // 찢긴 벽화 타일 (HO_Wall_Mural{번호}_{열}_{줄}, 줄 0 = 위). 타일 팔레트에도 같은 타일이 들어감
+    private static void PaintMurals(Tilemap wall)
+    {
+        for (int i = 0; i < MuralX.Length; i++)
+        {
+            for (int c = 0; c < 4; c++)
+            {
+                for (int r = 0; r < 2; r++)
+                {
+                    TileBase t = HorusTileArt.Get(HorusTileArt.Mural(i + 1, c, r));
+                    if (t != null) wall.SetTile(new Vector3Int(MuralX[i] + c, MuralTopY - r, 0), t);
+                }
+            }
+        }
     }
 
     // 방 하나: 바닥 + 둘레 벽 (북쪽은 벽 앞면 + 윗면 두 줄, 나머지는 윗면 한 줄)
@@ -105,7 +138,7 @@ public static class HorusRoomMap
     private static TileBase FloorFor(char c, System.Random rng)
     {
         if (c == 'S') return HorusTileArt.Get(HorusTileArt.FloorStar);
-        if (c == 'a') return HorusTileArt.Get(HorusTileArt.FloorAnte);
+        if (c == 'a' || c == 'c') return HorusTileArt.Get(HorusTileArt.FloorAnte);
         return HallFloor(rng);
     }
 

@@ -65,20 +65,36 @@ public static class HorusCutscenes
         ScreenFader.SetBlack();
         yield return TitleCardUI.Show("호루스의 신전", "하늘을 잃은 매", 1.8f);
         yield return ScreenFader.FadeIn(Cine.Skipping ? 0.2f : 1.2f);
-        if (p != null) yield return CineActor.WalkTo(p, new Vector2(12f, -5.6f), 2.2f);
-        // [수정] 예전엔 들어오자마자 이시스가 나왔음 -> 여신상만 보여 주고, 플레이어가 조사하면 나옴 (라/바스테트처럼)
-        CineCamera.Focus(StatuePos() + Vector3.up * 1f);
-        CineCamera.Zoom(3.6f, 0.8f);
-        yield return Cine.Wait(0.6f);
+        // [수정] 입구 복도가 생김: 걸어 들어가는 대신 카메라가 긴 복도의 찢긴 벽화들을 훑고 돌아옴
+        //        (이시스는 들어오자마자 나오지 않음 -> 전실의 여신상을 조사하면 나옴, 라/바스테트처럼)
+        yield return CorridorSweep();
         if (p != null) d.StartCoroutine(HorusFx.Emote(p, d.EmoteSprite, 1f));
-        yield return Cine.Say("나", "날개를 단 여신상... 눈가에 물기가 맺힌 것 같아. 가까이 가서 살펴볼까.");
+        yield return Cine.Say("나", "긴 복도... 벽마다 오래된 벽화가 이어져 있는데, 찢기고 긁힌 데가 많아.");
+        yield return Cine.Say("나", "하나씩 살펴보면서 안쪽으로 가 보자.");
         if (HasItem(EmberItem)) yield return Cine.Say("나", "라의 불씨가 아직 따뜻해. 이 어둠 속에서도 횃불은 꺼지지 않겠어.");
         HorusDirector.SetFlag(d.EnteredFlag);
         CineCamera.Release();
         Cine.End();
     }
 
-    private static Vector3 StatuePos() => Pos("OBJ_HA0_IsisStatue", new Vector3(12f, -3.4f, 0f));
+    private static Vector3 StatuePos() => Pos("OBJ_HA0_IsisStatue", new Vector3(8.9f, -2.9f, 0f));
+
+    // 복도 서쪽 -> 동쪽으로 카메라가 천천히 훑음 (찢긴 벽화 4점) -> 플레이어에게 돌아옴
+    private static IEnumerator CorridorSweep()
+    {
+        CineCamera.Zoom(4.2f, 0.6f);
+        foreach (string n in new[] { "OBJ_HC1_MuralWall", "OBJ_HC2_MuralWall", "OBJ_HC3_MuralWall", "OBJ_HC4_MuralWall" })
+        {
+            GameObject go = GameObject.Find(n);
+            if (go == null) continue;
+            CineCamera.Focus(go.transform.position + Vector3.up * 1.2f);
+            yield return Cine.Wait(0.9f);
+        }
+        Transform p = CineActor.Player();
+        if (p != null) CineCamera.Focus(p.position + Vector3.up * 0.8f);
+        CineCamera.Zoom(3.8f, 0.6f);
+        yield return Cine.Wait(0.6f);
+    }
 
     // ================= 1-1. 이시스 석상 조사: 짧게 나타난 이시스 -> 벽화로 보여주는 기억 -> 부탁 =================
     private static IEnumerator IsisStatueScene(HorusDirector d)

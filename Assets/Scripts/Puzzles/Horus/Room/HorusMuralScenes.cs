@@ -12,6 +12,11 @@ public static class HorusMuralScenes
     public const string EyeKey = "MURAL_EYE";
     public const string RaceKey = "MURAL_RACE";
     public const string EndingKey = "MURAL_ENDING";
+    public const string Wall1Key = "WALL_1";   // [추가] 입구 복도의 찢긴 벽화 4점 (등 뒤에서 올려다보는 장면)
+    public const string Wall2Key = "WALL_2";
+    public const string Wall3Key = "WALL_3";
+    public const string Wall4Key = "WALL_4";
+    private const string Me = "나";
 
     private const string Isis = "이시스";
     private const string Horus = "호루스";
@@ -25,6 +30,10 @@ public static class HorusMuralScenes
             case EyeKey: return new[] { EyeFight(), EyeThoth() };
             case RaceKey: return new[] { RaceStart(), RaceSink() };
             case EndingKey: return new[] { EndCourt(), EndThrone() };
+            case Wall1Key: return new[] { WallThrone() };
+            case Wall2Key: return new[] { WallEye() };
+            case Wall3Key: return new[] { WallBoats() };
+            case Wall4Key: return new[] { WallIsis() };
             default:
                 Debug.LogWarning($"[벽화] 모르는 컷신: {key}");
                 return new MuralShot[0];
@@ -139,5 +148,46 @@ public static class HorusMuralScenes
             .Move("sun", new MuralPose(0f, -80f, 0f, 0f), MuralPose.Rest, 0.45f, 0.9f)
             .Say(Horus, "어머니... 이제 하늘이 제자리를 찾았습니다.")
             .Say(Isis, "...그런데 서쪽 벽 너머에서, 아직 무언가가 너를 부르는구나.");
+    }
+
+    // ================= 입구 복도: 찢긴 벽화 (복선) =================
+    // 카메라: 플레이어 뒤통수 가까이에서 시작 -> 천천히 뒤로 빠지며 벽화 전체가 드러남. 빛줄기는 숨 쉬고 먼지가 떠오름
+    private static MuralShot WallView(string id, float playerX, float duration)
+    {
+        Vector2 start = new Vector2((playerX - 640f) * 0.45f, 50f);
+        return new MuralShot(id, id, duration)
+            .Camera(1.22f, 1f, start, Vector2.zero)
+            .Layer("rays").Layer("player", 1.2f, 1.1f)
+            .Pulse("rays", 0.45f, 0.9f)
+            .Move("player", new MuralPose(0f, 30f), MuralPose.Rest, 0f, 0.5f)
+            .Dust(46);
+    }
+
+    private static MuralShot WallThrone()
+    {
+        return WallView("Wall1", 600f, 7f)
+            .Say(Me, "왕좌에 앉은 초록 피부의 왕... 그 뒤로 거대한 그림자가 손을 뻗고 있어.")
+            .Say(Me, "그림자 쪽만 누가 일부러 긁어낸 것 같아. 이름조차 남기기 싫었던 걸까.");
+    }
+
+    private static MuralShot WallEye()
+    {
+        return WallView("Wall2", 300f, 7f)
+            .Say(Me, "커다란 눈 그림이야. 그런데 아래쪽 조각들이 통째로 뜯겨 나갔어.")
+            .Say(Me, "옆의 새 머리 신이 무언가를 내밀고 있어... 찢긴 눈을 다시 맞추려는 걸까?");
+    }
+
+    private static MuralShot WallBoats()
+    {
+        return WallView("Wall3", 640f, 7f)
+            .Say(Me, "강 위의 배 두 척. 흰 배는 떠 있는데, 붉은 돌배는 물속으로 잠기는 것처럼 그려져 있어.")
+            .Say(Me, "가라앉는 배라니... 이 신전을 지은 사람들은 이걸 꼭 기억하고 싶었나 봐.");
+    }
+
+    private static MuralShot WallIsis()
+    {
+        return WallView("Wall4", 1010f, 7f)
+            .Say(Me, "날개를 편 여신이 울고 있어. 눈물이 강물처럼 흘러내려.")
+            .Say(Me, "여신의 눈길을 따라가면... 복도 위쪽 방으로 올라가는 문이 있어.");
     }
 }

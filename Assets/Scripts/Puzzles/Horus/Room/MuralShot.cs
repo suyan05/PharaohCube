@@ -43,6 +43,8 @@ public class MuralLayer
     public Vector2 pos;      // 벽화 그림 기준 픽셀 (왼쪽 위 0,0)
     public float bobAmp;     // 둥실둥실 (픽셀)
     public float bobSpeed;
+    public float pulseAmp;   // 투명도가 숨 쉬듯 (빛줄기 등, 0~1)
+    public float pulseSpeed;
     public readonly List<MuralMove> moves = new List<MuralMove>();
 }
 
@@ -52,6 +54,7 @@ public class MuralShot
     public float duration = 7f;            // 움직임이 다 끝나는 시간(초)
     public float zoomFrom = 1f, zoomTo = 1f;
     public Vector2 panFrom, panTo;         // 화면 가운데가 볼 곳 (벽화 픽셀, 가운데 기준 차이)
+    public int dust;                        // 떠다니는 먼지 알갱이 수 (0이면 없음)
     public readonly List<MuralLayer> layers = new List<MuralLayer>();
     public readonly List<DialogueLine> lines = new List<DialogueLine>();
 
@@ -86,6 +89,21 @@ public class MuralShot
             return this;
         }
         l.moves.Add(new MuralMove { layer = layer, from = from, to = to, t0 = t0, t1 = t1 });
+        return this;
+    }
+
+    public MuralShot Dust(int count)
+    {
+        dust = Mathf.Max(0, count);
+        return this;
+    }
+
+    public MuralShot Pulse(string layer, float amp, float speed)
+    {
+        MuralLayer l = layers.Find(x => x.name == layer);
+        if (l == null) return this;
+        l.pulseAmp = Mathf.Clamp01(amp);
+        l.pulseSpeed = speed;
         return this;
     }
 

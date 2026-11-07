@@ -29,6 +29,8 @@ public static class HorusWorldPuzzles
             SteleNearPuzzles();
             RoomSconces();
             IsisStatue();
+            CorridorMurals();
+            CorridorSconces();
         }
         catch (System.Exception e)
         {
@@ -258,6 +260,73 @@ public static class HorusWorldPuzzles
         step.FindPropertyRelative("pathToLight").objectReferenceValue = null;
         step.FindPropertyRelative("target").objectReferenceValue = statue;
         so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // [추가] 입구 복도 찢긴 벽화 4점: 벽화 타일(HorusRoomMap.PaintMurals) 앞에 조사 상자 + 안 본 벽화 반짝임
+    private static readonly string[] MuralKeys = { HorusMuralScenes.Wall1Key, HorusMuralScenes.Wall2Key, HorusMuralScenes.Wall3Key, HorusMuralScenes.Wall4Key };
+    private static readonly string[] MuralTitles = { "찢긴 벽화 - 왕좌와 그림자", "찢긴 벽화 - 커다란 눈", "찢긴 벽화 - 강 위의 배", "찢긴 벽화 - 우는 여신" };
+
+    private static void CorridorMurals()
+    {
+        for (int i = 0; i < MuralKeys.Length; i++)
+        {
+            Vector2 c = HorusRoomMap.MuralCenter(i);
+            var go = new GameObject($"OBJ_HC{i + 1}_MuralWall");
+            go.transform.position = new Vector3(c.x, c.y - 0.8f, 0f); // 벽 바로 앞 바닥 쪽 (플레이어가 서는 곳)
+            BoxCollider2D box = go.AddComponent<BoxCollider2D>();
+            box.isTrigger = true;
+            box.size = new Vector2(3.6f, 1.4f);
+            HorusMuralWall wall = go.AddComponent<HorusMuralWall>();
+            var so = new SerializedObject(wall);
+            Str(so, "muralKey", MuralKeys[i]);
+            Str(so, "title", MuralTitles[i]);
+            Str(so, "seenFlag", $"F_HO_WALL_{i + 1}_SEEN");
+            Ref(so, "glint", Glint(go.transform, new Vector2(c.x, c.y + 0.4f)));
+            so.ApplyModifiedPropertiesWithoutUndo();
+            EditorUtility.SetDirty(go);
+        }
+    }
+
+    // 아직 안 본 벽화 위에 은은하게 깜빡이는 빛 (HorusMuralWall이 깜빡이게 함)
+    private static SpriteRenderer Glint(Transform parent, Vector2 pos)
+    {
+        var go = new GameObject("Glint");
+        go.transform.SetParent(parent, false);
+        go.transform.position = pos;
+        go.transform.localScale = new Vector3(2.6f, 1.2f, 1f);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = HorusRoomObjects.Circle;
+        sr.color = new Color(1f, 0.85f, 0.5f, 0.3f);
+        sr.sortingLayerName = string.IsNullOrEmpty(HorusRoomObjects.Layer) ? "Default" : HorusRoomObjects.Layer;
+        sr.sortingOrder = 22;
+        return sr;
+    }
+
+    // 복도 벽 횃대 (벽화 사이사이). 장식이라 끌 수 없음
+    private static void CorridorSconces()
+    {
+        foreach (float x in new[] { -7.5f, -1.5f, 3.5f, 9.5f, 13.5f, 19.5f })
+            Sconce(new Vector2(x, HorusRoomMap.MuralTopY + 0.2f), 5f, "HO_CorridorSconce");
+    }
+
+    private static void Sconce(Vector2 p, float radius, string objName)
+    {
+        Sprite on = Px("HO_Sconce_On");
+        var go = new GameObject(objName);
+        go.transform.position = p;
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = on;
+        sr.sortingLayerName = string.IsNullOrEmpty(HorusRoomObjects.Layer) ? "Default" : HorusRoomObjects.Layer;
+        sr.sortingOrder = 21;
+        if (on != null) go.transform.localScale = Vector3.one * (0.56f / on.bounds.size.x);
+        var light = new GameObject("Light", typeof(UnityEngine.Rendering.Universal.Light2D)).GetComponent<UnityEngine.Rendering.Universal.Light2D>();
+        light.transform.position = p + Vector2.up * 0.3f;
+        light.transform.SetParent(go.transform, true);
+        light.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+        light.color = new Color(1f, 0.78f, 0.5f);
+        light.intensity = 0.9f;
+        light.pointLightOuterRadius = radius;
+        light.pointLightInnerRadius = 0.4f;
     }
 
     // [추가] 퍼즐 방 북쪽 벽의 켜진 횃대 (어두워서 안 보이던 문제). 장식이라 끌 수 없음

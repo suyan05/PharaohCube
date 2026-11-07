@@ -36,6 +36,14 @@ public static class MuralArt
         { "EndB/isis", new Vector2(459.0f, 460.0f) },
         { "EndB/horus", new Vector2(843.0f, 395.5f) },
         { "EndB/sun", new Vector2(640.0f, 167.5f) },
+        { "Wall1/rays", new Vector2(807.0f, 360.0f) },
+        { "Wall1/player", new Vector2(600.0f, 474.5f) },
+        { "Wall2/rays", new Vector2(807.0f, 360.0f) },
+        { "Wall2/player", new Vector2(300.0f, 474.5f) },
+        { "Wall3/rays", new Vector2(807.0f, 360.0f) },
+        { "Wall3/player", new Vector2(640.0f, 474.5f) },
+        { "Wall4/rays", new Vector2(807.0f, 360.0f) },
+        { "Wall4/player", new Vector2(1010.0f, 474.5f) },
     };
 
     public static Vector2 Pos(string art, string layer)

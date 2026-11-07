@@ -11,6 +11,7 @@ using UnityEngine.UI;
 // - 자막 넘기기: E / Space / Enter / 클릭. ESC 길게 = 연출 스킵 (Cine.Skipping)
 // - 음성(선택): Resources/Voice/Mural/<장면 id>_<줄 번호(1부터)> 오디오가 있으면 그 줄에서 재생, 없으면 자막만
 // - 그림: Resources/Horus/Mural/MU_<art>_bg, MU_<art>_<조각>
+// - [추가] 먼지 알갱이(shot.dust), 빛줄기 숨쉬기(layer pulse) -> 찢긴 벽화를 올려다보는 장면용
 public class MuralStage : MonoBehaviour
 {
     private const float ArtScale = 1.5f;
@@ -29,6 +30,8 @@ public class MuralStage : MonoBehaviour
     private Text nameText, lineText, hintText;
     private AudioSource voice;
     private readonly List<(MuralLayer layer, Image img)> live = new List<(MuralLayer, Image)>();
+    private readonly List<(Image img, Vector2 home, float speed, float phase)> motes = new List<(Image, Vector2, float, float)>();
+    private RectTransform dustRoot;
     private bool animDone, shotOver;
 
     public static bool IsPlaying { get; private set; }
@@ -154,6 +157,7 @@ public class MuralStage : MonoBehaviour
             float u = Cine.Skipping ? 1f : Mathf.Clamp01(t / Mathf.Max(0.1f, shot.duration));
             ApplyCamera(shot, u);
             foreach (var pair in live) ApplyLayer(pair.layer, pair.img, u, t);
+            UpdateDust(t);
             if (u >= 1f) animDone = true;
             yield return null;
         }
@@ -177,8 +181,35 @@ public class MuralStage : MonoBehaviour
         img.rectTransform.anchoredPosition = ToUi(art);
         img.rectTransform.localRotation = Quaternion.Euler(0f, 0f, p.rot);
         Color c = img.color;
-        c.a = p.alpha;
+        float pulse = l.pulseAmp > 0f ? 1f - l.pulseAmp * (0.5f + 0.5f * Mathf.Sin(time * l.pulseSpeed)) : 1f;
+        c.a = p.alpha * pulse;
         img.color = c;
+    }
+
+    // ================= 먼지 =================
+    private void BuildDust(int count)
+    {
+        var rng = new System.Random(count * 31 + 7);
+        for (int i = 0; i < count; i++)
+        {
+            Vector2 home = new Vector2((float)rng.NextDouble() * 1920f - 960f, (float)rng.NextDouble() * 900f - 450f);
+            float size = 3f + (float)rng.NextDouble() * 5f;
+            Image img = UIBuild.Image(dustRoot, "Mote", home, new Vector2(size, size), null, new Color(1f, 0.88f, 0.65f, 0f));
+            motes.Add((img, home, 12f + (float)rng.NextDouble() * 26f, (float)rng.NextDouble() * 10f));
+        }
+    }
+
+    // 천천히 위로 떠오르며 좌우로 흔들림, 반짝임 (화면 위로 나가면 아래에서 다시)
+    private void UpdateDust(float time)
+    {
+        foreach (var m in motes)
+        {
+            if (m.img == null) continue;
+            float y = Mathf.Repeat(m.home.y + 450f + time * m.speed, 900f) - 450f;
+            float x = m.home.x + Mathf.Sin(time * 0.6f + m.phase) * 24f;
+            m.img.rectTransform.anchoredPosition = new Vector2(x, y);
+            m.img.color = new Color(1f, 0.88f, 0.65f, 0.25f + 0.25f * Mathf.Sin(time * 1.7f + m.phase));
+        }
     }
 
     // 벽화 픽셀(왼쪽 위 0,0, 아래로 +y) -> 화면 UI 좌표(가운데 0,0, 위로 +y)
@@ -194,6 +225,7 @@ public class MuralStage : MonoBehaviour
             if (bg == null) Debug.LogWarning($"[벽화] 배경 그림 없음: {ArtPath}{shot.art}_bg (빌더 실행/임포트 확인)");
             UIBuild.Image(artRoot, "BG", Vector2.zero, new Vector2(1280f, 720f) * ArtScale, bg, new Color(0.85f, 0.72f, 0.5f));
             foreach (MuralLayer l in shot.layers) live.Add((l, MakeLayer(shot, l)));
+            if (shot.dust > 0) BuildDust(shot.dust);
             ApplyCamera(shot, 0f);
             foreach (var pair in live) ApplyLayer(pair.layer, pair.img, 0f, 0f);
             return true;
@@ -221,6 +253,9 @@ public class MuralStage : MonoBehaviour
     private void Clear()
     {
         live.Clear();
+        motes.Clear();
+        if (dustRoot != null)
+            for (int i = dustRoot.childCount - 1; i >= 0; i--) Destroy(dustRoot.GetChild(i).gameObject);
         if (artRoot == null) return;
         for (int i = artRoot.childCount - 1; i >= 0; i--) Destroy(artRoot.GetChild(i).gameObject);
     }
@@ -236,6 +271,7 @@ public class MuralStage : MonoBehaviour
         frame = group.gameObject;
         UIBuild.Image(group, "Back", Vector2.zero, new Vector2(6000f, 4000f), null, Color.black);
         artRoot = UIBuild.Rect(group, "Art", Vector2.zero, new Vector2(1920f, 1080f));
+        dustRoot = UIBuild.Rect(group, "Dust", Vector2.zero, new Vector2(1920f, 1080f)); // 벽화 위, 검은 띠 아래
         Bar(group, true);
         BuildSubtitle(Bar(group, false), font);
         black = UIBuild.Image(root, "Fade", Vector2.zero, new Vector2(6000f, 4000f), null, Color.black);
