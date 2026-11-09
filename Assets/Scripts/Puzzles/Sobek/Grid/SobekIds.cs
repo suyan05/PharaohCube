@@ -16,6 +16,8 @@ public static class SobekIds
     public const string FlagS2Clear = "F_SOBEK_S2_CLEAR";
     public const string FlagS3Clear = "F_SOBEK_S3_CLEAR";
     public const string FlagS4Clear = "F_SOBEK_S4_CLEAR";
+    // Amulets[i]를 주는 서브 퍼즐의 클리어 플래그 (순서 같음). 씬이 바뀌면 인벤토리가 비므로 허브에서 이걸로 부적을 되살림
+    public static readonly string[] AmuletClearFlags = { FlagS1Clear, FlagS2Clear, FlagS3Clear, FlagS4Clear };
     public const string FlagDoorOpen = "F_SOBEK_DOOR_OPEN";       // 큰 문에 부적 4개를 넣음
     public const string FlagMainADone = "F_SOBEK_MAIN_A_DONE";    // 첫 구역(범람기) 통과
     public const int MainZoneA = 0;
