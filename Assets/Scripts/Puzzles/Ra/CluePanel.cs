@@ -46,7 +46,7 @@ public class CluePanel : MonoBehaviour
     {
         if (!IsOpen) return;
         bool eKey = Input.GetKeyDown(KeyCode.E) && Time.frameCount != openedFrame;
-        if (eKey || Input.GetKeyDown(KeyCode.Escape)) Hide();
+        if (eKey || PuzzleCloseKey.ExtraPressed) Hide();
     }
 
     private void OnDisable()

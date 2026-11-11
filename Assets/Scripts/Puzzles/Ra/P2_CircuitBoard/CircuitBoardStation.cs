@@ -30,6 +30,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     private Color paper, sandWall;
 
     private bool isOpen;
+    private bool solvedShown; // [추가] 다 풀었을 때의 효과음 + 자동 닫힘을 한 번만
     private PlayerController2D playerController;
     private Rigidbody2D playerRb;
 
@@ -77,7 +78,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (isOpen && Input.GetKeyDown(KeyCode.Escape))
+        if (isOpen && PuzzleCloseKey.ExtraPressed)
         {
             CloseBoard();
         }
@@ -118,6 +119,7 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
 
         // 튜토리얼 미완료면 안내만, 완료면 1단계 자동 클리어 + 가져온 조각 자동 장착
         puzzle.Open();
+        solvedShown = puzzle.IsComplete || puzzle.IsLocked; // 이미 풀린 판을 다시 연 경우엔 효과 없음
         RefreshHelp();
         RefreshStatus();
         Debug.Log("[P2] 회로판 열림");
@@ -166,9 +168,25 @@ public class CircuitBoardStation : MonoBehaviour, IInteractable
     private void RefreshStatus()
     {
         if (!isOpen || statusText == null) return;
+        CheckSolved();
         if (!puzzle.TutorialDone) return;
 
         statusText.text = BuildStatusMessage();
+    }
+
+    // [추가] 네 문양이 다 켜진 순간: 종소리 + 금빛 번쩍 -> 잠깐 보여주고 판이 스스로 닫힘 (다 풀었는지 몰라 멍하니 있던 문제)
+    private void CheckSolved()
+    {
+        if (solvedShown || !puzzle.IsComplete || puzzle.IsLocked) return;
+        solvedShown = true;
+        PuzzleSolvedFx.Play();
+        if (isActiveAndEnabled) StartCoroutine(CloseAfterSolved());
+    }
+
+    private System.Collections.IEnumerator CloseAfterSolved()
+    {
+        yield return new WaitForSecondsRealtime(PuzzleSolvedFx.HoldSeconds);
+        if (isOpen) CloseBoard();
     }
 
     private string BuildStatusMessage()

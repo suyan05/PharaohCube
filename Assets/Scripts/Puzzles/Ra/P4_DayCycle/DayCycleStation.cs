@@ -59,7 +59,7 @@ public class DayCycleStation : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (isOpen && Input.GetKeyDown(KeyCode.Escape))
+        if (isOpen && PuzzleCloseKey.ExtraPressed)
         {
             CloseOverlay();
         }
