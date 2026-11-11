@@ -54,25 +54,25 @@ EditorBuildSettings:
     path: Assets/Scenes/Puzzle_Test/Puzzle_Test_Thoth.unity
     guid: d0fa0767347318f4d9f50f903ab6eefb
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_Main.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_Main.unity
     guid: f83294b604973884398826790d794ac7
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_Hub.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_Hub.unity
     guid: dc9622010d85e794c982779bc9b52c26
   - enabled: 1
     path: Assets/Scenes/Puzzle_Test/Sobek_Illusion1.unity
     guid: 22fa4a64dcb254740b2413a40f3263a3
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_S1.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_S1.unity
     guid: 7d2ab0ce42872ba4f89166063e3ece9a
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_S2.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_S2.unity
     guid: 75730c813c4da884b872b27664d62ddd
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_S3.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_S3.unity
     guid: a14396655540d794eb547cff2102f87d
   - enabled: 1
-    path: Assets/Scenes/Puzzle_Test/Sobek_S4.unity
+    path: Assets/Scenes/Puzzle_Test/Sobeck/Sobek_S4.unity
     guid: e7d12148b70b5ba49987ed1257f4afbc
   - enabled: 1
     path: Assets/Scenes/Puzzle_Test/Puzzle_Horus_Test.unity
