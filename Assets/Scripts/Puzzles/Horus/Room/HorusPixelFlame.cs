@@ -17,6 +17,8 @@ public class HorusPixelFlame : MonoBehaviour
     [SerializeField] private Sprite baseSprite;
     [SerializeField, Min(1f)] private float fps = 10f;
     [SerializeField, Min(1f)] private float flickerSteps = 12f; // 빛이 1초에 바뀌는 횟수 (끊기는 도트 느낌)
+    [Tooltip("[추가] 장식 횃대 전용: 이 플래그가 켜져야 불이 붙음 (비우면 항상 켜짐)")]
+    [SerializeField] private string litFlag = "";
 
     private SpriteRenderer host;
     private SpriteRenderer flame;
@@ -43,6 +45,25 @@ public class HorusPixelFlame : MonoBehaviour
         baseSprite = unlitSconce;
     }
 
+    // [추가] 장식 횃대를 "플래그가 켜질 때까지 꺼진 횃대"로 만듦 (예: 돌배 퍼즐을 풀면 켜지는 동쪽 방 횃대)
+    public void RequireFlag(string flag)
+    {
+        litFlag = flag;
+    }
+
+    private bool FlagOk()
+    {
+        if (string.IsNullOrEmpty(litFlag)) return true;
+        return GameManager.Instance != null && GameManager.Instance.HasFlag(litFlag);
+    }
+
+    // 장식 횃대가 꺼져 있으면 빛도 끄고 그림도 불꽃 없는 횃대로
+    private void ShowDecor(bool lit)
+    {
+        if (glow != null && glow.gameObject.activeSelf != lit) glow.gameObject.SetActive(lit);
+        if (!lit && baseSprite != null && host.sprite != baseSprite) host.sprite = baseSprite;
+    }
+
     private void Start()
     {
         try
@@ -51,6 +72,7 @@ public class HorusPixelFlame : MonoBehaviour
             if (host == null || frames == null || frames.Length == 0) { enabled = false; return; }
             torch = GetComponent<WallTorch>();
             glow = GetComponentInChildren<Light2D>(true);
+            TorchGlowTune.Widen(glow); // [추가] 빛을 넓고 은은하게
             glowBase = glow != null ? Mathf.Max(glow.intensity, 0.6f) : 0f;
             rim = FindRim();
             clock = UnityEngine.Random.value * 10f; // 횃불마다 박자가 다르게
@@ -88,7 +110,8 @@ public class HorusPixelFlame : MonoBehaviour
         if (!ready) return;
         try
         {
-            bool lit = torch == null || torch.IsLit;
+            bool lit = torch != null ? torch.IsLit : FlagOk();
+            if (torch == null) ShowDecor(lit);
             flame.enabled = lit;
             if (lit && baseSprite != null && host.sprite != baseSprite) host.sprite = baseSprite;
             if (!lit) { HideEmbers(); return; }
