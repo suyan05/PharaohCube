@@ -225,7 +225,7 @@ MonoBehaviour:
   - {fileID: -8717975482313926904, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
   - {fileID: -1761608541376497799, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
   flipRightForLeft: 1
-  walkPattern: 00000000010000000200000001000000
+  walkPattern: 00000000010000000000000002000000
   idleFrame: 0
   framesPerSecond: 8
   moveThreshold: 0.05
