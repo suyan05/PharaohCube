@@ -40,6 +40,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
 
     private readonly List<HorusMirror> mirrors = new List<HorusMirror>();
     private LineRenderer beam;
+    private HorusBeamFx beamFx; // [추가] 부드럽게 번지고, 거울에서 튕기며 달려 나가는 빛 연출
     private SpriteRenderer sun;
     private Transform root;
     private bool done, busy;
@@ -94,6 +95,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         if (RaDarkness.Unlit != null) lr.sharedMaterial = RaDarkness.Unlit;
         else lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.positionCount = 0;
+        beamFx = HorusBeamFx.Attach(lr);
         return lr;
     }
 
@@ -109,14 +111,23 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         if (!Unlocked && !done)
         {
             beam.positionCount = 0;
+            if (beamFx != null) beamFx.Hide();
             return;
         }
         var pts = new List<Vector3> { World(Sun) + Vector3.right * 0.45f * cell };
         Hit hit = Walk(pts);
+        Color beamColor = hit == Hit.Red ? Red : Gold;
+        if (beamFx != null) beamFx.Show(pts, beamColor); // [수정] 딱딱한 직선 대신 빛 연출이 그림 (판정은 그대로)
+        else DrawPlainBeam(pts, beamColor);
+        if (hit == Hit.Target && !done) Submit();
+    }
+
+    // 빛 연출을 못 만들었을 때만 쓰는 예전 방식 (직선 하나)
+    private void DrawPlainBeam(List<Vector3> pts, Color beamColor)
+    {
         beam.positionCount = pts.Count;
         beam.SetPositions(pts.ToArray());
-        beam.startColor = beam.endColor = hit == Hit.Red ? Red : Gold;
-        if (hit == Hit.Target && !done) Submit();
+        beam.startColor = beam.endColor = beamColor;
     }
 
     private Hit Walk(List<Vector3> pts)
