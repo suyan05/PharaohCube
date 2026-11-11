@@ -64,7 +64,7 @@ public class NotebookUI : MonoBehaviour
                 return;
             }
             if (popup != null && (popup.IsOpen || popup.ClosedFrame == Time.frameCount)) return; // 팝업이 Esc를 먼저 받음
-            if (Input.GetKeyDown(KeyCode.J) || Input.GetKeyDown(KeyCode.Escape)) Close();
+            if (Input.GetKeyDown(KeyCode.J)) Close(); // [수정] ESC는 설정 창 키 -> 수첩은 J로만 여닫음
         }
         catch (Exception e)
         {
@@ -208,7 +208,7 @@ public class NotebookUI : MonoBehaviour
         chapterMemo.alignment = TextAnchor.UpperLeft;
         chapterCount = UIBuild.Text(leftPage, "Count", body, 30, new Vector2(0f, -150f), new Vector2(660f, 40f), ink);
         stampRow = UIBuild.Rect(leftPage, "Stamps", new Vector2(0f, -240f), new Vector2(660f, 120f));
-        UIBuild.Text(leftPage, "Help", body, 20, new Vector2(0f, -400f), new Vector2(660f, 30f), new Color(0.55f, 0.42f, 0.28f)).text = "카드를 누르면 크게 보기  |  J / Esc : 닫기";
+        UIBuild.Text(leftPage, "Help", body, 20, new Vector2(0f, -400f), new Vector2(660f, 30f), new Color(0.55f, 0.42f, 0.28f)).text = "카드를 누르면 크게 보기  |  J : 닫기";
     }
 
     private void BuildRightPage()
