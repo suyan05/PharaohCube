@@ -54,6 +54,14 @@ public class DigIntroCutscene : MonoBehaviour
     };
     [SerializeField] private DialogueLine[] zoneLines = { new DialogueLine("나", "로프 쳐둔 저기가 B구역이지. 일지부터 보고, 장비 상자에서 붓을 챙기자.") };
 
+    [Header("[추가] 불길한 징조 (첫 컷: 모래 위 뱀 자국 / 한탄 뒤: 땅울림)")]
+    [SerializeField, Min(1f)] private float omenSize = 2.8f;
+    [SerializeField] private DialogueLine[] tremorLines =
+    {
+        new DialogueLine("나", "...방금, 땅이 울렸나?"),
+        new DialogueLine("나", "기분 탓이겠지. 요즘 통 잠을 못 자서.")
+    };
+
     private Transform player;
 
     // ================= 시작 =================
@@ -65,10 +73,12 @@ public class DigIntroCutscene : MonoBehaviour
 
         yield return TitleCardUI.Show(title, subtitle, titleSeconds);
         yield return ScreenFader.FadeIn(Cine.Skipping ? 0.2f : 1.5f);
+        yield return OmenShot(); // [추가] 첫 컷: 모래 위 뱀 자국 -> 크레인으로 물러나며 캠프 전체
         yield return Cine.Wait(1.2f);
 
         yield return ExitTent();
         yield return Lament();
+        yield return Tremor(); // [추가] 발밑이 아주 잠깐 울림 (붕괴 복선)
         yield return RadioCall();
         yield return ShowZone();
         Finish();
@@ -84,8 +94,9 @@ public class DigIntroCutscene : MonoBehaviour
             if (player != null) CineActor.Place(player, player.GetComponent<Rigidbody2D>(), tentDoor);
             CineActor.SetAlpha(player, 0f);
 
-            CineCamera.Focus(CineCamera.MapCenter(new Vector3(14f, 7f, 0f)));
-            CineCamera.Zoom(CineCamera.WideSize(0.3f, 8f));
+            // [수정] 첫 화면은 캠프 전체가 아니라 모래 위 뱀 자국을 가까이서 (OmenShot에서 캠프 전체로 물러남)
+            CineCamera.Focus(DigAtmosphere.TrackPos);
+            CineCamera.Zoom(omenSize);
             CineCamera.SnapZoom();
         }
         catch (Exception e)
@@ -95,6 +106,30 @@ public class DigIntroCutscene : MonoBehaviour
     }
 
     // ================= 장면들 =================
+    // [추가] 아무 말 없이 보여주는 첫 컷: 뱀 자국 클로즈업(핸드헬드) + 새 그림자가 스침 -> 크레인 업으로 캠프 전체
+    private IEnumerator OmenShot()
+    {
+        if (Cine.Skipping) yield break;
+        Vector3 track = DigAtmosphere.TrackPos;
+        Vector3 center = CineCamera.MapCenter(new Vector3(14f, 7f, 0f));
+        float wide = CineCamera.WideSize(0.3f, 8f);
+        DigAtmosphere.FlyOver(track + new Vector3(-5f, 3f, 0f), track + new Vector3(5f, -2.5f, 0f), 1.5f);
+        yield return CineShots.Handheld(track, 2.2f, 0.06f);
+        yield return CineShots.Crane(track, center, omenSize, wide, 3f);
+    }
+
+    // [추가] 한탄이 끝난 뒤 발밑이 아주 짧게 울림. 주인공은 대수롭지 않게 넘김
+    private IEnumerator Tremor()
+    {
+        if (Cine.Skipping) yield break;
+        GameAudio.Play("sfx_rumble", 0.35f);
+        CineCamera.Shake(0.6f, 0.035f);
+        CineFX.Puff(dustSprites, player != null ? player.position : (Vector3)lamentSpot, 5);
+        yield return Cine.Wait(0.5f);
+        yield return EmoteBalloonUI.Show(player, "?", 0.8f);
+        yield return Cine.Say(tremorLines);
+    }
+
     private IEnumerator ExitTent()
     {
         CineCamera.Focus(tentFront + Vector2.up * 0.8f);
@@ -126,7 +161,7 @@ public class DigIntroCutscene : MonoBehaviour
 
     private IEnumerator RadioCall()
     {
-        CineAudio.Play(GameAudio.Or(radioStaticSfx, "sfx_radio_static"));
+        CineAudio.Play(GameAudio.Or(radioStaticSfx, "sfx_radio_static"), 0.3f); // [수정] 치지직 소리가 너무 커서 줄임
         Cine.Run(CineActor.Jitter(radio, 1.4f, 0.05f));
         yield return EmoteBalloonUI.Show(player, "!", 0.7f);
         if (radio != null) CineCamera.Focus(radio.position + Vector3.up);
