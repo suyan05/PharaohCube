@@ -102,6 +102,7 @@ public class DigCollapseSequence : MonoBehaviour
         CineCamera.Zoom(3.5f, 0.5f);
         Cine.Run(CineCamera.Rumble(fadeOutSeconds + 0.6f, strongShake, strongShake));
         yield return CineActor.Sink(player, 0.6f, 0.6f);
+        yield return ApepShadow.Sweep(1.1f); // [추가] 최종 스토리: 무너지는 틈으로 보랏빛 뱀 그림자가 스침 (아펩 첫 등장)
         yield return ScreenFader.FadeOut(fadeOutSeconds);
         yield return CineAudio.StopLoop(0.3f);
         yield return new WaitForSeconds(blackHoldSeconds);

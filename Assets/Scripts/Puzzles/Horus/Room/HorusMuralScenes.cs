@@ -1,7 +1,8 @@
 using UnityEngine;
 
-// 호루스의 방 벽화 컷신 대본 (이시스가 보여주는 기억 = 이집트 벽화 인형극)
-// - 입구 이시스 석상: Isis()   오시리스의 왕좌 -> 갈대숲의 이시스와 아기 호루스
+// 호루스의 방 벽화 컷신 대본 (이집트 벽화 인형극)
+// [수정] 최종 스토리(B안)에는 이시스가 나오지 않음 -> 회상은 호루스가 자기 기억으로 들려줌 (이시스 장면 데이터는 남겨 둠, 안 부름)
+// - (안 씀) 입구 이시스 석상: IsisKey   오시리스의 왕좌 -> 갈대숲의 이시스와 아기 호루스
 // - 성좌 2 (H3 우자트 차례): Eye()   호루스와 세트의 싸움, 눈이 여섯 조각 -> 토트가 큰 조각부터 이어 붙임
 // - 성좌 3 (H4 돌배 차례): Race()   돌배 경주, 세트의 돌배가 가라앉음 -> 퍼즐 힌트 (세트 배를 강에 가라앉혀 다리로)
 // - H5 클리어 (엔딩): Ending()   신들의 재판 -> 왕이 된 호루스 + 서쪽 벽 복선
@@ -17,6 +18,8 @@ public static class HorusMuralScenes
     public const string Wall3Key = "WALL_3";
     public const string Wall4Key = "WALL_4";
     private const string Me = "나";
+    private const string Wall = "벽화";
+    public static readonly string[] WallTitles = { "빼앗긴 왕좌", "갈대숲의 아이", "여든 해의 다툼", "왕관을 쓴 매" };
 
     private const string Isis = "이시스";
     private const string Horus = "호루스";
@@ -31,9 +34,9 @@ public static class HorusMuralScenes
             case RaceKey: return new[] { RaceStart(), RaceSink() };
             case EndingKey: return new[] { EndCourt(), EndThrone() };
             case Wall1Key: return new[] { WallThrone() };
-            case Wall2Key: return new[] { WallEye() };
-            case Wall3Key: return new[] { WallBoats() };
-            case Wall4Key: return new[] { WallIsis() };
+            case Wall2Key: return new[] { WallMarsh() };
+            case Wall3Key: return new[] { WallCourt() };
+            case Wall4Key: return new[] { WallCrowned() };
             default:
                 Debug.LogWarning($"[벽화] 모르는 컷신: {key}");
                 return new MuralShot[0];
@@ -76,8 +79,8 @@ public static class HorusMuralScenes
             s.Layer(EyeParts[i]);
             s.Move(EyeParts[i], MuralPose.Rest, new MuralPose(fly[i].x, fly[i].y, 40f * (i % 2 == 0 ? 1f : -1f), 0.55f), 0.45f, 0.8f);
         }
-        return s.Say(Isis, "왕좌를 두고 호루스와 세트는 오래도록 싸웠다.")
-                .Say(Isis, "싸움 끝에 세트는 아들의 왼눈을 뽑아 여섯 조각으로 찢어 버렸지.");
+        return s.Say(Horus, "왕좌를 두고 나는 세트와 오래도록 싸웠다.")
+                .Say(Horus, "싸움 끝에 세트는 나의 왼눈을 뽑아 여섯 조각으로 찢어 버렸다.");
     }
 
     // 토트가 큰 몫부터 차례로 이어 붙임 (H3 규칙 힌트). 마지막 눈물 조각은 마법으로 천천히 채워짐
@@ -94,8 +97,8 @@ public static class HorusMuralScenes
             s.Layer(EyeParts[i]);
             s.Move(EyeParts[i], new MuralPose(from[i].x, from[i].y, 30f, 0f), MuralPose.Rest, t0, t1);
         }
-        return s.Say(Isis, "지혜의 신 토트가 흩어진 조각을 주워 모았다. 가장 큰 몫부터, 차례로.")
-                .Say(Isis, "그러나 마지막 한 조각은 끝내 찾지 못해, 토트가 마법으로 채웠단다.")
+        return s.Say(Horus, "지혜의 신 토트가 흩어진 조각을 주워 모았다. 가장 큰 몫부터, 차례로.")
+                .Say(Horus, "마지막 한 조각은 끝내 찾지 못해, 토트가 마법으로 채웠지.")
                 .Say(Horus, "...그 눈을 다시 이어다오. 큰 조각부터다.");
     }
 
@@ -109,8 +112,8 @@ public static class HorusMuralScenes
             .Move("horus", new MuralPose(-240f, 0f), MuralPose.Rest, 0f, 1f)
             .Move("boatS", new MuralPose(-160f, 0f), MuralPose.Rest, 0f, 1f)
             .Move("set", new MuralPose(-160f, 0f), MuralPose.Rest, 0f, 1f)
-            .Say(Isis, "세트가 또 꾀를 냈다. 돌로 만든 배로 경주해서 이기는 자가 왕이 되자고.")
-            .Say(Isis, "아들은 나무배에 흰 석회를 발라 돌배처럼 꾸몄지.");
+            .Say(Horus, "세트가 또 꾀를 냈다. 돌로 만든 배로 경주해서 이기는 자가 왕이 되자고.")
+            .Say(Horus, "나는 나무배에 흰 석회를 발라 돌배처럼 꾸몄다.");
     }
 
     private static MuralShot RaceSink()
@@ -122,7 +125,7 @@ public static class HorusMuralScenes
             .Move("horus", MuralPose.Rest, new MuralPose(150f, 0f), 0f, 1f)
             .Move("boatS", MuralPose.Rest, new MuralPose(20f, 130f, -9f, 1f), 0.15f, 0.85f)
             .Move("set", MuralPose.Rest, new MuralPose(30f, 150f, -9f, 0.2f), 0.15f, 0.9f)
-            .Say(Isis, "무거운 세트의 돌배는... 강물에 가라앉고 말았다.")
+            .Say(Horus, "무거운 세트의 돌배는... 강물에 가라앉고 말았다.")
             .Say(Horus, "그 가라앉은 돌배를 밟고 나는 강을 건넜다. 세트의 붉은 배를 강에 밀어 넣어라.");
     }
 
@@ -134,8 +137,8 @@ public static class HorusMuralScenes
             .Layer("ennead").Layer("horus")
             .Move("ennead", MuralPose.Hidden, MuralPose.Rest, 0f, 0.4f)
             .Move("horus", new MuralPose(-120f, 0f, 0f, 0f), MuralPose.Rest, 0.3f, 0.7f)
-            .Say(Isis, "신들은 팔십 년 동안 두 사람의 다툼을 지켜보았다.")
-            .Say(Isis, "그리고 마침내, 내 아들을 두 땅의 왕으로 인정했지.");
+            .Say(Horus, "신들은 여든 해 동안 나와 세트의 다툼을 지켜보았다.")
+            .Say(Horus, "그리고 마침내, 나를 두 땅의 왕으로 인정했다.");
     }
 
     private static MuralShot EndThrone()
@@ -146,11 +149,12 @@ public static class HorusMuralScenes
             .Move("horus", new MuralPose(0f, 40f, 0f, 0f), MuralPose.Rest, 0f, 0.4f)
             .Move("isis", MuralPose.Hidden, MuralPose.Rest, 0.25f, 0.6f)
             .Move("sun", new MuralPose(0f, -80f, 0f, 0f), MuralPose.Rest, 0.45f, 0.9f)
-            .Say(Horus, "어머니... 이제 하늘이 제자리를 찾았습니다.")
-            .Say(Isis, "...그런데 서쪽 벽 너머에서, 아직 무언가가 너를 부르는구나.");
+            .Say(Horus, "내 눈이 다시 떴다. 별길이 보인다.")
+            .Say(Horus, "잊지 마라. 부서진 것은 맞추는 자만이 되찾는다.");
     }
 
-    // ================= 입구 복도: 찢긴 벽화 (복선) =================
+    // ================= 입구 복도: 찢긴 벽화 4장 (최종 스토리 호루스 방 벽화 1~4) =================
+    // 자막 이름 칸은 HorusMuralWall이 '벽화 이름 (n/4)'로 바꿔 넣음
     // 카메라: 플레이어 뒤통수 가까이에서 시작 -> 천천히 뒤로 빠지며 벽화 전체가 드러남. 빛줄기는 숨 쉬고 먼지가 떠오름
     private static MuralShot WallView(string id, float playerX, float duration)
     {
@@ -165,29 +169,26 @@ public static class HorusMuralScenes
 
     private static MuralShot WallThrone()
     {
-        return WallView("Wall1", 600f, 7f)
-            .Say(Me, "왕좌에 앉은 초록 피부의 왕... 그 뒤로 거대한 그림자가 손을 뻗고 있어.")
-            .Say(Me, "그림자 쪽만 누가 일부러 긁어낸 것 같아. 이름조차 남기기 싫었던 걸까.");
+        return WallView("Wall1", 790f, 7f)
+            .Say(Wall, "세트는 형을 속여 관에 가두고 왕좌를 빼앗았다.");
     }
 
-    private static MuralShot WallEye()
+    private static MuralShot WallMarsh()
     {
-        return WallView("Wall2", 300f, 7f)
-            .Say(Me, "커다란 눈 그림이야. 그런데 아래쪽 조각들이 통째로 뜯겨 나갔어.")
-            .Say(Me, "옆의 새 머리 신이 무언가를 내밀고 있어... 찢긴 눈을 다시 맞추려는 걸까?");
+        return WallView("Wall2", 1060f, 7f)
+            .Say(Wall, "이시스는 갈대숲에 아이를 숨기고, 매는 그곳에서 자랐다.");
     }
 
-    private static MuralShot WallBoats()
+    private static MuralShot WallCourt()
     {
-        return WallView("Wall3", 640f, 7f)
-            .Say(Me, "강 위의 배 두 척. 흰 배는 떠 있는데, 붉은 돌배는 물속으로 잠기는 것처럼 그려져 있어.")
-            .Say(Me, "가라앉는 배라니... 이 신전을 지은 사람들은 이걸 꼭 기억하고 싶었나 봐.");
+        return WallView("Wall3", 700f, 7f)
+            .Say(Wall, "호루스와 세트는 여든 해 동안 신들 앞에서 다퉜다.");
     }
 
-    private static MuralShot WallIsis()
+    private static MuralShot WallCrowned()
     {
-        return WallView("Wall4", 1010f, 7f)
-            .Say(Me, "날개를 편 여신이 울고 있어. 눈물이 강물처럼 흘러내려.")
-            .Say(Me, "여신의 눈길을 따라가면... 복도 위쪽 방으로 올라가는 문이 있어.");
+        return WallView("Wall4", 260f, 7f)
+            .Say(Wall, "마침내 매는 두 땅의 왕이 되었다.")
+            .Say(Wall, "그때부터 모든 파라오는 '살아 있는 호루스'라 불렸다.");
     }
 }

@@ -118,11 +118,12 @@ public class HorusDirector : MonoBehaviour
         if (!queue.Contains(HorusCutscenes.Isis)) queue.Add(HorusCutscenes.Isis);
     }
 
+    // [수정] 최종 스토리(B안): 입구 복도 벽화 4장을 모두 보면 방 스토리 연출(호루스 목소리 + 매 착지 + 케프리)
+    // (예전: 이시스 연출을 본 뒤 본당(y > awakenY)에 들어가면)
     private bool ShouldAwaken()
     {
-        if (!HasFlag(introFlag) || HasFlag(awakenFlag)) return false;
-        Transform p = CineActor.Player();
-        return p != null && p.position.y > awakenY;
+        if (HasFlag(awakenFlag)) return false;
+        return HorusMuralWall.SeenCount() >= HorusMuralWall.Count;
     }
 
     private bool CanPlay()

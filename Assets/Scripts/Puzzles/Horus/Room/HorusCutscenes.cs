@@ -69,13 +69,16 @@ public static class HorusCutscenes
         //        (이시스는 들어오자마자 나오지 않음 -> 전실의 여신상을 조사하면 나옴, 라/바스테트처럼)
         yield return CorridorSweep();
         if (p != null) d.StartCoroutine(HorusFx.Emote(p, d.EmoteSprite, 1f));
-        yield return Cine.Say("나", "긴 복도... 벽마다 오래된 벽화가 이어져 있는데, 찢기고 긁힌 데가 많아.");
-        yield return Cine.Say("나", "하나씩 살펴보면서 안쪽으로 가 보자.");
+        // [수정] 최종 스토리(B안): 입장하면 케프리가 이 방이 밤의 몇 시인지 한 줄로 알려 줌
+        yield return Cine.Say(Khepri, "밤의 일곱째 시간이다. 매가 별을 따라 배를 이끄는 길, 호루스의 신전이지.");
+        yield return Cine.Say("나", "벽마다 찢긴 벽화가 이어져 있어. 하나씩 살펴보자.");
         if (HasItem(EmberItem)) yield return Cine.Say("나", "라의 불씨가 아직 따뜻해. 이 어둠 속에서도 횃불은 꺼지지 않겠어.");
         HorusDirector.SetFlag(d.EnteredFlag);
         CineCamera.Release();
         Cine.End();
     }
+
+    private const string Khepri = "케프리";
 
     private static Vector3 StatuePos() => Pos("OBJ_HA0_IsisStatue", new Vector3(8.9f, -2.9f, 0f));
 
@@ -261,6 +264,8 @@ public static class HorusCutscenes
         yield return AwakenTakeOff(d);
         CineLight.Restore(0.8f);
         HorusDirector.SetFlag(d.AwakenFlag);
+        HorusDirector.SetFlag("F_HO_STORY");     // [추가] 최종 스토리: 방 스토리 연출 끝 = 길잡이 동물과 첫 만남
+        HorusDirector.SetFlag("F_HO_GUIDE_MET");
         CineCamera.Release();
         Cine.End();
     }
@@ -274,7 +279,8 @@ public static class HorusCutscenes
         GameAudio.Play("sfx_rumble", 0.7f, 0.7f);
         HorusFx.StarBurst(HallCenter + Vector3.up * 5f, new Vector2(HallHalf.x, 1.2f), 18, Gold);
         yield return CineCamera.Rumble(0.9f, 0.02f, 0.07f);
-        yield return HorusVoice(d, "누가... 나의 하늘을 밟는가.");
+        GameAudio.Play("sfx_wind_gust", 0.4f, 1.3f); // [수정] 최종 스토리: 천장 별 일부가 꺼져 있고, 멀리서 날갯짓 소리
+        yield return Cine.Wait(0.6f);
     }
 
     // (2)(3) 하늘 틈(오른쪽 위)으로 카메라가 휙 -> 매가 뛰어들어 방 가운데로 -> 넓게 빠지며 방을 한 바퀴
@@ -295,9 +301,10 @@ public static class HorusCutscenes
     }
 
     // (4) 제단 위 착지 -> 빠른 줌인 + 번쩍 + 날개 활짝 -> 말하며 천천히 밀기 -> 마지막 대사에 뒤로 빠짐
+    // [수정] 최종 스토리(B안): 호루스 목소리 2줄 -> 매가 매 석상 위에 내려앉음('삐이') -> 케프리
     private static IEnumerator AwakenCloseUp(HorusDirector d)
     {
-        Vector3 perch = TopOf("H5_SkyAlign", new Vector3(12f, 13.4f, 0f));
+        Vector3 perch = TopOf("OBJ_H12_FalconStatue_L", new Vector3(9.5f, 12.8f, 0f));
         if (d.Falcon != null) yield return d.Falcon.PerchAt(perch, true);
         CineCamera.Focus(perch + Vector3.down * 0.6f); // 대사창 위쪽 가운데에 매가 오게
         CineCamera.Zoom(2.6f, 0.25f);
@@ -305,15 +312,14 @@ public static class HorusCutscenes
         CineCamera.Shake(0.3f, 0.05f);
         if (d.Falcon != null) d.StartCoroutine(d.Falcon.Spread(1.4f));
         yield return ScreenTintUI.Flash(new Color(1f, 0.85f, 0.5f, 0.4f), 0.03f, 0.08f, 0.5f);
-        yield return HorusVoice(d, "나는 호루스. 두 땅의 주인, 하늘을 가르는 매.");
-        yield return Cine.Say("나", "매가... 말을 해? 이시스 여신이 말한 그 아들이야?");
+        yield return HorusVoice(d, "여기는 밤하늘의 길이다. 이 길은 내가 지킨다. 매가 별을 따라 배를 이끌어야 한다.");
         CineCamera.Zoom(2.2f, 3f);
-        yield return HorusVoice(d, "어머니께서 너를 보내셨구나. 그렇다. 세트가 내 눈을 찢고 이 하늘의 별을 꺼뜨렸다.");
-        yield return Cine.Say("나", "내가 뭘 하면 되는데?");
+        yield return HorusVoice(d, "그런데 아펩이 별을 삼켜 길을 지웠다. 나는 그 길을 되찾을 것이다.");
+        GameAudio.Play("sfx_discover", 0.6f, 1.4f); // 매 울음 '삐이' (전용 소리가 생기면 교체)
         CineCamera.Zoom(6f, 1f);
         CineCamera.Focus(HallCenter + Vector3.up * 2f);
         HorusFx.StarBurst(HallCenter, HallHalf, 30, StarBlue);
-        yield return HorusVoice(d, "별을 되살려라, 인간이여. 나의 매가 길을 보여 주리라.");
+        yield return Cine.Say(Khepri, "매는 하늘의 왕이다. 매의 그림자가 지나가는 곳을 봐라.");
     }
 
     // (5) 매가 첫 목적지로 출발 (카메라가 따라감)
@@ -374,9 +380,12 @@ public static class HorusCutscenes
         yield return PlateRises(d, altar, sr => plate = sr);
         yield return SkyReturns(d);
         yield return MuralStage.Play(HorusMuralScenes.For(HorusMuralScenes.EndingKey));
+        yield return FinaleLines(d);
         yield return PlateToPlayer(plate);
+        yield return Cine.Say(Khepri, "하늘이 우리 편이다.");
         yield return DoorOpens();
         HorusDirector.SetFlag(d.EndingFlag);
+        HorusDirector.SetFlag("F_HO_FINALE"); // [추가] 최종 스토리: 형판 개수는 이 플래그로 셈
         CineCamera.Release();
         Cine.End();
     }
@@ -401,8 +410,16 @@ public static class HorusCutscenes
         d.StartCoroutine(HorusFx.LightTo(d.ClearIntensity, d.ClearColor, 2.5f));
         HorusFx.StarBurst(HallCenter, HallHalf, 60, StarBlue);
         if (d.Falcon != null) d.StartCoroutine(d.Falcon.CircleAround(HallCenter, 4f, 2.6f, false));
-        yield return HorusVoice(d, "보아라... 하늘이 다시 빛난다.", "이제 하늘은 다시 나의 것이다!");
-        yield return HorusVoice(d, "인간이여, 그 형판을 큐브에 바쳐라. 아버지 오시리스께서 다시 눈을 뜨실 것이다.", "...세트는 오늘을 잊지 않겠지. 그의 붉은 눈이 너를 지켜볼 것이다.");
+        yield return Cine.Wait(2.2f); // [수정] 최종 스토리: 꺼져 있던 천장의 별이 하나씩 켜짐 (대사는 벽화 뒤 FinaleLines)
+    }
+
+    // 최종 스토리(B안) 호루스 클리어 대사 3~5 (1~2는 엔딩 벽화 EndThrone)
+    // 세트를 라의 배 앞에 세운 이야기 -> 라의 방 벽화 4(뱃머리의 세트) 회수, 지평선의 문지기(스핑크스)도 호루스
+    private static IEnumerator FinaleLines(HorusDirector d)
+    {
+        yield return HorusVoice(d, "지평선에서 너를 맞이한 문지기도 나였다. 세트는 내가 죽이지 않았다. 라의 배 앞을 지키는 자리를 그에게 주었다.");
+        yield return HorusVoice(d, "태양의 조각을 가져가라. 심판의 방에서는 매가 네 위를 날 것이다.");
+        yield return HorusVoice(d, "강이 마르면 배가 멈춘다. 물의 주인에게 가라.");
     }
 
     private static IEnumerator PlateToPlayer(SpriteRenderer plate)
@@ -412,7 +429,7 @@ public static class HorusCutscenes
         CineCamera.Zoom(4.5f);
         if (plate != null) yield return HorusFx.MoveInto(plate.transform, p, 0.7f);
         GameAudio.Play("sfx_item_get", 0.8f);
-        yield return TitleCardUI.Show("하늘의 형판", "호루스의 시험을 마쳤다", 1.4f);
+        yield return TitleCardUI.Show("매 형판", "태양의 네 번째 조각을 되찾았다", 1.4f);
     }
 
     private static IEnumerator DoorOpens()

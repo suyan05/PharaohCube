@@ -28,8 +28,10 @@ public static class HorusWorldPuzzles
             SteleOrder();
             SteleNearPuzzles();
             RoomSconces();
-            IsisStatue();
+            // IsisStatue(); [수정] 최종 스토리(B안)에는 이시스가 안 나옴 -> 여신상은 놓지 않음 (함수는 남겨 둠)
             CorridorMurals();
+            CorridorObjective();
+            StoryStele();
             CorridorSconces();
         }
         catch (System.Exception e)
@@ -264,7 +266,6 @@ public static class HorusWorldPuzzles
 
     // [추가] 입구 복도 찢긴 벽화 4점: 벽화 타일(HorusRoomMap.PaintMurals) 앞에 조사 상자 + 안 본 벽화 반짝임
     private static readonly string[] MuralKeys = { HorusMuralScenes.Wall1Key, HorusMuralScenes.Wall2Key, HorusMuralScenes.Wall3Key, HorusMuralScenes.Wall4Key };
-    private static readonly string[] MuralTitles = { "찢긴 벽화 - 왕좌와 그림자", "찢긴 벽화 - 커다란 눈", "찢긴 벽화 - 강 위의 배", "찢긴 벽화 - 우는 여신" };
 
     private static void CorridorMurals()
     {
@@ -279,12 +280,55 @@ public static class HorusWorldPuzzles
             HorusMuralWall wall = go.AddComponent<HorusMuralWall>();
             var so = new SerializedObject(wall);
             Str(so, "muralKey", MuralKeys[i]);
-            Str(so, "title", MuralTitles[i]);
-            Str(so, "seenFlag", $"F_HO_WALL_{i + 1}_SEEN");
+            SerializedProperty idx = HorusArtSetup.Prop(so, "index");
+            if (idx != null) idx.intValue = i + 1; // F_HO_MURAL_{1~4}, 이름은 HorusMuralScenes.WallTitles
             Ref(so, "glint", Glint(go.transform, new Vector2(c.x, c.y + 0.4f)));
             so.ApplyModifiedPropertiesWithoutUndo();
             EditorUtility.SetDirty(go);
         }
+    }
+
+    // [추가] 최종 스토리(B안): 목표 HUD 맨 앞 '벽화 4장 살펴보기' (다 보면 F_HO_STORY = 방 스토리 연출 끝)
+    private static void CorridorObjective()
+    {
+        HorusObjectiveGuide guide = Object.FindFirstObjectByType<HorusObjectiveGuide>(FindObjectsInactive.Include);
+        if (guide == null) return;
+        var so = new SerializedObject(guide);
+        SerializedProperty steps = HorusArtSetup.Prop(so, "steps");
+        if (steps == null) return;
+        for (int i = 0; i < steps.arraySize; i++)
+            if (steps.GetArrayElementAtIndex(i).FindPropertyRelative("doneFlag").stringValue == "F_HO_STORY") return;
+        steps.InsertArrayElementAtIndex(0);
+        SerializedProperty step = steps.GetArrayElementAtIndex(0);
+        step.FindPropertyRelative("doneFlag").stringValue = "F_HO_STORY";
+        step.FindPropertyRelative("objective").stringValue = "입구 복도의 찢긴 벽화 4장을 모두 살펴보자";
+        step.FindPropertyRelative("pathToLight").objectReferenceValue = null;
+        step.FindPropertyRelative("target").objectReferenceValue = null;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // [추가] 최종 스토리(B안) 호루스 비석 3 (H4 앞): 나일의 방 문(동쪽 벽 x 24, y 2~3) 옆 본당 쪽
+    private static void StoryStele()
+    {
+        Sprite slate = HorusArtSetup.Art(HorusClueSetup.Slate);
+        var go = new GameObject("OBJ_HS4_StoryStele");
+        go.transform.position = new Vector3(22.6f, 4.8f, 0f);
+        SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+        sr.sprite = slate;
+        sr.sortingLayerName = string.IsNullOrEmpty(HorusRoomObjects.Layer) ? "Default" : HorusRoomObjects.Layer;
+        Vector2 size = new Vector2(0.75f, 1.1f);
+        if (slate != null) HorusWorldArt.FitObject(go, slate, size, Color.white);
+        float k = Mathf.Max(go.transform.localScale.x, 0.001f);
+        HorusWorld.AddBox(go, new Vector2(0.7f, 0.35f), k, false);
+        BoxCollider2D reach = go.AddComponent<BoxCollider2D>();
+        reach.isTrigger = true;
+        reach.size = (size + new Vector2(0.5f, 0.5f)) / k;
+        go.AddComponent<HorusStoryStele>().EditorSetup("F_HO_STELE_3", new[]
+        {
+            new DialogueLine("비석", "심판의 날, 매 머리의 호루스가 죽은 자의 손을 잡고 오시리스 앞으로 데려간다.")
+        });
+        Emblem(go, "HO_Sym_Falcon");
+        EditorUtility.SetDirty(go);
     }
 
     // 아직 안 본 벽화 위에 은은하게 깜빡이는 빛 (HorusMuralWall이 깜빡이게 함)

@@ -176,6 +176,19 @@ public class SphinxDreamDirector : MonoBehaviour
             yield return HeadSay(lines.wrong);
         }
         yield return HeadSay(lines.right);
+        yield return StoryOnce();
+        yield return HeadSay(lines.lensGive);
+    }
+
+    // [추가] 최종 스토리(B안): 수수께끼를 맞히면 스핑크스가 전체 이야기를 벽화 인형극으로 들려줌 (한 번만)
+    // 라의 배 -> 아펩이 태양을 깨뜨림 -> 다섯 신전 -> 심판의 저울 (PrologueMuralScenes)
+    private IEnumerator StoryOnce()
+    {
+        string flag = lines.storyFlag;
+        bool seen = GameManager.Instance != null && !string.IsNullOrEmpty(flag) && GameManager.Instance.HasFlag(flag);
+        if (seen) yield break;
+        yield return MuralStage.Play(PrologueMuralScenes.Story());
+        if (GameManager.Instance != null && !string.IsNullOrEmpty(flag)) GameManager.Instance.SetFlag(flag);
     }
 
     private IEnumerator AskRiddle(Action<int> chosen)
