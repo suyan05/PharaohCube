@@ -76,7 +76,11 @@ public class ObjectiveBoxUI : MonoBehaviour
         Image box = UIBuild.Image(root, "Box", Vector2.zero, BoxSize, boxSprite, Hex("#F6F1E7"));
         box.preserveAspect = false;
         if (boxSprite != null && boxSprite.border != Vector4.zero) box.type = Image.Type.Sliced;
-        if (boxSprite == null)
+        if (boxSprite == null && UIFrames.Papyrus != null)
+        {
+            UIFrames.Apply(box, UIFrames.Papyrus); // [수정] 흰 상자 + 검은 줄 -> 도트 파피루스 판
+        }
+        else if (boxSprite == null)
         {
             Outline line = box.gameObject.AddComponent<Outline>();
             line.effectColor = Hex("#4A3423");
@@ -93,10 +97,12 @@ public class ObjectiveBoxUI : MonoBehaviour
 
     private void BuildIcon(RectTransform box)
     {
-        Sprite sprite = iconSprite != null ? iconSprite : UIBuild.Circle();
-        Vector2 pos = new Vector2(-BoxSize.x * 0.5f + 44f, 0f);
-        Image icon = UIBuild.Image(box, "Icon", pos, new Vector2(56f, 56f), sprite, Color.white);
-        if (iconSprite == null) icon.color = Hex("#E8B23A");
+        // [수정] 노란 원 -> 앙크 도장 (UI_Stamp). 그림이 없으면 예전처럼 노란 원
+        Sprite stampArt = iconSprite == null ? UIFrames.Get("UI_Stamp") : null;
+        Sprite sprite = iconSprite != null ? iconSprite : (stampArt != null ? stampArt : UIBuild.Circle());
+        Vector2 pos = new Vector2(-BoxSize.x * 0.5f + 50f, 0f);
+        Image icon = UIBuild.Image(box, "Icon", pos, new Vector2(52f, 52f), sprite, Color.white);
+        if (iconSprite == null) icon.color = stampArt != null ? Hex("#B8862E") : Hex("#E8B23A");
     }
 
     private static Color Hex(string hex)

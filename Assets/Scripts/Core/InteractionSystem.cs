@@ -24,6 +24,9 @@ public class InteractionSystem : MonoBehaviour
     {
         FindNearestTarget();
 
+        // [수정] 획득 팝업(또는 수첩)이 떠 있는 동안의 E는 그것을 닫는 키 -> 그 E로 옆 물건까지 조사되면 팝업이 안 넘어가는 것처럼 보였음
+        if (ItemPopup.IsShowing || NotebookUI.IsOpen) return;
+
         if (currentTarget != null && Input.GetKeyDown(interactKey))
         {
             TryInteract(currentTarget);
