@@ -33,7 +33,9 @@ public class HorusSkyRings : PuzzleBase, IInteractable
     private static readonly int[] Want = { Sun, Moon, Falcon, Crown };
     private static readonly int[] StartOffset = { 3, 2, 2, 3 };
     private static readonly Vector2Int[] LeverRings = { new Vector2Int(0, 1), new Vector2Int(1, 2), new Vector2Int(2, 3), new Vector2Int(3, 0) };
-    private static readonly Vector2[] LeverPos = { new Vector2(-2.7f, -0.3f), new Vector2(-1.9f, -2.0f), new Vector2(1.9f, -2.0f), new Vector2(2.7f, -0.3f) };
+    // [수정] 레버가 제단 양옆(기둥과 매 석상 사이)에 있어서 제단 둘레를 돌 때마다 몸이 걸렸음
+    //        -> 네 개를 전부 제단 남쪽에 부채꼴로 모음. 가운데 길(폭 2.4칸)과 제단 양옆, 북쪽은 비움
+    private static readonly Vector2[] LeverPos = { new Vector2(-2.5f, -2.3f), new Vector2(-1.2f, -2.8f), new Vector2(1.2f, -2.8f), new Vector2(2.5f, -2.3f) };
     private static readonly string[] Names = { "왕관", "해", "달", "매", "붉은 별" };
 
     [Header("연결 (빌더가 채움)")]
