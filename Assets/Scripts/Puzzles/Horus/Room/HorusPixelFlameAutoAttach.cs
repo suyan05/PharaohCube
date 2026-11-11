@@ -36,6 +36,7 @@ public static class HorusPixelFlameAutoAttach
                 if (!IsSconce(sr) || sr.GetComponent<HorusPixelFlame>() != null) continue;
                 sr.gameObject.AddComponent<HorusPixelFlame>().Setup(frames, baseSprite);
             }
+            HorusRuntimeTune.Apply(); // [추가] 비석 표식, 석상 방향, 달의 눈 자리, 꺼진 횃대, 방 밝기
         }
         catch (Exception e)
         {
