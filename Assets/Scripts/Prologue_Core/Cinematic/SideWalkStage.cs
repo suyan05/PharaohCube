@@ -94,7 +94,7 @@ public class SideWalkStage : MonoBehaviour
     {
         const float seconds = 2.6f;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             SetBlack(1f - Mathf.Clamp01(t / 0.9f));
@@ -376,7 +376,7 @@ public class SideWalkStage : MonoBehaviour
     private IEnumerator Fade(float from, float to, float seconds)
     {
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             SetBlack(Mathf.Lerp(from, to, t / seconds));

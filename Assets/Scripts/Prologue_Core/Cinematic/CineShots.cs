@@ -27,7 +27,7 @@ public static class CineShots
     public static IEnumerator Glide(Vector3 from, Vector3 to, float seconds)
     {
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             CineCamera.Focus(Vector3.Lerp(from, to, Ease(t / Mathf.Max(0.01f, seconds))));
@@ -40,7 +40,7 @@ public static class CineShots
     public static IEnumerator Crane(Vector3 from, Vector3 to, float sizeFrom, float sizeTo, float seconds)
     {
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float e = Ease(t / Mathf.Max(0.01f, seconds));
@@ -64,7 +64,7 @@ public static class CineShots
     {
         float t = 0f;
         float seed = UnityEngine.Random.value * 50f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float x = (Mathf.PerlinNoise(seed, t * 1.7f) - 0.5f) * 2f * amount;
@@ -83,7 +83,7 @@ public static class CineShots
         if (cam == null) yield break;
         float from = Mathf.DeltaAngle(0f, cam.eulerAngles.z);
         float t = 0f;
-        while (t < seconds && !Cine.Skipping && cam != null)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry && cam != null)
         {
             t += Time.deltaTime;
             SetRoll(cam, Mathf.Lerp(from, toAngle, Ease(t / Mathf.Max(0.01f, seconds))));

@@ -69,7 +69,7 @@ public static class CineCamera
     public static IEnumerator Rumble(float seconds, float from, float to)
     {
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             Shake(0.12f, Mathf.Lerp(from, to, t / Mathf.Max(0.01f, seconds)));

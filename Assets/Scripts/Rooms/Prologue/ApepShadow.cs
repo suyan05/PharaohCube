@@ -61,7 +61,7 @@ public static class ApepShadow
     {
         GameAudio.Play("sfx_rumble", 0.5f, 0.6f);
         float t = 0f;
-        while (t < seconds && !Cine.Skipping && veil != null)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry && veil != null)
         {
             t += Time.deltaTime;
             veil.color = new Color(Veil.r, Veil.g, Veil.b, Mathf.Clamp01(t / seconds) * 0.82f);
@@ -75,7 +75,7 @@ public static class ApepShadow
         GameAudio.Play("sfx_dream_shimmer", 0.6f, 0.45f);
         float travel = serpent.PathLength * 0.5f;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping && serpent != null)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry && serpent != null)
         {
             t += Time.deltaTime;
             float k = Mathf.Clamp01(t / seconds);
@@ -97,7 +97,7 @@ public static class ApepShadow
         yield return Cine.Wait(0.35f); // 완전한 어둠으로 한 박자 쉼
         GameAudio.Play("sfx_sphinx_voice", 0.5f, 0.5f);
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float open = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.45f));   // 눈꺼풀이 열림
