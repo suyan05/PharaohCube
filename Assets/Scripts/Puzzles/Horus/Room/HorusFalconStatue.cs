@@ -25,13 +25,19 @@ public class HorusFalconStatue : MonoBehaviour, IInteractable
         new DialogueLine("나", "석상의 두 눈이 은은하게 빛나고 있다. 서쪽 벽 너머를 바라보는 것 같다.")
     };
 
+    // [수정] 우자트 부적은 토트의 방 보상이라 지금은 얻을 길이 없어 회랑이 영영 안 열렸음
+    //        -> 이 방의 우자트 석탁 퍼즐(H3)로 "호루스의 눈"을 되찾으면 그것으로도 열림
+    [SerializeField] private string eyeRestoredFlag = "F_HO_H3_DONE";
+
     private bool HasAmulet => ItemInventory.Instance != null && ItemInventory.Instance.Has(amuletItem);
+    private bool EyeRestored => GameManager.Instance != null && GameManager.Instance.HasFlag(eyeRestoredFlag);
+    private bool CanOpen => HasAmulet || EyeRestored;
     private bool IsOpen => gallery != null && gallery.IsOpen;
 
     public string GetPrompt()
     {
         if (IsOpen) return "E: 매 석상 보기";
-        return HasAmulet ? "E: 우자트 부적 끼우기" : "E: 매 석상 조사";
+        return CanOpen ? "E: 되찾은 눈을 석상에 끼우기" : "E: 매 석상 조사";
     }
 
     public void Interact(GameObject player)
@@ -44,12 +50,13 @@ public class HorusFalconStatue : MonoBehaviour, IInteractable
                 DialogueBox.Play(openedLines);
                 return;
             }
-            if (!HasAmulet || gallery == null)
+            if (!CanOpen || gallery == null)
             {
                 DialogueBox.Play(emptyEyeLines);
                 return;
             }
-            if (ItemInventory.Instance.Consume(amuletItem)) gallery.PlayOpenCutscene();
+            if (HasAmulet) ItemInventory.Instance.Consume(amuletItem);
+            gallery.PlayOpenCutscene();
         }
         catch (Exception e)
         {

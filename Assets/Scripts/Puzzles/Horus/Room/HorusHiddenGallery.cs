@@ -81,7 +81,7 @@ public class HorusHiddenGallery : MonoBehaviour
     {
         Cine.Begin(true);
         HorusFx.MatchPlayer();
-        yield return Cine.Say("나", "비어 있는 눈에... 우자트 부적을 끼워 보자.");
+        yield return Cine.Say("나", "비어 있는 눈에... 되찾은 호루스의 눈을 끼워 보자.");
         yield return EyeAwakens();
         Vector3 wallPos = new Vector3(passage.x, passage.y, 0f);
         CineCamera.Focus((statue.position + wallPos) * 0.5f);
