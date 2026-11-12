@@ -124,6 +124,17 @@ public class HorusIsisGhost : MonoBehaviour
         idle = true;
     }
 
+    // [수정] 들어가자마자 나오고 등장이 길고 요란하다는 의견 -> 석상을 조사했을 때 쓰는 짧은 등장
+    // 깃털이 모이며 -> 반투명하게 스르륵 (눈물/물결/번쩍임 생략, 날개는 펼친 채로 나타남)
+    public IEnumerator QuickAppear()
+    {
+        yield return FeathersGather(6, 0.7f);
+        wingAngle = OpenAngle;
+        ApplyWings();
+        yield return RiseFromRipple(0.9f);
+        idle = true;
+    }
+
     private IEnumerator Tears(int count)
     {
         for (int i = 0; i < count && !Cine.Skipping; i++)

@@ -4,33 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-// 아이템 획득 팝업 (아트 요청서 5.6, 화면 가운데 760x440)
+// 아이템 획득 팝업 - [수정] 고고학자가 현장에서 유물 사진을 찍어 수첩에 붙이는 모양으로 바꿈
 // - ItemPopup.Grant("TOOL_BRUSH", 끝나면 할 일)  = 인벤토리에 넣고 + 팝업
 // - ItemPopup.Show("TOOL_BRUSH", 끝나면 할 일)   = 팝업만 (이미 넣은 경우)
 // - 여러 개를 연달아 부르면 순서대로 하나씩 보여줌
-// - 0.3초 뒤부터 아무 키나 / 클릭으로 닫힘. 열려 있는 동안 플레이어 잠금
-// - 씬에 안 놓아도 처음 부를 때 자동으로 생김 (아트를 넣으려면 씬에 놓고 칸 채우기)
+// - 연출: 찰칵(셔터 소리) + 하얗게 번쩍 -> 살짝 기울어진 즉석 사진이 톡 떨어짐 -> 빨간 기록 도장이 쾅
+// - 닫기: E / Space / Enter / 클릭 (예전엔 아무 키나였음). 열려 있는 동안 플레이어 잠금
+// - 씬에 안 놓아도 처음 부를 때 자동으로 생김. 아래 아트 칸은 예전 씬과 맞추려고 남겨둠 (raysSprite, hiddenBadgeSprite만 씀)
 public class ItemPopup : MonoBehaviour
 {
     private static ItemPopup instance;
 
-    [Header("아트 (비우면 코드로 그린 틀)")]
-    [SerializeField] private Sprite frameSprite;        // Common_UI_ItemPopup_Frame
-    [SerializeField] private Sprite frameHiddenSprite;  // Common_UI_ItemPopup_FrameHidden
-    [SerializeField] private Sprite iconBaseSprite;     // Common_UI_ItemPopup_IconBase
-    [SerializeField] private Sprite hiddenBadgeSprite;  // Common_UI_ItemPopup_HiddenBadge
-    [SerializeField] private Sprite raysSprite;         // Common_FX_ItemRays
+    [Header("아트 (비워도 됨)")]
+    [SerializeField] private Sprite frameSprite;        // (안 씀) 예전 틀
+    [SerializeField] private Sprite frameHiddenSprite;  // (안 씀)
+    [SerializeField] private Sprite iconBaseSprite;     // 사진 배경 (비우면 UI_PhotoBg)
+    [SerializeField] private Sprite hiddenBadgeSprite;  // 히든 표시
+    [SerializeField] private Sprite raysSprite;         // 히든 빛줄기
 
     [Header("튜닝")]
-    [SerializeField] private float minShowTime = 0.3f;
-    [SerializeField] private float popTime = 0.2f;
+    [SerializeField] private float minShowTime = 0.45f;
+    [SerializeField] private float popTime = 0.22f;
     [SerializeField] private float raysSpeed = 20f;
     [SerializeField] private int sortingOrder = 110;
 
     private readonly Queue<(ItemDefinition def, Action done)> queue = new Queue<(ItemDefinition, Action)>();
     private GameObject canvasGo;
-    private RectTransform panel;
-    private Image frame, icon, rays, badge;
+    private RectTransform card, stamp;
+    private Image paper, icon, rays, badge, flash;
     private Text headerText, nameText, descText;
     private Font font;
     private bool showing;
@@ -98,33 +99,50 @@ public class ItemPopup : MonoBehaviour
     {
         Fill(def);
         canvasGo.SetActive(true);
+        GameAudio.Play("sfx_shutter", 0.9f);
 
         float t = 0f;
         while (true)
         {
             t += Time.unscaledDeltaTime;
-            panel.localScale = Vector3.one * Mathf.Lerp(0.9f, 1f, Mathf.Clamp01(t / popTime));
-            if (rays.enabled) rays.rectTransform.Rotate(0f, 0f, -raysSpeed * Time.unscaledDeltaTime);
-            if (t >= minShowTime && (Input.anyKeyDown || Input.GetMouseButtonDown(0))) break;
+            Animate(t);
+            if (t >= minShowTime && ClosePressed()) break;
             yield return null;
         }
         yield return null; // 닫은 키가 다음 팝업/조사로 이어지지 않게 한 프레임 쉼
     }
 
+    // 번쩍 -> 사진이 톡 -> 도장이 쾅
+    private void Animate(float t)
+    {
+        flash.color = new Color(1f, 1f, 1f, Mathf.Clamp01(1f - t / 0.28f) * 0.9f);
+        float pop = Mathf.Clamp01(t / popTime);
+        card.localScale = Vector3.one * Mathf.Lerp(1.18f, 1f, pop * pop * (3f - 2f * pop));
+        float s = Mathf.Clamp01((t - 0.32f) / 0.12f);
+        stamp.gameObject.SetActive(t >= 0.32f);
+        stamp.localScale = Vector3.one * Mathf.Lerp(2.2f, 1f, s);
+        if (rays.enabled) rays.rectTransform.Rotate(0f, 0f, -raysSpeed * Time.unscaledDeltaTime);
+    }
+
+    private static bool ClosePressed()
+    {
+        return Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Return)
+            || Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetMouseButtonDown(0);
+    }
+
     private void Fill(ItemDefinition def)
     {
         bool hidden = def.hidden;
-        frame.sprite = hidden && frameHiddenSprite != null ? frameHiddenSprite : frameSprite;
-        frame.color = frame.sprite != null ? Color.white : Hex(hidden ? "#E8B23A" : "#C9A66B");
-
-        headerText.text = hidden ? "히든!" : "획득!";
-        badge.enabled = hidden;
+        paper.color = hidden ? Hex("#F7E3A6") : Hex("#FCF7E8");
+        headerText.text = hidden ? "히든 유물 기록" : "유물 기록";
+        badge.enabled = hidden && hiddenBadgeSprite != null;
         rays.enabled = hidden;
 
         icon.sprite = def.icon;
         icon.enabled = def.icon != null;
         nameText.text = def.displayName;
         descText.text = def.description;
+        stamp.gameObject.SetActive(false);
     }
 
     private void OnDisable()
@@ -144,32 +162,52 @@ public class ItemPopup : MonoBehaviour
 
         RectTransform root = UIBuild.CreateCanvas(transform, "ItemPopupCanvas", sortingOrder, out canvasGo);
         Image dim = UIBuild.Stretch(root, "Dim").gameObject.AddComponent<Image>();
-        dim.color = new Color(0f, 0f, 0f, 0.5f);
+        dim.color = new Color(0f, 0f, 0f, 0.6f);
         dim.raycastTarget = true;
 
-        panel = UIBuild.Rect(root, "Panel", Vector2.zero, new Vector2(760f, 440f));
-        BuildPanel();
+        card = UIBuild.Rect(root, "Card", new Vector2(0f, 60f), new Vector2(470f, 560f));
+        card.localRotation = Quaternion.Euler(0f, 0f, -3f);
+        BuildCard();
+        BuildCaption(root);
+        flash = UIBuild.Image(root, "Flash", Vector2.zero, new Vector2(6000f, 4000f), null, Color.white);
         canvasGo.SetActive(false);
     }
 
-    private void BuildPanel()
+    // 즉석 사진: 그림자 + 흰 종이 + 사진(모래 배경 위 유물) + 테이프 + 이름 + 도장
+    private void BuildCard()
     {
-        rays = UIBuild.Image(panel, "Rays", new Vector2(0f, 70f), new Vector2(400f, 400f), raysSprite, Hex("#F3D98A"));
-        rays.color = raysSprite != null ? Color.white : new Color(0.95f, 0.85f, 0.54f, 0.35f);
+        UIBuild.Image(card, "Shadow", new Vector2(12f, -12f), new Vector2(470f, 560f), null, new Color(0f, 0f, 0f, 0.4f));
+        paper = UIBuild.Image(card, "Paper", Vector2.zero, new Vector2(470f, 560f), null, Hex("#FCF7E8"));
+        Sprite photoBg = iconBaseSprite != null ? iconBaseSprite : UIFrames.Get("UI_PhotoBg");
+        Image photo = UIBuild.Image(card, "Photo", new Vector2(0f, 50f), new Vector2(410f, 410f), photoBg, Hex("#E2C48C"));
+        photo.preserveAspect = false;
 
-        frame = UIBuild.Image(panel, "Frame", Vector2.zero, new Vector2(760f, 440f), frameSprite, Hex("#C9A66B"));
-        if (frameSprite != null && frameSprite.border != Vector4.zero) frame.type = Image.Type.Sliced;
-        UIBuild.Image(panel, "Inner", Vector2.zero, new Vector2(736f, 416f), null, Hex("#F6F1E7")).enabled = frameSprite == null;
+        rays = UIBuild.Image(card, "Rays", new Vector2(0f, 50f), new Vector2(400f, 400f), raysSprite, Hex("#F3D98A"));
+        rays.color = raysSprite != null ? Color.white : new Color(1f, 0.92f, 0.6f, 0.35f);
+        if (raysSprite == null) rays.sprite = UIBuild.Circle();
+        icon = UIBuild.Image(card, "Icon", new Vector2(0f, 56f), new Vector2(256f, 256f), null, Color.white);
 
-        badge = UIBuild.Image(panel, "HiddenBadge", new Vector2(0f, 220f), new Vector2(220f, 56f), hiddenBadgeSprite, Hex("#E8B23A"));
-        headerText = UIBuild.Text(panel, "Header", font, 26, new Vector2(0f, 205f), new Vector2(300f, 40f), Hex("#4A3423"));
+        Image tape = UIBuild.Image(card, "Tape", new Vector2(0f, 276f), new Vector2(150f, 48f), UIFrames.Get("UI_Tape"), Hex("#EEE0AA"));
+        tape.preserveAspect = false;
+        tape.rectTransform.localRotation = Quaternion.Euler(0f, 0f, 5f);
+        badge = UIBuild.Image(card, "HiddenBadge", new Vector2(-150f, 236f), new Vector2(120f, 40f), hiddenBadgeSprite, Hex("#E8B23A"));
 
-        UIBuild.Image(panel, "IconBase", new Vector2(0f, 70f), new Vector2(200f, 200f), iconBaseSprite, Hex("#E8D9B8"));
-        icon = UIBuild.Image(panel, "Icon", new Vector2(0f, 70f), new Vector2(192f, 192f), null, Color.white);
-
-        nameText = UIBuild.Text(panel, "Name", font, 36, new Vector2(0f, -95f), new Vector2(640f, 50f), Hex("#4A3423"));
+        nameText = UIBuild.Text(card, "Name", font, 38, new Vector2(0f, -212f), new Vector2(430f, 60f), Hex("#4A3423"));
         nameText.fontStyle = FontStyle.Bold;
-        descText = UIBuild.Text(panel, "Desc", font, 24, new Vector2(0f, -155f), new Vector2(640f, 50f), Hex("#6B4A2B"));
+        Image stampImg = UIBuild.Image(card, "Stamp", new Vector2(150f, -110f), new Vector2(130f, 130f), UIFrames.Get("UI_Stamp"), Hex("#AA3426"));
+        stamp = stampImg.rectTransform;
+        stamp.localRotation = Quaternion.Euler(0f, 0f, 14f);
+    }
+
+    // 사진 아래 설명 띠 (파피루스 판) + 닫는 법
+    private void BuildCaption(RectTransform root)
+    {
+        Image strip = UIBuild.Image(root, "Caption", new Vector2(0f, -330f), new Vector2(860f, 130f), null, Hex("#F6F1E7"));
+        UIFrames.Apply(strip, UIFrames.Papyrus);
+        headerText = UIBuild.Text(strip.rectTransform, "Header", font, 22, new Vector2(0f, 34f), new Vector2(800f, 30f), Hex("#A0522D"));
+        descText = UIBuild.Text(strip.rectTransform, "Desc", font, 28, new Vector2(0f, -14f), new Vector2(800f, 60f), Hex("#4A3423"));
+        Text hint = UIBuild.Text(root, "Hint", font, 22, new Vector2(0f, -430f), new Vector2(600f, 30f), new Color(1f, 1f, 1f, 0.65f));
+        hint.text = "E: 수첩에 붙이기";
     }
 
     private static Color Hex(string hex)

@@ -27,7 +27,7 @@ public static class CineActor
         float timeout = Vector2.Distance(actor.position, point) / Mathf.Max(0.1f, speed) + 1.5f;
         var stuck = new StuckCheck(actor.position);
 
-        while (timeout > 0f && !Cine.Skipping)
+        while (timeout > 0f && !Cine.Skipping && !Cine.Hurry) // [추가] E를 누르면 걷는 걸 기다리지 않고 도착한 것으로
         {
             Vector2 diff = point - (Vector2)actor.position;
             if (diff.magnitude <= speed * Time.deltaTime * 1.5f) break;

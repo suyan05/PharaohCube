@@ -7,8 +7,15 @@ using UnityEngine;
 // - SafeFocus: 연출 카메라가 맵 끝에 있는 대상을 화면 안쪽에 담도록 줌 크기를 정해 줌
 public static class HorusWorld
 {
-    // 호루스 본당 카메라 경계 (HorusRoomMap: 벽 포함 x -1~25, y -9~17)
-    private const float MinX = -1f, MaxX = 25f, MinY = -9f, MaxY = 17f;
+    // 카메라 경계 = 'Ground' 타일맵 범위 (퍼즐 방이 붙어서 맵이 넓어져도 맞게). 못 찾으면 예전 본당 크기
+    private static Bounds MapBounds()
+    {
+        GameObject g = GameObject.Find("Ground");
+        UnityEngine.Tilemaps.Tilemap tm = g != null ? g.GetComponent<UnityEngine.Tilemaps.Tilemap>() : null;
+        if (tm == null) return new Bounds(new Vector3(12f, 4f, 0f), new Vector3(26f, 26f, 1f));
+        tm.CompressBounds();
+        return tm.localBounds;
+    }
 
     public static SpriteRenderer Prop(Transform parent, string objName, Sprite sprite, Vector3 pos, float width, Vector2 solidSize)
     {
@@ -54,8 +61,9 @@ public static class HorusWorld
     {
         Camera cam = Camera.main;
         float aspect = cam != null ? cam.aspect : 16f / 9f;
-        float edgeX = Mathf.Min(p.x - MinX, MaxX - p.x);
-        float edgeY = Mathf.Min(p.y - MinY, MaxY - p.y);
+        Bounds b = MapBounds();
+        float edgeX = Mathf.Min(p.x - b.min.x, b.max.x - p.x);
+        float edgeY = Mathf.Min(p.y - b.min.y, b.max.y - p.y);
         // 대상이 화면 가로/세로의 가운데 60% 안에 들어오려면: 화면 반쪽 크기 <= 끝까지 거리 / (1 - 0.6)
         float byX = edgeX / 0.4f / aspect;
         float byY = edgeY / 0.4f;

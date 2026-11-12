@@ -164,7 +164,7 @@ public class SunCycleStation : MonoBehaviour, IInteractable
 
     private void Update()
     {
-        if (isOpen && !playingFinale && Input.GetKeyDown(KeyCode.Escape)) CloseOverlay();
+        if (isOpen && !playingFinale && PuzzleCloseKey.ExtraPressed) CloseOverlay();
     }
 
     // ================= IInteractable =================
@@ -522,12 +522,22 @@ public class SunCycleStation : MonoBehaviour, IInteractable
         {
             statusText.text = "태양의 하루가 제단에 새겨졌다. 입구의 라의 성소가 빛난다.";
             RefreshAll();
+            PuzzleSolvedFx.Play(); // [추가] 낮에도 다 풀면 종소리 + 번쩍 -> 잠깐 보여주고 제단이 스스로 닫힘
+            if (isActiveAndEnabled) StartCoroutine(DayClearClose());
             return;
         }
 
         statusText.text = "태양의 배가 저승의 강을 건넜다!";
         RefreshAll();
         if (isActiveAndEnabled) StartCoroutine(NightClearSequence());
+    }
+
+    private IEnumerator DayClearClose()
+    {
+        playingFinale = true; // 보여주는 동안 E로 닫히지 않게
+        yield return new WaitForSeconds(PuzzleSolvedFx.HoldSeconds);
+        playingFinale = false;
+        if (isOpen) CloseOverlay();
     }
 
     private IEnumerator NightClearSequence()

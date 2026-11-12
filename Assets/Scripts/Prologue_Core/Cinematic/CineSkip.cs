@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // 연출 건너뛰기: ESC를 holdSeconds초 동안 누르고 있으면 Requested = true
-// - Cine.Begin(true)일 때만 동작, 화면 오른쪽 위(위쪽 검은 바 안)에 "ESC 길게: 건너뛰기" 안내 (대사창에 안 가리게)
+// - Cine.Begin(true)일 때만 동작, 화면 오른쪽 위(위쪽 검은 바 안)에 "E: 넘기기   ESC 길게: 건너뛰기" 안내 (대사창에 안 가리게)
 // - 시연, 발표 때 프롤로그를 빨리 넘기는 용도 (기획서 5장 확인 필요 항목)
 public class CineSkip : MonoBehaviour
 {
@@ -61,7 +61,7 @@ public class CineSkip : MonoBehaviour
         if (!armed || Requested) return;
 
         held = Input.GetKey(KeyCode.Escape) ? held + Time.unscaledDeltaTime : 0f;
-        if (hint != null) hint.text = held > 0f ? "건너뛰는 중..." : "ESC 길게: 건너뛰기";
+        if (hint != null) hint.text = held > 0f ? "건너뛰는 중..." : "E: 넘기기   ESC 길게: 건너뛰기";
 
         if (held < HoldSeconds) return;
         Requested = true;

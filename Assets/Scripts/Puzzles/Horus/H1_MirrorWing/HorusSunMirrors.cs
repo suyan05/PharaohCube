@@ -19,11 +19,13 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
     [Header("격자 (칸 (0,0) 왼쪽 아래 = origin)")]
     [SerializeField] private Vector2 origin = new Vector2(0f, 5f);
     [SerializeField] private Vector2Int size = new Vector2Int(8, 8);
+    [Tooltip("[수정] 칸 하나의 크기 (월드). 1이면 거울 사이가 좁아서 지나가다 걸림 -> 1.5")]
+    [SerializeField] private float cell = 1.5f;
 
     [Header("연결 (빌더가 채움)")]
     [SerializeField] private SpriteRenderer eyeStand;
     [SerializeField] private Sprite dustySprite, cleanSprite, litSprite;
-    [SerializeField] private Sprite mirrorA, mirrorB, mirrorFlat, sunSprite, setStoneSprite;
+    [SerializeField] private Sprite mirrorA, mirrorB, mirrorFlat, sunSprite, setStoneSprite, blockSprite;
 
     [Header("진행")]
     [SerializeField] private string unlockedFlag = "F_HO_H1_UNLOCKED";
@@ -33,10 +35,12 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
     private static readonly Vector2Int Sun = new Vector2Int(-1, 6), SunDir = new Vector2Int(1, 0), Target = new Vector2Int(3, 3);
     private static readonly Vector2Int[] MirrorCells = { new Vector2Int(5, 6), new Vector2Int(1, 1), new Vector2Int(3, 0), new Vector2Int(1, 0), new Vector2Int(5, 1) };
     private static readonly Vector2Int[] SetStones = { new Vector2Int(4, 0), new Vector2Int(1, 5) };
-    private static readonly Vector2Int[] Blocks = { new Vector2Int(6, 5), new Vector2Int(7, 4), new Vector2Int(7, 5), new Vector2Int(7, 6), new Vector2Int(7, 0) }; // 비석 HS1, 북서/남서 기둥
+    // 빛을 막는 돌기둥 (예전 본당 비석/기둥 자리 그대로라 정답이 같음). [수정] 해의 방으로 옮기면서 실제 돌기둥 소품을 놓음
+    private static readonly Vector2Int[] Blocks = { new Vector2Int(6, 5), new Vector2Int(7, 4), new Vector2Int(7, 5), new Vector2Int(7, 6), new Vector2Int(7, 0) };
 
     private readonly List<HorusMirror> mirrors = new List<HorusMirror>();
     private LineRenderer beam;
+    private HorusBeamFx beamFx; // [추가] 부드럽게 번지고, 거울에서 튕기며 달려 나가는 빛 연출
     private SpriteRenderer sun;
     private Transform root;
     private bool done, busy;
@@ -68,7 +72,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
 
     private void BuildProps()
     {
-        sun = HorusWorld.Prop(root, "H1_WingedSun", sunSprite, World(Sun) + new Vector3(0.45f, 0.2f, 0f), 1.4f, Vector2.zero);
+        sun = HorusWorld.Prop(root, "H1_WingedSun", sunSprite, World(Sun) + new Vector3(0.45f * cell, 0.2f, 0f), 1.4f, Vector2.zero);
         sun.sortingOrder = 25; // 벽에 걸린 장식 (항상 위)
         for (int i = 0; i < MirrorCells.Length; i++)
         {
@@ -76,6 +80,7 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
             mirrors.Add(m);
         }
         foreach (Vector2Int c in SetStones) HorusWorld.Prop(root, "H1_SetStone", setStoneSprite, World(c), 0.75f, new Vector2(0.6f, 0.4f));
+        foreach (Vector2Int c in Blocks) HorusWorld.Prop(root, "H1_StoneColumn", blockSprite, World(c), 0.7f, new Vector2(0.6f, 0.4f));
     }
 
     private LineRenderer BuildBeam()
@@ -90,10 +95,11 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         if (RaDarkness.Unlit != null) lr.sharedMaterial = RaDarkness.Unlit;
         else lr.material = new Material(Shader.Find("Sprites/Default"));
         lr.positionCount = 0;
+        beamFx = HorusBeamFx.Attach(lr);
         return lr;
     }
 
-    private Vector3 World(Vector2Int c) => new Vector3(origin.x + c.x + 0.5f, origin.y + c.y + 0.5f, 0f);
+    private Vector3 World(Vector2Int c) => new Vector3(origin.x + (c.x + 0.5f) * cell, origin.y + (c.y + 0.5f) * cell, 0f);
 
     // ================= 빛 따라가기 =================
     // 거울을 돌릴 때마다 다시 계산. 결과: 목표에 닿음 / 붉은 돌 / 막힘 / 밖
@@ -105,14 +111,23 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         if (!Unlocked && !done)
         {
             beam.positionCount = 0;
+            if (beamFx != null) beamFx.Hide();
             return;
         }
-        var pts = new List<Vector3> { World(Sun) + Vector3.right * 0.45f };
+        var pts = new List<Vector3> { World(Sun) + Vector3.right * 0.45f * cell };
         Hit hit = Walk(pts);
+        Color beamColor = hit == Hit.Red ? Red : Gold;
+        if (beamFx != null) beamFx.Show(pts, beamColor); // [수정] 딱딱한 직선 대신 빛 연출이 그림 (판정은 그대로)
+        else DrawPlainBeam(pts, beamColor);
+        if (hit == Hit.Target && !done) Submit();
+    }
+
+    // 빛 연출을 못 만들었을 때만 쓰는 예전 방식 (직선 하나)
+    private void DrawPlainBeam(List<Vector3> pts, Color beamColor)
+    {
         beam.positionCount = pts.Count;
         beam.SetPositions(pts.ToArray());
-        beam.startColor = beam.endColor = hit == Hit.Red ? Red : Gold;
-        if (hit == Hit.Target && !done) Submit();
+        beam.startColor = beam.endColor = beamColor;
     }
 
     private Hit Walk(List<Vector3> pts)
@@ -121,9 +136,9 @@ public class HorusSunMirrors : PuzzleBase, IInteractable
         for (int step = 0; step < 200; step++)
         {
             p += d;
-            if (p.x < 0 || p.y < 0 || p.x >= size.x || p.y >= size.y) { pts.Add(World(p - d) + (Vector3)(Vector2)d * 0.5f); return Hit.None; }
+            if (p.x < 0 || p.y < 0 || p.x >= size.x || p.y >= size.y) { pts.Add(World(p - d) + (Vector3)(Vector2)d * 0.5f * cell); return Hit.None; }
             if (p == Target) { pts.Add(World(p)); return Hit.Target; }
-            if (Array.IndexOf(Blocks, p) >= 0) { pts.Add(World(p) - (Vector3)(Vector2)d * 0.45f); return Hit.None; }
+            if (Array.IndexOf(Blocks, p) >= 0) { pts.Add(World(p) - (Vector3)(Vector2)d * 0.45f * cell); return Hit.None; }
             if (Array.IndexOf(SetStones, p) >= 0) { pts.Add(World(p)); return Hit.Red; }
             int m = Array.IndexOf(MirrorCells, p);
             if (m < 0 || mirrors[m].State == Flat) continue;

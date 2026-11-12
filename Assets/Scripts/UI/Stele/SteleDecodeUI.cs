@@ -63,6 +63,7 @@ public class SteleDecodeUI : MonoBehaviour
         yield return ui.DecodeLoop();
         ui.lens.gameObject.SetActive(false);
         ui.noteText.text = "해독 완료";
+        yield return ui.ShowParagraph(lines); // [추가] 한 글자씩 띄엄띄엄이라 읽기 힘들었음 -> 다 풀면 문장으로 모아 보여줌
         yield return ui.WaitClose("E: 닫기");
     }
 
@@ -71,6 +72,7 @@ public class SteleDecodeUI : MonoBehaviour
         SteleDecodeUI ui = Instance;
         if (!ui.Open(title, lines, false, "")) yield break;
         foreach (SteleCell cell in ui.cells) cell.ForceDecoded();
+        yield return ui.ShowParagraph(lines);
         yield return ui.WaitClose("E: 닫기");
     }
 
@@ -143,6 +145,27 @@ public class SteleDecodeUI : MonoBehaviour
             if (cell.Decoded) decoded++;
         }
         return decoded;
+    }
+
+    // [추가] 해독이 끝나면 글자 칸을 지우고, 같은 내용을 띄어쓰기가 살아 있는 문장으로 다시 보여줌 (문장마다 줄바꿈)
+    private IEnumerator ShowParagraph(string[] lines)
+    {
+        if (lines == null || lines.Length == 0) yield break;
+        foreach (Transform child in textArea) Destroy(child.gameObject);
+        cells.Clear();
+        string body = string.Join(" ", lines).Replace(". ", ".\n").Replace("? ", "?\n").Replace("! ", "!\n");
+        int size = body.Length <= 40 ? 40 : (body.Length <= 90 ? 34 : 28);
+        Text text = UIBuild.Text(textArea, "Paragraph", font, size, Vector2.zero, textBox - new Vector2(30f, 20f), Hex("#5A3410"));
+        text.fontStyle = FontStyle.Bold;
+        text.lineSpacing = 1.35f;
+        text.text = body;
+        for (float t = 0f; t < 0.45f; t += Time.unscaledDeltaTime)
+        {
+            Color c = text.color;
+            text.color = new Color(c.r, c.g, c.b, t / 0.45f);
+            yield return null;
+        }
+        text.color = Hex("#5A3410");
     }
 
     private IEnumerator WaitClose(string hint)

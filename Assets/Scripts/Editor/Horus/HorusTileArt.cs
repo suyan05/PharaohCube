@@ -20,6 +20,10 @@ public static class HorusTileArt
     public const string WallFace = "HO_Wall_Face";
     public const string WallFaceEye = "HO_Wall_Face_Eye";
     public const string WallFaceFalcon = "HO_Wall_Face_Falcon";
+    public const string WallFaceLow = "HO_Wall_Face_Low";   // [추가] 2줄 벽의 아랫줄 (금 띠 없음)
+
+    // [추가] 입구 복도의 찢긴 벽화 (4칸 x 2줄 한 점). n 1~4, col 0~3, row 0(위)~1
+    public static string Mural(int n, int col, int row) => $"HO_Wall_Mural{n}_{col}_{row}";
 
     public static TileBase Get(string name)
     {

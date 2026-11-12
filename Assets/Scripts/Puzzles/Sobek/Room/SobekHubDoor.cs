@@ -31,10 +31,18 @@ public class SobekHubDoor : MonoBehaviour, IInteractable
     private static bool HasFlag(string f) => GameManager.Instance != null && GameManager.Instance.HasFlag(f);
     private static bool Has(string id) => ItemInventory.Instance != null && ItemInventory.Instance.Has(id);
 
+    // 부적이 인벤토리에 있거나, 그 부적을 주는 서브 퍼즐을 이미 풀었으면 가진 것으로 셈
+    private static bool HasAmulet(string id)
+    {
+        if (Has(id)) return true;
+        int i = System.Array.IndexOf(SobekIds.Amulets, id);
+        return i >= 0 && HasFlag(SobekIds.AmuletClearFlags[i]);
+    }
+
     private int CountHave()
     {
         int n = 0;
-        foreach (string id in requiredItems) if (Has(id)) n++;
+        foreach (string id in requiredItems) if (HasAmulet(id)) n++;
         return n;
     }
 
@@ -58,7 +66,7 @@ public class SobekHubDoor : MonoBehaviour, IInteractable
                 AnubisToast.Show($"악어 입 모양의 큰 문. 부적을 끼우는 홈이 네 개 있다. ({have}/{requiredItems.Length})", 3f);
                 return;
             }
-            foreach (string id in requiredItems) ItemInventory.Instance.Consume(id);
+            if (ItemInventory.Instance != null) foreach (string id in requiredItems) if (Has(id)) ItemInventory.Instance.Consume(id);
             if (GameManager.Instance != null) GameManager.Instance.SetFlag(SobekIds.FlagDoorOpen);
             if (cameraFollow != null) cameraFollow.Shake(0.8f, 0.15f);
             AnubisToast.Show("부적 네 개가 빛나며 소베크의 입이 열린다...", 2.5f);

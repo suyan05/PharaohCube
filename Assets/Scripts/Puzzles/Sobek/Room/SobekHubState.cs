@@ -45,6 +45,7 @@ public class SobekHubState : MonoBehaviour
     private void Start()
     {
         if (cameraFollow == null && Camera.main != null) cameraFollow = Camera.main.GetComponent<CameraFollow2D>();
+        RestoreAmulets();
 
         bool done = HasFlag(SobekIds.FlagMainDone);
         SetDrained(false, 1f);
@@ -76,6 +77,20 @@ public class SobekHubState : MonoBehaviour
         Debug.Log("[SobekHubState] 물 빠짐 -> 수로 바닥·악어·출구 열림", this);
         yield return new WaitForSeconds(0.3f);
         SobekStory.Say(drainedLines);
+    }
+
+    // 서브 씬에서 받은 부적은 그 씬의 ItemInventory에 들어갔다가 씬과 함께 사라짐 (Managers는 DontDestroyOnLoad가 아님)
+    // 플래그(GameManager)는 남아 있으니, 푼 서브의 부적을 허브 인벤토리에 다시 넣어 줌 (문에 넣기 전까지만)
+    private static void RestoreAmulets()
+    {
+        ItemInventory inv = ItemInventory.Instance;
+        if (inv == null || HasFlag(SobekIds.FlagDoorOpen)) return;
+        for (int i = 0; i < SobekIds.Amulets.Length; i++)
+        {
+            if (!HasFlag(SobekIds.AmuletClearFlags[i]) || inv.Has(SobekIds.Amulets[i])) continue;
+            inv.Grant(SobekIds.Amulets[i]);
+            Debug.Log($"[SobekHubState] 부적 복구: {SobekIds.Amulets[i]} ({SobekIds.AmuletClearFlags[i]})");
+        }
     }
 
     private IEnumerator IntroRoutine()

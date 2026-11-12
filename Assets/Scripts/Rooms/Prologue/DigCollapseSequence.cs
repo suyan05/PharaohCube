@@ -76,7 +76,7 @@ public class DigCollapseSequence : MonoBehaviour
         yield return EmoteBalloonUI.Show(player, "?", 0.7f);
         yield return Cine.Say(rumbleLines);
 
-        CineAudio.Play(radioStaticSfx);
+        CineAudio.Play(radioStaticSfx, 0.3f); // [수정] 치지직 소리가 너무 커서 줄임
         Cine.Run(CineCamera.Rumble(4f, weakShake, weakShake * 1.5f));
         yield return Cine.Say(radioWarnLines);
     }
@@ -101,7 +101,9 @@ public class DigCollapseSequence : MonoBehaviour
 
         CineCamera.Zoom(3.5f, 0.5f);
         Cine.Run(CineCamera.Rumble(fadeOutSeconds + 0.6f, strongShake, strongShake));
+        Cine.Run(CineShots.Roll(-7f, 0.7f)); // [추가] 떨어지는 순간 화면이 기울어짐
         yield return CineActor.Sink(player, 0.6f, 0.6f);
+        yield return ApepShadow.Sweep(6.5f); // [수정] 아펩 첫 등장: 어둠 -> 천천히 기어가는 뱀 + 자막 -> 눈이 뜨임 (너무 빨리 지나가서 뜬금없던 것을 길고 느리게)
         yield return ScreenFader.FadeOut(fadeOutSeconds);
         yield return CineAudio.StopLoop(0.3f);
         yield return new WaitForSeconds(blackHoldSeconds);

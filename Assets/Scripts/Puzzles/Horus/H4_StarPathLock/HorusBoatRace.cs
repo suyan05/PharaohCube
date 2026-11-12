@@ -11,7 +11,10 @@ using UnityEngine;
 // 3. 호루스의 나무배(흰 돌색): 물에 못 들어감 / 세트의 돌배(붉은): 물 칸에 밀어 넣으면 가라앉아 그 칸이 땅이 됨
 // 4. 나무배 두 척을 별 자리 두 곳에 대면 승리 -> 별 조각 3 + 노트 5
 // 5. R: 한 수 되돌리기 (사람도 그 자리로) / 경기장 옆 비석 E: 처음부터
-// 판 데이터는 Rows (설계: 최소 15번 밀기, 세트의 돌배를 가라앉히지 않으면 못 품 - 컴퓨터로 확인함)
+// 판 데이터는 Rows (설계: 최소 9번 밀기, 세트의 돌배로 강에 다리를 놓지 않으면 못 품 - 컴퓨터로 확인함)
+// [수정] 너무 어려웠던 판(15번)을 쉽게: 강(물 한 줄)이 경기장을 가르고, 돌배 1척 = 다리 1개
+//        가라앉은 돌배 칸은 땅 그림으로 바뀌어서 사람도 배도 지나갈 수 있음 (처음 가라앉을 때 대사로 알려줌)
+// 경기장은 본당 동쪽 '나일의 방' 안 (HorusRoomMap.NileRoom)
 public class HorusBoatRace : PuzzleBase, IInteractable
 {
     // 위가 북쪽. 글자 하나 = 1칸. 왼쪽 아래 칸 = (Origin.x, Origin.y)
@@ -19,16 +22,18 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private static readonly string[] Rows =
     {
         "########",
-        "p..~~o.#",
-        "p.B.#..#",
-        "p..S#B.#",
-        "#.#..~.#",
-        "G...S~o#",
-        "#......#"
+        "#..~.o.#",
+        "#.B~...#",
+        "#..~.B.#",
+        "#.S~...#",
+        "G..~.o.#",
+        "#..~...#"
     };
 
     [Header("연결 (빌더가 채움)")]
-    [SerializeField] private Vector2 origin = new Vector2(16f, 0f);
+    [SerializeField] private Vector2 origin = new Vector2(27f, 1f);
+    [Tooltip("[수정] 칸 하나의 크기 (월드). 1이면 배/바위 사이 길이 좁아서 지나가다 걸림 -> 1.5")]
+    [SerializeField] private float cell = 1.5f;
     [SerializeField] private Sprite rockSprite, waterSprite, sunkSprite, socketSprite, woodSprite, setSprite, sealSprite;
 
     [Header("진행")]
@@ -52,7 +57,7 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private Transform root, player;
     private float holdTimer;
     private Vector2Int holdDir;
-    private bool sliding, done, toldRules;
+    private bool sliding, done, toldRules, toldBridge;
 
     private bool Unlocked => IsFlagOn(unlockedFlag);
     private bool Paused => DialogueBox.IsOpen || Cine.Running || HorusFocus.PanelOpen || ItemPopup.IsShowing;
@@ -90,12 +95,12 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     {
         Vector3 pos = World(cell);
         map[cell] = ch == 'B' || ch == 'S' || ch == 'G' ? '.' : ch;
-        if (ch == '#') HorusWorld.Prop(root, "H4_Rock", rockSprite, pos, 1f, new Vector2(0.96f, 0.96f));
+        if (ch == '#') HorusWorld.Prop(root, "H4_Rock", rockSprite, pos, this.cell * 0.95f, new Vector2(this.cell, this.cell)); // 바위 사이로 빠져나가지 않게 충돌은 한 칸 꽉
         else if (ch == '~') AddWater(cell, pos);
         else if (ch == 'o')
         {
             sockets.Add(cell);
-            HorusWorld.Floor(root, "H4_Socket", socketSprite, pos, 1f, 1);
+            HorusWorld.Floor(root, "H4_Socket", socketSprite, pos, this.cell * 0.9f, 1);
         }
         else if (ch == 'B' || ch == 'S') AddBoat(cell, ch == 'S');
         else if (ch == 'G') BuildGate(pos);
@@ -104,30 +109,30 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     private void AddWater(Vector2Int cell, Vector3 pos)
     {
         water.Add(cell);
-        SpriteRenderer sr = HorusWorld.Floor(root, "H4_Water", waterSprite, pos, 1f, 0);
+        SpriteRenderer sr = HorusWorld.Floor(root, "H4_Water", waterSprite, pos, this.cell, 0);
         waterTiles[cell] = sr;
-        waterBlocks[cell] = HorusWorld.AddBox(sr.gameObject, new Vector2(1f, 1f), sr.transform.localScale.x, false);
+        waterBlocks[cell] = HorusWorld.AddBox(sr.gameObject, new Vector2(this.cell, this.cell), sr.transform.localScale.x, false);
         ((BoxCollider2D)waterBlocks[cell]).offset = Vector2.zero;
     }
 
     private void AddBoat(Vector2Int cell, bool set)
     {
-        SpriteRenderer sr = HorusWorld.Prop(root, set ? "H4_SetBoat" : "H4_HorusBoat", set ? setSprite : woodSprite, World(cell), 0.95f, Vector2.zero);
+        SpriteRenderer sr = HorusWorld.Prop(root, set ? "H4_SetBoat" : "H4_HorusBoat", set ? setSprite : woodSprite, World(cell), this.cell * 0.85f, Vector2.zero);
         BoxCollider2D box = sr.gameObject.AddComponent<BoxCollider2D>();
-        box.size = new Vector2(0.9f, 0.9f) / sr.transform.localScale.x;
+        box.size = new Vector2(this.cell * 0.8f, this.cell * 0.8f) / sr.transform.localScale.x;
         boats.Add(new Boat { sr = sr, cell = cell, set = set, scale = sr.transform.localScale });
     }
 
     // 입구를 막은 세트의 봉인 (매의 인장으로 풂)
     private void BuildGate(Vector3 pos)
     {
-        gate = HorusWorld.Prop(root, "H4_SetSealGate", sealSprite, pos, 1f, new Vector2(1f, 1f));
+        gate = HorusWorld.Prop(root, "H4_SetSealGate", sealSprite, pos, cell * 0.8f, new Vector2(cell, cell));
         RaGlowFx.Glow(gate.transform, Vector3.up * 0.5f / gate.transform.localScale.x, 1.6f / gate.transform.localScale.x, new Color(1f, 0.25f, 0.2f, 0.35f), HorusFx.Layer, 1);
     }
 
-    private Vector3 World(Vector2Int cell) => new Vector3(origin.x + cell.x + 0.5f, origin.y + cell.y + 0.5f, 0f);
+    private Vector3 World(Vector2Int c) => new Vector3(origin.x + (c.x + 0.5f) * cell, origin.y + (c.y + 0.5f) * cell, 0f);
 
-    private Vector2Int CellOf(Vector3 p) => new Vector2Int(Mathf.FloorToInt(p.x - origin.x), Mathf.FloorToInt(p.y - origin.y));
+    private Vector2Int CellOf(Vector3 p) => new Vector2Int(Mathf.FloorToInt((p.x - origin.x) / cell), Mathf.FloorToInt((p.y - origin.y) / cell));
 
     // ================= 매 프레임: 밀기 / 되돌리기 =================
     private void Update()
@@ -162,8 +167,9 @@ public class HorusBoatRace : PuzzleBase, IInteractable
     {
         if (toldRules) return;
         toldRules = true;
-        HorusWorld.Say("호루스와 세트의 '돌배 경주'... 나무배 두 척을 별 자리까지 밀어 보내면 되겠어.",
-            "붉은 배는 세트의 진짜 돌배. 물에 밀어 넣으면 가라앉겠지. (R: 한 수 되돌리기)");
+        HorusWorld.Say("호루스와 세트의 '돌배 경주'... 흰 나무배 두 척을 강 건너 금빛 별 자리 두 곳까지 밀어 보내면 돼.",
+            "강물은 사람도 배도 못 건너. 붉은 배는 세트의 진짜 돌배라 물에 밀어 넣으면 가라앉아 다리가 되겠지.",
+            "배는 몸을 대고 그 방향키를 꾹 누르면 한 칸씩 밀려. 당길 수는 없어. (R: 한 수 되돌리기 / 비석 E: 처음부터)");
     }
 
     // 배에 붙어서 그 방향으로 pushHold초 동안 밀면 한 칸
@@ -192,7 +198,7 @@ public class HorusBoatRace : PuzzleBase, IInteractable
             if (b.sunk) continue;
             Vector2 d = (Vector2)(World(b.cell) - p);
             float along = Vector2.Dot(d, dir), side = Mathf.Abs(Vector2.Dot(d, new Vector2(dir.y, dir.x)));
-            if (along > 0.2f && along < 1.05f && side < 0.45f) return b;
+            if (along > 0.2f && along < cell * 0.5f + 0.75f && side < cell * 0.35f) return b;
         }
         return null;
     }
@@ -238,6 +244,9 @@ public class HorusBoatRace : PuzzleBase, IInteractable
             yield return null;
         }
         SetSunk(boat, cell, true);
+        if (toldBridge) yield break;
+        toldBridge = true;
+        HorusWorld.Say("세트의 돌배가 가라앉아 강 위에 다리가 됐다! 이제 그 위로 걸어서도, 배를 밀어서도 건널 수 있어.");
     }
 
     private void SetSunk(Boat boat, Vector2Int cell, bool sunk)

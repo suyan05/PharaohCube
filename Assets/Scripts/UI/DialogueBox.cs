@@ -360,7 +360,10 @@ public class DialogueBox : MonoBehaviour
         Image box = UIBuild.Image(root, "Box", BoxPos, BoxSize, boxSprite, Hex("#E8B23A"));
         box.preserveAspect = false;
         if (boxSprite != null && boxSprite.border != Vector4.zero) box.type = Image.Type.Sliced;
-        UIBuild.Image(root, "Inner", BoxPos, BoxSize - new Vector2(12f, 12f), null, Hex("#F6F1E7")).enabled = boxSprite == null;
+        // [수정] 아트 칸이 비어 있으면 도트 파피루스 판을 씀 (예전: 노란 테두리 + 흰 상자)
+        bool papyrus = boxSprite == null && UIFrames.Papyrus != null;
+        if (papyrus) UIFrames.Apply(box, UIFrames.Papyrus);
+        UIBuild.Image(root, "Inner", BoxPos, BoxSize - new Vector2(12f, 12f), null, Hex("#F6F1E7")).enabled = boxSprite == null && !papyrus;
 
         Vector2 portraitPos = BoxPos + new Vector2(-BoxSize.x * 0.5f + 30f + PortraitSize.x * 0.5f, 0f);
         portraitImage = UIBuild.Image(root, "Portrait", portraitPos, PortraitSize, null, Color.white);

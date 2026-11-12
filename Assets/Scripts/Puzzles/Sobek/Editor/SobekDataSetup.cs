@@ -575,7 +575,7 @@ public static class SobekDataSetup
             { SobekIds.AmuletWater, Ui("Common_Icon_SobekAmuletWater") },
             { SobekIds.AmuletMirror, Ui("Common_Icon_SobekAmuletMirror") },
             { SobekIds.Tooth, Ui("Common_Icon_SobekTooth") },
-            { SobekIds.Plate, AssetDatabase.LoadAssetAtPath<Sprite>("Assets/image/Cube/Sobek.jpg") },
+            { SobekIds.Plate, Ui("Sobek_Plate_Icon") ?? AssetDatabase.LoadAssetAtPath<Sprite>("Assets/image/Cube/Sobek.jpg") }, // 아트팀 형판(512x512)이 오면 그것
         };
         for (int i = 0; i < list.arraySize; i++)
         {

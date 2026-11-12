@@ -67,7 +67,7 @@ public class EclipseStation : MonoBehaviour, IInteractable
     {
         if (!isOpen) return;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (PuzzleCloseKey.ExtraPressed)
         {
             CloseOverlay();
             return;

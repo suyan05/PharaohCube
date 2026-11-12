@@ -32,7 +32,8 @@ public class HorusDirector : MonoBehaviour
     [SerializeField] private GameObject[] overlays;
 
     [Header("플래그")]
-    [SerializeField] private string introFlag = "F_HO_INTRO_PLAYED";
+    [SerializeField] private string introFlag = "F_HO_INTRO_PLAYED";   // 이시스 석상 연출을 봄 (이 뒤에 매가 깨어남)
+    [SerializeField] private string enteredFlag = "F_HO_ENTERED";      // 처음 들어와 제목 자막을 봄
     [SerializeField] private string awakenFlag = "F_HO_AWAKENED";
     [SerializeField] private string clearFlag = "F_HO_H5_DONE";
     [SerializeField] private string endingFlag = "F_HO_ENDING_PLAYED";
@@ -57,6 +58,7 @@ public class HorusDirector : MonoBehaviour
     public float ClearIntensity => clearIntensity;
     public Color ClearColor => clearColor;
     public string IntroFlag => introFlag;
+    public string EnteredFlag => enteredFlag;
     public string AwakenFlag => awakenFlag;
     public string EndingFlag => endingFlag;
 
@@ -72,7 +74,8 @@ public class HorusDirector : MonoBehaviour
             HorusFocus.SetOverlays(overlays);
             if (dreamVolume != null) dreamVolume.weight = 0f;
             if (HasFlag(endingFlag)) RestoreSky();
-            if (!HasFlag(introFlag)) queue.Add(HorusCutscenes.Intro);
+            // [수정] 이시스가 들어오자마자 나오지 않게: 처음엔 제목 자막만, 이시스는 석상을 조사하면 (RequestIsis)
+            if (!HasFlag(introFlag) && !HasFlag(enteredFlag)) queue.Add(HorusCutscenes.Intro);
             if (GameManager.Instance == null) return;
             GameManager.Instance.OnFlagChanged += HandleFlag;
             subscribed = true;
@@ -109,11 +112,18 @@ public class HorusDirector : MonoBehaviour
         if (ShouldAwaken()) Cine.Run(HorusCutscenes.For(this, HorusCutscenes.Awaken));
     }
 
+    // 입구 이시스 석상 E -> 이시스 연출 (벽화로 보여주는 기억). 이미 본 뒤에도 다시 볼 수 있음
+    public void RequestIsis()
+    {
+        if (!queue.Contains(HorusCutscenes.Isis)) queue.Add(HorusCutscenes.Isis);
+    }
+
+    // [수정] 최종 스토리(B안): 입구 복도 벽화 4장을 모두 보면 방 스토리 연출(호루스 목소리 + 매 착지 + 케프리)
+    // (예전: 이시스 연출을 본 뒤 본당(y > awakenY)에 들어가면)
     private bool ShouldAwaken()
     {
-        if (!HasFlag(introFlag) || HasFlag(awakenFlag)) return false;
-        Transform p = CineActor.Player();
-        return p != null && p.position.y > awakenY;
+        if (HasFlag(awakenFlag)) return false;
+        return HorusMuralWall.SeenCount() >= HorusMuralWall.Count;
     }
 
     private bool CanPlay()

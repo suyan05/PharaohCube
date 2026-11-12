@@ -21,3 +21,11 @@ PharaohCube 소리 출처 (Assets/Resources/Audio)
         sfx_bastet_night(해가 짐), sfx_bastet_clear(메인 클리어), sfx_bastet_plate_mount(형판 장착),
         sfx_bastet_ending_chime(엔딩 일러스트 컷)
 배경음악: bgm_bastet_temple (A 히자즈 음계, 시스트럼·프레임 드럼·우드·네이), bgm_bastet_ending (패드 + 뜯는 소리)
+
+[2026-11-12 다시 만듦] 담당 방 배경음악 5곡을 방마다 악기, 빠르기, 음계가 다르게 새로 합성 (같은 파일 이름으로 교체)
+  bgm_prologue_desert  : 발굴 현장. 60BPM, D 히자즈. 바람 + 낮은 드론 + 홀로 부는 갈대 피리(네이) + 드문 우드
+  bgm_sphinx_dream     : 스핑크스의 꿈. 48BPM, E 리디안. 유리 종 아르페지오 + 숨 같은 패드, 긴 울림, 북 없음
+  bgm_ra_temple_day    : 낮의 라. 104BPM, A 믹솔리디안. 리라 리프 + 프레임 드럼 + 셰이커 + 피리 선율 (밝고 당당함)
+  bgm_ra_temple_night  : 밤의 라. 66BPM, A 프리지안. 심장 같은 북 + 두둑(리드) 선율 + 낮은 패드
+  bgm_horus_temple     : 호루스. 6/8박, B 도리안. 하프 아르페지오 + 별처럼 반짝이는 첼레스타 + 위로 치솟는 피리
+추가 효과음: sfx_shutter (획득 팝업 셔터), sfx_puzzle_solved (퍼즐 완료 종소리)

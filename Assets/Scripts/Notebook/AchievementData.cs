@@ -53,6 +53,7 @@ public static class AchievementData
         night.allFlags = new[] { "F_RA_NIGHT_P1_DONE", "F_RA_NIGHT_P3_DONE", "F_RA_NIGHT_P4_DONE", "F_RA_NIGHT_P5_DONE" };
         l.Add(night);
         l.Add(Any("ACH_RA_CLEAR", "라", "라의 형판", "황금 태양 형판", AchGrade.Bronze, "큐브의 첫 면. 태양의 신이 시험을 통과한 자에게 내어준 금판.", "라의 시련을 끝내자", "F_RA_PLATE_GIVEN"));
+        l.Add(Any("ACH_RA_VAULT", "라", "밤의 뱃길", "열두 문의 벽화", AchGrade.Bronze, "태양의 배는 밤마다 열두 문을 지난다. 일곱째 문 아래에는 똬리를 튼 것이 기다린다.", "???", "F_RA_HIDDEN_VAULT")); // [추가] 라의 숨은 길
     }
 
     private static void AddOtherRooms(List<AchievementDef> l)
@@ -69,8 +70,13 @@ public static class AchievementData
         l.Add(Any("ACH_THO_1", "토트", "서기관의 손", "서기관 팔레트", AchGrade.Papyrus, "갈대 펜과 먹 두 개(검정, 빨강)를 담는 나무 팔레트. 글을 아는 자는 귀한 대접을 받았다.", "지식의 방 첫 관문"));
         l.Add(Any("ACH_THO_2", "토트", "달의 셈", "따오기 상", AchGrade.Papyrus, "달을 세는 신 토트의 새. 따오기의 부리는 초승달을 닮았다.", "지식의 방 두 번째 관문"));
         l.Add(Any("ACH_THO_CLEAR", "토트", "신성문자 해독가", "로제타석", AchGrade.Bronze, "세 가지 글자로 같은 내용을 새긴 돌. 이 돌 덕분에 상형문자를 다시 읽게 됐다.", "지식의 방을 끝내자"));
-        l.Add(Any("ACH_HOR_STAR", "호루스", "별을 잇는 자", "덴데라 천장 별자리판", AchGrade.Papyrus, "신전 천장에 새겨진 하늘 지도. 별은 신들의 길이었다.", "밤하늘의 방"));
-        l.Add(Any("ACH_HOR_CLEAR", "호루스", "호루스의 눈", "우자트 부적", AchGrade.Bronze, "상처에서 다시 온전해진 눈. 지키고 되살리는 힘의 상징.", "매의 방을 끝내자"));
+        // [수정] 호루스 업적에 조건(플래그) 연결 + 벽화/숨은 둥지 업적 추가
+        l.Add(Any("ACH_HOR_STAR", "호루스", "별을 잇는 자", "덴데라 천장 별자리판", AchGrade.Papyrus, "신전 천장에 새겨진 하늘 지도. 별은 신들의 길이었다.", "밤하늘의 방", "F_HO_CHART_4"));
+        AchievementDef murals = Any("ACH_HOR_MURAL", "호루스", "찢긴 벽화의 기억", "채색 벽화 네 폭", AchGrade.Papyrus, "빼앗긴 왕좌, 갈대숲의 아이, 여든 해의 다툼, 왕관을 쓴 매. 한 신이 왕이 되기까지.", "신전 입구 복도의 벽");
+        murals.allFlags = new[] { "F_HO_MURAL_1", "F_HO_MURAL_2", "F_HO_MURAL_3", "F_HO_MURAL_4" };
+        l.Add(murals);
+        l.Add(Any("ACH_HOR_NEST", "호루스", "매의 둥지", "푸른 매 깃털", AchGrade.Bronze, "갈대숲에 숨겨진 아이는 밤마다 별을 헤아렸다.", "???", "F_HO_NEST_VAULT"));
+        l.Add(Any("ACH_HOR_CLEAR", "호루스", "호루스의 눈", "우자트 부적", AchGrade.Bronze, "상처에서 다시 온전해진 눈. 지키고 되살리는 힘의 상징.", "매의 방을 끝내자", "F_HO_FINALE"));
         l.Add(Any("ACH_SOB_CLEAR", "소베크", "나일의 주인", "악어 신 소베크 상", AchGrade.Bronze, "나일의 물과 비옥함을 다스리던 악어 머리의 신.", "물의 방을 끝내자"));
         l.Add(Any("ACH_ANU_CLEAR", "아누비스", "마음의 무게", "심장의 무게 달기 파피루스", AchGrade.Bronze, "죽은 자의 심장을 깃털과 달아본다. 가벼우면 영원한 삶으로, 무거우면 암무트에게.", "저울 앞에 서라"));
     }

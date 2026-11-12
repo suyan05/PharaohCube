@@ -37,6 +37,13 @@ public class NotebookCardPopup : MonoBehaviour
         Image ill = NotebookBuild.Solid(frame.rectTransform, "Ill", new Vector2(0f, 30f), new Vector2(size.x - 24f, size.x - 24f), inner, false);
         Text mark = UIBuild.Text(ill.rectTransform, "Mark", PuzzleUITheme.GetBodyFont(), 60, Vector2.zero, ill.rectTransform.sizeDelta, got ? NotebookUI.GradeColor(def.grade) : NotebookBuild.Hex("#C9A66B"));
         mark.text = got ? def.relic.Substring(0, 1) : "?";
+        Sprite art = got ? NotebookCardArt.Of(def.id) : null; // [추가] 얻은 카드는 일러스트로 (그림이 없는 업적은 예전처럼 글자)
+        if (art != null)
+        {
+            ill.sprite = art;
+            ill.color = Color.white;
+            mark.text = "";
+        }
         Text name = UIBuild.Text(frame.rectTransform, "Name", PuzzleUITheme.GetBodyFont(), 20, new Vector2(0f, -size.y * 0.5f + 40f), new Vector2(size.x - 16f, 56f), got ? Ink : NotebookBuild.PageL);
         name.text = got ? def.relic : "???";
         if (got && AchievementSystem.Instance.IsNew(def.id)) Dot(frame.rectTransform, new Vector2(size.x * 0.5f - 12f, size.y * 0.5f - 12f));
@@ -96,7 +103,7 @@ public class NotebookCardPopup : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) Close();
+        if (Input.GetKeyDown(KeyCode.E)) Close(); // [수정] ESC는 설정 창 키 -> 닫기는 E로 통일
         else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) Step(-1);
         else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) Step(1);
     }
@@ -120,7 +127,9 @@ public class NotebookCardPopup : MonoBehaviour
         AchievementDef def = list[index];
         bool got = Got(def);
         bigFrame.color = got ? NotebookUI.GradeColor(def.grade) : Back;
-        bigInner.color = got ? new Color(0.16f, 0.12f, 0.09f) : new Color(0.29f, 0.2f, 0.14f);
+        Sprite art = got ? NotebookCardArt.Of(def.id) : null;
+        bigInner.sprite = art;
+        bigInner.color = art != null ? Color.white : (got ? new Color(0.16f, 0.12f, 0.09f) : new Color(0.29f, 0.2f, 0.14f));
         bigName.text = got ? def.relic : "???";
         infoTitle.text = got ? def.title : "아직 발굴하지 못했다";
         infoBody.text = got ? $"{def.text}\n\n<size=20>{GradeName(def.grade)} 등급  |  {def.chapter}</size>" : $"단서: {def.hint}";
@@ -161,6 +170,6 @@ public class NotebookCardPopup : MonoBehaviour
         infoBody.supportRichText = true;
         NotebookBuild.Arrow(layer, "<", new Vector2(-500f, 0f), () => Step(-1));
         NotebookBuild.Arrow(layer, ">", new Vector2(640f, 0f), () => Step(1));
-        UIBuild.Text(layer, "Help", PuzzleUITheme.GetBodyFont(), 20, new Vector2(0f, -330f), new Vector2(800f, 30f), NotebookBuild.PageL).text = "좌우: 다른 카드  |  Esc / 바깥 클릭: 닫기";
+        UIBuild.Text(layer, "Help", PuzzleUITheme.GetBodyFont(), 20, new Vector2(0f, -330f), new Vector2(800f, 30f), NotebookBuild.PageL).text = "좌우: 다른 카드  |  E / 바깥 클릭: 닫기";
     }
 }

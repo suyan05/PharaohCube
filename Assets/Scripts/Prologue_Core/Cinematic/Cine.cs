@@ -22,6 +22,19 @@ public static class Cine
     public static bool Running { get; private set; }
     public static bool Skipping => CineSkip.Requested;
 
+    // [추가] 연출 중 E = "이 장면은 다 봤으니 다음으로". 연출 전체 건너뛰기(ESC 길게)와 다름
+    // - 지금 기다리는 한 박자(대기, 걷기, 카메라 이동)만 바로 끝냄. 대사, 획득 팝업, 벽화 컷은 원래 E로 넘기므로 그때는 꺼짐
+    // - 대사를 닫은 바로 그 E가 다음 기다림까지 넘기지 않게, 대사창이 닫힌 프레임에는 무시
+    public static bool Hurry
+    {
+        get
+        {
+            if (!Running || Skipping || !Input.GetKeyDown(KeyCode.E)) return false;
+            if (DialogueBox.IsOpen || DialogueBox.ClosedFrame == Time.frameCount) return false;
+            return !ItemPopup.IsShowing && !MuralStage.IsPlaying;
+        }
+    }
+
     // 연출이 끝날 때 (목표 문구 다시 띄우기 등)
     public static event Action Ended;
 
@@ -64,7 +77,7 @@ public static class Cine
     public static IEnumerator Wait(float seconds)
     {
         float t = 0f;
-        while (t < seconds && !Skipping)
+        while (t < seconds && !Skipping && !Hurry)
         {
             t += Time.deltaTime;
             yield return null;

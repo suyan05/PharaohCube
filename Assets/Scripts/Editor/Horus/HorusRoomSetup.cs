@@ -9,7 +9,8 @@ using Object = UnityEngine.Object;
 public static class HorusRoomSetup
 {
     private const string PlayerPrefab = "Assets/Prefabs/Player/Player.prefab";
-    private static readonly Vector3 PlayerStart = new Vector3(12f, -7.3f, 0f); // 입구 전실 아래쪽 (작업 도면 HA0)
+    // [수정] 입구 복도가 생겨서 시작 위치를 복도 서쪽 끝으로 (예전: 입구 전실 아래쪽 12, -7.3)
+    private static readonly Vector3 PlayerStart = HorusRoomMap.CorridorStart;
 
     private static readonly string[] PlaceholderWalls = { "Floor", "Wall_North", "Wall_South", "Wall_West", "Wall_East" };
     private static readonly string[] FloorDecals = { "Plaza", "StarPathSpine", "Path_East", "Path_West", "Path_SouthWest", "Path_SouthEast" };
