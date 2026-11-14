@@ -5,6 +5,7 @@
 만드는 것 (Assets/Resources/Horus/Mural/  <- MuralStage가 읽는 폴더, 파일 이름만 MU_Bastet* 로 구분)
   MU_BastetS{n}_bg / _<조각>   : 벽화 n의 '이야기 연출' 장면 (배경 + 움직이는 조각)
   MU_BastetW{n}_bg / _rays / _player : 벽화 n을 '플레이어 등 뒤에서 올려다보는' 장면
+  MU_BastetP{n}_bg               : E를 누르면 먼저 크게 보여 주는 깨끗한 벽화 그림
 그리고
   Assets/image/Bastet/Story/Bastet_Mural{n}.png : 게임 안 벽에 걸리는 작은 도트 벽화 (128x64, 32 PPU = 4x2칸)
   Assets/Scripts/Puzzles/Bastet/Story/BastetMuralArt.cs : 조각 위치표 (MuralArt와 같은 방식)
@@ -684,6 +685,7 @@ def main():
         # 올려다보는 장면: 모든 조각을 붙인 낡은 벽화 + 빛줄기 + 플레이어 뒷모습
         full_ss = composite(bg, list(layers.values()))
         clean = finish(full_ss)
+        clean.convert("RGB").save(os.path.join(OUT_MURAL, f"MU_BastetP{i}_bg.png"))  # E를 누르면 먼저 보여 줄 깨끗한 그림
         old = aged(full_ss, 100 + i, PATCHES[i - 1])
         save_bg(old, w_art)
         rays.save(os.path.join(OUT_MURAL, f"MU_{w_art}_rays.png"))
