@@ -200,3 +200,4 @@ public class BastetMural : MonoBehaviour, IInteractable
     }
 #endif
 }
+

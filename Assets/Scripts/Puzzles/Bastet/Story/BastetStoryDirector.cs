@@ -10,7 +10,6 @@ using UnityEngine.Rendering.Universal;
 // (2) 메인 클리어: F_BASTET_MAIN_DONE이 켜지면 금빛 번쩍 + 방이 밝아짐 + 고양이가 플레이어 곁으로
 //     (여신 마무리 대사는 BastetGoddess가 이 연출이 끝난 뒤 말함 -> "내 고양이도 데려가라")
 //     마무리 대사가 끝나면(F_BASTET_GODDESS_END) 고양이가 플레이어를 따라감
-// 붙이는 곳: Bastet_Story/BastetStoryDirector (Tools/Bastet/★ 스토리·검은 고양이 세팅 메뉴가 만듦)
 public class BastetStoryDirector : MonoBehaviour
 {
     [Header("연결 (비우면 자동으로 찾음)")]
