@@ -22,14 +22,9 @@ public static class BastetStoryAnimalSetup
     private const string ArtFolder = "Assets/image/Bastet/Story/";
     private const string RootName = "Bastet_Story";
 
-    // 벽화 4장 (스토리 기획서 그대로)
-    private static readonly (string title, string body, int note)[] Murals =
-    {
-        ("라의 눈", "라의 눈에서 딸이 태어났다. 그 눈은 밤에도 감기지 않는다.", 16),
-        ("나무 아래의 칼", "밤마다 뱀이 배를 덮친다. 밤마다 고양이가 칼을 든다.", 17),
-        ("집을 지키는 고양이", "바스테트는 집을 지킨다. 곡식과, 아이와, 잠든 자의 숨을.", 18),
-        ("잠든 고양이들", "사람들은 죽은 고양이도 미라로 만들어 여신 곁에 뉘었다.", 19),
-    };
+    // 벽화 4장: 제목·글·연출은 BastetMuralScenes, 여기선 수첩 노트 번호만
+    private static readonly int[] MuralNotes = { 16, 17, 18, 19 };
+    private const string MuralCorridorName = "MuralCorridor";
 
     // 이야기 비석 3개 (방 이름, 제목, 내용, 반응 대사, 노트 번호)
     private static readonly (string room, string title, string text, DialogueLine[] after, int note)[] Steles =
@@ -55,6 +50,72 @@ public static class BastetStoryAnimalSetup
         EditorUtility.DisplayDialog("스토리·검은 고양이", log.ToString().Replace("[BastetStoryAnimalSetup] ", "") + "\n확인 후 Ctrl+S", "확인");
     }
 
+    // ================= 벽화 복도 =================
+    [MenuItem("Tools/Bastet/★ 벽화 복도 (카메라 내려오기 + 벽화 나란히 걸기)", priority = 6)]
+    private static void CorridorMenu()
+    {
+        var log = new StringBuilder();
+        bool ok = BuildCorridor(log);
+        Debug.Log("[BastetStoryAnimalSetup] 벽화 복도\n" + log);
+        EditorUtility.DisplayDialog("벽화 복도", log + (ok ? "\n확인 후 Ctrl+S" : ""), "확인");
+    }
+
+    // 복도 바닥 상자(CameraRoomZone + BastetMuralCorridor)를 만들고 벽화 4장을 윗벽에 나란히 검
+    // 처음 만들 때 자리: 선택한 오브젝트 위치 (없으면 플레이어 위치). 이미 있으면 상자 크기·자리는 그대로 두고 다시 걸기만
+    public static bool BuildCorridor(StringBuilder log)
+    {
+        var murals = new BastetMural[BastetMuralScenes.Count];
+        foreach (BastetMural m in Object.FindObjectsByType<BastetMural>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (m.Index >= 1 && m.Index <= murals.Length) murals[m.Index - 1] = m;
+        for (int i = 0; i < murals.Length; i++)
+        {
+            if (murals[i] != null) continue;
+            log.AppendLine($"벽화 {i + 1}이 없음 -> Tools/Bastet/★ 스토리·검은 고양이 세팅을 먼저 실행");
+            return false;
+        }
+
+        GameObject go = BastetWalkBuilder.FindInScene(MuralCorridorName);
+        bool created = go == null;
+        if (created)
+        {
+            Vector3 at = Vector3.zero;
+            string from = "원점";
+            if (Selection.activeTransform != null) { at = Selection.activeTransform.position; from = $"선택한 '{Selection.activeTransform.name}'"; }
+            else
+            {
+                GameObject player = BastetWalkBuilder.FindInScene("Player");
+                if (player != null) { at = player.transform.position; from = "플레이어"; }
+            }
+            go = new GameObject(MuralCorridorName);
+            Undo.RegisterCreatedObjectUndo(go, MuralCorridorName);
+            go.transform.SetParent(EnsureRoot(), true);
+            go.transform.position = new Vector3(at.x, at.y, 0f);
+            log.AppendLine($"- 복도 상자 만듦: {from} 위치 기준 18 x 3칸");
+        }
+
+        var box = GetOrAdd<BoxCollider2D>(go);
+        box.isTrigger = true;
+        var zone = GetOrAdd<CameraRoomZone>(go);
+        if (created) zone.EditorSetup(new Vector2(18f, 3f), new Vector4(1f, 1f, 1.25f, 2.5f));
+        var so = new SerializedObject(zone);
+        so.FindProperty("fitWholeRoom").boolValue = false; // 복도는 줌 아웃하지 않음
+        so.ApplyModifiedProperties();
+
+        var corridor = GetOrAdd<BastetMuralCorridor>(go);
+        corridor.EditorSetup(murals);
+        corridor.Arrange();
+        EditorUtility.SetDirty(corridor);
+        EditorUtility.SetDirty(zone);
+        Selection.activeGameObject = go;
+        EditorSceneManager.MarkAllScenesDirty();
+
+        log.AppendLine("- 카메라: 복도 안에서는 복도 높이에 맞춰 내려옴 (위아래 고정, 좌우만 따라감)");
+        log.AppendLine("- 벽화 4장을 복도 윗벽에 같은 간격으로 걸었음");
+        log.AppendLine("\n초록 상자가 복도 바닥과 다르면: BoxCollider2D의 Edit Collider로 바닥에 맞추고");
+        log.AppendLine("MuralCorridor 우클릭(⋮) > '벽화 4장을 윗벽에 나란히 걸기'");
+        return true;
+    }
+
     public static bool Build(StringBuilder log)
     {
         var areas = new Dictionary<string, BastetRoomArea>();
@@ -70,19 +131,17 @@ public static class BastetStoryAnimalSetup
         Sprite catSit = SaveTempSprite("Bastet_Story_Cat_Sit_Temp", BastetPixelArt.CatTexture(false), SpriteAlignment.BottomCenter, log);
         Sprite catEyes = SaveTempSprite("Bastet_Story_Cat_Eyes_Temp", BastetPixelArt.CatTexture(true), SpriteAlignment.BottomCenter, log);
         Sprite eyesIcon = SaveTempSprite("Bastet_Story_EyesIcon_Temp", BastetPixelArt.EyesIconTexture(), SpriteAlignment.Center, log);
-        Sprite muralSprite = SaveTempSprite("Bastet_Story_Mural_Temp", BastetPixelArt.MuralTexture(), SpriteAlignment.BottomCenter, log);
         Sprite bubbleSprite = LoadFirstSprite("Assets/image/ui/UI_Prompt_New.png");
         Sprite steleSprite = LoadFirstSprite("Assets/image/Bastet/Bastet_Obj/Bastet_Obj_Stele.png");
 
         CluePanel panel = Object.FindFirstObjectByType<CluePanel>(FindObjectsInactive.Include);
-        if (panel == null) log.AppendLine("- 경고: CluePanel 없음 -> Tools/Bastet/실전 방 세팅을 먼저 실행 (벽화 조사 창)");
 
         // 2) 벽화 4장: 가운데 홀 양옆 (서쪽 아래 1, 서쪽 위 2, 동쪽 위 3, 동쪽 아래 4)
         Vector2 hs = hall.Size;
         float mx = hs.x * 0.5f - 2.8f;
         Vector2[] muralPos = { new Vector2(-mx, -1.5f), new Vector2(-mx, 2.5f), new Vector2(mx, 2.5f), new Vector2(mx, -1.5f) };
-        for (int i = 0; i < Murals.Length; i++)
-            MakeMural(i + 1, hall.transform, muralPos[i], muralSprite, bubbleSprite, panel, log);
+        for (int i = 0; i < MuralNotes.Length; i++)
+            MakeMural(i + 1, hall.transform, muralPos[i], MuralSprite(i + 1, log), bubbleSprite, log);
 
         // 3) 이야기 비석 3개 (방 왼쪽/오른쪽 위 구석)
         for (int i = 0; i < Steles.Length; i++)
@@ -145,6 +204,41 @@ public static class BastetStoryAnimalSetup
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
+    // 벽에 거는 도트 벽화 (Tools/BastetMural/bastet_murals.py가 만든 Bastet_Mural{n}.png, 32 PPU = 4x2칸)
+    private static Sprite MuralSprite(int index, StringBuilder log)
+    {
+        string path = $"{ArtFolder}Bastet_Mural{index}.png";
+        if (!File.Exists(path))
+        {
+            log.AppendLine($"- 경고: {path} 없음 -> 임시 석판으로 표시");
+            return null;
+        }
+        ConfigureSprite(path, 32f, SpriteAlignment.BottomCenter);
+        return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+    }
+
+    // 도트 스프라이트 설정 (이미 맞으면 다시 가져오지 않음)
+    private static void ConfigureSprite(string path, float ppu, SpriteAlignment pivot)
+    {
+        if (!(AssetImporter.GetAtPath(path) is TextureImporter ti)) return;
+        var settings = new TextureImporterSettings();
+        ti.ReadTextureSettings(settings);
+        bool ok = ti.textureType == TextureImporterType.Sprite && Mathf.Approximately(ti.spritePixelsPerUnit, ppu)
+                  && ti.filterMode == FilterMode.Point && settings.spriteAlignment == (int)pivot;
+        if (ok) return;
+        ti.textureType = TextureImporterType.Sprite;
+        ti.spriteImportMode = SpriteImportMode.Single;
+        ti.spritePixelsPerUnit = ppu;
+        ti.filterMode = FilterMode.Point;
+        ti.mipmapEnabled = false;
+        ti.alphaIsTransparency = true;
+        ti.textureCompression = TextureImporterCompression.Uncompressed;
+        ti.ReadTextureSettings(settings);
+        settings.spriteAlignment = (int)pivot;
+        ti.SetTextureSettings(settings);
+        ti.SaveAndReimport();
+    }
+
     private static Sprite LoadFirstSprite(string path)
     {
         foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(path)) if (o is Sprite s) return s;
@@ -184,26 +278,29 @@ public static class BastetStoryAnimalSetup
         return c != null ? c : Undo.AddComponent<T>(go);
     }
 
-    private static void MakeMural(int index, Transform hall, Vector2 local, Sprite sprite, Sprite bubbleSprite, CluePanel panel, StringBuilder log)
+    private static void MakeMural(int index, Transform hall, Vector2 local, Sprite sprite, Sprite bubbleSprite, StringBuilder log)
     {
         GameObject go = GetOrCreate($"Mural_Bastet_{index}", hall, local, out bool created);
         var sr = GetOrAdd<SpriteRenderer>(go);
-        if (sr.sprite == null) sr.sprite = sprite;
+        // 비어 있거나 예전 임시 석판이면 새 도트 벽화로 (직접 넣은 그림은 그대로)
+        if (sprite != null && (sr.sprite == null || sr.sprite.name.StartsWith("Bastet_Story_Mural_Temp") || sr.sprite.name.StartsWith("Bastet_Mural")))
+            sr.sprite = sprite;
         sr.sortingLayerName = "Objects";
 
-        float w = sr.sprite != null ? sr.sprite.bounds.size.x : 3f;
+        float w = sr.sprite != null ? sr.sprite.bounds.size.x : 4f;
         float h = sr.sprite != null ? sr.sprite.bounds.size.y : 2f;
+        // 벽에 걸린 그림이라 막지 않는 트리거, 아래 바닥 한 줄까지 닿게 (바닥에 서서 E)
         var col = GetOrAdd<BoxCollider2D>(go);
-        col.size = new Vector2(w, 0.8f);
-        col.offset = new Vector2(0f, 0.4f);
+        col.isTrigger = true;
+        col.size = new Vector2(w * 0.9f, 1.4f);
+        col.offset = new Vector2(0f, -0.1f);
 
         SpriteRenderer bubble = MakeBubble(go.transform, new Vector3(0f, h + 0.5f, 0f), bubbleSprite, sr.sortingOrder + 2);
 
         var m = GetOrAdd<BastetMural>(go);
-        var info = Murals[index - 1];
-        m.EditorSetup(index, info.title, info.body, info.note, $"벽화 '{info.title}': {info.body}", panel, sr, bubble);
+        m.EditorSetup(index, MuralNotes[index - 1], sr, bubble);
         EditorUtility.SetDirty(m);
-        log.AppendLine($"- 벽화 {index} '{info.title}' {(created ? "만듦" : "내용 갱신")} (노트 {info.note})");
+        log.AppendLine($"- 벽화 {index} '{BastetMuralScenes.Title(index)}' {(created ? "만듦" : "그림·내용 갱신")} (노트 {MuralNotes[index - 1]})");
     }
 
     private static void MakeStoryStele(int index, Transform room, Vector2 local, Sprite sprite, StringBuilder log)
