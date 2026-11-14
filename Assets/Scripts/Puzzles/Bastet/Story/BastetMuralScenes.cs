@@ -1,10 +1,11 @@
 using UnityEngine;
 
 // [추가] 바스테트의 방 벽화 4장 컷신 대본 (호루스 벽화와 같은 MuralStage 인형극)
-// 벽화 하나를 보면 두 장면이 이어짐
-//   1) 올려다보기: 플레이어 등 뒤에서 낡은 벽화를 올려다봄 (빛줄기 + 먼지) + 벽화 글 한 줄  -> 자막 이름 '벽화 이름 (n/4)'
-//   2) 이야기 연출: 벽화 속 인물이 움직이며 그 그림의 이야기를 보여 줌 (스토리 기획서 B안 바스테트)
-// 그림: Resources/Horus/Mural/MU_BastetW{n}_* (올려다보기), MU_BastetS{n}_* (이야기)  <- Tools/BastetMural/bastet_murals.py가 만듦
+// 벽화 하나를 보면 (BastetMuralViewer가 재생)
+//   0) 그림 먼저: 깨끗한 벽화 그림 + 제목 '벽화 이름 (n/4)' + 벽에 새겨진 글   (MU_BastetP{n}_bg)
+//   1) 올려다보기: 플레이어 등 뒤에서 낡은 벽화를 올려다보며 한마디 (빛줄기 + 먼지)   (MU_BastetW{n}_*)
+//   2) 이야기 연출: 벽화 속 인물이 움직이며 그 그림의 이야기를 보여 줌 (스토리 기획서 B안 바스테트)   (MU_BastetS{n}_*)
+// 그림은 Tools/BastetMural/bastet_murals.py가 만듦
 // 위치표: BastetMuralArt (같은 도구가 자동으로 만듦)
 // 움직임 값: 벽화 픽셀 기준 (오른쪽 +x, 아래 +y), 회전은 도(+ = 반시계), 시간은 장면 진행도 0~1
 public static class BastetMuralScenes
@@ -21,6 +22,15 @@ public static class BastetMuralScenes
         "사람들은 죽은 고양이도 미라로 만들어 여신 곁에 뉘었다."
     };
 
+    // 올려다볼 때 '나'의 한마디 (그림을 보다가 이야기 속으로 빠져드는 연결)
+    private static readonly string[] LookLines =
+    {
+        "눈 하나에서... 누군가 걸어 나오고 있어.",
+        "나무 아래 고양이... 앞발에 칼을 쥐고 있어.",
+        "곡식 창고, 잠든 사람, 아이... 그리고 고양이.",
+        "고양이 미라들이 여신 곁에 줄지어 서 있어."
+    };
+
     // 올려다보는 장면에서 플레이어가 선 자리 (그림 도구의 PLAYER_X와 같아야 함)
     private static readonly float[] PlayerX = { 250f, 200f, 250f, 1185f };
 
@@ -29,23 +39,32 @@ public static class BastetMuralScenes
 
     public static string Title(int index) => index >= 1 && index <= Count ? Titles[index - 1] : "벽화";
 
-    // number = 자막에 표시할 'n/4'의 n, withStory = 이야기 연출까지 볼지
-    public static MuralShot[] For(int index, int number, bool withStory)
+    // 그림 먼저 보기 화면의 제목 / 글 / 그림 이름
+    public static string PictureTitle(int index, int number) => $"벽화 {number}/{Count}  ·  {Title(index)}";
+    public static string WallLine(int index) => index >= 1 && index <= Count ? WallLines[index - 1] : "";
+    public static string PictureArt(int index) => $"BastetP{index}";
+
+    // 그림 다음에 이어질 연출. withLook = 올려다보기 장면, withStory = 이야기 장면 (둘 다 끄면 그림만)
+    public static MuralShot[] For(int index, bool withLook, bool withStory)
     {
         if (index < 1 || index > Count)
         {
             Debug.LogWarning($"[바스테트 벽화] 모르는 벽화 번호: {index}");
             return new MuralShot[0];
         }
-        MuralShot look = Look(index).Say($"{Title(index)} ({number}/{Count})", WallLines[index - 1]);
-        if (!withStory) return new[] { look };
-        switch (index)
+        var list = new System.Collections.Generic.List<MuralShot>();
+        if (withLook) list.Add(Look(index).Say(Me, LookLines[index - 1]));
+        if (withStory)
         {
-            case 1: return new[] { look, EyeOfRa() };
-            case 2: return new[] { look, KnifeUnderTree() };
-            case 3: return new[] { look, HouseGuard() };
-            default: return new[] { look, SleepingCats() };
+            switch (index)
+            {
+                case 1: list.Add(EyeOfRa()); break;
+                case 2: list.Add(KnifeUnderTree()); break;
+                case 3: list.Add(HouseGuard()); break;
+                default: list.Add(SleepingCats()); break;
+            }
         }
+        return list.ToArray();
     }
 
     // ================= 1) 올려다보기 =================
@@ -54,7 +73,7 @@ public static class BastetMuralScenes
     {
         string art = $"BastetW{index}";
         float px = PlayerX[index - 1];
-        return new MuralShot(art, art, 6.5f)
+        return new MuralShot(art, art, 4.5f)
             .Camera(1.22f, 1f, new Vector2((px - 640f) * 0.45f, 50f), Vector2.zero)
             .Lay("rays").Lay("player", 1.2f, 1.1f)
             .Pulse("rays", 0.45f, 0.9f)

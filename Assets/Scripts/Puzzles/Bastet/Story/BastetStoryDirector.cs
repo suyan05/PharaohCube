@@ -148,7 +148,7 @@ public class BastetStoryDirector : MonoBehaviour
 
     private bool Busy()
     {
-        return (panel != null && panel.IsOpen) || DialogueBox.IsOpen || Cine.Running || MuralStage.IsPlaying || ItemPopup.IsShowing
+        return (panel != null && panel.IsOpen) || DialogueBox.IsOpen || Cine.Running || BastetMuralViewer.IsPlaying || ItemPopup.IsShowing
             || (bastetVoice != null && bastetVoice.IsPlaying) || BastetGoddess.Busy;
     }
 

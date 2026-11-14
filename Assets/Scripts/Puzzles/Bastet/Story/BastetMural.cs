@@ -3,12 +3,13 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
-// [수정] 바스테트의 방 벽화 (4장) - 호루스 입구 복도 벽화와 같은 방식으로 바꿈
-// - 벽에는 작은 도트 벽화 그림 (Assets/image/Bastet/Story/Bastet_Mural{n}.png, 4x2칸)
-// - E: 게임 카메라가 벽화로 쑥 다가가며 어두워짐
-//      -> (1) 플레이어 등 뒤에서 큰 벽화를 올려다보는 장면 + 벽화 글 '벽화 이름 (n/4)'
+// [수정] 바스테트의 방 벽화 (4장) - 호루스 입구 복도 벽화와 같은 방식
+// - 벽에는 작은 도트 벽화 그림 (Assets/image/Bastet/Story/Bastet_Mural{n}.png, 4x2칸), 플레이어보다 뒤에 그려짐
+// - E: 게임 카메라가 벽화로 쑥 다가감
+//      -> (0) 벽화 그림을 먼저 크게 보여 줌 (제목 + 벽에 새겨진 글) -> E
+//      -> (1) 플레이어 등 뒤에서 벽화를 올려다보며 한마디
 //      -> (2) 그 그림의 이야기 연출 (벽화 속 인물이 움직임, BastetMuralScenes)
-//      -> 다시 게임 화면
+//      -> 다시 게임 화면   (재생: BastetMuralViewer, E = 바로 다음)
 // - 처음 볼 때 고고학 수첩 메모 [노트 16~19] + "벽화 n/4" 알림
 // - 4장을 다 보면 F_BASTET_MURALS_ALL -> BastetStoryDirector가 방 스토리 연출
 // - 안 본 벽화는 어둠 속에서도 보이게 은은한 빛 + "!" 말풍선, 본 뒤에는 빛이 약해짐
@@ -20,10 +21,14 @@ public class BastetMural : MonoBehaviour, IInteractable
     [Range(1, 4)] [SerializeField] private int index = 1;
 
     [Header("연출")]
-    [Tooltip("올려다보기 다음에 그림 이야기 연출까지 보여 줌 (끄면 올려다보기만)")]
+    [Tooltip("그림 다음에 '올려다보기' 장면")]
+    [SerializeField] private bool playLook = true;
+    [Tooltip("그림 다음에 이야기 연출 (끄면 그림만)")]
     [SerializeField] private bool playStory = true;
-    [Tooltip("두 번째로 볼 때도 이야기 연출까지 (끄면 올려다보기만)")]
+    [Tooltip("두 번째로 볼 때도 연출까지 (끄면 그림만)")]
     [SerializeField] private bool storyOnRevisit = false;
+    [Tooltip("벽화를 플레이어보다 뒤에 그림 (벽에 걸린 그림이므로 켜 둠)")]
+    [SerializeField] private bool drawBehindPlayer = true;
     [Tooltip("다가갈 때 카메라 크기 (작을수록 크게 확대)")]
     [Range(0.8f, 4f)] [SerializeField] private float zoomSize = 1.6f;
     [Tooltip("다가가는 시간 (초)")]
@@ -64,9 +69,22 @@ public class BastetMural : MonoBehaviour, IInteractable
         if (slab == null) slab = GetComponent<SpriteRenderer>();
         if (slab != null && slab.sprite == null) slab.sprite = BastetPixelArt.MuralSlab;
 
+        if (drawBehindPlayer) SortBehindPlayer();
+
         float h = slab != null && slab.sprite != null ? slab.sprite.bounds.size.y : 2f;
         glow = RaGlowFx.PointLight(transform, new Vector3(0f, h * 0.5f, 0f), glowColor, glowRadius, glowIntensity);
         if (newBubble != null) bubbleBasePos = newBubble.transform.localPosition;
+    }
+
+    // 플레이어와 같은 정렬 레이어에서 2칸 뒤 (같은 순서면 그림이 플레이어를 덮는 문제), "!"는 플레이어 위
+    private void SortBehindPlayer()
+    {
+        Transform p = CineActor.Player();
+        SpriteRenderer psr = p != null ? p.GetComponentInChildren<SpriteRenderer>() : null;
+        int layer = psr != null ? psr.sortingLayerID : SortingLayer.NameToID("Objects");
+        int order = psr != null ? psr.sortingOrder : 0;
+        if (slab != null) { slab.sortingLayerID = layer; slab.sortingOrder = order - 2; }
+        if (newBubble != null) { newBubble.sortingLayerID = layer; newBubble.sortingOrder = order + 5; }
     }
 
     // ================= 빛 / "!" =================
@@ -97,8 +115,9 @@ public class BastetMural : MonoBehaviour, IInteractable
     {
         try
         {
-            if (playing || DialogueBox.IsOpen || DialogueBox.ClosedFrame == Time.frameCount || Cine.Running || MuralStage.IsPlaying) return;
-            Cine.Run(View());
+            // [수정] MuralStage.IsPlaying(공용 static)은 연출 중 씬을 나가면 true로 남아 다시 와도 막힘 -> 바스테트 전용 상태만 봄
+            if (playing || DialogueBox.IsOpen || DialogueBox.ClosedFrame == Time.frameCount || Cine.Running || BastetMuralViewer.IsPlaying) return;
+            StartCoroutine(View()); // 이 벽화에서 돌림 -> 씬이 바뀌면 같이 멈춤
         }
         catch (Exception e)
         {
@@ -106,21 +125,25 @@ public class BastetMural : MonoBehaviour, IInteractable
         }
     }
 
-    // 카메라가 벽화로 다가감 -> 올려다보기 -> 이야기 연출 -> 원래대로
+    // 카메라가 벽화로 다가감 -> 그림 -> 올려다보기 -> 이야기 연출 -> 원래대로
     private IEnumerator View()
     {
         playing = true;
         bool first = !Seen;
         int number = BastetStoryIds.MuralsSeen() + (first ? 1 : 0);
+        bool more = first || storyOnRevisit;
         Debug.Log($"[BastetMural] 벽화 {index} '{Title}' 보기 ({(first ? "처음" : "다시")})", this);
 
         Cine.Begin(true);
         CineCamera.Focus(transform.position + Vector3.up * focusHeight);
         CineCamera.Zoom(zoomSize, 0.7f);
         GameAudio.Play("sfx_dream_shimmer", 0.5f, 0.8f);
+        yield return null; // 벽화를 연 그 E가 다가가기(Cine.Wait)를 바로 끝내지 않게
         yield return Cine.Wait(approachSeconds);
 
-        yield return MuralStage.Play(BastetMuralScenes.For(index, number, playStory && (first || storyOnRevisit)));
+        MuralShot[] shots = BastetMuralScenes.For(index, playLook && more, playStory && more);
+        yield return BastetMuralViewer.Get().Play(BastetMuralScenes.PictureTitle(index, number), BastetMuralScenes.WallLine(index),
+            BastetMuralScenes.PictureArt(index), shots);
 
         CineCamera.Release();
         Cine.End();
@@ -144,6 +167,7 @@ public class BastetMural : MonoBehaviour, IInteractable
 
     private void OnDisable()
     {
+        if (playing && Cine.Running) Cine.End(); // 연출 중 꺼지면 플레이어가 묶이지 않게
         playing = false;
     }
 
@@ -151,7 +175,7 @@ public class BastetMural : MonoBehaviour, IInteractable
     [ContextMenu("테스트: 이 벽화 연출 보기")]
     private void TestView()
     {
-        if (Application.isPlaying && !playing && !Cine.Running) Cine.Run(View());
+        if (Application.isPlaying && !playing && !Cine.Running) StartCoroutine(View());
     }
 
     [ContextMenu("테스트: 이 벽화를 본 것으로 처리")]
