@@ -127,6 +127,42 @@ public class BastetMuralViewer : MonoBehaviour
         playing = false;
     }
 
+    // [추가] 그림 없이 이야기 연출만 (메인 클리어 엔딩). 검은 화면에서 시작해서 holdBlack이면 검은 화면으로 끝남 -> Hide()로 닫기
+    public IEnumerator PlayStory(MuralShot[] shots, bool holdBlack)
+    {
+        if (playing || shots == null || shots.Length == 0) yield break;
+        if (!TryBuild()) yield break;
+        playing = true;
+        ignoreUntilFrame = Time.frameCount + 1;
+        canvasGo.SetActive(true);
+        pictureGroup.gameObject.SetActive(false);
+        shotGroup.SetActive(true);
+        SetBlack(1f);
+        foreach (MuralShot shot in shots)
+        {
+            if (Cine.Skipping) break;
+            if (!BuildShot(shot)) continue;
+            yield return FadeBlack(1f, 0f);
+            yield return RunShot(shot);
+            yield return FadeBlack(0f, 1f);
+        }
+        ClearShot();
+        shotGroup.SetActive(false);
+        SetBlack(1f);
+        if (!holdBlack)
+        {
+            yield return FadeBlack(1f, 0f);
+            canvasGo.SetActive(false);
+        }
+        playing = false;
+    }
+
+    // 검은 화면으로 남겨 둔 보기 화면 닫기
+    public void Hide()
+    {
+        if (canvasGo != null) canvasGo.SetActive(false);
+    }
+
     // 다음 줄 입력 (New Input System)
     private bool Pressed()
     {

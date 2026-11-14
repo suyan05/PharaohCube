@@ -148,6 +148,44 @@ public static class BastetMuralScenes
                 .Say(Me, "...잊히지 않는 것. 이 방의 시험도 '기억'이겠지.");
     }
 
+    // ================= 메인 클리어 스토리 연출 (BastetEnding이 재생) =================
+    // 1) 저승의 강: 태양의 배 -> 아펩이 물에서 솟아 배를 노림 -> 고양이가 칼로 벰 -> 새벽빛과 함께 해가 떠오름
+    // 2) 형판: 바스테트가 손에서 고양이 형판을 띄워 건넴, 곁에 검은 고양이
+    public static MuralShot[] Ending()
+    {
+        MuralShot night = new MuralShot("BastetE1", "BastetE1", 12f)
+            .Camera(1.1f, 1.04f, new Vector2(-120f, -10f), new Vector2(60f, 0f))
+            .Lay("dawn").Lay("boat", 3f, 0.8f).Lay("sun", 3f, 0.8f).Lay("apep").Lay("head").Lay("cat", 1f, 1.2f).Lay("knife")
+            .Move("dawn", MuralPose.Hidden, MuralPose.Rest, 0.8f, 1f)
+            .Move("boat", new MuralPose(-260f, 0f, 0f, 0f), MuralPose.Rest, 0f, 0.25f)
+            .Move("sun", new MuralPose(-260f, 50f, 0f, 0f), new MuralPose(0f, 50f, 0f, 0.45f), 0f, 0.25f)
+            .Move("sun", new MuralPose(0f, 50f, 0f, 0.45f), new MuralPose(0f, -170f, 0f, 1f), 0.8f, 1f)
+            .Move("apep", new MuralPose(0f, 140f, 0f, 0f), MuralPose.Rest, 0.2f, 0.42f)
+            .Move("apep", MuralPose.Rest, new MuralPose(0f, 130f, 0f, 0f), 0.7f, 0.9f)
+            .Move("head", new MuralPose(0f, 140f, 0f, 0f), MuralPose.Rest, 0.2f, 0.42f)
+            .Move("head", MuralPose.Rest, new MuralPose(-50f, 170f, 50f, 0f), 0.68f, 0.86f)
+            .Move("cat", new MuralPose(0f, -50f, 0f, 0f), MuralPose.Rest, 0.45f, 0.56f)
+            .Move("knife", MuralPose.Hidden, new MuralPose(0f, -24f, -12f, 1f), 0.5f, 0.6f)
+            .Move("knife", new MuralPose(0f, -24f, -12f, 1f), new MuralPose(-56f, 40f, 64f, 1f), 0.62f, 0.68f)
+            .Dust(30)
+            .Say(Wall, "태양의 배가 저승을 건너던 밤,")
+            .Say(Wall, "혼돈의 뱀 아펩이 어둠 속에서 배를 노렸다.")
+            .Say(Wall, "그때 고양이의 모습을 한 바스테트가 칼을 들어 뱀을 베었고,")
+            .Say(Wall, "다시 새벽이 열렸다.");
+
+        MuralShot gift = new MuralShot("BastetE2", "BastetE2", 8f)
+            .Camera(1.12f, 1.02f, new Vector2(-60f, 10f), new Vector2(40f, 0f))
+            .Lay("glow").Lay("goddess").Lay("plate", 4f, 1f).Lay("cat", 1f, 1.3f)
+            .Move("goddess", MuralPose.Hidden, MuralPose.Rest, 0f, 0.25f)
+            .Move("glow", MuralPose.Hidden, MuralPose.Rest, 0.25f, 0.45f)
+            .Pulse("glow", 0.35f, 2f)
+            .Move("plate", new MuralPose(-120f, 90f, 0f, 0f), MuralPose.Rest, 0.3f, 0.6f)
+            .Move("cat", MuralPose.Hidden, MuralPose.Rest, 0.6f, 0.8f)
+            .Say("바스테트", "그 형판을 가져가라. 큐브의 한 면이 될 것이다.")
+            .Say(Me, "고양이 형판... 중앙 홀의 큐브에 끼우면 되겠어.");
+        return new[] { night, gift };
+    }
+
     // 조각 추가 (위치는 BastetMuralArt 표에서. 호루스 MuralArt 표는 건드리지 않음)
     private static MuralShot Lay(this MuralShot shot, string name, float bobAmp = 0f, float bobSpeed = 0f)
     {
