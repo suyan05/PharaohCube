@@ -446,6 +446,99 @@ public static class BastetStoryAnimalSetup
         return count > 0;
     }
 
+    // ================= 메인 클리어 후 흐름 (스토리 연출 -> 형판 -> 중앙 홀에서 큐브 -> 호루스) =================
+    private const string HallScene = "CentralRoom_Temp";
+    private static readonly string[] FlowScenes = { HallScene, "Puzzle_Test_Bastet_Tliemap", "Puzzle_Horus_Tilemap" };
+    private static readonly string[] CubeFaces = { "Ra", "Bastet", "Thoth", "Horus", "Sobek", "Anubis" };
+
+    [MenuItem("Tools/Bastet/★ 클리어 후 흐름 세팅 (바스테트 씬·중앙 홀 씬에서 각각 실행)", priority = 8)]
+    private static void FlowMenu()
+    {
+        var log = new StringBuilder();
+        EnsureBuildScenes(log);
+        int endings = SetupBastetEnding(log);
+        bool hall = SetupHallCube(log);
+        if (endings == 0 && !hall) log.AppendLine("\n이 씬에는 BastetEnding(바스테트 씬)도 HallTempDirector(중앙 홀 씬)도 없음");
+        Debug.Log("[BastetStoryAnimalSetup] 클리어 후 흐름\n" + log);
+        EditorUtility.DisplayDialog("클리어 후 흐름", log + "\n확인 후 Ctrl+S (두 씬 모두 한 번씩 실행)", "확인");
+    }
+
+    // 중앙 홀 / 바스테트 / 호루스 씬이 Scene List에 없으면 추가 (없으면 씬 이동이 '다음 번호 씬'으로 엉뚱하게 감)
+    private static void EnsureBuildScenes(StringBuilder log)
+    {
+        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
+        bool changed = false;
+        foreach (string sceneName in FlowScenes)
+        {
+            string path = null;
+            foreach (string guid in AssetDatabase.FindAssets($"t:Scene {sceneName}"))
+            {
+                string p = AssetDatabase.GUIDToAssetPath(guid);
+                if (Path.GetFileNameWithoutExtension(p) == sceneName) { path = p; break; }
+            }
+            if (path == null) { log.AppendLine($"- 경고: 씬 '{sceneName}'을 찾을 수 없음"); continue; }
+            int idx = list.FindIndex(e => e.path == path);
+            if (idx >= 0)
+            {
+                if (!list[idx].enabled) { list[idx] = new EditorBuildSettingsScene(path, true); changed = true; log.AppendLine($"- Scene List: {sceneName} 켬"); }
+                continue;
+            }
+            list.Add(new EditorBuildSettingsScene(path, true));
+            changed = true;
+            log.AppendLine($"- Scene List에 추가: {sceneName}");
+        }
+        if (changed) EditorBuildSettings.scenes = list.ToArray();
+        else log.AppendLine("- Scene List: 중앙 홀·바스테트·호루스 모두 있음");
+    }
+
+    // 바스테트 씬: 엔딩을 '스토리 연출 -> 형판 -> 중앙 홀로 이동'으로 (소베크 씬에서는 건드리지 않음)
+    private static int SetupBastetEnding(StringBuilder log)
+    {
+        if (!EditorSceneManager.GetActiveScene().name.Contains("Bastet")) return 0;
+        int n = 0;
+        foreach (BastetEnding e in Object.FindObjectsByType<BastetEnding>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            Undo.RecordObject(e, "바스테트 엔딩 흐름");
+            e.EditorSetupFlow(true, true, HallScene);
+            EditorUtility.SetDirty(e);
+            n++;
+        }
+        if (n > 0)
+        {
+            MakeViewer(EnsureRoot(), log);
+            EditorSceneManager.MarkAllScenesDirty();
+            log.AppendLine($"- 바스테트 엔딩 {n}개: 스토리 연출 -> 형판 -> 중앙 홀 '{HallScene}'로 이동 (큐브는 홀에서)");
+        }
+        return n;
+    }
+
+    // 중앙 홀 씬: 형판 끼우기 화면(HallCubeInsert) + 큐브·형판 그림 연결
+    private static bool SetupHallCube(StringBuilder log)
+    {
+        HallTempDirector director = Object.FindFirstObjectByType<HallTempDirector>(FindObjectsInactive.Include);
+        if (director == null) return false;
+        var insert = GetOrAdd<HallCubeInsert>(director.gameObject);
+        Sprite cube = LoadFirstSprite("Assets/image/Cube/Cube.png");
+        var faces = new Sprite[CubeFaces.Length];
+        for (int i = 0; i < faces.Length; i++)
+        {
+            faces[i] = LoadFirstSprite($"Assets/image/Cube/{CubeFaces[i]}.jpg");
+            if (faces[i] == null) log.AppendLine($"- 경고: image/Cube/{CubeFaces[i]}.jpg 스프라이트 없음");
+        }
+        var font = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>("Assets/Fonts/Fonts/Galmuri11 SDF.asset");
+        Undo.RecordObject(insert, "큐브 끼우기");
+        insert.EditorSetup(cube, faces, font);
+        EditorUtility.SetDirty(insert);
+
+        var so = new SerializedObject(director);
+        SerializedProperty prop = so.FindProperty("cubeInsert");
+        if (prop != null) { prop.objectReferenceValue = insert; so.ApplyModifiedProperties(); }
+        EditorUtility.SetDirty(director);
+        EditorSceneManager.MarkAllScenesDirty();
+        log.AppendLine("- 중앙 홀: 돌아오면 큐브에 형판 끼우기 화면 -> 큐브 빛 -> 다음 신전 (횃불 필요 없음)");
+        return true;
+    }
+
     // ================= 여신 대사 =================
     private static void UpdateGoddess(BastetGoddess goddess, StringBuilder log)
     {
