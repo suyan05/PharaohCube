@@ -495,6 +495,12 @@ public static class BastetStoryAnimalSetup
     private static int SetupBastetEnding(StringBuilder log)
     {
         if (!EditorSceneManager.GetActiveScene().name.Contains("Bastet")) return 0;
+        // [수정] 씬에 엔딩이 없으면 먼저 만듦 (그림·글꼴·메인 퍼즐 연결은 기존 '★ 엔딩 연출 세팅' 메뉴가 함)
+        if (Object.FindFirstObjectByType<BastetEnding>(FindObjectsInactive.Include) == null)
+        {
+            EditorApplication.ExecuteMenuItem("Tools/Bastet/★ 엔딩 연출 세팅 (일러스트 컷·큐브·소리)");
+            log.AppendLine("- 씬에 BastetEnding이 없어서 새로 만들고 메인 퍼즐에 연결함");
+        }
         int n = 0;
         foreach (BastetEnding e in Object.FindObjectsByType<BastetEnding>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {

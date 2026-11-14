@@ -329,7 +329,8 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         BastetSfx.Clear(); // [추가]
         Debug.Log("[BastetB5] 해와 달의 기억 클리어!", this);
         if (ending == null) ending = FindFirstObjectByType<BastetEnding>(FindObjectsInactive.Include); // [추가]
-        if (ending != null || autoExitOnClear) StartCoroutine(AutoExit()); // [수정] 엔딩이 있으면 엔딩 먼저
+        if (ending == null) ending = BastetEnding.CreateRuntime(); // [수정] 엔딩이 없으면 북쪽 문으로 바로 넘어가던 문제 -> 항상 스토리 연출 -> 중앙 홀
+        StartCoroutine(AutoExit()); // [수정] 여신 대사 -> 엔딩(스토리 연출 -> 형판 -> 중앙 홀)
     }
 
     // [추가] 보상 팝업·대사가 닫히면 잠시 뒤 다음 씬으로

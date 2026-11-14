@@ -89,6 +89,20 @@ public class BastetEnding : MonoBehaviour
     public bool IsPlaying => playing;
 
     // ================= 시작 =================
+    // [추가] 씬에 BastetEnding이 없을 때 메인 퍼즐(BastetSunMoonWalk)이 즉석에서 만듦
+    // -> 스토리 연출 -> 형판 -> 중앙 홀 (큐브는 홀에서). 형판 그림은 Resources의 엔딩 형판 조각, 글꼴은 한글 글꼴 자동
+    public static BastetEnding CreateRuntime()
+    {
+        var go = new GameObject("BastetEnding (자동)");
+        BastetEnding e = go.AddComponent<BastetEnding>();
+        e.storyCutscene = true;
+        e.cubeInHall = true;
+        e.plateSprite = Resources.Load<Sprite>("Horus/Mural/MU_BastetE2_plate");
+        e.font = BastetMuralViewer.FindKoreanFont();
+        Debug.LogWarning("[BastetEnding] 씬에 엔딩이 없어 자동으로 만듦 (스토리 연출 -> 형판 -> 중앙 홀). 메뉴 '★ 클리어 후 흐름 세팅'으로 씬에 넣어 두면 이 경고가 사라짐", go);
+        return e;
+    }
+
     public void Play()
     {
         if (playing) return;

@@ -34,7 +34,7 @@ public class HallRoute
         {
             god = "바스테트",
             cubeSlot = 1,
-            clearFlag = "F_BASTET_ENDING_DONE",
+            clearFlag = "F_BASTET_MAIN_DONE", // [수정] 메인 퍼즐을 풀었으면 엔딩을 건너뛰었어도 '바스테트에서 돌아옴'으로 봄
             returnedFlag = "F_HALL_BASTET_RETURNED",
             faceTitle = "큐브의 두 번째 면 - 고양이",
             nextScene = "Puzzle_Horus_Tilemap", // 메뉴 PharaohCube -> Horus -> 호루스 타일맵 씬 만들기 로 생기는 씬

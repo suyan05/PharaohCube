@@ -267,6 +267,8 @@ MonoBehaviour:
   walkInto: {x: 9, y: 10.6}
   nextScene: Puzzle_Test_Ra_Tilemap
   setFlagOnEnter: 
+  autoEnter: 0
+  autoEnterDistance: 0.6
 --- !u!61 &189949705
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -749,6 +751,12 @@ MonoBehaviour:
   emberColor: {r: 1, g: 0.95, b: 0.77, a: 1}
   intensity: 1.1
   radiusLerpSpeed: 6
+  coneLight: 1
+  coneOuterAngle: 80
+  coneInnerAngle: 35
+  coneLengthMul: 1.8
+  glowRadius: 1.6
+  turnSpeed: 540
   litMul: 1
   litEmberMul: 1.3
   litVesselMul: 2
@@ -1225,8 +1233,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
@@ -1415,6 +1423,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1228352477}
   - component: {fileID: 1228352478}
+  - component: {fileID: 1228352479}
   m_Layer: 0
   m_Name: HallSystems
   m_TagString: Untagged
@@ -1456,10 +1465,78 @@ MonoBehaviour:
   door: {fileID: 189949703}
   arrivePoint: {x: 9, y: 0.8}
   walkPoint: {x: 9, y: 3}
+  cubeInsert: {fileID: 1228352479}
   introFlag: F_HALL_TEMP_INTRO
   objRack: "\uD683\uBD88 \uAC78\uC774\uC5D0\uC11C \uD683\uBD88\uC744 \uC9D1\uC790"
   objBrazier: "\uD654\uB85C\uC5D0 \uD683\uBD88\uC744 \uB300\uACE0 \uBD88\uC744 \uBD99\uC774\uC790"
   objDoor: "\uBD81\uCABD \uBB38\uC73C\uB85C \uB77C\uC758 \uC2E0\uC804\uC5D0 \uB4E4\uC5B4\uAC00\uC790"
+  routes:
+  - god: "\uB77C"
+    clearFlag: F_RA_PLATE_GIVEN
+    returnedFlag: F_HALL_RA_RETURNED
+    faceTitle: "\uD050\uBE0C\uC758 \uCCAB \uBC88\uC9F8 \uBA74 - \uD0DC\uC591"
+    cubeLines:
+    - speaker: ???
+      text: "\uD0DC\uC591\uC758 \uBA74\uC774 \uAE68\uC5B4\uB0AC\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: ???
+      text: "\uB2E4\uC74C \uBB38\uC774 \uC5F4\uB9B0\uB2E4. \uACE0\uC591\uC774 \uC5EC\uC2E0,
+        \uBC14\uC2A4\uD14C\uD2B8\uC758 \uC2E0\uC804\uC774\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: "\uB098"
+      text: "\uD050\uBE0C\uC5D0 \uBE5B\uC774 \uD558\uB098 \uB4E4\uC5B4\uC654\uC5B4...
+        \uB2E4\uC74C\uC740 \uBC14\uC2A4\uD14C\uD2B8."
+      portrait: {fileID: 0}
+    nextScene: Puzzle_Test_Bastet_Tliemap
+    nextPrompt: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uC2E0\uC804\uC73C\uB85C"
+    objective: "\uBD81\uCABD \uBB38\uC73C\uB85C \uBC14\uC2A4\uD14C\uD2B8\uC758 \uC2E0\uC804\uC5D0
+      \uB4E4\uC5B4\uAC00\uC790"
+    cubeSlot: 0
+    needTorch: 0
+  - god: "\uBC14\uC2A4\uD14C\uD2B8"
+    clearFlag: F_BASTET_ENDING_DONE
+    returnedFlag: F_HALL_BASTET_RETURNED
+    faceTitle: "\uD050\uBE0C\uC758 \uB450 \uBC88\uC9F8 \uBA74 - \uACE0\uC591\uC774"
+    cubeLines:
+    - speaker: ???
+      text: "\uACE0\uC591\uC774\uC758 \uBA74\uC774 \uAE68\uC5B4\uB0AC\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: ???
+      text: "\uB2E4\uC74C \uBB38\uC774 \uC5F4\uB9B0\uB2E4. \uD558\uB298\uC744 \uB098\uB294
+        \uB9E4, \uD638\uB8E8\uC2A4\uC758 \uC2E0\uC804\uC774\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: "\uB098"
+      text: "\uB450 \uBC88\uC9F8 \uBE5B... \uB2E4\uC74C\uC740 \uD638\uB8E8\uC2A4."
+      portrait: {fileID: 0}
+    nextScene: Puzzle_Horus_Tilemap
+    nextPrompt: "\uD638\uB8E8\uC2A4\uC758 \uC2E0\uC804\uC73C\uB85C"
+    objective: "\uBD81\uCABD \uBB38\uC73C\uB85C \uD638\uB8E8\uC2A4\uC758 \uC2E0\uC804\uC5D0
+      \uB4E4\uC5B4\uAC00\uC790"
+    cubeSlot: 1
+    needTorch: 0
+  - god: "\uD638\uB8E8\uC2A4"
+    clearFlag: F_HO_H5_DONE
+    returnedFlag: F_HALL_HORUS_RETURNED
+    faceTitle: "\uD050\uBE0C\uC758 \uB124 \uBC88\uC9F8 \uBA74 - \uD558\uB298"
+    cubeLines:
+    - speaker: ???
+      text: "\uD558\uB298\uC758 \uBA74\uC774 \uAE68\uC5B4\uB0AC\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: ???
+      text: "\uB2E4\uC74C \uBB38\uC774 \uC5F4\uB9B0\uB2E4. \uC8FD\uC740 \uC790\uB97C
+        \uC2EC\uD310\uD558\uB294 \uC790, \uC544\uB204\uBE44\uC2A4\uC758 \uC2E0\uC804\uC774\uB2E4."
+      portrait: {fileID: 0}
+    - speaker: "\uB098"
+      text: "\uB9E4\uC758 \uB208\uAE4C\uC9C0 \uCC3E\uC558\uC5B4... \uC774\uC81C \uC544\uB204\uBE44\uC2A4\uC57C."
+      portrait: {fileID: 0}
+    nextScene: Puzzle_Test_Anubis_Tilemap
+    nextPrompt: "\uC544\uB204\uBE44\uC2A4\uC758 \uC2E0\uC804\uC73C\uB85C"
+    objective: "\uBD81\uCABD \uBB38\uC73C\uB85C \uC544\uB204\uBE44\uC2A4\uC758 \uC2E0\uC804\uC5D0
+      \uB4E4\uC5B4\uAC00\uC790"
+    cubeSlot: 3
+    needTorch: 0
+  returnPoint: {x: 9, y: 8.6}
+  returnWalkPoint: {x: 9, y: 6.8}
   lines:
     title: "\uC911\uC559 \uD640"
     subtitle: "\uC5EC\uC12F \uC2E0\uC758 \uC2E0\uC804"
@@ -1492,6 +1569,34 @@ MonoBehaviour:
       text: "\uBD81\uCABD \uBB38 \uB108\uBA38\uAC00 \uCCAB \uBC88\uC9F8 \uC2E0\uC804...
         \uD0DC\uC591\uC758 \uC2E0, \uB77C."
       portrait: {fileID: 0}
+    returnArrive:
+    - speaker: "\uB098"
+      text: "\uB3CC\uC544\uC654\uB2E4... \uD050\uBE0C\uAC00 \uB098\uB97C \uBD80\uB974\uB294
+        \uAC83 \uAC19\uC544."
+      portrait: {fileID: 0}
+--- !u!114 &1228352479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1228352476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 055cb860b6031a6438d7eddaa25d1e1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HallCubeInsert
+  cubeSprite: {fileID: 5752739366588724016, guid: 27c69db98137ffd42b4a9abbe15e2d20, type: 3}
+  faceSprites:
+  - {fileID: 4524913410433130931, guid: c63ad91a41ec2894b8ec4e54d973a6d8, type: 3}
+  - {fileID: -4401819410366401690, guid: 8c85558847ce13141915403f8baf6836, type: 3}
+  - {fileID: -2909773197796118627, guid: b780bfcbb8687fc48a69d50449b9ca76, type: 3}
+  - {fileID: -5237746922409818941, guid: 9cad3efe5cc7b9c4a8ccf42fe684e191, type: 3}
+  - {fileID: -5700976550161359322, guid: 5ae35cf713dc67b4d9ebe9bb3bb48096, type: 3}
+  - {fileID: 4264317810600858832, guid: 530a30c4d0889064ea47abf5172f8f60, type: 3}
+  font: {fileID: 11400000, guid: 3ac9c94f4a025de49ba2325854bbec5a, type: 2}
+  fadeTime: 0.6
+  flyTime: 0.9
 --- !u!1 &1273968161
 GameObject:
   m_ObjectHideFlags: 0
@@ -1545,8 +1650,8 @@ MonoBehaviour:
   m_ShadowVolumeIntensityEnabled: 0
   m_ShadowVolumeIntensity: 0.75
   m_LocalBounds:
-    m_Center: {x: 0, y: 0, z: 0}
-    m_Extent: {x: 0, y: 0, z: 0}
+    m_Center: {x: 0, y: -0.00000011920929, z: 0}
+    m_Extent: {x: 0.9985302, y: 0.99853027, z: 0}
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0

@@ -403,7 +403,7 @@ public class BastetMuralViewer : MonoBehaviour
     }
 
     // 글꼴 칸이 비었을 때: 이미 불러온 글꼴 중 한글이 되는 것 (Galmuri 우선). 기본 LiberationSans는 한글이 네모로 나옴
-    private static TMP_FontAsset FindKoreanFont()
+    public static TMP_FontAsset FindKoreanFont()
     {
         TMP_FontAsset pick = null;
         foreach (TMP_FontAsset f in Resources.FindObjectsOfTypeAll<TMP_FontAsset>())
