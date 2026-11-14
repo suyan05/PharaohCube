@@ -10,7 +10,8 @@ using UnityEngine.Rendering.Universal;
 // 4. 목표: 화로에 대고 불 붙이기 (Inspectable, 길게 누르기 -> ITEM_TORCH -> 내 횃불 켜짐)
 // 5. 목표: 북쪽 문으로 라의 신전에 들어가기 (SceneDoor, 횃불 필요)
 // 6. [추가] 신전을 끝내고 돌아오면 (Routes 칸): 북쪽 문 앞에서 시작 -> 큐브 앞으로 걸어감
-//    -> 내 몸에서 빛이 큐브로 흘러가 면이 깨어남 -> 목소리 -> 북쪽 문이 다음 신전으로 바뀜
+//    -> [추가] 큐브에 형판 끼우기 화면 (HallCubeInsert) -> 내 몸에서 빛이 큐브로 흘러가 면이 깨어남 -> 목소리
+//    -> 북쪽 문이 다음 신전으로 바뀜 ([수정] 횃불 없이 열림, 횃불 대사는 처음 한 번만)
 public class HallTempDirector : MonoBehaviour
 {
     [Header("연결 (배치 도구가 채움)")]
@@ -21,6 +22,8 @@ public class HallTempDirector : MonoBehaviour
     [SerializeField] private Transform door;
     [SerializeField] private Vector2 arrivePoint = new Vector2(9f, 0.8f);
     [SerializeField] private Vector2 walkPoint = new Vector2(9f, 3f);
+    [Tooltip("[추가] 돌아왔을 때 큐브에 형판 끼우는 화면 (비우면 같은 오브젝트에서 찾음, 없으면 건너뜀)")]
+    [SerializeField] private HallCubeInsert cubeInsert;
 
     [Header("플래그")]
     [SerializeField] private string introFlag = "F_HALL_TEMP_INTRO";
@@ -71,7 +74,12 @@ public class HallTempDirector : MonoBehaviour
     {
         Cine.Ended += ShowObjective;
         if (rack != null) rack.OnCompleted += _ => RefreshObjective();
-        if (brazierInspect != null) brazierInspect.OnCompleted += _ => StartCoroutine(AfterTorch());
+        // [수정] 신전을 하나라도 끝낸 뒤에는 화로에 불을 붙여도 "첫 번째 신전... 라" 대사를 하지 않음
+        if (brazierInspect != null) brazierInspect.OnCompleted += _ =>
+        {
+            if (LatestCleared() == null) StartCoroutine(AfterTorch());
+            else RefreshObjective();
+        };
     }
 
     private void OnDestroy()
@@ -224,6 +232,7 @@ public class HallTempDirector : MonoBehaviour
         yield return ScreenFader.FadeIn(Cine.Skipping ? 0.2f : 1.2f);
         if (player != null) yield return CineActor.WalkTo(player, returnWalkPoint, 1.6f);
         yield return Cine.Say(lines.returnArrive);
+        yield return InsertPlate(route);
         yield return FaceAwakens(player);
         yield return Cine.Say(route.cubeLines);
         yield return LookAtDoor();
@@ -231,6 +240,25 @@ public class HallTempDirector : MonoBehaviour
         SetFlagOnce(route.returnedFlag);
         SetFlagOnce(introFlag); // 홀 첫 연출을 건너뛰고 바로 온 경우(테스트)에도 다시 안 나오게
         Cine.End();
+    }
+
+    // [추가] 큐브에 형판 끼우기 (HallCubeInsert 화면). 이미 돌아온 신전의 칸은 채워진 채로 보임
+    private IEnumerator InsertPlate(HallRoute route)
+    {
+        if (cubeInsert == null) cubeInsert = GetComponent<HallCubeInsert>();
+        if (cubeInsert == null || route.cubeSlot < 0)
+        {
+            Debug.LogWarning("[HallTempDirector] HallCubeInsert가 없어 형판 끼우기 화면을 건너뜀 -> 메뉴 Tools/Bastet/★ 클리어 후 흐름 세팅");
+            yield break;
+        }
+        var filled = new bool[HallCubeInsert.GodNames.Length];
+        foreach (HallRoute r in routes)
+        {
+            if (r == null || r == route || r.cubeSlot < 0 || r.cubeSlot >= filled.Length) continue;
+            if (HasFlag(r.returnedFlag)) filled[r.cubeSlot] = true;
+        }
+        if (cube != null) CineCamera.Focus(cube.transform.position + Vector3.up);
+        yield return cubeInsert.Play(route.cubeSlot, filled);
     }
 
     // 내 몸에서 빛이 큐브로 흘러감 -> 큐브가 크게 빛남 + 흔들림 + 쿠르릉
@@ -278,7 +306,12 @@ public class HallTempDirector : MonoBehaviour
         HallRoute r = LatestCleared();
         if (r == null || door == null) return;
         SceneDoor sceneDoor = door.GetComponent<SceneDoor>();
-        if (sceneDoor != null) sceneDoor.Retarget(r.nextPrompt, r.nextScene);
+        if (sceneDoor != null)
+        {
+            sceneDoor.Retarget(r.nextPrompt, r.nextScene);
+            if (!r.needTorch) sceneDoor.SetRequiredItem(""); // [수정] 돌아온 뒤에는 횃불 없이 다음 신전으로
+            Debug.Log($"[HallTempDirector] 북쪽 문 -> {r.nextScene} (횃불 {(r.needTorch ? "필요" : "필요 없음")})");
+        }
         else Debug.LogWarning("[HallTempDirector] 북쪽 문에 SceneDoor가 없어서 다음 신전으로 못 바꿈");
     }
 

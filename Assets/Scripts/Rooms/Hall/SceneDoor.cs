@@ -98,6 +98,12 @@ public class SceneDoor : MonoBehaviour, IInteractable
         if (!string.IsNullOrEmpty(scene)) nextScene = scene;
     }
 
+    // [추가] 필요한 아이템 바꾸기 (빈 문자열 = 아무것도 필요 없음). 신전에서 돌아온 뒤 북쪽 문은 횃불 없이 열림
+    public void SetRequiredItem(string itemId)
+    {
+        requiredItem = itemId ?? "";
+    }
+
     private bool HasItem()
     {
         if (string.IsNullOrEmpty(requiredItem)) return true;

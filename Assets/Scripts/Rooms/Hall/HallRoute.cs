@@ -17,6 +17,10 @@ public class HallRoute
     public string nextScene = "Puzzle_Test_Bastet_Tliemap"; // [수정] 시연: 튜토리얼 방 없이 바로 실전 방
     public string nextPrompt = "바스테트의 신전으로";
     public string objective = "북쪽 문으로 바스테트의 신전에 들어가자";
+    // [추가] 돌아왔을 때 큐브에 형판을 끼울 칸 (0 라, 1 바스테트, 2 토트, 3 호루스, 4 소베크, 5 아누비스, -1 = 끼우는 연출 없음)
+    public int cubeSlot = 0;
+    // [추가] 다음 신전으로 가는 북쪽 문에 횃불이 필요한지 (신전에서 돌아온 뒤에는 필요 없음)
+    public bool needTorch = false;
 
     public static HallRoute[] Defaults()
     {
@@ -29,6 +33,7 @@ public class HallRoute
         return new HallRoute
         {
             god = "바스테트",
+            cubeSlot = 1,
             clearFlag = "F_BASTET_ENDING_DONE",
             returnedFlag = "F_HALL_BASTET_RETURNED",
             faceTitle = "큐브의 두 번째 면 - 고양이",
@@ -51,6 +56,7 @@ public class HallRoute
         return new HallRoute
         {
             god = "호루스",
+            cubeSlot = 3,
             clearFlag = "F_HO_H5_DONE",
             returnedFlag = "F_HALL_HORUS_RETURNED",
             faceTitle = "큐브의 네 번째 면 - 하늘",
