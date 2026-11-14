@@ -7,6 +7,17 @@ public static class BastetMuralArt
 {
     private static readonly Dictionary<string, Vector2> Table = new Dictionary<string, Vector2>
     {
+        { "BastetE1/apep", new Vector2(996.5f, 515.0f) },
+        { "BastetE1/boat", new Vector2(360.0f, 504.5f) },
+        { "BastetE1/cat", new Vector2(1115.0f, 425.0f) },
+        { "BastetE1/dawn", new Vector2(365.5f, 350.5f) },
+        { "BastetE1/head", new Vector2(689.5f, 415.5f) },
+        { "BastetE1/knife", new Vector2(1010.0f, 345.0f) },
+        { "BastetE1/sun", new Vector2(352.0f, 400.5f) },
+        { "BastetE2/cat", new Vector2(917.5f, 507.0f) },
+        { "BastetE2/glow", new Vector2(700.0f, 330.0f) },
+        { "BastetE2/goddess", new Vector2(456.0f, 408.0f) },
+        { "BastetE2/plate", new Vector2(700.0f, 330.0f) },
         { "BastetS1/beam", new Vector2(909.5f, 429.5f) },
         { "BastetS1/cat", new Vector2(1030.5f, 526.5f) },
         { "BastetS1/eye", new Vector2(636.5f, 333.5f) },
