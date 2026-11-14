@@ -49089,6 +49089,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19aa80e3228e3f44b98deaf41614f8c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BastetEnding
+  illustration: {fileID: 0}
+  mural: {fileID: 0}
+  plateSprite: {fileID: 0}
+  cubeSprite: {fileID: 0}
+  faceSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  font: {fileID: 0}
+  storyLines:
+  - "\uD0DC\uC591\uC758 \uBC30\uAC00 \uC800\uC2B9\uC744 \uAC74\uB108\uB358 \uBC24,"
+  - "\uD63C\uB3C8\uC758 \uBC40 \uC544\uD3A9\uC774 \uC5B4\uB460 \uC18D\uC5D0\uC11C
+    \uBC30\uB97C \uB178\uB838\uB2E4."
+  - "\uADF8\uB54C \uACE0\uC591\uC774\uC758 \uBAA8\uC2B5\uC744 \uD55C \uBC14\uC2A4\uD14C\uD2B8\uAC00
+    \uBC40\uC744 \uBB3C\uB9AC\uCCE4\uACE0"
+  - "\uB2E4\uC2DC \uC0C8\uBCBD\uC774 \uC5F4\uB838\uB2E4."
+  goddessLine: "\"\uADF8 \uD615\uD310\uC744 \uAC00\uC838\uAC00\uB77C. \uD050\uBE0C\uC758
+    \uD55C \uBA74\uC774 \uB420 \uAC83\uC774\uB2E4.\""
+  plateName: "\uACE0\uC591\uC774 \uD615\uD310"
+  plateDesc: "\uD050\uBE0C\uC758 \uB450 \uBC88\uC9F8 \uBA74\uC5D0 \uB07C\uC6B0\uB294
+    \uBC14\uC2A4\uD14C\uD2B8\uC758 \uD615\uD310"
+  bastetSlot: 1
+  playerInventoryFace: 2
+  plateGivenFlag: F_BASTET_PLATE_GIVEN
+  endingDoneFlag: F_BASTET_ENDING_DONE
+  nextSceneName: Puzzle_Test_Anubis_Tutorial
+  exitMessage: "\uB2E4\uC74C \uC2E0\uC758 \uBC29\uC73C\uB85C \uD5A5\uD569\uB2C8\uB2E4..."
+  storyCutscene: 1
+  cubeInHall: 1
+  hallSceneName: CentralRoom_Temp
+  hallMessage: "\uD615\uD310\uC744 \uB4E4\uACE0 \uC911\uC559 \uD640\uB85C \uB3CC\uC544\uAC11\uB2C8\uB2E4..."
+  fadeTime: 0.9
+  lineTime: 2.2
+  plateFlyTime: 0.9
 --- !u!4 &1089422421
 Transform:
   m_ObjectHideFlags: 0
