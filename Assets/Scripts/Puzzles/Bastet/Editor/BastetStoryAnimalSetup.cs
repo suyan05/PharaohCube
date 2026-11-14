@@ -164,6 +164,7 @@ public static class BastetStoryAnimalSetup
         RaDialogue voice = Object.FindFirstObjectByType<RaDialogue>(FindObjectsInactive.Include);
         if (goddess == null) log.AppendLine("- 경고: 바스테트 여신상 없음 -> ★ 비석·벽화·여신 대사 세팅을 먼저 실행");
         MakeDirector(root, cat, voice, goddess != null ? goddess.transform : null, panel, log);
+        MakeViewer(root, log);
 
         // 6) 여신 대사 + 7) 목표 띠
         if (goddess != null) UpdateGoddess(goddess, log);
@@ -286,6 +287,7 @@ public static class BastetStoryAnimalSetup
         if (sprite != null && (sr.sprite == null || sr.sprite.name.StartsWith("Bastet_Story_Mural_Temp") || sr.sprite.name.StartsWith("Bastet_Mural")))
             sr.sprite = sprite;
         sr.sortingLayerName = "Objects";
+        sr.sortingOrder = -2; // 벽에 걸린 그림: 플레이어(0)보다 뒤
 
         float w = sr.sprite != null ? sr.sprite.bounds.size.x : 4f;
         float h = sr.sprite != null ? sr.sprite.bounds.size.y : 2f;
@@ -295,7 +297,7 @@ public static class BastetStoryAnimalSetup
         col.size = new Vector2(w * 0.9f, 1.4f);
         col.offset = new Vector2(0f, -0.1f);
 
-        SpriteRenderer bubble = MakeBubble(go.transform, new Vector3(0f, h + 0.5f, 0f), bubbleSprite, sr.sortingOrder + 2);
+        SpriteRenderer bubble = MakeBubble(go.transform, new Vector3(0f, h + 0.5f, 0f), bubbleSprite, 5);
 
         var m = GetOrAdd<BastetMural>(go);
         m.EditorSetup(index, MuralNotes[index - 1], sr, bubble);
@@ -377,6 +379,71 @@ public static class BastetStoryAnimalSetup
         d.EditorSetup(cat, voice, goddess, panel);
         EditorUtility.SetDirty(d);
         log.AppendLine("- 스토리 감독: 벽화 4장 -> 방 연출 / 메인 클리어 -> 방이 밝아지고 고양이가 곁으로");
+    }
+
+    // 벽화 보기 화면 (그림 먼저 -> 연출). 글꼴은 게임 UI와 같은 Galmuri11
+    private static void MakeViewer(Transform root, StringBuilder log)
+    {
+        GameObject go = GetOrCreate("BastetMuralViewer", root, Vector2.zero, out _);
+        var v = GetOrAdd<BastetMuralViewer>(go);
+        var font = AssetDatabase.LoadAssetAtPath<TMPro.TMP_FontAsset>("Assets/Fonts/Fonts/Galmuri11 SDF.asset");
+        if (font == null) log.AppendLine("- 경고: Galmuri11 SDF 글꼴 없음 -> TMP 기본 글꼴 사용");
+        Undo.RecordObject(v, "벽화 보기 화면");
+        v.EditorSetup(font);
+        EditorUtility.SetDirty(v);
+        log.AppendLine("- 벽화 보기 화면: 그림 먼저 -> E -> 올려다보기 -> 이야기 연출");
+    }
+
+    // ================= 횃불 -> 호루스 횃대 =================
+    [MenuItem("Tools/Bastet/★ 횃불을 호루스 횃대로 바꾸기", priority = 7)]
+    private static void TorchMenu()
+    {
+        var log = new StringBuilder();
+        bool ok = ConvertTorches(log);
+        Debug.Log("[BastetStoryAnimalSetup] 횃불 바꾸기\n" + log);
+        EditorUtility.DisplayDialog("횃불 바꾸기", log + (ok ? "\n확인 후 Ctrl+S" : ""), "확인");
+    }
+
+    // 씬의 벽 횃불(WallTorch)을 호루스 복도 횃대 그림 + 움직이는 픽셀 불꽃(HorusPixelFlame)으로
+    // - 켜고 끄는 규칙(불 옮겨 붙이기, 플래그, 빛)은 WallTorch 그대로. 켜졌을 때만 불꽃·불씨가 보임
+    public static bool ConvertTorches(StringBuilder log)
+    {
+        const string fx = "Assets/Resources/Horus/PixelFx/";
+        Sprite sconce = LoadFirstSprite(fx + "HO_Sconce_Base.png");
+        var frames = new Sprite[8];
+        for (int i = 0; i < frames.Length; i++) frames[i] = LoadFirstSprite($"{fx}HO_Flame_{i}.png");
+        if (sconce == null || System.Array.Exists(frames, f => f == null))
+        {
+            log.AppendLine($"호루스 횃대 그림이 없음 ({fx}HO_Sconce_Base, HO_Flame_0~7)");
+            return false;
+        }
+
+        int count = 0;
+        foreach (WallTorch t in Object.FindObjectsByType<WallTorch>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            var so = new SerializedObject(t);
+            var target = so.FindProperty("target").objectReferenceValue as SpriteRenderer;
+            if (target == null) target = t.GetComponent<SpriteRenderer>();
+            if (target == null) { log.AppendLine($"- 건너뜀: {t.name} (그림 없음)"); continue; }
+
+            Undo.RecordObject(target, "횃대 그림");
+            target.sprite = sconce;
+            so.FindProperty("offSprite").objectReferenceValue = sconce;
+            so.FindProperty("onSprite").objectReferenceValue = sconce;
+            so.ApplyModifiedProperties();
+
+            var flame = GetOrAdd<HorusPixelFlame>(target.gameObject);
+            Undo.RecordObject(flame, "픽셀 불꽃");
+            flame.Setup(frames, sconce);
+            EditorUtility.SetDirty(flame);
+            EditorUtility.SetDirty(target);
+            if (target.gameObject != t.gameObject) log.AppendLine($"- 주의: {t.name}의 그림이 자식에 있어 불꽃이 항상 켜져 보일 수 있음");
+            count++;
+        }
+        EditorSceneManager.MarkAllScenesDirty();
+        log.AppendLine($"- 벽 횃불 {count}개를 호루스 횃대 + 픽셀 불꽃으로 바꿈");
+        log.AppendLine("- 켜고 끄는 규칙은 그대로 (불 꺼진 횃대는 불꽃 없이 보임)");
+        return count > 0;
     }
 
     // ================= 여신 대사 =================
