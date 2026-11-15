@@ -64,7 +64,10 @@ public class NotebookUI : MonoBehaviour
                 return;
             }
             if (popup != null && (popup.IsOpen || popup.ClosedFrame == Time.frameCount)) return; // 팝업이 Esc를 먼저 받음
-            if (Input.GetKeyDown(KeyCode.J)) Close(); // [수정] ESC는 설정 창 키 -> 수첩은 J로만 여닫음
+            if (Input.GetKeyDown(KeyCode.J)) { Close(); return; } // [수정] ESC는 설정 창 키 -> 수첩은 J로만 여닫음
+            // [추가] 좌우 방향키 / A, D 로 쪽 넘기기 (카드, 메모 공통)
+            if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A)) TurnPage(-1);
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) TurnPage(1);
         }
         catch (Exception e)
         {
@@ -135,19 +138,48 @@ public class NotebookUI : MonoBehaviour
         pageText.text = pages > 1 ? $"{page + 1} / {pages}" : "";
         prevBtn.gameObject.SetActive(pages > 1);
         nextBtn.gameObject.SetActive(pages > 1);
+        prevBtn.interactable = page > 0;          // [추가] 첫 쪽/끝 쪽에서는 화살표 흐리게
+        nextBtn.interactable = page < pages - 1;
     }
 
     private void ShowMemo()
     {
         chapterTitle.text = "연구원 메모";
         chapterMemo.text = "신전의 비석과 벽에서 읽어 낸 단서를 적어 둔다.\n밤이 되면 같은 자리의 글이 달라지기도 한다.";
-        chapterCount.text = $"메모 {NotebookNotes.Count} / {NotebookNotes.RaNoteCount}";
-        NotebookCardPopup.FillStamps(stampRow, NotebookNotes.Count, NotebookNotes.RaNoteCount);
-        memoText.text = NotebookTexts.NotesText();
+        // [수정] "메모 12 / 7" 처럼 라의 방 개수(7)를 넘던 표시 -> 모은 메모 개수만 표시 (방마다 메모 수가 달라서)
+        chapterCount.text = $"모은 메모 {NotebookNotes.Count}개";
+        NotebookCardPopup.FillStamps(stampRow, 0, 0); // 도장 줄은 메모 탭에서 비움
+        // [수정] 한 쪽에 다 안 들어가면 다음 쪽으로 나눔
+        List<string> pages = NotebookTexts.NotesPages(MeasureMemo, MemoMaxHeight);
+        page = Mathf.Clamp(page, 0, pages.Count - 1);
+        memoText.text = pages[page];
         NotebookNotes.MarkSeen();
-        pageText.text = "";
-        prevBtn.gameObject.SetActive(false);
-        nextBtn.gameObject.SetActive(false);
+        pageText.text = pages.Count > 1 ? $"{page + 1} / {pages.Count}" : "";
+        prevBtn.gameObject.SetActive(pages.Count > 1);
+        nextBtn.gameObject.SetActive(pages.Count > 1);
+        prevBtn.interactable = page > 0;
+        nextBtn.interactable = page < pages.Count - 1;
+    }
+
+    // [추가] 메모 칸 높이 (아래쪽 쪽 번호와 겹치지 않게 칸 높이보다 조금 작게)
+    private const float MemoMaxHeight = 740f;
+
+    // [추가] 이 글을 메모 칸에 넣었을 때 높이 (줄바꿈, 글꼴 크기 그대로 계산)
+    private float MeasureMemo(string text)
+    {
+        TextGenerationSettings set = memoText.GetGenerationSettings(new Vector2(memoText.rectTransform.rect.width, 0f));
+        set.verticalOverflow = VerticalWrapMode.Overflow;
+        return memoText.cachedTextGeneratorForLayout.GetPreferredHeight(text, set) / memoText.pixelsPerUnit;
+    }
+
+    // [추가] 쪽 넘기기 (카드 탭은 카드 쪽, 메모 탭은 메모 쪽). 끝에서는 더 안 넘어감
+    private void TurnPage(int dir)
+    {
+        int before = page;
+        page = Mathf.Max(0, page + dir);
+        if (chapter == MemoTab) ShowMemo();
+        else ShowCards();
+        if (page != before) Debug.Log($"[NotebookUI] {chapter} {page + 1}쪽");
     }
 
     private static List<AchievementDef> ChapterList(string name)
@@ -208,7 +240,7 @@ public class NotebookUI : MonoBehaviour
         chapterMemo.alignment = TextAnchor.UpperLeft;
         chapterCount = UIBuild.Text(leftPage, "Count", body, 30, new Vector2(0f, -150f), new Vector2(660f, 40f), ink);
         stampRow = UIBuild.Rect(leftPage, "Stamps", new Vector2(0f, -240f), new Vector2(660f, 120f));
-        UIBuild.Text(leftPage, "Help", body, 20, new Vector2(0f, -400f), new Vector2(660f, 30f), new Color(0.55f, 0.42f, 0.28f)).text = "카드를 누르면 크게 보기  |  J : 닫기";
+        UIBuild.Text(leftPage, "Help", body, 20, new Vector2(0f, -400f), new Vector2(660f, 30f), new Color(0.55f, 0.42f, 0.28f)).text = "카드를 누르면 크게 보기  |  좌우 : 쪽 넘기기  |  J : 닫기"; // [수정] 쪽 넘기기 안내
     }
 
     private void BuildRightPage()
@@ -216,8 +248,11 @@ public class NotebookUI : MonoBehaviour
         cardArea = UIBuild.Rect(rightPage, "Cards", Vector2.zero, new Vector2(760f, 860f));
         memoText = UIBuild.Text(rightPage, "Notes", PuzzleUITheme.GetBodyFont(), 24, new Vector2(0f, 0f), new Vector2(680f, 800f), new Color(0.29f, 0.2f, 0.14f));
         memoText.alignment = TextAnchor.UpperLeft;
+        memoText.supportRichText = true;
+        memoText.verticalOverflow = VerticalWrapMode.Truncate; // [추가] 혹시 넘쳐도 쪽 번호 위로 삐져나오지 않게
         pageText = UIBuild.Text(rightPage, "Page", PuzzleUITheme.GetBodyFont(), 22, new Vector2(0f, -405f), new Vector2(200f, 30f), new Color(0.42f, 0.3f, 0.2f));
-        prevBtn = NotebookBuild.Arrow(rightPage, "<", new Vector2(-150f, -405f), () => { page--; ShowCards(); });
-        nextBtn = NotebookBuild.Arrow(rightPage, ">", new Vector2(150f, -405f), () => { page++; ShowCards(); });
+        // [수정] 카드 쪽과 메모 쪽을 같은 화살표로 넘김
+        prevBtn = NotebookBuild.Arrow(rightPage, "<", new Vector2(-150f, -405f), () => TurnPage(-1));
+        nextBtn = NotebookBuild.Arrow(rightPage, ">", new Vector2(150f, -405f), () => TurnPage(1));
     }
 }

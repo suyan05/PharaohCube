@@ -21,6 +21,33 @@ public static class NotebookTexts
         return Memos.TryGetValue(chapter, out string text) ? text : "";
     }
 
+    // [추가] 메모 탭을 쪽으로 나눔: 한 쪽에 들어가는 만큼 노트를 담고, 넘치면 다음 쪽으로
+    // measure = 글을 넣었을 때의 높이(픽셀), maxHeight = 한 쪽 칸 높이
+    public static List<string> NotesPages(System.Func<string, float> measure, float maxHeight)
+    {
+        var pages = new List<string>();
+        if (NotebookNotes.Count == 0)
+        {
+            pages.Add(NotesText());
+            return pages;
+        }
+
+        var sb = new StringBuilder();
+        foreach (KeyValuePair<int, string> n in NotebookNotes.All)
+        {
+            string one = "<b>[노트 " + n.Key + "]</b>  " + n.Value + "\n\n";
+            // 지금 쪽에 이미 글이 있고, 이 노트를 더하면 넘치면 -> 쪽을 넘김
+            if (sb.Length > 0 && measure(sb + one) > maxHeight)
+            {
+                pages.Add(sb.ToString());
+                sb.Clear();
+            }
+            sb.Append(one); // 노트 하나가 한 쪽보다 길어도 그 쪽에 혼자 둠
+        }
+        if (sb.Length > 0) pages.Add(sb.ToString());
+        return pages;
+    }
+
     // 메모 탭: [노트 1] 글 ... (못 찾은 번호는 "아직 찾지 못한 메모")
     public static string NotesText()
     {
