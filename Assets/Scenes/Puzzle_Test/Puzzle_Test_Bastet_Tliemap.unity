@@ -2658,6 +2658,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 175057422}
   m_CullTransparentMesh: 1
+--- !u!1 &184707639
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 184707640}
+  m_Layer: 0
+  m_Name: IntroViewPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &184707640
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 184707639}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 0.6507041, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 206950968}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &185148716
 GameObject:
   m_ObjectHideFlags: 0
@@ -3163,7 +3194,8 @@ Transform:
   m_LocalPosition: {x: -0.71, y: -15.73, z: 0}
   m_LocalScale: {x: 1.5367969, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 184707640}
   m_Father: {fileID: 140557556}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &206950969
@@ -49119,8 +49151,8 @@ MonoBehaviour:
   endingDoneFlag: F_BASTET_ENDING_DONE
   nextSceneName: Puzzle_Test_Anubis_Tutorial
   exitMessage: "\uB2E4\uC74C \uC2E0\uC758 \uBC29\uC73C\uB85C \uD5A5\uD569\uB2C8\uB2E4..."
-  storyCutscene: 1
-  cubeInHall: 1
+  storyCutscene: 0
+  cubeInHall: 0
   hallSceneName: CentralRoom_Temp
   hallMessage: "\uD615\uD310\uC744 \uB4E4\uACE0 \uC911\uC559 \uD640\uB85C \uB3CC\uC544\uAC11\uB2C8\uB2E4..."
   fadeTime: 0.9
@@ -60130,8 +60162,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RaIntroCutscene
   cameraFollow: {fileID: 0}
   playedFlag: F_BASTET_INTRO_PLAYED
-  overviewPoint: {fileID: 0}
-  overviewSize: 0
+  overviewPoint: {fileID: 184707640}
+  overviewSize: 5
   mapPadding: 0.5
   startDelay: 0.4
   zoomOutTime: 1.4

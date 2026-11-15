@@ -545,6 +545,64 @@ public static class BastetStoryAnimalSetup
         return true;
     }
 
+    // ================= 시작 카메라 =================
+    // [추가] 바스테트 시작 연출(RaIntroCutscene, 라의 방과 같은 스크립트)이 맵 전체로 줌아웃하던 것
+    //        -> 입구 벽화 복도를 비추고 안내를 띄운 뒤 플레이어에게 돌아오게 (라 스크립트는 그대로, 이 씬 설정값만 바꿈)
+    [MenuItem("Tools/Bastet/시작 카메라를 입구 벽화 복도로", priority = 9)]
+    private static void StartCameraMenu()
+    {
+        var log = new StringBuilder();
+        bool ok = SetupStartCamera(log);
+        Debug.Log("[BastetStoryAnimalSetup] 시작 카메라\n" + log);
+        EditorUtility.DisplayDialog("시작 카메라", log + (ok ? "\n확인 후 Ctrl+S" : ""), "확인");
+    }
+
+    public static bool SetupStartCamera(StringBuilder log)
+    {
+        RaIntroCutscene intro = Object.FindFirstObjectByType<RaIntroCutscene>(FindObjectsInactive.Include);
+        if (intro == null)
+        {
+            log.AppendLine("시작 연출(RaIntroCutscene)이 씬에 없음 -> Tools/Bastet/실전 방 세팅을 먼저 실행");
+            return false;
+        }
+        GameObject corridor = BastetWalkBuilder.FindInScene(MuralCorridorName);
+        if (corridor == null)
+        {
+            log.AppendLine("입구 벽화 복도(MuralCorridor)가 없음 -> Tools/Bastet/★ 벽화 복도 메뉴를 먼저 실행");
+            return false;
+        }
+
+        // 비출 자리: 복도 바닥 상자 가운데에서 1칸 위 (윗벽 벽화가 같이 보이게)
+        var box = corridor.GetComponent<BoxCollider2D>();
+        Vector3 center = box != null ? corridor.transform.TransformPoint(box.offset) : corridor.transform.position;
+        Transform point = corridor.transform.Find("IntroViewPoint");
+        if (point == null)
+        {
+            var go = new GameObject("IntroViewPoint");
+            Undo.RegisterCreatedObjectUndo(go, "시작 카메라 자리");
+            point = go.transform;
+            point.SetParent(corridor.transform, true);
+        }
+        Undo.RecordObject(point, "시작 카메라 자리");
+        point.position = new Vector3(center.x, center.y + 1f, 0f);
+
+        // 크기: 평소 게임 카메라 크기 그대로 (줌아웃하지 않음 -> 맵 전체가 보이지 않음)
+        float size = Camera.main != null ? Camera.main.orthographicSize : 5f;
+
+        var so = new SerializedObject(intro);
+        so.FindProperty("overviewPoint").objectReferenceValue = point;
+        so.FindProperty("overviewSize").floatValue = size;
+        so.ApplyModifiedProperties();
+        EditorUtility.SetDirty(intro);
+        EditorSceneManager.MarkAllScenesDirty();
+
+        log.AppendLine($"- 시작 연출이 비출 곳: 입구 벽화 복도 가운데 ({point.position.x:0.#}, {point.position.y:0.#})");
+        log.AppendLine($"- 비출 크기: {size:0.#} (평소 카메라와 같음, 맵 전체로 줌아웃하지 않음)");
+        log.AppendLine("- 안내 문구가 복도 위에 뜬 뒤 플레이어에게 돌아옴");
+        log.AppendLine("\n위치를 바꾸려면 MuralCorridor/IntroViewPoint 를 옮기면 됨");
+        return true;
+    }
+
     // ================= 여신 대사 =================
     private static void UpdateGoddess(BastetGoddess goddess, StringBuilder log)
     {
