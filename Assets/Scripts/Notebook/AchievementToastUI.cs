@@ -20,6 +20,7 @@ public class AchievementToastUI : MonoBehaviour
     private readonly Queue<AchievementDef> queue = new Queue<AchievementDef>();
     private RectTransform root, panel, keyHint, stamp;
     private Image card, dot;
+    private Image cardArt; // [추가] 카드 안 유물 그림 (처음 발굴할 때 이 알림에서 보여줌)
     private Text nameText, titleText;
     private CanvasGroup keyGroup;
     private bool showing;
@@ -80,6 +81,10 @@ public class AchievementToastUI : MonoBehaviour
         nameText.text = def.relic;
         titleText.text = def.title;
         card.color = NotebookUI.GradeColor(def.grade);
+        // [추가] 유물 그림이 있으면 카드 안에 표시 (알림은 업적을 처음 얻을 때 한 번만 뜸)
+        Sprite art = NotebookCardArt.Of(def.id);
+        cardArt.sprite = art;
+        cardArt.enabled = art != null;
         panel.gameObject.SetActive(true);
         panel.localScale = Vector3.one;
         stamp.gameObject.SetActive(false);
@@ -160,6 +165,12 @@ public class AchievementToastUI : MonoBehaviour
         frame.raycastTarget = false;
 
         card = UIBuild.Image(panel, "Card", new Vector2(-190f, 0f), new Vector2(76f, 112f), null, Color.white);
+        card.raycastTarget = false;
+        // [추가] 카드 위쪽 정사각형 칸에 유물 그림
+        cardArt = UIBuild.Image(card.rectTransform, "Art", new Vector2(0f, 12f), new Vector2(66f, 66f), null, Color.white);
+        cardArt.raycastTarget = false;
+        cardArt.preserveAspect = true;
+        cardArt.enabled = false;
         Font font = PuzzleUITheme.GetBodyFont();
         // [수정] 세 줄을 칸을 나눠 겹치지 않게: 머리말 / 유물 이름(길면 글자 크기 자동으로 줄임) / 업적 이름
         UIBuild.Text(panel, "Head", font, 20, new Vector2(-6f, 44f), new Vector2(250f, 26f), new Color(0.64f, 0.23f, 0.15f)).text = "유물 발굴!";

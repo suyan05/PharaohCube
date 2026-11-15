@@ -24,7 +24,8 @@ public static class NotebookCardArt
         { "ACH_SP_TRUE", "MAAT_FEATHER" }, { "ACH_SP_NOHINT", "OBELISK" }, { "ACH_SP_ALL", "GOLDEN_MASK" },
         // [추가] 바스테트 서브 퍼즐 유물 4장 (글자 고/호/청/발 대신 그림)
         { "ACH_BAS_B1", "BASTET_PAW_RELIEF" }, { "ACH_BAS_B2", "BASTET_AMBER_EYE" },
-        { "ACH_BAS_B3", "BASTET_LAPIS_USEKH" }, { "ACH_BAS_B4", "BASTET_CLAW_TABLET" }
+        { "ACH_BAS_B3", "BASTET_LAPIS_USEKH" }, { "ACH_BAS_B4", "BASTET_CLAW_TABLET" },
+        { "ACH_BAS_VESSEL", "BASTET_ALABASTER_VESSEL" } // [추가] 바스테트 히든 유물
     };
 
     public static Sprite Of(string achievementId)
@@ -33,16 +34,29 @@ public static class NotebookCardArt
         if (cache.TryGetValue(achievementId, out Sprite s)) return s;
         try
         {
-            Texture2D tex = Resources.Load<Texture2D>(Folder + file);
-            s = tex != null ? Sprite.Create(tex, new Rect(0f, 0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f) : null;
-            if (tex == null) Debug.LogWarning($"[수첩 카드] 그림 없음: Resources/{Folder}{file}");
+            // [수정] 임포트 설정(Sprite 한 장 / Multiple 조각 / Default)에 상관없이 찾도록 세 가지 방법으로 시도
+            s = Resources.Load<Sprite>(Folder + file);
+            if (s == null)
+            {
+                Sprite[] parts = Resources.LoadAll<Sprite>(Folder + file);
+                if (parts != null && parts.Length > 0) s = parts[0];
+            }
+            if (s == null)
+            {
+                Texture2D tex = Resources.Load<Texture2D>(Folder + file);
+                if (tex != null) s = Sprite.Create(tex, new Rect(0f, 0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100f);
+            }
+            if (s == null) Debug.LogWarning($"[수첩 카드] 그림 없음: Resources/{Folder}{file} ({achievementId})");
         }
         catch (Exception e)
         {
             Debug.LogError($"[수첩 카드] {achievementId} 그림 읽기 오류: {e.Message}");
             s = null;
         }
-        cache[achievementId] = s;
+        if (s != null) cache[achievementId] = s; // [수정] 못 찾은 것은 기억하지 않음 (다음에 다시 시도)
         return s;
     }
+
+    // [추가] 그림이 연결된 업적인지 (점검 메뉴용)
+    public static bool HasEntry(string achievementId) => !string.IsNullOrEmpty(achievementId) && Files.ContainsKey(achievementId);
 }

@@ -18,6 +18,13 @@ public class NotebookNotes : MonoBehaviour
 
     public static void MarkSeen() => HasNew = false;
 
+    // [추가] 새 게임: 이전 판의 메모를 지움 (같은 실행 안에서 새 게임을 눌러도 남던 문제)
+    public static void Clear()
+    {
+        notes.Clear();
+        HasNew = false;
+    }
+
     private void OnEnable() => Application.logMessageReceived += HandleLog;
 
     private void OnDisable() => Application.logMessageReceived -= HandleLog;

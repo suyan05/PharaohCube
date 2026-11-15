@@ -79,6 +79,8 @@ public static class SaveSystem
         pending = null;
         pendingClear = true;
         ClearSets(); // 이미 살아 있는 매니저(씬을 넘어 유지)도 비움
+        AchievementSystem.ClearForNewGame(); // [추가] 새 게임이면 수첩 유물 카드도 처음부터
+        NotebookNotes.Clear();               // [추가] 수첩 메모도 처음부터
     }
 
     // GameMenuBootstrap이 씬이 열릴 때마다 부름 (씬 오브젝트 Awake 다음, Start 전)

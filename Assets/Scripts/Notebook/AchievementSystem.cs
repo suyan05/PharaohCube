@@ -143,6 +143,21 @@ public class AchievementSystem : MonoBehaviour
         foreach (string s in text.Split(',')) if (!string.IsNullOrEmpty(s)) into.Add(s);
     }
 
+    // [추가] 새 게임: 이전 판(테스트 플레이 포함)에서 얻은 유물 카드를 모두 지움
+    //        타이틀의 "새 게임" 버튼(SaveSystem.PrepareNewGame)이 부름
+    public static void ClearForNewGame()
+    {
+        PlayerPrefs.DeleteKey(SaveKey);
+        PlayerPrefs.DeleteKey(NewKey);
+        PlayerPrefs.Save();
+        if (Instance != null)
+        {
+            Instance.unlocked.Clear();
+            Instance.fresh.Clear();
+        }
+        Debug.Log("[AchievementSystem] 새 게임 -> 유물 카드 기록 초기화");
+    }
+
     [ContextMenu("테스트: 업적 전부 지우기")]
     private void ResetAll()
     {
