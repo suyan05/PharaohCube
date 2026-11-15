@@ -51,6 +51,8 @@ public class BastetClueStele : MonoBehaviour, IInteractable
     private string ReadFlag => $"F_CLUE_{Id}_READ";
     private string DecodedFlag => $"F_CLUE_{Id}_DECODED";
     private bool Unlocked => string.IsNullOrEmpty(unlockFlag) || HasFlag(unlockFlag);
+    // [추가] 해독(또는 읽기)을 마쳤는지 - 숨은 방(BastetIncenseVault)이 비석을 모두 읽었는지 셀 때 씀
+    public bool IsDecoded => HasFlag(lensDecode ? DecodedFlag : ReadFlag);
 
     // ================= 초기화 =================
     private void Start()
@@ -185,6 +187,13 @@ public class BastetClueStele : MonoBehaviour, IInteractable
     private static void SetFlag(string f) { if (GameManager.Instance != null && !GameManager.Instance.HasFlag(f)) GameManager.Instance.SetFlag(f); }
 
     // ================= 테스트 =================
+    // [추가] 테스트용: 해독한 것으로 표시 (숨은 방 입구 테스트에서 씀)
+    public void TestMarkDecoded()
+    {
+        SetFlag(DecodedFlag);
+        SetFlag(ReadFlag);
+    }
+
     [ContextMenu("테스트: 렌즈 해독 화면 다시 보기")]
     private void TestShowDecode()
     {

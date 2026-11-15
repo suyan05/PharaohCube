@@ -19,6 +19,8 @@ public static class BastetItemIds
     public const string FlagB3Clear = "F_BASTET_B3_CLEAR";
     public const string FlagB4Clear = "F_BASTET_B4_CLEAR";
     public const string FlagShrineOpen = "F_BASTET_SHRINE_OPEN"; // 신상에 발톱 인장을 넣음
+    public const string FlagVaultOpen = "F_BASTET_VAULT_OPEN";   // [추가] 비석을 모두 해독해 숨은 방(향실) 입구가 드러남
+    public const string FlagVaultSeen = "F_BASTET_INCENSE_VAULT"; // [추가] 숨은 방 통로와 벽화를 다 봄
 
     public static string ClearFlag(int n) => n == 1 ? FlagB1Clear : n == 2 ? FlagB2Clear : n == 3 ? FlagB3Clear : n == 4 ? FlagB4Clear : "";
 }

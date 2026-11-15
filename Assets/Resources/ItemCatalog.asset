@@ -99,7 +99,7 @@ MonoBehaviour:
     displayName: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uADF8\uB987"
     description: "\uBD88\uC744 \uB2F4\uB294 \uACE0\uC591\uC774 \uADC0 \uADF8\uB987.
       \uD683\uBD88\uC774 \uB450 \uBC30 \uBC1D\uACE0 \uB450 \uBC30 \uC624\uB798 \uD0C4\uB2E4"
-    icon: {fileID: 0}
+    icon: {fileID: 5149893154953138914, guid: 6f14f7c37f700e74a86bd7a076af113a, type: 3}
     hidden: 1
   - id: ITEM_SOBEK_AMULET_ROTATE
     displayName: "\uC18C\uC6A9\uB3CC\uC774 \uBD80\uC801"
