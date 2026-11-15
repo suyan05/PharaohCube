@@ -218,7 +218,7 @@ public class BastetMuralViewer : MonoBehaviour
         pictureImg.color = s != null ? Color.white : new Color(0.85f, 0.72f, 0.5f);
         picTitle.text = title;
         picText.text = wallText;
-        picHint.text = hasStory ? "E  이야기 보기 ▶" : "E  닫기";
+        picHint.text = hasStory ? "E : 이야기 보기 >" : "E : 닫기"; // [수정] Galmuri 글꼴에 > 기호가 없어 네모로 깨짐 -> > 로
         pictureGroup.alpha = 0f;
         pictureGroup.gameObject.SetActive(true);
         shotGroup.SetActive(false);
@@ -380,7 +380,7 @@ public class BastetMuralViewer : MonoBehaviour
         nameText = MakeText(bottom, "Name", new Vector2(0f, 38f), new Vector2(1400f, 44f), 30, nameColor, TextAlignmentOptions.Center);
         lineText = MakeText(bottom, "Line", new Vector2(0f, -10f), new Vector2(1500f, 80f), 34, new Color(0.96f, 0.94f, 0.9f), TextAlignmentOptions.Center);
         hintText = MakeText(bottom, "Hint", new Vector2(860f, -52f), new Vector2(180f, 30f), 22, new Color(1f, 1f, 1f, 0.55f), TextAlignmentOptions.Right);
-        hintText.text = "E ▶";
+        hintText.text = "E >"; // [수정] > 대신 > (호루스 연출과 같은 표시)
 
         // 그림 먼저 보기 (어두운 바탕 + 금 테두리 그림 + 제목 + 글)
         RectTransform pic = Stretch(root, "Picture");
