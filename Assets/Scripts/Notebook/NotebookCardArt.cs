@@ -21,7 +21,10 @@ public static class NotebookCardArt
         { "ACH_THO_2", "IBIS_STATUE" }, { "ACH_THO_CLEAR", "ROSETTA_STONE" }, { "ACH_HOR_STAR", "DENDERA_ZODIAC" },
         { "ACH_HOR_CLEAR", "WEDJAT_EYE" }, { "ACH_SOB_CLEAR", "SOBEK_STATUE" }, { "ACH_ANU_CLEAR", "WEIGHING_HEART" },
         { "ACH_SP_GIFTS", "GOLD_PECTORAL" }, { "ACH_SP_TWICE", "AMMIT_RELIEF" }, { "ACH_SP_MUMMY", "ANTHROPOID_COFFIN" },
-        { "ACH_SP_TRUE", "MAAT_FEATHER" }, { "ACH_SP_NOHINT", "OBELISK" }, { "ACH_SP_ALL", "GOLDEN_MASK" }
+        { "ACH_SP_TRUE", "MAAT_FEATHER" }, { "ACH_SP_NOHINT", "OBELISK" }, { "ACH_SP_ALL", "GOLDEN_MASK" },
+        // [추가] 바스테트 서브 퍼즐 유물 4장 (글자 고/호/청/발 대신 그림)
+        { "ACH_BAS_B1", "BASTET_PAW_RELIEF" }, { "ACH_BAS_B2", "BASTET_AMBER_EYE" },
+        { "ACH_BAS_B3", "BASTET_LAPIS_USEKH" }, { "ACH_BAS_B4", "BASTET_CLAW_TABLET" }
     };
 
     public static Sprite Of(string achievementId)

@@ -42,14 +42,31 @@ public static class BastetCatalogSetup
 
         var so = new SerializedObject(catalog);
         SerializedProperty list = so.FindProperty("items");
-        var have = new HashSet<string>();
-        for (int i = 0; i < list.arraySize; i++) have.Add(list.GetArrayElementAtIndex(i).FindPropertyRelative("id").stringValue);
+        // [수정] ID -> 목록 칸 (이미 있는 항목도 아이콘이 비어 있으면 채우기 위해)
+        var have = new Dictionary<string, SerializedProperty>();
+        for (int i = 0; i < list.arraySize; i++)
+        {
+            SerializedProperty el = list.GetArrayElementAtIndex(i);
+            have[el.FindPropertyRelative("id").stringValue] = el;
+        }
 
         int added = 0, iconLinked = 0;
         var log = new List<string>();
         foreach (Def d in Items)
         {
-            if (have.Contains(d.id)) { log.Add($"{d.id} 이미 있음"); continue; }
+            if (have.TryGetValue(d.id, out SerializedProperty old))
+            {
+                // [추가] 예전에 그림 없이 먼저 추가된 항목: 아이콘 칸만 채움 (이름·설명은 그대로)
+                SerializedProperty oldIcon = old.FindPropertyRelative("icon");
+                if (oldIcon.objectReferenceValue == null)
+                {
+                    Sprite s = FindSprite(d.icon);
+                    if (s != null) { oldIcon.objectReferenceValue = s; iconLinked++; log.Add($"{d.id} 아이콘 연결 ({s.name})"); }
+                    else log.Add($"{d.id} 아이콘 그림 없음 ({d.icon})");
+                }
+                else log.Add($"{d.id} 이미 있음");
+                continue;
+            }
             list.arraySize++;
             SerializedProperty e = list.GetArrayElementAtIndex(list.arraySize - 1);
             e.FindPropertyRelative("id").stringValue = d.id;
@@ -66,6 +83,7 @@ public static class BastetCatalogSetup
         EditorUtility.SetDirty(catalog);
         AssetDatabase.SaveAssets();
         Debug.Log($"[BastetCatalogSetup] {added}개 추가, 아이콘 {iconLinked}개 연결\n- " + string.Join("\n- ", log), catalog);
+        EditorUtility.DisplayDialog("바스테트 아이템", $"{added}개 추가, 아이콘 {iconLinked}개 연결\n\n- " + string.Join("\n- ", log), "확인"); // [추가] 결과 바로 보기
     }
 
     // 파일 이름이 정확히 같은 Sprite 찾기 (없으면 null)
@@ -74,7 +92,12 @@ public static class BastetCatalogSetup
         foreach (string guid in AssetDatabase.FindAssets(fileName + " t:Sprite"))
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
-            if (Path.GetFileNameWithoutExtension(path) == fileName) return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (Path.GetFileNameWithoutExtension(path) != fileName) continue;
+            // [수정] 아이콘 그림이 Sprite Mode = Multiple(조각 _0)이라 하위 스프라이트까지 뒤져서 첫 장을 씀
+            Sprite single = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+            if (single != null) return single;
+            foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(path))
+                if (o is Sprite sp) return sp;
         }
         return null;
     }

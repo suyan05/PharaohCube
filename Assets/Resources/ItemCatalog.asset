@@ -63,25 +63,25 @@ MonoBehaviour:
     displayName: "\uC740 \uBC1C\uC790\uAD6D \uC778\uC7A5"
     description: "\uBC14\uC2A4\uD14C\uD2B8\uAC00 \uC9C0\uB098\uAC04 \uAE38\uC744
       \uAE30\uC5B5\uD55C \uC99D\uD45C"
-    icon: {fileID: 0}
+    icon: {fileID: 1165139681570989319, guid: fec71d59068dcbf4989ae3d62c174212, type: 3}
     hidden: 0
   - id: ITEM_BASTET_EYE
     displayName: "\uD638\uBC15 \uB208"
     description: "\uB4A4\uB97C \uB3CC\uC544\uBCF4\uB294 \uACE0\uC591\uC774\uC758
       \uB208\uBE5B\uC774 \uB2F4\uAE34 \uAD6C\uC2AC"
-    icon: {fileID: 0}
+    icon: {fileID: 4957603304160428340, guid: bfae690494769024b8a4d0532d01156b, type: 3}
     hidden: 0
   - id: ITEM_BASTET_NECKLACE
     displayName: "\uBAA9\uAC78\uC774 \uAD6C\uC2AC"
     description: "\uC88C\uC6B0\uAC00 \uAF2D \uB9DE\uB294 \uBC14\uC2A4\uD14C\uD2B8\uC758
       \uBAA9\uAC78\uC774 \uAD6C\uC2AC"
-    icon: {fileID: 0}
+    icon: {fileID: 2724324263070457411, guid: 06b99f4d0ff28c44ea19884c7b601e38, type: 3}
     hidden: 0
   - id: ITEM_BASTET_CLAW
     displayName: "\uBC1C\uD1B1 \uC778\uC7A5"
     description: "\uBC1C\uD1B1 \uC790\uAD6D \uC138 \uC904\uC774 \uC0C8\uACA8\uC9C4
       \uC778\uC7A5"
-    icon: {fileID: 0}
+    icon: {fileID: -2072091412728459402, guid: 2cdcb9861ab9877469789c31095199ee, type: 3}
     hidden: 0
   - id: PLATE_BASTET
     displayName: "\uACE0\uC591\uC774 \uD615\uD310"
