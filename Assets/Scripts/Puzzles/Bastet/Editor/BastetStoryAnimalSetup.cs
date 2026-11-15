@@ -603,6 +603,50 @@ public static class BastetStoryAnimalSetup
         return true;
     }
 
+    // ================= [추가] 맵 밖 배경 =================
+    // 카메라 배경이 유니티 기본 파란색(#314D79)이라 타일이 없는 칸(방 사이 빈 곳, 맵 가장자리)이 파랗게 보였음
+    // -> 씬의 Main Camera 배경을 검은색으로 저장 (편집 화면·게임 화면 모두 검게)
+    //    실행 중에는 SceneBackgroundColor도 한 번 더 검게 칠해 줌 (이중 안전장치)
+    [MenuItem("Tools/Bastet/맵 밖 배경을 검은색으로", priority = 10)]
+    private static void BlackBackgroundMenu()
+    {
+        var log = new StringBuilder();
+        bool ok = SetupBlackBackground(log);
+        Debug.Log("[BastetStoryAnimalSetup] 맵 밖 배경\n" + log);
+        EditorUtility.DisplayDialog("맵 밖 배경", log + (ok ? "\n확인 후 Ctrl+S" : ""), "확인");
+    }
+
+    public static bool SetupBlackBackground(StringBuilder log)
+    {
+        Camera cam = Camera.main;
+        if (cam == null)
+        {
+            // 태그가 빠져 있을 때를 대비해 씬의 카메라 아무거나
+            cam = Object.FindFirstObjectByType<Camera>(FindObjectsInactive.Include);
+        }
+        if (cam == null) { log.AppendLine("- 씬에 카메라가 없음"); return false; }
+
+        Undo.RecordObject(cam, "맵 밖 배경 검은색");
+        cam.clearFlags = CameraClearFlags.SolidColor;     // URP Inspector: Environment > Background Type = Solid Color
+        cam.backgroundColor = new Color(0f, 0f, 0f, 1f);  // 검은색 (알파 1)
+        EditorUtility.SetDirty(cam);
+        EditorSceneManager.MarkAllScenesDirty();
+        log.AppendLine($"- {cam.name}: 배경을 검은색으로 바꿈");
+
+        // 카메라가 맵 가장자리 밖으로 나가지 않는지 확인 (CameraFollow2D의 Bounds Tilemap)
+        CameraFollow2D follow = cam.GetComponent<CameraFollow2D>();
+        if (follow != null)
+        {
+            var so = new SerializedObject(follow);
+            SerializedProperty bounds = so.FindProperty("boundsTilemap");
+            if (bounds != null && bounds.objectReferenceValue == null)
+                log.AppendLine("- 주의: CameraFollow2D의 Bounds Tilemap이 비어 있음 -> 바닥 타일맵을 넣어야 카메라가 맵 밖으로 안 나감");
+            else
+                log.AppendLine("- 카메라 이동 범위(Bounds Tilemap) 연결 확인");
+        }
+        return true;
+    }
+
     // ================= 여신 대사 =================
     private static void UpdateGoddess(BastetGoddess goddess, StringBuilder log)
     {
