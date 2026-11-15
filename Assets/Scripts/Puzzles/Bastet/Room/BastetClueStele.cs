@@ -134,6 +134,9 @@ public class BastetClueStele : MonoBehaviour, IInteractable
         {
             if (data == null || panel == null || decoding) return;
             if (panel.IsOpen) { panel.Hide(); return; }
+            // [수정] 창(CluePanel)이 이번 프레임에 E로 닫혔으면 같은 E로 다시 열지 않음
+            //        (창이 먼저 E를 받아 닫히고 -> 비석이 같은 E로 바로 다시 여는 바람에 창이 안 닫히는 것처럼 보였음)
+            if (panel.ClosedFrame == Time.frameCount) return;
             if (DialogueBox.IsOpen || DialogueBox.ClosedFrame == Time.frameCount) return;
 
             if (!IsLitHere()) { DialogueBox.Play(darkLines); return; }
