@@ -76,6 +76,12 @@ public class PauseMenu : MonoBehaviour
         Debug.Log("[PauseMenu] 일시 정지");
     }
 
+    // [추가] 치트키 메뉴에서 씬을 바꾸기 전에 일시 정지를 풂
+    public static void ResumeIfPaused()
+    {
+        if (instance != null) instance.Resume();
+    }
+
     public void Resume()
     {
         if (!IsPaused) return;

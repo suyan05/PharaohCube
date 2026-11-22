@@ -167,6 +167,14 @@ public class SobekIllusionFlow : MonoBehaviour
         SceneFlow.LoadByNameOrNext(returnScene);
     }
 
+    // [추가] 설정 창 치트키 "모든 서브 퍼즐 완료"에서 부름 (지금 구역을 푼 것으로)
+    public void CheatClearCurrent()
+    {
+        if (!Application.isPlaying || current < 0 || leaving) return;
+        Debug.Log($"[SobekIllusionFlow] 치트: 구역 {current + 1} 클리어", this);
+        HandleCleared(stages[current].board);
+    }
+
     [ContextMenu("테스트: 지금 구역 건너뛰기")]
     private void TestSkip()
     {

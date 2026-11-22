@@ -10,6 +10,7 @@ using UnityEngine.UI;
 // 화면: 해상도 / 화면 모드 / 수직 동기화 (해상도·모드는 빌드에서만 바뀜, 에디터 Game 창은 그대로)
 // 언어: 한국어 / English (메뉴 글자만)
 // 값은 바꾸는 즉시 적용 + 저장 (GameSettings)
+// [추가] 게임 중(일시 정지 메뉴에서 연 설정)에는 아래에 "치트키" 버튼 -> CheatWindow
 public class SettingsWindow : MonoBehaviour
 {
     private static SettingsWindow current;
@@ -24,6 +25,7 @@ public class SettingsWindow : MonoBehaviour
     private Slider master, bgm, sfx;
     private OptionSelector resolution, mode, vsync, language;
     private Button closeButton;
+    private Button cheatButton; // [추가]
 
     // returnTo: 닫은 뒤 다시 고를 버튼 (키보드 조작용)
     // background: 뒤에 깔 배경 그림 (시작 화면에서 열 때. 게임 중에는 비워서 게임 화면이 어둡게 비침)
@@ -97,12 +99,20 @@ public class SettingsWindow : MonoBehaviour
         h.childControlWidth = true; h.childControlHeight = true;
         h.childForceExpandWidth = false; h.childForceExpandHeight = true;
         h.padding = new RectOffset(0, 0, 14, 0);
+        // [수정] 게임 중이면 치트키 버튼이 들어갈 자리만큼 버튼을 조금 줄임
+        bool cheat = PauseMenu.IsPaused && GameCheats.Enabled;
+        float bw = cheat ? 200f : 220f;
         TextMeshProUGUI hint = MenuUI.Text("Hint", bottom, "hint.back", 24f, th.disabledText, TextAlignmentOptions.Left);
-        MenuUI.Size(hint, 380f, 0f);
+        MenuUI.Size(hint, cheat ? 160f : 380f, 0f);
+        if (cheat)
+        {
+            cheatButton = MenuUI.Button("Cheat", bottom, "settings.cheat", 30f, OpenCheats); // [추가]
+            MenuUI.Size(cheatButton, bw, 0f);
+        }
         Button reset = MenuUI.Button("Reset", bottom, "settings.reset", 30f, ResetDefaults);
         closeButton = MenuUI.Button("Close", bottom, "settings.close", 30f, Close);
-        MenuUI.Size(reset, 220f, 0f);
-        MenuUI.Size(closeButton, 220f, 0f);
+        MenuUI.Size(reset, bw, 0f);
+        MenuUI.Size(closeButton, bw, 0f);
 
         GameSettings.LanguageChanged += RefreshLabels;
         MenuUI.Select(master);
@@ -114,6 +124,12 @@ public class SettingsWindow : MonoBehaviour
         if (mode != null) mode.RefreshLabel();
         if (vsync != null) vsync.RefreshLabel();
         if (language != null) language.RefreshLabel();
+    }
+
+    // [추가] 치트키 창 (닫으면 치트키 버튼을 다시 고름)
+    private void OpenCheats()
+    {
+        CheatWindow.Open(() => { if (cheatButton != null) MenuUI.Select(cheatButton); });
     }
 
     private void ResetDefaults()
@@ -132,6 +148,7 @@ public class SettingsWindow : MonoBehaviour
     {
         Keyboard kb = Keyboard.current;
         if (kb == null || Time.frameCount == openedFrame || ConfirmDialog.IsOpen) return;
+        if (CheatWindow.IsOpen || CheatWindow.ClosedFrame == Time.frameCount) return; // [추가] 치트키 창이 Esc를 씀
         if (kb.escapeKey.wasPressedThisFrame) Close();
     }
 

@@ -46,6 +46,19 @@ public static class Loc
         { "lang.ko", new[] { "한국어", "한국어" } },
         { "lang.en", new[] { "English", "English" } },
         { "hint.back", new[] { "Esc: 뒤로", "Esc: Back" } },
+        // [추가] 치트키 메뉴
+        { "settings.cheat", new[] { "치트키", "Cheats" } },
+        { "cheat.title", new[] { "치트키 (시연, 테스트용)", "Cheats (Demo / Test)" } },
+        { "cheat.subs", new[] { "모든 서브 퍼즐 완료", "Clear All Sub Puzzles" } },
+        { "cheat.next", new[] { "다음 스테이지로 이동", "Go to Next Stage" } },
+        { "cheat.steles", new[] { "비석 모두 해석", "Decode All Steles" } },
+        { "cheat.torch", new[] { "횃불 지급", "Give Torch" } },
+        { "cheat.items", new[] { "아이템 전부 지급", "Give All Items" } },
+        { "cheat.ranight", new[] { "라 방: 밤으로 전환 (F9)", "Ra: Switch to Night (F9)" } },
+        { "cheat.raphase", new[] { "라 방: 지금 낮/밤 (F10)", "Ra: Show Day/Night (F10)" } },
+        { "cheat.speed", new[] { "이동 속도 +5", "Move Speed +5" } },
+        { "cheat.speedreset", new[] { "이동 속도 원래대로", "Reset Move Speed" } },
+        { "cheat.note", new[] { "방을 바꾸는 치트는 누르면 메뉴가 닫힙니다.", "Cheats that change the room close the menu." } },
     };
 
     public static string Get(string key)
