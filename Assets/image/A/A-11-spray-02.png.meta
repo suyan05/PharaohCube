@@ -1,0 +1,429 @@
+fileFormatVersion: 2
+guid: e1ddfa1e8e460bb4ab8460ff8fc3b888
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4129332690022323331
+    second: A-11-spray-02_0
+  - first:
+      213: -5118975811971210618
+    second: A-11-spray-02_1
+  - first:
+      213: 5190903795344535503
+    second: A-11-spray-02_2
+  - first:
+      213: 3541879264704913262
+    second: A-11-spray-02_3
+  - first:
+      213: 2666924308425570776
+    second: A-11-spray-02_4
+  - first:
+      213: -6718539980334210018
+    second: A-11-spray-02_5
+  - first:
+      213: 137210586152977089
+    second: A-11-spray-02_6
+  - first:
+      213: -3170188587226666890
+    second: A-11-spray-02_7
+  - first:
+      213: 955047712549355192
+    second: A-11-spray-02_8
+  - first:
+      213: -6127899853402712837
+    second: A-11-spray-02_9
+  - first:
+      213: 1555522947592212757
+    second: A-11-spray-02_10
+  - first:
+      213: 7895829650058959931
+    second: A-11-spray-02_11
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: A-11-spray-02_0
+      rect:
+        serializedVersion: 2
+        x: 185
+        y: 161
+        width: 17
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 384503414365e4930800000000000000
+      internalID: 4129332690022323331
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_1
+      rect:
+        serializedVersion: 2
+        x: 254
+        y: 177
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 682a3a9de9eb5f8b0800000000000000
+      internalID: -5118975811971210618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_2
+      rect:
+        serializedVersion: 2
+        x: 287
+        y: 183
+        width: 12
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcfecb0df7bc90840800000000000000
+      internalID: 5190903795344535503
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_3
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 164
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e6fde02fc68472130800000000000000
+      internalID: 3541879264704913262
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_4
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 50
+        width: 273
+        height: 125
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8d97f8e4781d20520800000000000000
+      internalID: 2666924308425570776
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_5
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 169
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e146be6fb73f2c2a0800000000000000
+      internalID: -6718539980334210018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_6
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 143
+        width: 20
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c242171d4877e100800000000000000
+      internalID: 137210586152977089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_7
+      rect:
+        serializedVersion: 2
+        x: 290
+        y: 144
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6786b5bb64a3104d0800000000000000
+      internalID: -3170188587226666890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_8
+      rect:
+        serializedVersion: 2
+        x: 304
+        y: 135
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8bebd02a5d2014d00800000000000000
+      internalID: 955047712549355192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_9
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 111
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf453c2ec8355faa0800000000000000
+      internalID: -6127899853402712837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_10
+      rect:
+        serializedVersion: 2
+        x: 299
+        y: 119
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 511d33b11e3569510800000000000000
+      internalID: 1555522947592212757
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: A-11-spray-02_11
+      rect:
+        serializedVersion: 2
+        x: 286
+        y: 96
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3cd2ca9b3f939d60800000000000000
+      internalID: 7895829650058959931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      A-11-spray-02_0: 4129332690022323331
+      A-11-spray-02_1: -5118975811971210618
+      A-11-spray-02_10: 1555522947592212757
+      A-11-spray-02_11: 7895829650058959931
+      A-11-spray-02_2: 5190903795344535503
+      A-11-spray-02_3: 3541879264704913262
+      A-11-spray-02_4: 2666924308425570776
+      A-11-spray-02_5: -6718539980334210018
+      A-11-spray-02_6: 137210586152977089
+      A-11-spray-02_7: -3170188587226666890
+      A-11-spray-02_8: 955047712549355192
+      A-11-spray-02_9: -6127899853402712837
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -24,6 +24,12 @@ public class BastetAltarInteractable : MonoBehaviour, IInteractable
     [Tooltip("Esc로 팝업 닫기")]
     [SerializeField] private bool closeWithEscape = true;
 
+    [Header("[추가] 퍼즐을 풀면 바뀌는 그림 (비우면 그대로)")]
+    [Tooltip("예: Bastet_Obj_NecklaceAltar_Open, Bastet_Obj_ClawWall_Open")]
+    [SerializeField] private Sprite openSprite;
+    [Tooltip("비우면 이 오브젝트의 SpriteRenderer")]
+    [SerializeField] private SpriteRenderer bodyRenderer;
+
     private PlayerController2D player;
     private Rigidbody2D playerRb;
     private bool isOpen;
@@ -31,6 +37,26 @@ public class BastetAltarInteractable : MonoBehaviour, IInteractable
     public bool IsUnlocked => string.IsNullOrEmpty(requiredItemId)
                               || (ItemInventory.Instance != null && ItemInventory.Instance.Has(requiredItemId));
     public PuzzleBase TargetPuzzle => targetPuzzle;
+
+    // [추가] 퍼즐을 풀었으면(이어하기 포함) 열린 그림으로
+    private void Start()
+    {
+        if (bodyRenderer == null) bodyRenderer = GetComponent<SpriteRenderer>();
+        if (targetPuzzle == null || openSprite == null) return;
+        if (targetPuzzle.IsCleared) ShowOpen();
+        else targetPuzzle.OnSuccess += ShowOpen;
+    }
+
+    private void OnDestroy()
+    {
+        if (targetPuzzle != null) targetPuzzle.OnSuccess -= ShowOpen;
+    }
+
+    private void ShowOpen()
+    {
+        if (bodyRenderer != null && openSprite != null) bodyRenderer.sprite = openSprite;
+        Debug.Log($"[BastetAltar] {name}: 퍼즐 완료 -> 열린 그림", this);
+    }
 
     public string GetPrompt()
     {
@@ -126,5 +152,8 @@ public class BastetAltarInteractable : MonoBehaviour, IInteractable
         requiredItemId = requiredItem;
         if (!string.IsNullOrEmpty(lockedMsg)) lockedMessage = lockedMsg;
     }
+
+    // [추가] 아트 그림 교체 메뉴용
+    public void EditorSetOpenArt(SpriteRenderer body, Sprite open) { bodyRenderer = body; openSprite = open; }
 #endif
 }
