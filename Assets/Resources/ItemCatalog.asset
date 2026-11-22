@@ -192,3 +192,61 @@ MonoBehaviour:
       \uAF2D \uB9DE\uC744 \uAC83 \uAC19\uB2E4."
     icon: {fileID: 6849059424106506041, guid: 0cc05d2c66ced3f4386b6eeb0c5966c3, type: 3}
     hidden: 0
+  - id: ITEM_TH_NOTES
+    displayName: "\uD1A0\uD2B8\uC758 \uC5EC\uBC31 \uBA54\uBAA8"
+    description: "\uAE00\uC790\uC640 \uB73B: \uB530\uC624\uAE30 = \uD1A0\uD2B8, \uC800\uC6B8
+      = \uC9C4\uC2E4, \uAC08\uB300 \uD39C = \uAE30\uB85D, \uB2EC = \uB2EC, \uB208
+      = \uB208. \uAE00\uC740 \uC0C8\uAC00 \uBC14\uB77C\uBCF4\uB294 \uCABD\uC5D0\uC11C
+      \uC2DC\uC791\uB41C\uB2E4."
+    icon: {fileID: 21300000, guid: 8442afea6c8d4619b2a63d31fbce765e, type: 3}
+    hidden: 0
+  - id: ITEM_TH_PIECE_A
+    displayName: "\uBCBD\uD654 \uC870\uAC01"
+    description: "\uBCBD\uD654 '\uAE00\uC790\uB97C \uB9CC\uB4E0 \uD1A0\uD2B8'\uC758
+      \uC870\uAC01. \uC11C\uCABD \uC11C\uACE0\uC758 \uBCBD\uD654 \uC55E\uC5D0\uC11C
+      \uB9DE\uCD94\uC790."
+    icon: {fileID: 21300000, guid: 6a526ae3b9aa4b3da6a06c3d356c2b6b, type: 3}
+    hidden: 0
+  - id: ITEM_TH_PIECE_B
+    displayName: "\uBCBD\uD654 \uC870\uAC01"
+    description: "\uBCBD\uD654 '\uB2EC\uACFC\uC758 \uB0B4\uAE30'\uC758 \uC870\uAC01.
+      \uB3D9\uCABD \uC11C\uACE0\uC758 \uBCBD\uD654 \uC55E\uC5D0\uC11C \uB9DE\uCD94\uC790."
+    icon: {fileID: 21300000, guid: 417b90a17ee44652a7b41c698c7ebd53, type: 3}
+    hidden: 0
+  - id: ITEM_TH_PIECE_C
+    displayName: "\uBCBD\uD654 \uC870\uAC01"
+    description: "\uBCBD\uD654 '\uB418\uCC3E\uC740 \uB208'\uC758 \uC870\uAC01. \uBD81\uCABD
+      \uBCBD\uAC10\uC758 \uBCBD\uD654 \uC55E\uC5D0\uC11C \uB9DE\uCD94\uC790."
+    icon: {fileID: 21300000, guid: a595c1a26a0847e9be03fad9da8d278f, type: 3}
+    hidden: 0
+  - id: ITEM_TH_MOON_1
+    displayName: "\uB2EC \uC870\uAC01 (\uCD08\uC2B9\uB2EC)"
+    description: "\uB2EC \uBAA8\uC591 \uAE08 \uC870\uAC01. \uC5B4\uB518\uAC00\uC758
+      \uB2EC \uBAA8\uC591 \uD648\uC5D0 \uAF2D \uB9DE\uC744 \uAC83 \uAC19\uB2E4."
+    icon: {fileID: 21300000, guid: 6adc252928c24f38b0d78040301fddc6, type: 3}
+    hidden: 0
+  - id: ITEM_TH_MOON_2
+    displayName: "\uB2EC \uC870\uAC01 (\uBC18\uB2EC)"
+    description: "\uB2EC \uBAA8\uC591 \uAE08 \uC870\uAC01. \uC5B4\uB518\uAC00\uC758
+      \uB2EC \uBAA8\uC591 \uD648\uC5D0 \uAF2D \uB9DE\uC744 \uAC83 \uAC19\uB2E4."
+    icon: {fileID: 21300000, guid: d5bad310fbf041a9bb8cc46d4c2b277d, type: 3}
+    hidden: 0
+  - id: ITEM_TH_MOON_3
+    displayName: "\uB2EC \uC870\uAC01 (\uBCF4\uB984\uB2EC)"
+    description: "\uB2EC \uBAA8\uC591 \uAE08 \uC870\uAC01. \uC5B4\uB518\uAC00\uC758
+      \uB2EC \uBAA8\uC591 \uD648\uC5D0 \uAF2D \uB9DE\uC744 \uAC83 \uAC19\uB2E4."
+    icon: {fileID: 21300000, guid: ae782b8eb582459088d4d6db89950a26, type: 3}
+    hidden: 0
+  - id: PLATE_THOTH
+    displayName: "\uC9C0\uD61C\uC758 \uD615\uD310"
+    description: "\uD1A0\uD2B8\uC758 \uC9C0\uD61C\uAC00 \uC0C8\uACA8\uC9C4 \uD615\uD310.
+      \uD050\uBE0C\uC758 \uC138 \uBC88\uC9F8 \uBA74\uC5D0 \uB07C\uC6B8 \uC218 \uC788\uB2E4."
+    icon: {fileID: 21300000, guid: abd24fca0daa4509a60ca477a62d1bd1, type: 3}
+    hidden: 0
+  - id: ITEM_THOTH_TABLET
+    displayName: "\uD1A0\uD2B8\uC758 \uC810\uD1A0\uD310"
+    description: "\uD1A0\uD2B8\uC758 \uCC45 \uCCAB \uC904\uC744 \uC62E\uACA8 \uC801\uC740
+      \uC791\uC740 \uC810\uD1A0\uD310. \uC77D\uC9C0 \uB9D0\uACE0 \uAE30\uC5B5\uB9CC
+      \uD558\uB77C."
+    icon: {fileID: 21300000, guid: 8442afea6c8d4619b2a63d31fbce765e, type: 3}
+    hidden: 1
