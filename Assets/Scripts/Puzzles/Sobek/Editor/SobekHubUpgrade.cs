@@ -15,6 +15,7 @@ using UnityEngine.SceneManagement;
 //  4) 순서 잠금: S2~S4 다리 안쪽 끝에 통나무(Lock_S2~S4) + 섬을 덮는 어둠(Fog_S2~S4)
 //  5) 수위계 옆 계단(StairsDown): 처음 내려갈 때 통로 "페트수코스의 길"을 걸은 뒤 숨은 방 도착
 //  6) 허브 첫 대사에 벽화·순서 안내 추가 (예전 기본 대사일 때만)
+//  [추가] 숨은 방 도착 지점(Lower_Spawn)이 방 밖이면 방 안으로 옮김
 public static class SobekHubUpgrade
 {
     private const string WorldFolder = "Assets/image/Sobek/World";
@@ -56,6 +57,7 @@ public static class SobekHubUpgrade
         MakeCameraZones(root, log);
         MakeLocks(root, log);
         SetupStairs(log);
+        FixLowerSpawn(log);
         UpdateIntro(log);
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -226,6 +228,24 @@ public static class SobekHubUpgrade
         st.EditorSetCorridor(true);
         EditorUtility.SetDirty(st);
         log.AppendLine("- StairsDown: 처음 내려갈 때 통로 '페트수코스의 길' -> 숨은 방 도착");
+    }
+
+    // ================= 5-2) 숨은 방 도착 지점 =================
+    // 숨은 방(HiddenRoom_Lower)을 옮기면 Lower_Spawn만 방 밖(왼쪽 벽 너머)에 남는 문제 -> 바닥 안, 올라가는 계단 오른쪽으로
+    private static void FixLowerSpawn(StringBuilder log)
+    {
+        GameObject spawn = Find("Lower_Spawn"), floor = Find("Lower_Floor"), up = Find("Lower_StairsUp");
+        if (spawn == null || floor == null) return;
+        Bounds b = floor.GetComponent<Renderer>().bounds;
+        Vector3 p = spawn.transform.position;
+        Bounds inner = b; inner.Expand(new Vector3(-1.5f, -1.5f, 0f));
+        if (inner.Contains(new Vector3(p.x, p.y, b.center.z))) { log.AppendLine("- Lower_Spawn: 숨은 방 안에 있음 (그대로)"); return; }
+        Vector3 target = up != null ? up.transform.position + new Vector3(1.8f, 0.6f, 0f) : new Vector3(b.min.x + 2f, b.min.y + 1.5f, 0f);
+        target.x = Mathf.Clamp(target.x, inner.min.x, inner.max.x);
+        target.y = Mathf.Clamp(target.y, inner.min.y, inner.max.y);
+        Undo.RecordObject(spawn.transform, "숨은 방 도착 지점");
+        spawn.transform.position = new Vector3(target.x, target.y, 0f);
+        log.AppendLine($"- Lower_Spawn: 방 밖({p.x:0.#}, {p.y:0.#}) -> 방 안({target.x:0.#}, {target.y:0.#})");
     }
 
     // ================= 6) 첫 대사 =================

@@ -7,6 +7,15 @@ public static class SobekMuralArt
 {
     private static readonly Dictionary<string, Vector2> Table = new Dictionary<string, Vector2>
     {
+        { "SobekE1/boat", new Vector2(560.0f, 506.0f) },
+        { "SobekE1/croc", new Vector2(1000.0f, 596.5f) },
+        { "SobekE1/reeds", new Vector2(177.0f, 484.5f) },
+        { "SobekE1/river", new Vector2(646.0f, 615.0f) },
+        { "SobekE1/sun", new Vector2(760.0f, 191.5f) },
+        { "SobekE2/anubis", new Vector2(1006.5f, 391.0f) },
+        { "SobekE2/door", new Vector2(285.5f, 425.0f) },
+        { "SobekE2/glow", new Vector2(760.5f, 330.5f) },
+        { "SobekE2/scale", new Vector2(760.0f, 436.0f) },
         { "SobekS1/god", new Vector2(337.5f, 360.5f) },
         { "SobekS1/grain", new Vector2(926.5f, 456.0f) },
         { "SobekS1/river", new Vector2(810.5f, 537.5f) },

@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 // 신전 하나를 끝내고 중앙 홀로 돌아왔을 때의 정보 (HallTempDirector Inspector의 Routes 칸)
 // 진행 순서: 프롤로그 -> 중앙 홀 -> 라 -> 중앙 홀 -> 바스테트 -> 중앙 홀 -> 토트 -> 호루스 -> 소베크 -> 아누비스
@@ -24,8 +26,37 @@ public class HallRoute
 
     public static HallRoute[] Defaults()
     {
-        return new[] { Ra(), Bastet(), Horus() };
+        return new[] { Ra(), Bastet(), Horus(), Sobek() }; // [수정] 소베크 추가
     }
+
+    // [추가] 씬에 저장된 Routes 칸(예전 기본값)을 지금 순서에 맞춤 (HallTempDirector.Awake에서 부름, 씬 파일은 안 바뀜)
+    // - 없는 신전(소베크)은 뒤에 붙임 -> 소베크를 끝내고 돌아와도 홀 첫 튜토리얼이 아니라 "돌아옴" 연출
+    // - 호루스 다음 문이 예전 기본값(아누비스)이고 소베크 씬이 빌드 목록에 있으면 -> 소베크로
+    public static HallRoute[] Sync(HallRoute[] current)
+    {
+        var list = new List<HallRoute>();
+        if (current != null) foreach (HallRoute r in current) if (r != null) list.Add(r);
+        bool sobekReady = Application.CanStreamedLevelBeLoaded(SobekScene);
+        foreach (HallRoute r in list)
+        {
+            if (r.god == "호루스" && !sobekReady && r.nextScene == SobekScene) { r.nextScene = AnubisScene; r.nextPrompt = "아누비스의 신전으로"; r.objective = "북쪽 문으로 아누비스의 신전에 들어가자"; continue; }
+            if (r.god != "호루스" || !sobekReady || r.nextScene != AnubisScene) continue;
+            HallRoute h = Horus();
+            r.nextScene = h.nextScene; r.nextPrompt = h.nextPrompt; r.objective = h.objective; r.cubeLines = h.cubeLines;
+            Debug.Log("[HallRoute] 호루스 다음 문 -> 소베크의 신전");
+        }
+        foreach (HallRoute d in Defaults())
+        {
+            if (d.god == "소베크" && !sobekReady) continue;
+            if (list.Exists(r => r.god == d.god || r.clearFlag == d.clearFlag)) continue;
+            list.Add(d);
+            Debug.Log($"[HallRoute] 경로 추가: {d.god} (끝 플래그 {d.clearFlag})");
+        }
+        return list.ToArray();
+    }
+
+    private const string SobekScene = "Sobek_Hub";
+    private const string AnubisScene = "Puzzle_Test_Anubis_Tilemap";
 
     // [수정] 바스테트를 끝내고 돌아오면 -> 호루스의 방 (토트는 아직 준비 중이라 건너뜀, 준비되면 이 사이에 Thoth() 추가)
     private static HallRoute Bastet()
@@ -49,7 +80,7 @@ public class HallRoute
         };
     }
 
-    // [추가] 호루스를 끝내고 돌아오면 -> 아누비스의 방 (튜토리얼 없이 실전 방)
+    // [추가] 호루스를 끝내고 돌아오면 -> [수정] 소베크의 방 (소베크 씬이 빌드 목록에 없으면 Sync가 아누비스로 둠)
     // [확인 필요] faceTitle 몇 번째 면인지: 기획 순서(라-바스테트-토트-호루스)대로 네 번째로 적음
     private static HallRoute Horus()
     {
@@ -60,14 +91,36 @@ public class HallRoute
             clearFlag = "F_HO_H5_DONE",
             returnedFlag = "F_HALL_HORUS_RETURNED",
             faceTitle = "큐브의 네 번째 면 - 하늘",
-            nextScene = "Puzzle_Test_Anubis_Tilemap",
+            nextScene = SobekScene,
+            nextPrompt = "소베크의 신전으로",
+            objective = "북쪽 문으로 소베크의 신전에 들어가자",
+            cubeLines = new[]
+            {
+                new DialogueLine("???", "하늘의 면이 깨어났다."),
+                new DialogueLine("???", "다음 문이 열린다. 나일의 주인, 악어의 신 소베크의 신전이다."),
+                new DialogueLine("나", "매의 눈까지 찾았어... 다음은 소베크야.")
+            }
+        };
+    }
+
+    // [추가] 소베크를 끝내고 돌아오면 (메인 퍼즐 클리어) -> 아누비스의 방
+    private static HallRoute Sobek()
+    {
+        return new HallRoute
+        {
+            god = "소베크",
+            cubeSlot = 4,
+            clearFlag = "F_SOBEK_MAIN_DONE",
+            returnedFlag = "F_HALL_SOBEK_RETURNED",
+            faceTitle = "큐브의 다섯 번째 면 - 악어",
+            nextScene = AnubisScene,
             nextPrompt = "아누비스의 신전으로",
             objective = "북쪽 문으로 아누비스의 신전에 들어가자",
             cubeLines = new[]
             {
-                new DialogueLine("???", "하늘의 면이 깨어났다."),
-                new DialogueLine("???", "다음 문이 열린다. 죽은 자를 심판하는 자, 아누비스의 신전이다."),
-                new DialogueLine("나", "매의 눈까지 찾았어... 이제 아누비스야.")
+                new DialogueLine("???", "물의 면이 깨어났다."),
+                new DialogueLine("???", "마지막 문이 열린다. 죽은 자를 심판하는 자, 아누비스의 신전이다."),
+                new DialogueLine("나", "강이 다시 흐르고 배가 떴어... 이제 심장을 다는 저울로 가자.")
             }
         };
     }

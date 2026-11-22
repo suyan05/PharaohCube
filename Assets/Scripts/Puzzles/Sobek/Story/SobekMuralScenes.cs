@@ -146,6 +146,39 @@ public static class SobekMuralScenes
             .Say(Me, "가둬 둔 물을 강으로 돌려보내면... 배가 다시 뜰 수 있어.");
     }
 
+    // ================= 3) 떠나기 전 이야기 (SobekFarewell이 재생) =================
+    // 1) 다시 흐르는 강: 강물이 돌아오고 배가 떠오름, 소베크-라의 원반이 뜨고, 페트수코스가 배를 따라 헤엄침
+    // 2) 심장의 저울: 물 밑에서 드러난 문, 자칼 머리 아누비스와 심장·깃털 저울 (아누비스 복선)
+    public static MuralShot[] Farewell()
+    {
+        MuralShot river = new MuralShot("SobekE1", "SobekE1", 10f)
+            .Camera(1.1f, 1.02f, new Vector2(-120f, 40f), new Vector2(40f, -20f))
+            .Lay("river", 2f, 0.8f).Lay("reeds").Lay("sun", 3f, 0.9f).Lay("boat", 3f, 1f).Lay("croc", 1f, 1.2f)
+            .Move("river", new MuralPose(-1300f, 0f, 0f, 0f), MuralPose.Rest, 0f, 0.35f)
+            .Move("reeds", new MuralPose(0f, 60f, 0f, 0f), MuralPose.Rest, 0.25f, 0.45f)
+            .Move("boat", new MuralPose(-260f, 50f, -4f, 0f), MuralPose.Rest, 0.3f, 0.6f)
+            .Move("sun", new MuralPose(0f, 260f, 0f, 0f), MuralPose.Rest, 0.45f, 0.8f)
+            .Pulse("sun", 0.2f, 1.2f)
+            .Move("croc", new MuralPose(280f, 0f, 0f, 0f), MuralPose.Rest, 0.55f, 0.85f)
+            .Dust(24)
+            .Say(Wall, "가둬 둔 마지막 범람이 강으로 돌아가자, 마른 모래 위의 배가 다시 물에 떠올랐다.")
+            .Say(SobekStory.Sobek, "물은 다시 흐른다. 배를 타고 마지막 문으로 가라.")
+            .Say(Me, "배가... 다시 떴어. 악어가 배를 따라 헤엄치고 있어.");
+
+        MuralShot scale = new MuralShot("SobekE2", "SobekE2", 9f)
+            .Camera(1.12f, 1f, new Vector2(-260f, 20f), new Vector2(60f, 0f))
+            .Lay("door").Lay("glow").Lay("scale").Lay("anubis")
+            .Move("door", MuralPose.Hidden, MuralPose.Rest, 0f, 0.2f)
+            .Move("glow", MuralPose.Hidden, MuralPose.Rest, 0.3f, 0.5f)
+            .Pulse("glow", 0.35f, 1.4f)
+            .Move("scale", new MuralPose(0f, 40f, 0f, 0f), MuralPose.Rest, 0.25f, 0.45f)
+            .Move("anubis", MuralPose.Hidden, MuralPose.Rest, 0.5f, 0.75f)
+            .Say(Wall, "물 밑에 잠겨 있던 문 너머, 죽은 자의 심장을 깃털과 함께 다는 저울이 있다.")
+            .Say(SobekStory.Sobek, "그곳에서는 심장이 너를 대신 말한다.")
+            .Say(Me, "심장과 깃털... 저 자칼 머리의 신이 아누비스야.");
+        return new[] { river, scale };
+    }
+
     // 조각 추가 (위치는 SobekMuralArt 표에서. 호루스 MuralArt 표는 건드리지 않음)
     private static MuralShot Lay(this MuralShot shot, string name, float bobAmp = 0f, float bobSpeed = 0f)
     {

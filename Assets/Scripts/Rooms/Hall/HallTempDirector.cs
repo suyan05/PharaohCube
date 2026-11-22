@@ -48,6 +48,7 @@ public class HallTempDirector : MonoBehaviour
 
     private void Awake()
     {
+        routes = HallRoute.Sync(routes); // [추가] 씬에 저장된 예전 Routes에 소베크 경로를 붙이고 호루스 다음 문을 맞춤
         ScreenFader.SetBlack();
     }
 
