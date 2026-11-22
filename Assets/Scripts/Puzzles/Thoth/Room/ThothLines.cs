@@ -28,8 +28,9 @@ public static class ThothLines
     // ================= 시작 =================
     public static DialogueLine[] Intro => ThothState.Lines(
         Khepri, "여기는 토트의 서고. 글자와 달을 다스리는 신, 따오기 머리의 서기관이 머물던 곳이야.",
-        Khepri, "밤의 여섯째 시간... 벽화들이 산산이 부서졌어. 그림은 기억을 품고 있으니, 조각을 맞추면 이야기가 돌아올 거야.",
-        Me, "벽화 조각 맞추기구나. 서쪽 서고부터 가 보자.");
+        Khepri, "밤의 여섯째 시간... 벽화들이 산산이 부서졌어. 그림은 기억을 품고 있으니, 조각을 맞추면 이야기가 돌아올 거야.");
+
+    public static DialogueLine[] IntroAfter => ThothState.Lines(Me, "벽화 조각 맞추기구나. 서쪽 서고부터 가 보자.");
 
     // ================= 벽화 =================
     public static DialogueLine[] WallFirst(string fresco) => ThothState.Lines(

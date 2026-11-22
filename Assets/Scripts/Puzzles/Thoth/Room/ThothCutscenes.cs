@@ -6,20 +6,23 @@ using UnityEngine.UI;
 public static class ThothCutscenes
 {
     // ================= 처음 들어옴 =================
+    // [수정] 플레이어가 있는 곳에서 시작 -> 제목 -> 천창 달빛(달 시계)을 보여 주고 -> 다시 플레이어로
     public static IEnumerator Intro(ThothDirector d)
     {
         Cine.Begin(true);
         Transform player = CineActor.Player();
-        Vector3 top = d.Skylight.position + Vector3.up * 2f;
-        Vector3 end = player != null ? player.position : top;
-        CineCamera.Focus(top);
-        CineCamera.Zoom(8f, 0f);
+        Vector3 me = (player != null ? player.position : d.Skylight.position) + Vector3.up * 0.6f;
+        Vector3 sky = d.Skylight.position;
+        CineCamera.Focus(me);
+        CineCamera.Zoom(4.5f, 0.05f);
         CineCamera.SnapZoom();
+        Cine.Run(TitleCardUI.Show("토트의 방", "달의 서고 - 밤의 여섯째 시간", 2.2f));
+        yield return Cine.Wait(2.6f);
         GameAudio.Play("sfx_dream_shimmer", 0.5f, 0.7f);
-        Cine.Run(TitleCardUI.Show("토트의 방", "달의 서고 - 밤의 여섯째 시간", 2.4f));
-        yield return CineShots.Crane(top, end + Vector3.up * 0.8f, 8f, 5f, 3.2f);
-        yield return Cine.Wait(0.4f);
+        yield return CineShots.Crane(me, sky, 4.5f, 6.5f, 2.4f);
         yield return Cine.Say(ThothLines.Intro);
+        yield return CineShots.Crane(sky, me, 6.5f, 5f, 1.8f);
+        yield return Cine.Say(ThothLines.IntroAfter);
         ThothState.Set(ThothIds.Intro);
         CineCamera.Release();
         Cine.End();
