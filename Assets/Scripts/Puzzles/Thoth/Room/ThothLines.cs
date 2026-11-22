@@ -75,7 +75,7 @@ public static class ThothLines
 
     // ================= 달 시계 =================
     public const string DialTitle = "달의 시계";
-    public const string DialHelp = "달 그림을 골라 빈 구멍에 끼우자. 맨 위는 빛이 없는 밤.   < > 바늘 돌리기   E: 닫기";
+    public const string DialHelp = "달을 누르면 위에서부터 시계 방향으로 차례로 끼워져. 끼운 달을 누르면 빠져.   < > 바늘   E: 닫기";
     public static string DialWrong(int right) => $"달 그림 {right}/7개가 제자리에 있다.";
     public const string DialNeedle = "달의 차례는 맞았어. 바늘은 '내기의 밤'의 달을 가리켜야 해.";
     public const string DialNotFull = "아직 빈 구멍이 있다.";
