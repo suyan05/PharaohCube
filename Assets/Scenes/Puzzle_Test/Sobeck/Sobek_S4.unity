@@ -778,7 +778,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 20
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: -5207231776682384544, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -873,6 +873,24 @@ MonoBehaviour:
   stepTime: 0.22
   mechTime: 0.55
   avatarHeight: 0.95
+  avatarFront:
+  - {fileID: -5207231776682384544, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -7233381385078609286, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: 428769192662469898, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  avatarBack:
+  - {fileID: -8533962960574808602, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -8717975482313926904, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  - {fileID: -1761608541376497799, guid: 2500ad01ce8aac2459228b864e7ab283, type: 3}
+  walkPattern: 00000000010000000000000002000000
+  walkFps: 8
+  blockAtlas: {fileID: 0}
+  waterTexture: {fileID: 0}
+  backdrop: {fileID: 0}
+  waterScroll: {x: 0.025, y: 0.012}
+  poolMargin: 4.5
+  raftThickness: 0.4
+  mechShake: 0.07
+  waterShake: 0.025
   flashNewLinks: 1
   linkFlashColor: {r: 0.45, g: 1, b: 1, a: 0.75}
   blockedFlashColor: {r: 1, g: 0.35, b: 0.3, a: 0.6}

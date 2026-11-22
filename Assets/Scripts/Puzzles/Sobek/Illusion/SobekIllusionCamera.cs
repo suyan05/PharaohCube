@@ -22,6 +22,9 @@ public class SobekIllusionCamera : MonoBehaviour
     private float snapFrom, snapTo, snapT = 1f;
     private bool dragging;
 
+    // [추가] 화면 흔들림 (장치가 움직일 때). 카메라만 화면 가로·세로로 살짝 떨림 -> 길 계산에는 영향 없음
+    private float shakeTime, shakeDuration, shakeStrength;
+
     public event Action<int> Snapped;       // 각도에 붙음 (0~3)
     public event Action RotateStarted;      // 돌기 시작 (길 끊김)
 
@@ -75,6 +78,28 @@ public class SobekIllusionCamera : MonoBehaviour
         snapFrom = yaw;
         snapTo = target;
         snapT = 0f;
+    }
+
+    // [추가] duration초 동안 strength(유닛)만큼 흔들림, 끝으로 갈수록 약해짐
+    public void Shake(float duration, float strength)
+    {
+        if (duration <= 0f || strength <= 0f) return;
+        bool shaking = shakeTime > 0f;
+        shakeStrength = shaking ? Mathf.Max(shakeStrength, strength) : strength; // 흔들리는 중이면 더 센 쪽
+        shakeDuration = Mathf.Max(shakeTime, duration);
+        shakeTime = shakeDuration;
+        Debug.Log($"[SobekIllusionCamera] 화면 흔들림 {duration:0.##}초 x {strength:0.###}", this);
+    }
+
+    private void LateUpdate()
+    {
+        if (cam == null) return;
+        Vector3 basePos = new Vector3(0f, 0f, -distance);
+        if (shakeTime <= 0f) { cam.transform.localPosition = basePos; return; }
+        shakeTime -= Time.deltaTime;
+        float fade = Mathf.Clamp01(shakeTime / Mathf.Max(0.01f, shakeDuration));
+        Vector2 r = UnityEngine.Random.insideUnitCircle * shakeStrength * fade;
+        cam.transform.localPosition = basePos + new Vector3(r.x, r.y, 0f); // 카메라 자기 축(화면 가로·세로)으로만
     }
 
     private void Update()

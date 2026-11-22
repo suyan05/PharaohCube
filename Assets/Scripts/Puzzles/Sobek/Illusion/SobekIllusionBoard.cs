@@ -12,6 +12,9 @@ using UnityEngine.InputSystem;
 // - 색 발판을 밟으면 같은 색 장치가 한 단계 움직임: 청록 = 도는 섬, 주황 = 악어 등 다리, 파랑 = 물높이(뗏목)
 // - Z: 한 수 되돌리기, R: 처음으로
 // 붙이는 곳: 퍼즐 씬의 Board 오브젝트 (Tools/Sobek/5 가 자동 배치). 여러 구역이면 SobekIllusionFlow가 하나씩 켬
+// [추가] 그림: 블록 무늬(돌·통나무 뗏목·악어 등), 무늬 있는 물, 퍼즐마다 배경 그림 (Resources/Sobek/Illusion/)
+// [추가] 플레이어 그림이 걸을 때 앞/뒤 모습으로 걸음 (Tools/Sobek/6 메뉴가 플레이어 그림을 넣어 줌)
+// [추가] 섬이 돌거나 악어 다리가 움직일 때 화면 흔들림, 물이 차오르면 배경의 물도 같이 차오름
 public class SobekIllusionBoard : MonoBehaviour
 {
     [Header("데이터 · 연결")]
@@ -38,6 +41,35 @@ public class SobekIllusionBoard : MonoBehaviour
     [Range(0.1f, 2f)] [SerializeField] private float mechTime = 0.55f;
     [Tooltip("캐릭터 키 (유닛)")]
     [Range(0.3f, 2f)] [SerializeField] private float avatarHeight = 0.95f;
+
+    [Header("[추가] 플레이어 그림 (비우면 Avatar의 그림 한 장)")]
+    [Tooltip("앞모습 걷기 (카메라 쪽으로 걸을 때 + 서 있을 때)")]
+    [SerializeField] private Sprite[] avatarFront;
+    [Tooltip("뒷모습 걷기 (카메라 반대쪽으로 걸을 때)")]
+    [SerializeField] private Sprite[] avatarBack;
+    [Tooltip("걷기 프레임 순서 (플레이어와 같게 0 1 0 2)")]
+    [SerializeField] private int[] walkPattern = { 0, 1, 0, 2 };
+    [Range(2f, 16f)] [SerializeField] private float walkFps = 8f;
+
+    [Header("[추가] 그림 (비우면 Resources/Sobek/Illusion/ 에서 자동으로)")]
+    [Tooltip("블록 무늬 그림 (32x32 칸 8개: 돌 윗면/옆면, 통나무 윗면/옆면, 악어 윗면/옆면, 발판)")]
+    [SerializeField] private Texture2D blockAtlas;
+    [Tooltip("물결 그림 (반복)")]
+    [SerializeField] private Texture2D waterTexture;
+    [Tooltip("배경 그림 (비우면 Sobek_Backdrop_{퍼즐 키})")]
+    [SerializeField] private Texture2D backdrop;
+    [Tooltip("물결이 흐르는 속도 (초당 그림 비율)")]
+    [SerializeField] private Vector2 waterScroll = new Vector2(0.025f, 0.012f);
+    [Tooltip("물 연못 바깥 여백 (칸). 연못 바깥은 배경 그림이 보임")]
+    [Range(1f, 12f)] [SerializeField] private float poolMargin = 4.5f;
+    [Tooltip("물높이 뗏목 두께 (0.1~1, 1이면 정육면체)")]
+    [Range(0.1f, 1f)] [SerializeField] private float raftThickness = 0.4f;
+
+    [Header("[추가] 화면 흔들림")]
+    [Tooltip("섬이 돌거나 악어 다리가 움직일 때 흔들림 세기 (유닛, 0이면 안 흔들림)")]
+    [Range(0f, 0.3f)] [SerializeField] private float mechShake = 0.07f;
+    [Tooltip("물높이가 바뀔 때 흔들림 세기 (0이면 안 흔들림)")]
+    [Range(0f, 0.3f)] [SerializeField] private float waterShake = 0.025f;
 
     [Header("안내")]
     [Tooltip("각도를 맞췄을 때 지금 갈 수 있게 된 착시 길 양 끝을 잠깐 빛냄")]
@@ -66,6 +98,10 @@ public class SobekIllusionBoard : MonoBehaviour
     // 그림
     private Transform[] mechRoots;
     private Transform waterTr;
+    private Material blockMatInst, waterMatInst;   // [추가] 무늬 그림을 넣은 복사본 (원본 머티리얼은 그대로)
+    private SobekIllusionBackdrop backdropView;
+    private float walkClock;
+    private bool facingBack;
 
     // 입력 상태
     private bool pressing, dragging, pressRight;
@@ -115,8 +151,23 @@ public class SobekIllusionBoard : MonoBehaviour
             cameraRig.Cam.orthographicSize = Mathf.Max(level.CameraSize, FitSize(cameraRig.Cam.aspect));
             cameraRig.Cam.backgroundColor = level.BackgroundColor;
             cameraRig.Cam.clearFlags = CameraClearFlags.SolidColor;
+            // [추가] 배경 그림 + 물띠 (구역이 바뀌면 그 구역 그림으로)
+            backdropView = SobekIllusionBackdrop.For(cameraRig.Cam);
+            if (backdropView != null && model != null)
+                backdropView.Apply(LoadBackdrop(), level.WaterColor, model.WaterY(model.StartStates()), model.WaterY(mechStates));
         }
         cameraRig.SetYawImmediate(yaw < 0 ? level.StartYaw : yaw);
+    }
+
+    // [추가] 퍼즐 키 (에셋 이름 SobekIllusion_S1 -> S1)
+    private string LevelKey => level != null ? level.name.Replace("SobekIllusion_", "") : "";
+
+    private Texture2D LoadBackdrop()
+    {
+        if (backdrop != null) return backdrop;
+        var t = Resources.Load<Texture2D>("Sobek/Illusion/Sobek_Backdrop_" + LevelKey);
+        if (t == null) t = Resources.Load<Texture2D>("Sobek/Illusion/Sobek_Backdrop_S1");
+        return t;
     }
 
     // 네 각도 어디서 봐도 판 전체가 화면에 들어오는 카메라 크기 (장치가 움직일 자리 포함)
@@ -146,15 +197,22 @@ public class SobekIllusionBoard : MonoBehaviour
     private void OnDestroy()
     {
         if (cameraRig != null) { cameraRig.Snapped -= OnSnapped; cameraRig.RotateStarted -= OnRotateStarted; }
+        if (blockMatInst != null) Destroy(blockMatInst);
+        if (waterMatInst != null) Destroy(waterMatInst);
     }
 
     // ================= 그림 만들기 =================
     private void BuildVisuals()
     {
+        PrepareMaterials();
+
         // 발판 색 (고정 블록 윗면)
         var plateColor = new Dictionary<Vector3Int, Color>();
         foreach (SobekIllusionModel.Plate p in model.Plates)
             plateColor[p.cell] = SobekIllusionLevel.MechColor(model.Mechs[p.mech].kind);
+        // [추가] 발판 칸은 새김 무늬 그림
+        SobekIllusionMesh.Skin staticSkin = SobekIllusionMesh.Skin.Stone;
+        staticSkin.topOf = c => plateColor.ContainsKey(c) ? SobekIllusionMesh.SlotPlate : -1;
 
         SobekIllusionMesh.TopStyle staticStyle = (Vector3Int c, ref Color inner, ref Color edge) =>
         {
@@ -162,7 +220,7 @@ public class SobekIllusionBoard : MonoBehaviour
             else if (c == level.Goal) inner = level.GoalColor;
             if (plateColor.TryGetValue(c, out Color pc)) { inner = pc; edge = pc * 0.55f; edge.a = 1f; }
         };
-        MakeMesh("Blocks", transform, model.Static, Vector3.zero, Color.white, 0f, staticStyle);
+        MakeMesh("Blocks", transform, model.Static, Vector3.zero, Color.white, 0f, staticStyle, staticSkin, -0.5f);
 
         // 장치마다 따로 (움직일 때 오브젝트째로 돌리거나 옮김)
         mechRoots = new Transform[model.Mechs.Count];
@@ -179,7 +237,12 @@ public class SobekIllusionBoard : MonoBehaviour
                 if (c == level.Goal) inner = level.GoalColor;
                 edge = mc * 0.8f; edge.a = 1f; // 움직이는 블록은 테두리가 장치 색
             };
-            MakeMesh("Mesh", root, mech.cells, origin, mc, 0.22f, groupStyle);
+            // [추가] 장치마다 무늬: 도는 섬 = 돌, 악어 등 다리 = 악어 비늘, 물높이 = 물에 뜬 통나무 뗏목(얇게)
+            SobekIllusionMesh.Skin skin = SobekIllusionMesh.Skin.Stone;
+            float bottom = -0.5f, tintAmt = 0.22f;
+            if (mech.kind == SobekIllusionModel.Kind.Slide) { skin = new SobekIllusionMesh.Skin { top = SobekIllusionMesh.SlotCrocTop, side = SobekIllusionMesh.SlotCrocSide }; tintAmt = 0.08f; }
+            else if (mech.kind == SobekIllusionModel.Kind.Water) { skin = new SobekIllusionMesh.Skin { top = SobekIllusionMesh.SlotLogTop, side = SobekIllusionMesh.SlotLogSide }; bottom = 0.5f - raftThickness; tintAmt = 0.06f; }
+            MakeMesh("Mesh", root, mech.cells, origin, mc, tintAmt, groupStyle, skin, bottom);
             mechRoots[m] = root;
         }
         SnapMechVisuals();
@@ -187,8 +250,10 @@ public class SobekIllusionBoard : MonoBehaviour
         Vector3 center = level.Center();
         waterTr = new GameObject("Water").transform;
         waterTr.SetParent(transform, false);
-        waterTr.gameObject.AddComponent<MeshFilter>().sharedMesh = SobekIllusionMesh.Water(center, 40f, level.WaterColor);
-        waterTr.gameObject.AddComponent<MeshRenderer>().sharedMaterial = blockMaterial;
+        // [수정] 화면을 다 덮던 큰 물(40칸) -> 블록을 감싸는 연못 크기 (바깥은 배경 그림), 물결 무늬
+        float poolSize = PoolHalfSize(center);
+        waterTr.gameObject.AddComponent<MeshFilter>().sharedMesh = SobekIllusionMesh.Water(center, poolSize, WaterTint(), 6f);
+        waterTr.gameObject.AddComponent<MeshRenderer>().sharedMaterial = waterMatInst != null ? waterMatInst : blockMaterial;
         waterTr.localPosition = new Vector3(0f, model.WaterY(mechStates), 0f);
 
         mpb = new MaterialPropertyBlock();
@@ -204,6 +269,7 @@ public class SobekIllusionBoard : MonoBehaviour
             markers.Add(r);
         }
 
+        if (avatar != null && avatarFront != null && avatarFront.Length > 0 && avatarFront[0] != null) avatar.sprite = avatarFront[0]; // [추가] 플레이어 그림
         if (avatar != null && avatar.sprite != null)
         {
             float h = avatar.sprite.bounds.size.y;
@@ -216,19 +282,65 @@ public class SobekIllusionBoard : MonoBehaviour
         }
     }
 
-    private void MakeMesh(string objName, Transform parent, ICollection<Vector3Int> cells, Vector3 origin, Color tint, float tintAmount, SobekIllusionMesh.TopStyle style)
+    private void MakeMesh(string objName, Transform parent, ICollection<Vector3Int> cells, Vector3 origin, Color tint, float tintAmount, SobekIllusionMesh.TopStyle style,
+        SobekIllusionMesh.Skin skin, float bottom)
     {
         var go = new GameObject(objName);
         go.transform.SetParent(parent, false);
-        go.AddComponent<MeshFilter>().sharedMesh = SobekIllusionMesh.Build(cells, origin, level, tint, tintAmount, style);
-        go.AddComponent<MeshRenderer>().sharedMaterial = blockMaterial;
+        go.AddComponent<MeshFilter>().sharedMesh = SobekIllusionMesh.Build(cells, origin, level, tint, tintAmount, style, skin, bottom);
+        go.AddComponent<MeshRenderer>().sharedMaterial = blockMatInst != null ? blockMatInst : blockMaterial;
     }
+
+    // [추가] 원본 머티리얼을 복사해 무늬 그림을 넣음 (그림이 없으면 예전처럼 색만)
+    private void PrepareMaterials()
+    {
+        if (blockMaterial == null) return;
+        if (blockAtlas == null) blockAtlas = Resources.Load<Texture2D>("Sobek/Illusion/Sobek_Illusion_Atlas");
+        if (waterTexture == null) waterTexture = Resources.Load<Texture2D>("Sobek/Illusion/Sobek_Illusion_Water");
+        if (blockAtlas != null)
+        {
+            blockMatInst = new Material(blockMaterial) { name = blockMaterial.name + " (무늬)" };
+            blockMatInst.SetTexture("_MainTex", blockAtlas);
+        }
+        else Debug.LogWarning("[SobekIllusionBoard] 블록 무늬 그림 없음 (Resources/Sobek/Illusion/Sobek_Illusion_Atlas) -> 색만", this);
+        if (waterTexture != null)
+        {
+            waterMatInst = new Material(blockMaterial) { name = blockMaterial.name + " (물)" };
+            waterMatInst.SetTexture("_MainTex", waterTexture);
+            waterMatInst.SetVector("_Scroll", new Vector4(waterScroll.x, waterScroll.y, 0f, 0f));
+        }
+        Debug.Log($"[SobekIllusionBoard] {level.DisplayName}: 블록 무늬 {(blockAtlas != null ? blockAtlas.name : "없음")}, 물결 {(waterTexture != null ? waterTexture.name : "없음")}", this);
+    }
+
+    // [추가] 물 색: 물결 그림(밝은 회색)과 곱해지면 조금 어두워지므로 그만큼 밝게
+    private Color WaterTint()
+    {
+        Color c = level.WaterColor;
+        if (waterTexture == null) return c;
+        Color lit = c * 1.25f;
+        lit.a = 1f;
+        return lit;
+    }
+
+    // [추가] 둥근 연못 반지름: 모든 블록(장치가 움직일 자리 포함)을 덮고 여백만큼 더
+    private float PoolHalfSize(Vector3 center)
+    {
+        float need = 6f;
+        var pts = new List<Vector3Int>(model.Static);
+        for (int m = 0; m < model.Mechs.Count; m++)
+            for (int s = 0; s < Mathf.Max(1, model.Mechs[m].count); s++)
+                foreach (Vector3Int c in model.Mechs[m].cells) pts.Add(model.MechCell(m, c, s));
+        foreach (Vector3Int p in pts) need = Mathf.Max(need, new Vector2(p.x - center.x, p.z - center.z).magnitude + 0.75f); // 블록 모서리까지
+        return Mathf.Clamp(need + poolMargin, 8f, 40f);
+    }
+
 
     // 장치 오브젝트를 지금 상태 자리에 바로 놓음
     private void SnapMechVisuals()
     {
         for (int m = 0; m < mechRoots.Length; m++) SetMechVisual(m, mechStates[m], mechStates[m], 1f);
         if (waterTr != null) waterTr.localPosition = new Vector3(0f, model.WaterY(mechStates), 0f);
+        if (backdropView != null && isActiveAndEnabled) backdropView.SetWater(model.WaterY(mechStates));
     }
 
     // from -> to 상태 사이를 t(0~1)만큼
@@ -273,6 +385,7 @@ public class SobekIllusionBoard : MonoBehaviour
         Vector3 toCam = -camT.forward;
         if (avatar != null)
         {
+            AnimateAvatar();
             avatar.transform.rotation = camT.rotation;
             // 그림의 발(아래 끝)이 칸 위에 오게 + 카메라 쪽으로 조금 당겨서 자기 발판에 묻히지 않게
             avatar.transform.position = avatarPos + camT.up * FootOffset(avatar) + toCam * 0.35f;
@@ -295,6 +408,23 @@ public class SobekIllusionBoard : MonoBehaviour
                 return mechRoots[m].TransformPoint(Top(level.Goal) - origin);
             }
         return Top(level.Goal);
+    }
+
+    // [추가] 걷는 동안 프레임 넘김, 멈추면 첫 프레임 (앞/뒤 모습)
+    private void AnimateAvatar()
+    {
+        Sprite[] frames = facingBack && avatarBack != null && avatarBack.Length > 0 ? avatarBack : avatarFront;
+        if (frames == null || frames.Length == 0) return;
+        int idx = 0;
+        if (walking)
+        {
+            walkClock += Time.deltaTime * walkFps;
+            int step = Mathf.FloorToInt(walkClock);
+            idx = walkPattern != null && walkPattern.Length > 0 ? walkPattern[step % walkPattern.Length] : step;
+        }
+        else walkClock = 0f;
+        Sprite s = frames[Mathf.Clamp(idx, 0, frames.Length - 1)];
+        if (s != null && avatar.sprite != s) avatar.sprite = s;
     }
 
     // 피벗이 가운데든 아래든 그림 아래 끝이 발판에 닿도록 올릴 거리
@@ -440,6 +570,12 @@ public class SobekIllusionBoard : MonoBehaviour
 
     private IEnumerator Move(Vector3 from, Vector3 to, float time)
     {
+        // [추가] 화면에서 위로(카메라 반대쪽) 걸으면 뒷모습, 아래로 걸으면 앞모습
+        if (cameraRig != null && cameraRig.Cam != null && (to - from).sqrMagnitude > 0.0001f)
+        {
+            float dy = Vector3.Dot(to - from, cameraRig.Cam.transform.up);
+            if (Mathf.Abs(dy) > 0.01f) facingBack = dy > 0f;
+        }
         for (float t = 0f; t < time; t += Time.deltaTime)
         {
             avatarPos = Vector3.Lerp(from, to, t / time);
@@ -464,6 +600,10 @@ public class SobekIllusionBoard : MonoBehaviour
         int from = mechStates[m], to = next[m];
         float w0 = model.WaterY(mechStates), w1 = model.WaterY(next);
         if (cameraRig.Cam != null && mech.kind != SobekIllusionModel.Kind.Slide) AnubisToast.Show(MechToast(mech.kind, from, to), 1.6f);
+        // [추가] 화면 흔들림: 섬이 돌 때·악어 다리가 움직일 때 (물높이는 약하게)
+        float shake = mech.kind == SobekIllusionModel.Kind.Water ? waterShake : mechShake;
+        if (shake > 0f) cameraRig.Shake(mechTime + 0.15f, shake);
+        if (backdropView != null) backdropView.SetWater(w1); // [추가] 배경의 물도 같이 차오름/빠짐
         for (float t = 0f; t < mechTime; t += Time.deltaTime)
         {
             float e = Mathf.SmoothStep(0f, 1f, t / mechTime);
@@ -507,6 +647,7 @@ public class SobekIllusionBoard : MonoBehaviour
         PlacePlayer(level.Start);
         cameraRig.SetYawImmediate(level.StartYaw);
         yaw = lastYaw = level.StartYaw;
+        facingBack = false;
         steps = turns = 0;
         undo.Clear();
         shownLinks.Clear();
@@ -654,5 +795,14 @@ public class SobekIllusionBoard : MonoBehaviour
         hudPrefix = prefix; clearMessage = clearText;
         gizmoYaw = lv != null ? lv.StartYaw : 2;
     }
+
+    // [추가] 플레이어 그림 (앞/뒤 걷기 프레임, 프레임 순서)
+    public void EditorSetAvatarFrames(Sprite[] front, Sprite[] back, int[] pattern)
+    {
+        avatarFront = front; avatarBack = back;
+        if (pattern != null && pattern.Length > 0) walkPattern = pattern;
+        if (avatar != null && front != null && front.Length > 0 && front[0] != null) avatar.sprite = front[0];
+    }
+    public SpriteRenderer EditorAvatar => avatar;
 #endif
 }

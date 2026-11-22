@@ -219,6 +219,7 @@ public static class SobekIllusionBuilder
         Sprite altar = SobekDataSetup.World("Sobek_Illusion_Altar") ?? SobekDataSetup.World("Sobek_Obj_Altar");
         SpriteRenderer goal = MakeSprite(go.transform, "GoalAltar", altar, 10);
         board.EditorSetup(level, rig, block, marker, avatar, goal, font, prefix, clearText);
+        SobekIllusionArtPatch.ApplyFromPrefab(board); // [추가] 흰 네모 대신 플레이어 그림 (앞/뒤 걷기)
         return board;
     }
 
