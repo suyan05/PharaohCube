@@ -60,6 +60,7 @@ public static class Loc
         { "cheat.raphase", new[] { "라 방: 지금 낮/밤 (F10)", "Ra: Show Day/Night (F10)" } },
         { "cheat.speed", new[] { "이동 속도 +5", "Move Speed +5" } },
         { "cheat.speedreset", new[] { "이동 속도 원래대로", "Reset Move Speed" } },
+        { "cheat.cards", new[] { "수첩 카드 모두 수집", "Unlock All Notebook Cards" } },
         { "cheat.note", new[] { "방을 바꾸는 치트는 누르면 메뉴가 닫힙니다.", "Cheats that change the room close the menu." } },
     };
 

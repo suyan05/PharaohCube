@@ -16,17 +16,30 @@ public class SobekHiddenPickup : MonoBehaviour, IInteractable
     };
 
     private bool taking;
+    private bool shown = true;
+    private float poll;
 
     private void Start() => Refresh();
+
+    // [추가] 다른 길(치트 "아이템 전부 지급" 등)로 이빨을 받았어도 바닥의 이빨이 바로 사라지게 (0.5초마다 확인)
+    private void Update()
+    {
+        if (!shown || taking) return;
+        poll -= Time.deltaTime;
+        if (poll > 0f) return;
+        poll = 0.5f;
+        if (Got) { Refresh(); Debug.Log("[SobekHiddenPickup] 이미 가진 이빨 -> 바닥의 이빨 숨김", this); }
+    }
 
     private bool Got => SobekStory.HasFlag(gotFlag) || (ItemInventory.Instance != null && ItemInventory.Instance.Has(itemId));
 
     private void Refresh()
     {
+        shown = !Got;
         var sr = GetComponent<SpriteRenderer>();
-        if (sr != null) sr.enabled = !Got;
+        if (sr != null) sr.enabled = shown;
         var col = GetComponent<Collider2D>();
-        if (col != null) col.enabled = !Got;
+        if (col != null) col.enabled = shown;
     }
 
     public string GetPrompt() => Got || taking ? "" : "E: 빛나는 이빨 줍기";
@@ -40,6 +53,7 @@ public class SobekHiddenPickup : MonoBehaviour, IInteractable
             SobekStory.SetFlag(gotFlag);
             taking = false;
             Refresh();
+            AnubisToast.Show("소베크의 이빨을 얻었다.", 2.5f); // [추가] 얻은 것을 알 수 있게
             Debug.Log("[SobekHiddenPickup] 히든 아이템 획득: 소베크의 이빨", this);
             SobekStory.Say(afterLines);
         });

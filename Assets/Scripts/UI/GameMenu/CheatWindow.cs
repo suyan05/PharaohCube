@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // [추가] 치트키 창 (설정 창의 "치트키" 버튼 -> 이 창, 게임 중 일시 정지 메뉴에서 연 설정에서만 보임)
-// 버튼 11개 (2줄 격자): 서브 퍼즐 완료 / 소베크 메인 완료 / 모든 메인 완료 / 다음 스테이지 / 비석 해석 / 횃불 / 아이템 전부 / 라 F9 / 라 F10 / 이속 +5 / 이속 원래대로
+// 버튼 12개 (2줄 격자): 서브 퍼즐 완료 / 소베크 메인 완료 / 모든 메인 완료 / 다음 스테이지 / 비석 해석 / 횃불 / 아이템 전부 / 라 F9 / 라 F10 / 이속 +5 / 이속 원래대로
 // - 방을 바꾸는 치트(서브 퍼즐 완료, 소베크 메인 완료, 모든 메인 완료, 다음 스테이지, 라 밤 전환): 창·설정·일시 정지를 모두 닫고 다음 프레임에 실행
 // - 나머지: 창을 연 채로 바로 실행 (여러 개 연달아 누를 수 있음), 결과는 화면 위 알림
 // 치트 내용은 GameCheats, 끄려면 GameCheats.AllowInBuild = false
@@ -64,6 +64,7 @@ public class CheatWindow : MonoBehaviour
         Add(grid, "RaPhase", "cheat.raphase", GameCheats.RaPhase, false);
         Add(grid, "Speed", "cheat.speed", GameCheats.SpeedUp, false);
         Add(grid, "SpeedReset", "cheat.speedreset", GameCheats.SpeedReset, false);
+        Add(grid, "Cards", "cheat.cards", GameCheats.UnlockAllCards, false); // [추가] 수첩 카드 전부
 
         status = MenuUI.Text("Status", panel.transform, null, 26f, th.textColor, TextAlignmentOptions.Center);
         MenuUI.Size(status, 0f, 40f);

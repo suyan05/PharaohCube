@@ -19,6 +19,7 @@ using UnityEngine.UI;
 // - 아이템 전부 지급: 아이템 목록(ItemCatalog)에 있는 것 + 라·호루스·소베크·아누비스 아이템 전부
 // - 라 방 F9 / F10: 밤으로 전환 / 지금 낮·밤 보기 (RaPhaseDebug를 잠깐 붙여서 부름)
 // - 이동 속도 +5: 누를 때마다 +5, 씬이 바뀌어도 유지 ("원래대로"로 0)
+// - 수첩 카드 모두 수집: 고고학 수첩의 유물 카드를 전부 해금 (획득 알림 없이 한꺼번에)
 // 빌드에서 끄려면 AllowInBuild = false (에디터에서는 항상 켜짐)
 public static class GameCheats
 {
@@ -287,6 +288,14 @@ public static class GameCheats
             Debug.Log($"[GameCheats] 이동 속도 {mark.baseSpeed} + {SpeedBonus} = {mark.baseSpeed + SpeedBonus}", p);
         }
         return n;
+    }
+
+    // ================= 8) 수첩 카드 모두 수집 =================
+    public static void UnlockAllCards()
+    {
+        int n = AchievementSystem.UnlockAllSilently();
+        if (n < 0) { CheatRunner.Toast("이 씬에는 고고학 수첩(업적)이 없습니다"); return; }
+        CheatRunner.Toast(n > 0 ? $"[치트] 수첩 카드 {n}장 해금 -> J로 확인 (전체 {AchievementData.All.Count}장)" : "수첩 카드는 이미 모두 모았습니다");
     }
 
     // ================= 도우미 =================

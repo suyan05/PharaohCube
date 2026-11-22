@@ -77,7 +77,19 @@ public static class AchievementData
         l.Add(murals);
         l.Add(Any("ACH_HOR_NEST", "호루스", "매의 둥지", "푸른 매 깃털", AchGrade.Bronze, "갈대숲에 숨겨진 아이는 밤마다 별을 헤아렸다.", "???", "F_HO_NEST_VAULT"));
         l.Add(Any("ACH_HOR_CLEAR", "호루스", "호루스의 눈", "우자트 부적", AchGrade.Bronze, "상처에서 다시 온전해진 눈. 지키고 되살리는 힘의 상징.", "매의 방을 끝내자", "F_HO_FINALE"));
-        l.Add(Any("ACH_SOB_CLEAR", "소베크", "나일의 주인", "악어 신 소베크 상", AchGrade.Bronze, "나일의 물과 비옥함을 다스리던 악어 머리의 신.", "물의 방을 끝내자"));
+        // [추가] 소베크 (플래그: SobekIds - 서브 F_SOBEK_S1~S4_CLEAR, 벽화 F_SO_MURAL_1~4, 숨은 길 F_SO_VAULT_WALKED, 메인 F_SOBEK_MAIN_DONE)
+        l.Add(Any("ACH_SOB_S1", "소베크", "소용돌이를 건넌 자", "청보라 소용돌이 부적", AchGrade.Papyrus, "태초의 물은 도는 물이다. 소용돌이의 방향을 아는 자만 건너간다.", "소용돌이 섬", "F_SOBEK_S1_CLEAR"));
+        l.Add(Any("ACH_SOB_S2", "소베크", "악어의 등", "붉은 악어 부적", AchGrade.Papyrus, "물가에 놓인 소베크의 알이 악어를 부른다. 악어는 강을 건너는 다리가 되었다.", "악어 등 다리", "F_SOBEK_S2_CLEAR"));
+        l.Add(Any("ACH_SOB_S3", "소베크", "범람과 건기", "푸른 수위 부적", AchGrade.Papyrus, "물이 차면 땅이 잠기고, 물이 빠지면 길이 열린다. 범람은 벼도 길도 되었다.", "범람하는 나일", "F_SOBEK_S3_CLEAR"));
+        l.Add(Any("ACH_SOB_S4", "소베크", "두 개의 수면", "초록 거울 부적", AchGrade.Papyrus, "한 신전에 두 신이 산다. 왼쪽과 오른쪽은 서로의 물그림자다.", "두 개의 수면", "F_SOBEK_S4_CLEAR"));
+        AchievementDef sobMurals = Any("ACH_SOB_MURAL", "소베크", "물의 주인 이야기", "전실 벽화 네 폭", AchGrade.Papyrus, "땀에서 흐른 나일, 태초의 알, 강을 삼킨 뱀, 그리고 잠긴 문.", "신전 전실의 벽");
+        sobMurals.allFlags = new[] { "F_SO_MURAL_1", "F_SO_MURAL_2", "F_SO_MURAL_3", "F_SO_MURAL_4" };
+        l.Add(sobMurals);
+        l.Add(Any("ACH_SOB_CLEAR", "소베크", "나일의 주인", "악어 신 소베크 상", AchGrade.Bronze, "나일의 물과 비옥함을 다스리던 악어 머리의 신.", "물의 방을 끝내자", "F_SOBEK_MAIN_DONE"));
+        l.Add(Any("ACH_SOB_VAULT", "소베크", "페트수코스의 길", "악어 미라", AchGrade.Bronze, "신전 연못의 악어는 소베크의 아들로 섬겨졌고, 죽으면 미라가 되어 다음 악어에게 자리를 물려주었다.", "???", "F_SO_VAULT_WALKED"));
+        AchievementDef tooth = Any("ACH_SOB_TOOTH", "소베크", "놓지 않는 이빨", "소베크의 이빨", AchGrade.Bronze, "한 번 물면 놓지 않는다. 심판의 자리에서도 한 번 더 버티게 해 준다.", "???");
+        tooth.allItems = new[] { "ITEM_SOBEK_TOOTH" };
+        l.Add(tooth);
         l.Add(Any("ACH_ANU_CLEAR", "아누비스", "마음의 무게", "심장의 무게 달기 파피루스", AchGrade.Bronze, "죽은 자의 심장을 깃털과 달아본다. 가벼우면 영원한 삶으로, 무거우면 암무트에게.", "저울 앞에 서라"));
     }
 

@@ -57,8 +57,8 @@ bm.GLYPHS = ["sun", "ankh", "eye", "water", "reed", "bread", "snake", "star", "w
 
 
 # ================= 인물·동물 =================
-def sobek_god(pen, x, y, h, face=1, item="was", crown=True):
-    """악어 머리 신 소베크 (서 있는 옆모습). x,y = 발 밑, h = 머리 꼭대기까지"""
+def sobek_god(pen, x, y, h, face=1, item="was", crown=True, head_kind="croc"):
+    """악어 머리 신 소베크 (서 있는 옆모습). x,y = 발 밑, h = 머리 꼭대기까지. head_kind="jackal"이면 아누비스"""
     P = lambda pts: place(pts, x, y, h, face)
     # 뒤로 내린 팔 + 앙크
     pen.thick(P([(-0.05, -0.70), (-0.10, -0.52), (-0.09, -0.42)]), SKIN, h * 0.035)
@@ -99,6 +99,9 @@ def sobek_god(pen, x, y, h, face=1, item="was", crown=True):
         pen.line([bot, (bot[0] - h * 0.025, bot[1] + h * 0.01)], GOLD_D, 2)
         pen.line([bot, (bot[0] + h * 0.025, bot[1] + h * 0.01)], GOLD_D, 2)
     pen.ellipse(sx, sy, h * 0.02, h * 0.02, SKIN, INK, 1.5)
+    if head_kind == "jackal":
+        jackal_head(pen, P, h)
+        return
     # 악어 머리 (긴 주둥이)
     head = [(-0.06, -0.88), (-0.03, -0.96), (0.04, -0.97), (0.10, -0.93), (0.30, -0.885), (0.315, -0.865), (0.30, -0.85),
             (0.12, -0.835), (0.05, -0.80), (-0.02, -0.78), (-0.06, -0.80)]
@@ -118,6 +121,42 @@ def sobek_god(pen, x, y, h, face=1, item="was", crown=True):
             pen.poly(P([(dx - 0.012, -0.96), (dx + 0.012, -0.96), (dx + 0.02, -1.18), (dx - 0.005, -1.20)]), WHITE, INK, 1.5)
         cx, cy = P([(0.02, -1.0)])[0]
         pen.ellipse(cx, cy, h * 0.045, h * 0.045, RED, INK, 2)
+
+
+JACKAL = (34, 30, 40, 255)
+
+
+def jackal_head(pen, P, h):
+    """자칼 머리 (검은 몸, 뾰족한 귀, 긴 주둥이, 금 눈)"""
+    head = [(-0.06, -0.86), (-0.05, -0.93), (-0.03, -1.10), (0.0, -0.95), (0.03, -0.96), (0.06, -1.10), (0.075, -0.92),
+            (0.20, -0.885), (0.215, -0.87), (0.19, -0.855), (0.08, -0.835), (0.04, -0.80), (-0.02, -0.78), (-0.06, -0.80)]
+    pen.poly(P(head), JACKAL, INK, 2.5)
+    pen.poly(P([(-0.02, -1.03), (0.0, -0.96), (-0.03, -0.96)]), (120, 60, 70, 255), None, 0)
+    ex, ey = P([(0.07, -0.90)])[0]
+    pen.ellipse(ex, ey, h * 0.014, h * 0.009, GOLD, INK, 1.2)
+    pen.line(P([(0.10, -0.86), (0.20, -0.865)]), (90, 80, 100, 255), 1.5)
+
+
+def balance_scale(pen, cx, base, h, tilt=0.0):
+    """심장의 저울: 기둥 + 가로대 + 접시 두 개 (왼쪽 심장, 오른쪽 깃털). tilt = 왼쪽 접시가 내려간 정도 (-1~1)"""
+    pen.rect(cx - h * 0.04, base - h * 0.85, cx + h * 0.04, base, GOLD, INK, 2.5)
+    pen.rect(cx - h * 0.16, base - h * 0.06, cx + h * 0.16, base, GOLD_D, INK, 2.5)
+    top = base - h * 0.85
+    dy = h * 0.08 * tilt
+    lx, rx = cx - h * 0.45, cx + h * 0.45
+    pen.thick([(lx, top + dy), (rx, top - dy)], GOLD, h * 0.025, INK, 2)
+    pen.ellipse(cx, top, h * 0.05, h * 0.05, GOLD, INK, 2)
+    for x, yy, item in ((lx, top + dy, "heart"), (rx, top - dy, "feather")):
+        pan_y = yy + h * 0.38
+        pen.line([(x, yy), (x - h * 0.12, pan_y)], INK, 2)
+        pen.line([(x, yy), (x + h * 0.12, pan_y)], INK, 2)
+        pen.d.pieslice([(x - h * 0.15) * SS, (pan_y - h * 0.06) * SS, (x + h * 0.15) * SS, (pan_y + h * 0.08) * SS], 0, 180, fill=GOLD, outline=INK, width=2 * SS)
+        if item == "heart":
+            pen.ellipse(x, pan_y - h * 0.05, h * 0.06, h * 0.05, RED, INK, 2)
+            pen.thick([(x - h * 0.02, pan_y - h * 0.09), (x - h * 0.03, pan_y - h * 0.13)], RED, h * 0.015, INK, 1)
+        else:
+            pen.poly([(x, pan_y - h * 0.01), (x - h * 0.03, pan_y - h * 0.14), (x, pan_y - h * 0.26), (x + h * 0.03, pan_y - h * 0.14)], WHITE, INK, 2)
+            pen.line([(x, pan_y - h * 0.01), (x, pan_y - h * 0.25)], LINEN_D, 1.5)
 
 
 def crocodile(pen, x, y, L, face=1, color=CROC, mouth=0.0):
@@ -309,6 +348,50 @@ def scene4():
 
 
 SCENES = [scene1, scene2, scene3, scene4]
+
+
+# ================= 떠나기 전 이야기 (소베크 마무리 2장면) =================
+def ending1():
+    """다시 흐르는 강: 강물이 돌아오고 태양의 배가 다시 떠오름, 하늘에 소베크-라의 원반, 곁에 페트수코스"""
+    bg = bm.wall_base(71)
+    pen = Pen(bg)
+    bm.cracks(pen, 71)
+    bm.borders(pen)
+    # 마른 강바닥
+    pen.rect(22, 560, W - 22, 700, (196, 156, 98, 255), None, 0)
+    bm.ground(pen, 560)
+    bm.glyph_panel(pen, 52, 64, 2, 4, 54, 71)
+    river = blank(); waves(Pen(river), 22, W - 22, 530, 700, NILE, NILE_L, 26, 6)
+    boat = blank(); bm.solar_boat(Pen(boat), 560, 540, 400)
+    sun = blank(); sp = Pen(sun)
+    bm.sun_disk(sp, 760, 190, 70)
+    rays(sun, 760, 190, 90, 190, 16, (255, 220, 140, 150))
+    croc = blank(); crocodile(Pen(croc), 1000, 610, 300, -1, mouth=0.4)
+    reeds = blank(); rp = Pen(reeds)
+    for i, x in enumerate(range(60, 300, 26)):
+        papyrus(rp, x, 560, 90 + (i % 3) * 18)
+    return bg, {"river": river, "reeds": reeds, "sun": sun, "boat": boat, "croc": croc}
+
+
+def ending2():
+    """심장의 저울: 물 밑에서 드러난 문 너머, 자칼 머리 아누비스와 심장·깃털의 저울"""
+    bg = bm.wall_base(72, night=True)
+    pen = Pen(bg)
+    bm.cracks(pen, 72)
+    bm.borders(pen)
+    bm.stars(pen, 72, 40, 160, 12)
+    bm.ground(pen, 600)
+    bm.glyph_panel(pen, W - 52 - 2 * 54, 64, 2, 5, 54, 72)
+    door = blank(); dp = Pen(door)
+    dp.poly([(120, 600), (150, 250), (420, 250), (450, 600)], (150, 110, 70, 255), INK, 3)
+    dp.rect(200, 330, 370, 600, (40, 30, 26, 255), INK, 3)
+    scale = blank(); balance_scale(Pen(scale), 760, 598, 360, tilt=0.0)
+    anubis = blank(); sobek_god(Pen(anubis), 1040, 598, 380, face=-1, item="was", crown=False, head_kind="jackal")
+    glow = blank(); rays(glow, 760, 330, 40, 200, 12, (255, 230, 170, 110))
+    return bg, {"door": door, "glow": glow, "scale": scale, "anubis": anubis}
+
+
+ENDINGS = [ending1, ending2]
 PLAYER_X = [1120, 1130, 130, 1170]   # 올려다보는 장면에서 플레이어가 설 자리 (핵심 그림을 가리지 않게)
 PATCHES = [[(1100, 120), (180, 560), (760, 200)], [(150, 520), (1120, 140), (560, 200)],
            [(200, 160), (700, 230), (1150, 620)], [(1120, 140), (420, 200), (150, 540)]]
@@ -416,6 +499,15 @@ def main():
             pv.alpha_composite(player, (int(PLAYER_X[i - 1] - player.width / 2), int(474.5 - player.height / 2)))
             previews.append((clean, pv))
         print(f"벽화 {i}: 조각 {len(layers)}개")
+    for i, fn in enumerate(ENDINGS, start=1):
+        bg, layers = fn()
+        art = f"SobekE{i}"
+        save_bg(bg, art)
+        for name, img in layers.items():
+            save_layer(img, art, name, positions)
+        if PREVIEW:
+            finish(bm.composite(bg, list(layers.values()))).convert("RGB").save(PREVIEW.replace(".png", f"_E{i}.png"))
+        print(f"마무리 {i}: 조각 {len(layers)}개")
     write_cs(positions)
     print("위치표:", OUT_CS)
     if PREVIEW and previews:

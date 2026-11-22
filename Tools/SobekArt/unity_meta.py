@@ -116,6 +116,8 @@ TextureImporter:
 def write_meta(png_path, kind="texture", ppu=32, pivot=(0.5, 0.5), point=True, repeat=False, border=(0, 0, 0, 0)):
     meta = png_path + ".meta"
     guid = uuid.uuid4().hex
+    if os.path.exists(meta) and not os.environ.get("SOBEK_META_REWRITE"):
+        return None  # 이미 있으면 그대로 둠 (Unity에서 바꾼 설정·연결 유지). 다시 쓰려면 SOBEK_META_REWRITE=1
     if os.path.exists(meta):
         m = re.search(r"guid: ([0-9a-f]{32})", open(meta, encoding="utf-8").read())
         if m:

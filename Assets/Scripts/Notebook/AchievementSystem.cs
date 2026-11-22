@@ -65,6 +65,23 @@ public class AchievementSystem : MonoBehaviour
         Unlocked?.Invoke(def);
     }
 
+    // [추가] 치트키 "수첩 카드 모두 수집": 남은 카드를 한꺼번에 해금 (획득 알림은 띄우지 않음, 수첩에 새 카드 표시는 남김)
+    public static int UnlockAllSilently()
+    {
+        if (Instance == null) return -1;
+        int n = 0;
+        foreach (AchievementDef a in AchievementData.All)
+        {
+            if (Instance.unlocked.Contains(a.id)) continue;
+            Instance.unlocked.Add(a.id);
+            Instance.fresh.Add(a.id);
+            n++;
+        }
+        if (n > 0) Instance.Save();
+        Debug.Log($"[AchievementSystem] 치트: 카드 {n}장 해금 (전체 {AchievementData.All.Count}장)");
+        return n;
+    }
+
     public bool IsUnlocked(string id) => unlocked.Contains(id);
 
     public bool IsNew(string id) => fresh.Contains(id);
