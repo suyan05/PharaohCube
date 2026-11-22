@@ -350,6 +350,9 @@ public class DialogueBox : MonoBehaviour
         if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
         RectTransform root = UIBuild.CreateCanvas(transform, "DialogueCanvas", sortingOrder, out canvasGo);
+        // [추가] 화면 비율이 넓거나 Game 창이 낮아도 대화창이 아래로 잘리지 않게 세로 기준으로 맞춤
+        var dialogueScaler = canvasGo.GetComponent<UnityEngine.UI.CanvasScaler>();
+        if (dialogueScaler != null) dialogueScaler.matchWidthOrHeight = 1f;
         BuildBox(root);
         BuildChoicePanel(root);
         canvasGo.SetActive(false);

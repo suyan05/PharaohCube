@@ -231,7 +231,10 @@ public class BastetCatGuide : MonoBehaviour
     {
         float b = bodyVis * reachFade;
         body.color = new Color(1f, 1f, 1f, b);
-        eyes.color = new Color(eyeColor.r, eyeColor.g, eyeColor.b, eyeVis * Mathf.Max(reachFade, 0.6f));
+        // [수정] 고양이 몸이 보이면 눈빛은 숨김 (몸이 사라질 때만 어둠 속 눈이 보이게, 그림 눈과 겹치지 않게)
+        float eyeAlone = 1f - Mathf.Clamp01(bodyVis);
+        eyes.color = new Color(eyeColor.r, eyeColor.g, eyeColor.b, eyeVis * eyeAlone * Mathf.Max(reachFade, 0.6f));
+        eyes.flipX = body.flipX; // [추가] 왼쪽을 볼 때 눈도 같이 뒤집기 (눈만 옆에 떠 있던 문제)
         if (eyeLight != null) eyeLight.intensity = eyeLightIntensity * eyeVis * (eyes.enabled ? 1f : 0.3f);
     }
 

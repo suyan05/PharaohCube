@@ -234,6 +234,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
     // 달 단계: 석상 눈이 1번씩 빛남
     private IEnumerator ShowMoon()
     {
+        SetDisc(false); // [추가] 달 단계를 다시 보여 줄 때도 원반은 항상 달
         state = State.Showing;
         AllOffEyes();
         yield return waitBefore;
@@ -408,6 +409,7 @@ public class BastetSunMoonWalk : BastetWalkPuzzleBase, IBastetStatueOwner
         if (discRenderer == null) return;
         Sprite s = sun ? sunDiscSprite : moonDiscSprite;
         if (s != null) discRenderer.sprite = s;
+        Debug.Log($"[BastetB5] 신상 원반 -> {(sun ? "해" : "달")} ({(s != null ? s.name : "그림 없음")})", this);
     }
 
     private Color EyeColor(int i) => data.MoonUsesButtonColors ? data.ButtonColor(i) : data.MoonEyeColor;

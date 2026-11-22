@@ -130,6 +130,7 @@ public static class BastetTeamArtSwap
 
         // 4) 상태 그림 연결
         int states = LinkStates(log);
+        states += FillHudIcons(log);
 
         EditorSceneManager.MarkAllScenesDirty();
         AssetDatabase.SaveAssets();
@@ -207,6 +208,13 @@ public static class BastetTeamArtSwap
             EditorUtility.SetDirty(sr);
             n++;
         }
+        // [수정] 메뉴를 다시 눌러도 맞추도록: 이미 아트 그림인 몸통도 모두 포함
+        foreach (var sr in Object.FindObjectsByType<SpriteRenderer>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (!sr.gameObject.scene.IsValid() || sr.sprite == null || bodies.Contains(sr)) continue;
+            if (sr.name == "Eyes" || sr.name == "Glow" || sr.name == "Disc") continue;
+            if (AssetDatabase.GetAssetPath(sr.sprite).StartsWith(TeamW)) bodies.Add(sr);
+        }
         // 눈 빛 자식 위치 = (눈 그림 기준점 - 몸 그림 기준점), 신상 원반 = 몸 위
         foreach (SpriteRenderer body in bodies)
         {
@@ -222,7 +230,15 @@ public static class BastetTeamArtSwap
             if (d != null && body.sprite != null)
             {
                 Undo.RecordObject(d, "원반 위치");
-                d.localPosition = new Vector3(0f, body.sprite.bounds.max.y + 0.15f, 0f);
+                if (body.sprite.name == "Bastet_Obj_Shrine_Sleep")
+                {
+                    // [수정] 하연 님 신상은 머리 위에 원반 자리(어두운 원)가 그려져 있음 -> 그 자리에 해/달을 겹침
+                    //        원반 자리 가운데 = 그림 (49.5, 96.5)px, 지름 24px (해/달 그림 32px -> 0.75배)
+                    Vector2 slot = (new Vector2(49.5f, 96.5f) - body.sprite.pivot) / body.sprite.pixelsPerUnit;
+                    d.localPosition = new Vector3(slot.x, slot.y, 0f);
+                    d.localScale = Vector3.one * 0.75f;
+                }
+                else d.localPosition = new Vector3(0f, body.sprite.bounds.max.y + 0.15f, 0f);
             }
             var box = body.GetComponent<BoxCollider2D>();
             if (box != null && body.sprite != null && !body.sprite.name.StartsWith("Bastet_Obj_SealStone") && box.offset.y > 0.01f)
@@ -339,6 +355,34 @@ public static class BastetTeamArtSwap
             n++;
             log.AppendLine($"- 검은 고양이 {cat.name}: 쉬는 그림 + 걷기 2프레임 (예림 님 A-02)");
         }
+        return n;
+    }
+
+    // [추가] 왼쪽 아래 소지품 바(InventoryHUD): 아이콘 칸이 비어 이름 글자만 나오던 것 -> 아이템 목록(ItemCatalog)의 아이콘
+    private static int FillHudIcons(StringBuilder log)
+    {
+        ItemCatalog catalog = Resources.Load<ItemCatalog>("ItemCatalog");
+        if (catalog == null) { log.AppendLine("- 소지품 바: Resources/ItemCatalog 없음"); return 0; }
+        int n = 0;
+        foreach (var hud in Object.FindObjectsByType<InventoryHUD>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (!hud.gameObject.scene.IsValid()) continue;
+            var so = new SerializedObject(hud);
+            SerializedProperty list = so.FindProperty("entries");
+            if (list == null) continue;
+            for (int i = 0; i < list.arraySize; i++)
+            {
+                SerializedProperty e = list.GetArrayElementAtIndex(i);
+                SerializedProperty icon = e.FindPropertyRelative("icon");
+                string id = e.FindPropertyRelative("itemId").stringValue;
+                if (icon.objectReferenceValue != null || !catalog.TryGet(id, out ItemDefinition def) || def.icon == null) continue;
+                icon.objectReferenceValue = def.icon;
+                n++;
+                log.AppendLine($"- 소지품 바 {id}: 아이콘 {def.icon.name}");
+            }
+            so.ApplyModifiedProperties();
+        }
+        if (n == 0) log.AppendLine("- 소지품 바: 바꿀 아이콘 없음 (이미 있거나 목록에 아이콘이 없음)");
         return n;
     }
 
