@@ -1,0 +1,125 @@
+using System.Collections;
+using UnityEngine;
+using UnityEngine.UI;
+
+// 토트의 방 큰 연출 3개 (ThothDirector가 차례로 부름)
+public static class ThothCutscenes
+{
+    // ================= 처음 들어옴 =================
+    public static IEnumerator Intro(ThothDirector d)
+    {
+        Cine.Begin(true);
+        Transform player = CineActor.Player();
+        Vector3 top = d.Skylight.position + Vector3.up * 2f;
+        Vector3 end = player != null ? player.position : top;
+        CineCamera.Focus(top);
+        CineCamera.Zoom(8f, 0f);
+        CineCamera.SnapZoom();
+        GameAudio.Play("sfx_dream_shimmer", 0.5f, 0.7f);
+        Cine.Run(TitleCardUI.Show("토트의 방", "달의 서고 - 밤의 여섯째 시간", 2.4f));
+        yield return CineShots.Crane(top, end + Vector3.up * 0.8f, 8f, 5f, 3.2f);
+        yield return Cine.Wait(0.4f);
+        yield return Cine.Say(ThothLines.Intro);
+        ThothState.Set(ThothIds.Intro);
+        CineCamera.Release();
+        Cine.End();
+    }
+
+    // ================= 달 시계를 맞춤 -> 달빛 + 벽감이 열림 =================
+    public static IEnumerator Reveal(ThothDirector d)
+    {
+        Cine.Begin(true);
+        CineCamera.Focus(d.Skylight.position);
+        CineCamera.Zoom(5f, 0.8f);
+        GameAudio.Play("sfx_dream_shimmer", 0.7f, 1f);
+        yield return Cine.Wait(0.6f);
+        for (float t = 0f; t < 1.6f && !Cine.Skipping; t += Time.deltaTime)
+        {
+            d.SetBeam(t / 1.6f);
+            yield return null;
+        }
+        d.SetBeam(1f);
+        yield return LiftSlab(d);
+        ThothState.Set(ThothIds.RevealDone);
+        CineCamera.Focus(d.Skylight.position);
+        yield return Cine.Wait(0.6f);
+        yield return Cine.Say(ThothLines.DialReveal);
+        yield return Cine.Say(ThothLines.FragDial);
+        yield return ThothFrescoWall.GrantPopup(ThothIds.MoonFrag(2));
+        CineCamera.Release();
+        Cine.End();
+    }
+
+    private static IEnumerator LiftSlab(ThothDirector d)
+    {
+        if (d.Slab == null) yield break;
+        CineCamera.Focus(d.Slab.position);
+        yield return Cine.Wait(0.5f);
+        GameAudio.Play("sfx_th_stone", 0.9f);
+        GameAudio.Play("sfx_rumble", 0.6f);
+        CineCamera.Shake(1.2f, 0.1f);
+        SpriteRenderer sr = d.Slab.GetComponentInChildren<SpriteRenderer>();
+        Vector3 from = d.Slab.position;
+        for (float t = 0f; t < 1.4f && !Cine.Skipping; t += Time.deltaTime)
+        {
+            float u = t / 1.4f;
+            d.Slab.position = from + Vector3.up * (u * 1.6f);
+            if (sr != null) sr.color = new Color(1f, 1f, 1f, 1f - u);
+            yield return null;
+        }
+        d.OpenSlabNow();
+    }
+
+    // ================= 주문 완성 -> 문이 열리고 토트 =================
+    public static IEnumerator Finale(ThothDirector d)
+    {
+        Cine.Begin(true);
+        if (d.Gate != null) CineCamera.Focus(d.Gate.transform.position);
+        CineCamera.Zoom(4f, 0.8f);
+        yield return Cine.Wait(0.6f);
+        GameAudio.Play("sfx_rumble", 0.8f);
+        CineCamera.Shake(1.4f, 0.14f);
+        yield return Cine.Wait(0.8f);
+        if (d.Gate != null) d.Gate.Refresh();
+        GameAudio.Play("sfx_th_chime", 0.9f, 0.7f);
+        yield return Cine.Say(ThothLines.FinaleOpen);
+        yield return ShowThoth();
+        yield return ThothFrescoWall.GrantPopup(ThothIds.Plate);
+        yield return ThothFrescoWall.GrantPopup(ThothIds.Amulet);
+        ThothState.Set(ThothIds.Done);
+        d.SetGlobal(d.GlobalBright);
+        yield return Cine.Say(ThothLines.FinaleAfter);
+        CineCamera.Release();
+        Cine.End();
+    }
+
+    // 토트 일러스트를 화면 가득 띄우고 대사 (대사창은 그 위에 뜸)
+    private static IEnumerator ShowThoth()
+    {
+        RectTransform root = UIBuild.CreateCanvas(null, "ThothIllust", 92, out GameObject go);
+        Image black = UIBuild.Stretch(root, "Black").gameObject.AddComponent<Image>();
+        black.color = new Color(0f, 0f, 0f, 0f);
+        Image art = UIBuild.Stretch(root, "Art").gameObject.AddComponent<Image>();
+        art.sprite = ThothState.Art("UI/UI_Illust");
+        art.preserveAspect = true;
+        art.color = new Color(1f, 1f, 1f, 0f);
+        GameAudio.Play("sfx_dream_shimmer", 0.8f, 0.6f);
+        yield return FadeIllust(black, art, 0f, 1f, 1f);
+        yield return Cine.Say(ThothLines.FinaleThoth);
+        yield return FadeIllust(black, art, 1f, 0f, 0.8f);
+        Object.Destroy(go);
+    }
+
+    private static IEnumerator FadeIllust(Image black, Image art, float from, float to, float seconds)
+    {
+        for (float t = 0f; t < seconds && !Cine.Skipping; t += Time.deltaTime)
+        {
+            float a = Mathf.Lerp(from, to, t / seconds);
+            black.color = new Color(0f, 0f, 0f, a * 0.9f);
+            art.color = new Color(1f, 1f, 1f, a);
+            yield return null;
+        }
+        black.color = new Color(0f, 0f, 0f, to * 0.9f);
+        art.color = new Color(1f, 1f, 1f, to);
+    }
+}
