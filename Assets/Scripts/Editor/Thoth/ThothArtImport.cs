@@ -33,16 +33,33 @@ public class ThothArtImport : AssetPostprocessor
         }
     }
 
-    // 이미 들어와 있던 그림에 설정을 다시 적용 (빌더가 처음에 부름)
+    // [수정] 그림을 스프라이트로 못 읽으면 강제로 다시 가져옴 (빌더가 처음에 부름 + 메뉴)
+    // - 그림이 이 스크립트보다 먼저 들어오면 처음 가져올 때 이 설정이 안 들어가서 스프라이트가 없었음 -> 맵, 물건이 다 안 보였음
+    [MenuItem("PharaohCube/Thoth/토트 그림 다시 가져오기")]
     public static void ReimportAll()
     {
-        string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Resources/Thoth" });
-        foreach (string g in guids)
+        int fixedCount = 0;
+        foreach (string p in TexturePaths())
+        {
+            if (AssetDatabase.LoadAssetAtPath<Sprite>(p) != null) continue;
+            AssetDatabase.ImportAsset(p, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+            fixedCount++;
+        }
+        AssetDatabase.Refresh();
+        int still = 0;
+        foreach (string p in TexturePaths()) if (AssetDatabase.LoadAssetAtPath<Sprite>(p) == null) still++;
+        Debug.Log($"[토트 그림] 다시 가져옴 {fixedCount}개 / 아직 스프라이트가 아닌 그림 {still}개");
+    }
+
+    private static System.Collections.Generic.List<string> TexturePaths()
+    {
+        var list = new System.Collections.Generic.List<string>();
+        foreach (string g in AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Resources/Thoth", "Assets/Resources/Horus/Mural" }))
         {
             string p = AssetDatabase.GUIDToAssetPath(g);
-            TextureImporter imp = AssetImporter.GetAtPath(p) as TextureImporter;
-            if (imp == null || imp.textureType == TextureImporterType.Sprite && imp.spriteImportMode == SpriteImportMode.Single) continue;
-            AssetDatabase.ImportAsset(p, ImportAssetOptions.ForceUpdate);
+            string file = System.IO.Path.GetFileName(p);
+            if (p.StartsWith(Root, StringComparison.Ordinal) || file.StartsWith("MU_ThF", StringComparison.Ordinal) || file.StartsWith("MU_VaultTh", StringComparison.Ordinal)) list.Add(p);
         }
+        return list;
     }
 }
