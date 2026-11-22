@@ -50,6 +50,8 @@ public static class Loc
         { "settings.cheat", new[] { "치트키", "Cheats" } },
         { "cheat.title", new[] { "치트키 (시연, 테스트용)", "Cheats (Demo / Test)" } },
         { "cheat.subs", new[] { "모든 서브 퍼즐 완료", "Clear All Sub Puzzles" } },
+        { "cheat.sobekmain", new[] { "소베크 메인 퍼즐 완료", "Clear Sobek Main Puzzle" } },
+        { "cheat.allmains", new[] { "모든 메인 퍼즐 완료", "Clear All Main Puzzles" } },
         { "cheat.next", new[] { "다음 스테이지로 이동", "Go to Next Stage" } },
         { "cheat.steles", new[] { "비석 모두 해석", "Decode All Steles" } },
         { "cheat.torch", new[] { "횃불 지급", "Give Torch" } },

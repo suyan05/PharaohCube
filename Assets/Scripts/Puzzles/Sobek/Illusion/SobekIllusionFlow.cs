@@ -175,6 +175,15 @@ public class SobekIllusionFlow : MonoBehaviour
         HandleCleared(stages[current].board);
     }
 
+    // [추가] 치트키 "소베크 메인 퍼즐 완료": 남은 구역을 모두 푼 것으로 하고 바로 마무리 (메인 = 소베크 대사 -> 형판·큐브 -> 허브 물 빠짐)
+    public void CheatClearAll()
+    {
+        if (!Application.isPlaying || current < 0 || leaving) return;
+        for (int i = 0; i < stages.Length; i++) SetFlag(StageFlag(i));
+        Debug.Log($"[SobekIllusionFlow] 치트: 구역 {stages.Length}개 모두 클리어 -> {(isMain ? "메인 마무리" : "서브 보상")}", this);
+        StartCoroutine(isMain ? FinishMain() : FinishSub());
+    }
+
     [ContextMenu("테스트: 지금 구역 건너뛰기")]
     private void TestSkip()
     {

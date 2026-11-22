@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 // [추가] 치트키 창 (설정 창의 "치트키" 버튼 -> 이 창, 게임 중 일시 정지 메뉴에서 연 설정에서만 보임)
-// 버튼 9개 (2줄 격자): 서브 퍼즐 완료 / 다음 스테이지 / 비석 해석 / 횃불 / 아이템 전부 / 라 F9 / 라 F10 / 이속 +5 / 이속 원래대로
-// - 방을 바꾸는 치트(서브 퍼즐 완료, 다음 스테이지, 라 밤 전환): 창·설정·일시 정지를 모두 닫고 다음 프레임에 실행
+// 버튼 11개 (2줄 격자): 서브 퍼즐 완료 / 소베크 메인 완료 / 모든 메인 완료 / 다음 스테이지 / 비석 해석 / 횃불 / 아이템 전부 / 라 F9 / 라 F10 / 이속 +5 / 이속 원래대로
+// - 방을 바꾸는 치트(서브 퍼즐 완료, 소베크 메인 완료, 모든 메인 완료, 다음 스테이지, 라 밤 전환): 창·설정·일시 정지를 모두 닫고 다음 프레임에 실행
 // - 나머지: 창을 연 채로 바로 실행 (여러 개 연달아 누를 수 있음), 결과는 화면 위 알림
 // 치트 내용은 GameCheats, 끄려면 GameCheats.AllowInBuild = false
 public class CheatWindow : MonoBehaviour
@@ -37,7 +37,7 @@ public class CheatWindow : MonoBehaviour
     {
         MenuTheme th = MenuUI.Theme;
         MenuUI.FullScreen("Dim", root, th.dimColor);
-        Image panel = MenuUI.Panel("Panel", root, new Vector2(1000f, 820f));
+        Image panel = MenuUI.Panel("Panel", root, new Vector2(1000f, 910f));
         MenuUI.Column(panel.transform, 14f, new RectOffset(50, 50, 36, 36));
 
         TextMeshProUGUI title = MenuUI.Text("Title", panel.transform, "cheat.title", 48f, th.accentColor);
@@ -45,7 +45,7 @@ public class CheatWindow : MonoBehaviour
 
         // 버튼 격자 (2줄)
         RectTransform grid = MenuUI.Rect("Grid", panel.transform);
-        MenuUI.Size(grid, 0f, 5 * 74f + 4 * 14f);
+        MenuUI.Size(grid, 0f, 6 * 74f + 5 * 14f); // [수정] 버튼 11개 -> 6줄
         var g = grid.gameObject.AddComponent<GridLayoutGroup>();
         g.cellSize = new Vector2(440f, 74f);
         g.spacing = new Vector2(20f, 14f);
@@ -54,6 +54,8 @@ public class CheatWindow : MonoBehaviour
         g.childAlignment = TextAnchor.UpperCenter;
 
         first = Add(grid, "Subs", "cheat.subs", GameCheats.ClearSubPuzzles, true);
+        Add(grid, "SobekMain", "cheat.sobekmain", GameCheats.ClearSobekMain, true); // [추가]
+        Add(grid, "AllMains", "cheat.allmains", GameCheats.ClearAllMains, true); // [추가]
         Add(grid, "Next", "cheat.next", GameCheats.NextStage, true);
         Add(grid, "Steles", "cheat.steles", GameCheats.DecodeAllSteles, false);
         Add(grid, "Torch", "cheat.torch", GameCheats.GiveTorch, false);

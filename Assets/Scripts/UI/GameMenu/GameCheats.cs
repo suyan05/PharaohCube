@@ -11,6 +11,8 @@ using UnityEngine.UI;
 // - 모든 서브 퍼즐 완료: 지금 방의 서브 퍼즐을 푼 상태로 -> 바로 메인 퍼즐
 //     라·바스테트·호루스·아누비스 = 사랑님 DemoCheat(T 키)와 같은 처리를 그대로 부름 (그 파일은 안 고침)
 //     소베크 허브 = 서브 4개 클리어 + 부적 4개 + 다리 통나무 모두 열림 / 소베크 퍼즐 씬 = 지금 구역 클리어
+// - 소베크 메인 퍼즐 완료: 메인 퍼즐 씬이면 남은 구역을 모두 풀고 마무리 연출 / 허브면 메인을 깬 상태로 다시 불러와 물 빠짐 연출
+// - 모든 메인 퍼즐 완료: 라(낮·밤)·바스테트·호루스·소베크·아누비스 메인을 모두 깬 상태 + 형판 6장 -> 지금 방을 다시 불러옴
 // - 다음 스테이지로 이동: Build Profiles 씬 목록의 다음 씬 (F12와 같음)
 // - 비석 모두 해석: 씬의 비석들을 읽음·해독한 것으로 + 볼록렌즈
 // - 횃불 지급: 횃불 아이템 + 꺼졌거나 재가 된 횃불을 다시 켬
@@ -79,6 +81,70 @@ public static class GameCheats
         if (flow == null) { CheatRunner.Toast("착시 퍼즐을 찾지 못했습니다"); return; }
         flow.CheatClearCurrent();
         CheatRunner.Toast("[치트] 지금 구역 클리어");
+    }
+
+    // ================= 1-2) 소베크 메인 퍼즐 완료 =================
+    public static void ClearSobekMain()
+    {
+        string scene = SceneManager.GetActiveScene().name;
+        Debug.Log($"[GameCheats] 소베크 메인 퍼즐 완료 ({scene})");
+        if (scene == SobekIds.MainScene)
+        {
+            SobekIllusionFlow flow = UnityEngine.Object.FindFirstObjectByType<SobekIllusionFlow>();
+            if (flow == null) { CheatRunner.Toast("메인 퍼즐을 찾지 못했습니다"); return; }
+            flow.CheatClearAll(); // 소베크 대사 -> 형판 공개·큐브 -> 허브 (물 빠짐)
+            CheatRunner.Toast("[치트] 소베크 메인 퍼즐 완료");
+            return;
+        }
+        if (scene == SobekIds.HubScene)
+        {
+            if (GameManager.Instance != null && GameManager.Instance.HasFlag(SobekIds.FlagMainDone)) { CheatRunner.Toast("소베크 메인 퍼즐은 이미 끝났습니다"); return; }
+            // 서브 4개 + 통나무 + 큰 문에 부적을 넣은 것까지 -> 메인 클리어
+            foreach (string f in SobekIds.AmuletClearFlags) SetFlag(f);
+            foreach (string id in new[] { "S2", "S3", "S4" }) SetFlag($"F_SOBEK_LOCK_{id}_OPEN");
+            SetFlag(SobekIds.FlagDoorOpen);
+            SetFlag(SobekIds.FlagMainADone);
+            for (int i = 0; i < 3; i++) SetFlag("F_SOBEK_MAIN_STAGE_" + i);
+            SetFlag(SobekIds.FlagMainDone);
+            SetFlag(SobekIds.FlagTabletReady);
+            Grant(SobekIds.Plate);
+            CheatRunner.Toast("[치트] 소베크 메인 퍼즐 완료 + 악어 형판 -> 신전의 물이 빠진다");
+            ReloadScene(); // 허브가 메인 클리어 상태로 다시 열리며 물 빠짐 연출
+            return;
+        }
+        CheatRunner.Toast("소베크의 방(허브 또는 메인 퍼즐)에서만 쓸 수 있습니다");
+    }
+
+    // ================= 1-3) 모든 메인 퍼즐 완료 =================
+    // 방마다 "메인을 깼다"로 보는 플래그 (중앙 홀 HallRoute, 각 방 진행 코드 기준)
+    private static readonly string[] MainDoneFlags =
+    {
+        "F_RA_P5_DONE", RaPhaseState.NightFlag, "F_RA_NIGHT_P5_DONE", "F_RA_PLATE_GIVEN", // 라: 낮 메인 -> 밤 -> 밤 메인 -> 태양 형판
+        "F_BASTET_MAIN_DONE", "F_BASTET_PLATE_GIVEN",                                     // 바스테트
+        "F_HO_H5_DONE",                                                                   // 호루스 (H5 호루스의 하늘)
+        SobekIds.FlagDoorOpen, SobekIds.FlagMainADone, SobekIds.FlagMainDone, SobekIds.FlagTabletReady, // 소베크
+        "F_ANUBIS_MAIN_DONE",                                                             // 아누비스 (심판의 저울)
+    };
+    private static readonly string[] AllPlates = { "PLATE_RA", "PLATE_BASTET", "PLATE_THOTH", "PLATE_HORUS", "PLATE_SOBEK", "PLATE_ANUBIS" };
+
+    public static void ClearAllMains()
+    {
+        string scene = SceneManager.GetActiveScene().name;
+        Debug.Log($"[GameCheats] 모든 메인 퍼즐 완료 ({scene})");
+        int set = 0;
+        foreach (string f in MainDoneFlags) if (SetFlagNew(f)) set++;
+        for (int i = 0; i < 3; i++) SetFlag("F_SOBEK_MAIN_STAGE_" + i);
+        int plates = 0;
+        foreach (string id in AllPlates) if (Grant(id)) plates++;
+
+        // 소베크 메인 퍼즐 씬이면 그 자리에서 마무리 연출까지 (형판 공개 -> 허브 물 빠짐)
+        if (scene == SobekIds.MainScene)
+        {
+            SobekIllusionFlow flow = UnityEngine.Object.FindFirstObjectByType<SobekIllusionFlow>();
+            if (flow != null) { flow.CheatClearAll(); CheatRunner.Toast($"[치트] 모든 메인 퍼즐 완료 (플래그 {set}개, 형판 {plates}장)"); return; }
+        }
+        CheatRunner.Toast($"[치트] 모든 메인 퍼즐 완료 (플래그 {set}개, 형판 {plates}장) -> 방을 다시 불러옴");
+        ReloadScene(); // 방이 깬 상태로 다시 정리되게 (중앙 홀이면 큐브·문 상태도)
     }
 
     // ================= 2) 다음 스테이지 =================
@@ -228,6 +294,14 @@ public static class GameCheats
     {
         if (string.IsNullOrEmpty(f) || GameManager.Instance == null) return false;
         if (!GameManager.Instance.HasFlag(f)) GameManager.Instance.SetFlag(f);
+        return true;
+    }
+
+    // 새로 켠 플래그만 true (몇 개 바뀌었는지 알림용)
+    private static bool SetFlagNew(string f)
+    {
+        if (string.IsNullOrEmpty(f) || GameManager.Instance == null || GameManager.Instance.HasFlag(f)) return false;
+        GameManager.Instance.SetFlag(f);
         return true;
     }
 
