@@ -19,6 +19,7 @@ public class ThothArtImport : AssetPostprocessor
             var imp = (TextureImporter)assetImporter;
             bool world = path.StartsWith(Root + "World/", StringComparison.Ordinal);
             imp.textureType = TextureImporterType.Sprite;
+            imp.textureShape = TextureImporterShape.Texture2D; // [수정] 처음 가져올 때 Cube(큐브맵)로 잡혀서 스프라이트가 안 만들어졌었음
             imp.spriteImportMode = SpriteImportMode.Single;
             imp.spritePixelsPerUnit = world ? 32f : 100f;
             imp.filterMode = world ? FilterMode.Point : FilterMode.Bilinear;
@@ -42,7 +43,14 @@ public class ThothArtImport : AssetPostprocessor
         foreach (string p in TexturePaths())
         {
             if (AssetDatabase.LoadAssetAtPath<Sprite>(p) != null) continue;
-            AssetDatabase.ImportAsset(p, ImportAssetOptions.ForceUpdate | ImportAssetOptions.ForceSynchronousImport);
+            TextureImporter imp = AssetImporter.GetAtPath(p) as TextureImporter;
+            if (imp != null)
+            {
+                imp.textureShape = TextureImporterShape.Texture2D;
+                imp.textureType = TextureImporterType.Sprite;
+                imp.spriteImportMode = SpriteImportMode.Single;
+                imp.SaveAndReimport();
+            }
             fixedCount++;
         }
         AssetDatabase.Refresh();
