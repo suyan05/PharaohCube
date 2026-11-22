@@ -62,6 +62,20 @@ public static class MuralArt
         { "Story3/frag5", new Vector2(1103.0f, 312.0f) },
         { "Story4/anubis", new Vector2(267.5f, 440.0f) },
         { "Story4/scale", new Vector2(700.0f, 438.0f) },
+        // [추가] 토트의 방 벽화 3장 + 숨은 방 (th_fresco.py, th_vault.py)
+        { "ThFA/thoth", new Vector2(329.0f, 424.0f) },
+        { "ThFA/baboon", new Vector2(560.0f, 474.5f) },
+        { "ThFA/table", new Vector2(440.0f, 505.5f) },
+        { "ThFB/thoth", new Vector2(371.5f, 432.0f) },
+        { "ThFB/khonsu", new Vector2(909.0f, 432.0f) },
+        { "ThFB/board", new Vector2(640.0f, 530.0f) },
+        { "ThFB/days", new Vector2(640.0f, 360.0f) },
+        { "ThFB/moon", new Vector2(640.5f, 190.5f) },
+        { "ThFC/thoth", new Vector2(366.0f, 350.5f) },
+        { "ThFC/horus", new Vector2(918.5f, 330.0f) },
+        { "ThFC/eye", new Vector2(671.0f, 258.0f) },
+        { "VaultTh/rays", new Vector2(807.0f, 360.0f) },
+        { "VaultTh/player", new Vector2(980.0f, 591.0f) },
     };
 
     public static Vector2 Pos(string art, string layer)

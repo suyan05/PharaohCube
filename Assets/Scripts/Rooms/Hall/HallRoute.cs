@@ -4,6 +4,7 @@ using UnityEngine;
 
 // 신전 하나를 끝내고 중앙 홀로 돌아왔을 때의 정보 (HallTempDirector Inspector의 Routes 칸)
 // 진행 순서: 프롤로그 -> 중앙 홀 -> 라 -> 중앙 홀 -> 바스테트 -> 중앙 홀 -> 토트 -> 호루스 -> 소베크 -> 아누비스
+// [추가] 토트의 방(Puzzle_Thoth_Tilemap)이 빌드 목록에 있으면 바스테트 -> 토트 -> 호루스 순서로 이어짐
 // - clearFlag: 그 신전을 끝냈다는 플래그 (라 = 태양 형판을 받음)
 // - returnedFlag: 돌아온 연출을 이미 봤다는 플래그 (한 번만 보여줌)
 // - nextScene / nextPrompt / objective: 이제 북쪽 문이 어디로 가는지
@@ -26,7 +27,7 @@ public class HallRoute
 
     public static HallRoute[] Defaults()
     {
-        return new[] { Ra(), Bastet(), Horus(), Sobek() }; // [수정] 소베크 추가
+        return new[] { Ra(), Bastet(), Thoth(), Horus(), Sobek() }; // [수정] 소베크 추가 / [추가] 토트 (바스테트 -> 토트 -> 호루스)
     }
 
     // [추가] 씬에 저장된 Routes 칸(예전 기본값)을 지금 순서에 맞춤 (HallTempDirector.Awake에서 부름, 씬 파일은 안 바뀜)
@@ -37,6 +38,8 @@ public class HallRoute
         var list = new List<HallRoute>();
         if (current != null) foreach (HallRoute r in current) if (r != null) list.Add(r);
         bool sobekReady = Application.CanStreamedLevelBeLoaded(SobekScene);
+        bool thothReady = Application.CanStreamedLevelBeLoaded(ThothIds.Scene);
+        if (thothReady) RouteBastetToThoth(list);
         foreach (HallRoute r in list)
         {
             if (r.god == "호루스" && !sobekReady && r.nextScene == SobekScene) { r.nextScene = AnubisScene; r.nextPrompt = "아누비스의 신전으로"; r.objective = "북쪽 문으로 아누비스의 신전에 들어가자"; continue; }
@@ -48,19 +51,63 @@ public class HallRoute
         foreach (HallRoute d in Defaults())
         {
             if (d.god == "소베크" && !sobekReady) continue;
+            if (d.god == "토트" && !thothReady) continue;
             if (list.Exists(r => r.god == d.god || r.clearFlag == d.clearFlag)) continue;
-            list.Add(d);
+            InsertInOrder(list, d); // [수정] 토트는 바스테트 바로 뒤에 (LatestCleared가 순서를 봄)
             Debug.Log($"[HallRoute] 경로 추가: {d.god} (끝 플래그 {d.clearFlag})");
         }
         return list.ToArray();
     }
 
     private const string SobekScene = "Sobek_Hub";
+    private const string HorusScene = "Puzzle_Horus_Tilemap";
+
+    private static void InsertInOrder(List<HallRoute> list, HallRoute d)
+    {
+        int bastet = list.FindIndex(r => r.god == "바스테트");
+        if (d.god == "토트" && bastet >= 0) list.Insert(bastet + 1, d);
+        else list.Add(d);
+    }
+
+    // [추가] 씬에 저장된 바스테트 경로가 아직 호루스로 가면 -> 토트의 방으로 (토트 씬이 빌드 목록에 있을 때만)
+    private static void RouteBastetToThoth(List<HallRoute> list)
+    {
+        foreach (HallRoute r in list)
+        {
+            if (r.god != "바스테트" || r.nextScene != HorusScene) continue;
+            HallRoute b = Bastet();
+            r.nextScene = b.nextScene; r.nextPrompt = b.nextPrompt; r.objective = b.objective; r.cubeLines = b.cubeLines;
+            Debug.Log("[HallRoute] 바스테트 다음 문 -> 토트의 방");
+        }
+    }
+
+    // [추가] 토트를 끝내고 돌아오면 (지혜의 형판, F_TH_DONE) -> 호루스의 방
+    private static HallRoute Thoth()
+    {
+        return new HallRoute
+        {
+            god = "토트",
+            cubeSlot = 2,
+            clearFlag = ThothIds.Done,
+            returnedFlag = "F_HALL_THOTH_RETURNED",
+            faceTitle = "큐브의 세 번째 면 - 달",
+            nextScene = HorusScene,
+            nextPrompt = "호루스의 신전으로",
+            objective = "북쪽 문으로 호루스의 신전에 들어가자",
+            cubeLines = new[]
+            {
+                new DialogueLine("???", "달의 면이 깨어났다."),
+                new DialogueLine("???", "다음 문이 열린다. 하늘을 나는 매, 호루스의 신전이다."),
+                new DialogueLine("나", "토트가 고친 눈... 이 부적을 호루스에게 가져가자.")
+            }
+        };
+    }
     private const string AnubisScene = "Puzzle_Test_Anubis_Tilemap";
 
-    // [수정] 바스테트를 끝내고 돌아오면 -> 호루스의 방 (토트는 아직 준비 중이라 건너뜀, 준비되면 이 사이에 Thoth() 추가)
+    // [수정] 바스테트를 끝내고 돌아오면 -> 토트의 방 (토트 씬이 빌드 목록에 없으면 예전처럼 호루스의 방)
     private static HallRoute Bastet()
     {
+        if (Application.CanStreamedLevelBeLoaded(ThothIds.Scene)) return BastetToThoth();
         return new HallRoute
         {
             god = "바스테트",
@@ -76,6 +123,27 @@ public class HallRoute
                 new DialogueLine("???", "고양이의 면이 깨어났다."),
                 new DialogueLine("???", "다음 문이 열린다. 하늘을 나는 매, 호루스의 신전이다."),
                 new DialogueLine("나", "두 번째 빛... 다음은 호루스.")
+            }
+        };
+    }
+
+    private static HallRoute BastetToThoth()
+    {
+        return new HallRoute
+        {
+            god = "바스테트",
+            cubeSlot = 1,
+            clearFlag = "F_BASTET_MAIN_DONE",
+            returnedFlag = "F_HALL_BASTET_RETURNED",
+            faceTitle = "큐브의 두 번째 면 - 고양이",
+            nextScene = ThothIds.Scene,
+            nextPrompt = "토트의 신전으로",
+            objective = "북쪽 문으로 토트의 신전에 들어가자",
+            cubeLines = new[]
+            {
+                new DialogueLine("???", "고양이의 면이 깨어났다."),
+                new DialogueLine("???", "다음 문이 열린다. 글자와 달을 다스리는 서기관, 토트의 서고다."),
+                new DialogueLine("나", "두 번째 빛... 다음은 토트.")
             }
         };
     }

@@ -59,6 +59,7 @@ public class GameAudioDirector : MonoBehaviour
         else if (scene.Contains("Ra_Tilemap")) GameAudio.Music(RaPhaseState.IsNight ? "bgm_ra_temple_night" : "bgm_ra_temple_day");
         else if (scene.Contains("CentralRoom") || scene.Contains("CentralHall")) GameAudio.Music("bgm_ra_temple_day");
         else if (scene.Contains("Horus")) GameAudio.Music("bgm_horus_temple");
+        else if (scene.Contains("Thoth")) GameAudio.Music("bgm_thoth_library"); // [추가] 토트의 방: 물시계 + 리라 (달의 서고)
     }
 
     private void HandleFlag(string flag)

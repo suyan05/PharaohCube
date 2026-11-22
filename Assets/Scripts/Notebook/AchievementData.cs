@@ -67,9 +67,14 @@ public static class AchievementData
         AchievementDef vessel = Any("ACH_BAS_VESSEL", "바스테트", "향과 기름의 그릇", "설화석고 향유 그릇", AchGrade.Bronze, "바스테트는 향과 기름 그릇을 지키는 여신. 이 그릇에 담긴 불은 오래 탄다.", "???");
         vessel.allItems = new[] { "ITEM_BASTET_VESSEL" };
         l.Add(vessel);
-        l.Add(Any("ACH_THO_1", "토트", "서기관의 손", "서기관 팔레트", AchGrade.Papyrus, "갈대 펜과 먹 두 개(검정, 빨강)를 담는 나무 팔레트. 글을 아는 자는 귀한 대접을 받았다.", "지식의 방 첫 관문"));
-        l.Add(Any("ACH_THO_2", "토트", "달의 셈", "따오기 상", AchGrade.Papyrus, "달을 세는 신 토트의 새. 따오기의 부리는 초승달을 닮았다.", "지식의 방 두 번째 관문"));
-        l.Add(Any("ACH_THO_CLEAR", "토트", "신성문자 해독가", "로제타석", AchGrade.Bronze, "세 가지 글자로 같은 내용을 새긴 돌. 이 돌 덕분에 상형문자를 다시 읽게 됐다.", "지식의 방을 끝내자"));
+        l.Add(Any("ACH_THO_1", "토트", "서기관의 손", "서기관 팔레트", AchGrade.Papyrus, "갈대 펜과 먹 두 개(검정, 빨강)를 담는 나무 팔레트. 글을 아는 자는 귀한 대접을 받았다.", "지식의 방 첫 관문", "F_TH_FA_DONE")); // [추가] 토트: 벽화 A를 되살림
+        l.Add(Any("ACH_THO_2", "토트", "달의 셈", "따오기 상", AchGrade.Papyrus, "달을 세는 신 토트의 새. 따오기의 부리는 초승달을 닮았다.", "지식의 방 두 번째 관문", "F_TH_DIAL_DONE")); // [추가] 토트: 달 시계
+        l.Add(Any("ACH_THO_CLEAR", "토트", "신성문자 해독가", "로제타석", AchGrade.Bronze, "세 가지 글자로 같은 내용을 새긴 돌. 이 돌 덕분에 상형문자를 다시 읽게 됐다.", "지식의 방을 끝내자", "F_TH_DONE"));
+        // [추가] 토트: 벽화 3장 모두 / 숨은 방 '토트의 책'
+        AchievementDef frescoes = Any("ACH_THO_FRESCO", "토트", "부서진 것을 맞추는 자", "채색 벽화 조각", AchGrade.Papyrus, "무너진 벽화의 조각을 하나하나 맞추면 잊힌 이야기가 돌아온다.", "서고의 벽화를 모두 되살리자");
+        frescoes.allFlags = new[] { "F_TH_FA_DONE", "F_TH_FB_DONE", "F_TH_FC_DONE" };
+        l.Add(frescoes);
+        l.Add(Any("ACH_THO_BOOK", "토트", "토트의 책", "토트의 점토판", AchGrade.Bronze, "강 밑 여섯 겹 상자 속의 책. 읽은 자는 가장 소중한 것을 잃는다고 전한다.", "???", "F_TH_HIDDEN_VAULT"));
         // [수정] 호루스 업적에 조건(플래그) 연결 + 벽화/숨은 둥지 업적 추가
         l.Add(Any("ACH_HOR_STAR", "호루스", "별을 잇는 자", "덴데라 천장 별자리판", AchGrade.Papyrus, "신전 천장에 새겨진 하늘 지도. 별은 신들의 길이었다.", "밤하늘의 방", "F_HO_CHART_4"));
         AchievementDef murals = Any("ACH_HOR_MURAL", "호루스", "찢긴 벽화의 기억", "채색 벽화 네 폭", AchGrade.Papyrus, "빼앗긴 왕좌, 갈대숲의 아이, 여든 해의 다툼, 왕관을 쓴 매. 한 신이 왕이 되기까지.", "신전 입구 복도의 벽");
