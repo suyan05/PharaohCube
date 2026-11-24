@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-// 빌드 순서 맞추기: 발굴 현장 -> 스핑크스의 꿈 -> 임시 중앙 홀 -> 라의 방 -> (나머지는 원래 순서 그대로)
+// 빌드 순서 맞추기: 발굴 현장 -> 스핑크스의 꿈 -> 중앙 홀(CentralRoom_Tilemap) -> 라의 방 -> (나머지는 원래 순서 그대로)
 // 메뉴: PharaohCube -> Prologue -> 빌드 순서 맞추기 (임시 중앙 홀 만들기 때도 자동으로 부름)
 // 씬 이동(SceneFlow)은 Build Profiles의 Scene List에 있는 씬만 불러올 수 있어서 필요함
 public static class PrologueBuildOrder
@@ -11,7 +11,7 @@ public static class PrologueBuildOrder
     {
         "Assets/Scenes/Prologue/Prologue_Dig.unity",
         "Assets/Scenes/Prologue/Prologue_Sphinx.unity",
-        CentralRoomBuilder.ScenePath,
+        CentralRoomTilemapSetup.ScenePath, // [수정] 진짜 중앙 홀 (임시 홀 CentralRoomBuilder.ScenePath 대신)
         "Assets/Scenes/Puzzle_Test/Puzzle_Test_Ra_Tilemap.unity"
     };
 
@@ -31,6 +31,6 @@ public static class PrologueBuildOrder
         }
 
         EditorBuildSettings.scenes = result.ToArray();
-        Debug.Log("[PrologueBuildOrder] 빌드 순서: 발굴 현장 -> 스핑크스 -> 중앙 홀(임시) -> 라의 방 -> 나머지");
+        Debug.Log("[PrologueBuildOrder] 빌드 순서: 발굴 현장 -> 스핑크스 -> 중앙 홀 -> 라의 방 -> 나머지");
     }
 }

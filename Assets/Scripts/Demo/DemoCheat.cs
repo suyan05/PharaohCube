@@ -28,7 +28,7 @@ public class DemoCheat : MonoBehaviour
 
     private const KeyCode CheatKey = KeyCode.T;
     private const float Cooldown = 1.5f;
-    private const string HallScene = "CentralRoom_Temp";
+    private const string HallScene = HallScenes.Main; // [수정] 진짜 중앙 홀
 
     private static readonly string[] RaDayFlags =
     {

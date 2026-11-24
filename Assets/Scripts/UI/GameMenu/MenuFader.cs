@@ -13,6 +13,7 @@ public class MenuFader : MonoBehaviour
 
     public static bool LoadScene(string sceneName, float fadeOut = 0.6f, float fadeIn = 0.6f)
     {
+        sceneName = HallScenes.Resolve(sceneName); // [추가] 이어하기 저장이 예전 임시 홀이어도 진짜 홀로
         if (busy) return false;
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {

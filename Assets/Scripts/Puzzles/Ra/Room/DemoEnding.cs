@@ -17,7 +17,7 @@ public class DemoEnding : MonoBehaviour
     public const string CentralEnteredFlag = "F_RA_CENTRAL_ENTERED";
 
     // 중앙 홀 씬 이름 (아래 칸이 비어 있을 때)
-    public const string DefaultHallScene = "CentralRoom_Temp";
+    public const string DefaultHallScene = HallScenes.Main; // [수정] 진짜 중앙 홀
 
     [Header("연결 (예전 데모 화면 - 이제 안 씀, 비워도 됨)")]
     [SerializeField] private GameObject endingPanel;

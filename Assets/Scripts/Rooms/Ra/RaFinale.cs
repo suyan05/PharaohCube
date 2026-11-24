@@ -8,7 +8,7 @@ using UnityEngine.Rendering.Universal;
 // 2. 하얗게 번쩍 -> 라 일러스트 전체 화면 + 강렬한 이집트 음악(bgm_ra_finale) + 라의 대사
 // 3. 큐브 공개 (바스테트 엔딩과 같은 방식): 큐브 옆 여섯 면 칸 중 "라" 칸에 라의 면이 박힘
 //    [수정] 아이템 획득 팝업은 없앰 (형판은 조용히 인벤토리에 들어감)
-// 4. 작별 대사 -> 암전 -> 중앙 홀(CentralRoom_Temp)로 이동 -> 중앙 홀에서 돌아온 연출
+// 4. 작별 대사 -> 암전 -> 중앙 홀(CentralRoom_Tilemap)로 이동 -> 중앙 홀에서 돌아온 연출
 // - 성소를 직접 눌러도 이 연출이 나옴 (RaShrine이 TryStart를 부름)
 // - 씬에 안 놓아도 RaRuntimeBootstrap이 자동으로 붙임
 // - ESC 1초 = 건너뛰기 (형판 지급과 이동은 그대로 됨)
@@ -23,7 +23,7 @@ public class RaFinale : MonoBehaviour
     [SerializeField] private string plateItemId = "PLATE_RA";
 
     [Header("이동 (Build Profiles의 Scene List에 있어야 함)")]
-    [SerializeField] private string hallScene = "CentralRoom_Temp";
+    [SerializeField] private string hallScene = HallScenes.Main; // [수정] 씬에 예전 이름이 저장돼 있어도 SceneFlow가 진짜 홀로 바꿈
 
     [Header("연출")]
     [SerializeField, Min(0f)] private float delay = 0.8f;

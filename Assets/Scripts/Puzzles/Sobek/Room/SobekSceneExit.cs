@@ -23,7 +23,7 @@ public class SobekSceneExit : MonoBehaviour
         used = true;
         if (farewellFirst && (SobekFarewell.Pending || SobekFarewell.ShouldWarn))
         {
-            bool toHall = nextSceneName == SobekIds.CentralHallScene;
+            bool toHall = HallScenes.IsHall(nextSceneName); // [수정] 예전 임시 홀 이름이 저장돼 있어도 홀로 봄
             StartCoroutine(SobekFarewell.Play(toHall, stay =>
             {
                 if (stay) { used = false; Debug.Log("[SobekSceneExit] 이빨 힌트 -> 이번에는 떠나지 않음", this); }

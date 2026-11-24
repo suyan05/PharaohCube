@@ -11,7 +11,7 @@ public class HorusNorthDoor : MonoBehaviour, IInteractable
     [Header("연결 (예비용. 비워두면 아래 '갈 곳'으로 바로 이동 - DemoEnding은 라 형판을 등록하니 호루스엔 안 씀)")]
     [SerializeField] private DemoEnding ending;
 
-    [Header("갈 곳 (비우면 중앙 홀 CentralRoom_Temp)")]
+    [Header("갈 곳 (비우면 중앙 홀 CentralRoom_Tilemap)")]
     [SerializeField] private string hallSceneName = "";
     [SerializeField] private float fadeTime = 0.8f;
 

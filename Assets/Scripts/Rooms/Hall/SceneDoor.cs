@@ -6,6 +6,7 @@ using UnityEngine;
 // - Required Item이 없으면 Locked Lines (예: 횃불이 없으면 "너무 어둡다")
 // - 있으면: 문 앞까지 걸어감 -> 안쪽으로 들어가며 사라짐 -> 암전 -> Next Scene (비우면 Build 순서의 다음 씬)
 // - [추가] Auto Enter를 켜면 E 없이 문에 닿기만 해도 들어감 (중앙 홀 북쪽 문은 HallTempDirector가 켬)
+// - [추가] SetLocked: 아이템과 상관없이 잠그기 (중앙 홀 타일맵: 아직 차례가 아닌 신전 문, 이미 끝낸 신전 문)
 [RequireComponent(typeof(Collider2D))]
 public class SceneDoor : MonoBehaviour, IInteractable
 {
@@ -25,17 +26,30 @@ public class SceneDoor : MonoBehaviour, IInteractable
 
     private bool used;
     private bool lockedShown;
+    private bool forceLocked;
+
+    public string NextScene => nextScene;
+    public bool IsLocked => forceLocked;
     private Collider2D doorCollider;
 
     public string GetPrompt()
     {
         if (used || autoEnter) return null; // 자동 문은 E 안내를 띄우지 않음
+        if (forceLocked) return "E: 살펴보기"; // [추가] 잠긴 신전 문
         return $"E: {promptText}";
     }
 
     public void SetAutoEnter(bool on)
     {
         autoEnter = on;
+    }
+
+    // [추가] 잠그기 / 풀기 (lines가 있으면 잠김 대사도 바꿈)
+    public void SetLocked(bool locked, DialogueLine[] lines = null)
+    {
+        forceLocked = locked;
+        if (lines != null && lines.Length > 0) lockedLines = lines;
+        lockedShown = false;
     }
 
     private void Update()
@@ -106,6 +120,7 @@ public class SceneDoor : MonoBehaviour, IInteractable
 
     private bool HasItem()
     {
+        if (forceLocked) return false;
         if (string.IsNullOrEmpty(requiredItem)) return true;
         return ItemInventory.Instance != null && ItemInventory.Instance.Has(requiredItem);
     }

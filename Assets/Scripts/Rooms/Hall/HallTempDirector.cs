@@ -9,6 +9,7 @@ using UnityEngine.Rendering.Universal;
 // 3. 목표: 횃불 걸이에서 횃불 집기 (Inspectable, F_HALL_TORCH_TAKEN)
 // 4. 목표: 화로에 대고 불 붙이기 (Inspectable, 길게 누르기 -> ITEM_TORCH -> 내 횃불 켜짐)
 // 5. 목표: 북쪽 문으로 라의 신전에 들어가기 (SceneDoor, 횃불 필요)
+//    [추가] 중앙 홀 타일맵은 신전마다 문이 따로 있음 (HallDoorBoard): 차례인 문만 열림
 // 6. [추가] 신전을 끝내고 돌아오면 (Routes 칸): 북쪽 문 앞에서 시작 -> 큐브 앞으로 걸어감
 //    -> [추가] 큐브에 형판 끼우기 화면 (HallCubeInsert) -> 내 몸에서 빛이 큐브로 흘러가 면이 깨어남 -> 목소리
 //    -> 북쪽 문이 다음 신전으로 바뀜 ([수정] 횃불 없이 열림, 횃불 대사는 처음 한 번만)
@@ -24,6 +25,8 @@ public class HallTempDirector : MonoBehaviour
     [SerializeField] private Vector2 walkPoint = new Vector2(9f, 3f);
     [Tooltip("[추가] 돌아왔을 때 큐브에 형판 끼우는 화면 (비우면 같은 오브젝트에서 찾음, 없으면 건너뜀)")]
     [SerializeField] private HallCubeInsert cubeInsert;
+    [Tooltip("[추가] 중앙 홀(타일맵)의 신전 문 여러 개. 비우면 같은 오브젝트에서 찾고, 없으면 예전처럼 북쪽 문(door) 하나만 씀")]
+    [SerializeField] private HallDoorBoard doorBoard;
 
     [Header("플래그")]
     [SerializeField] private string introFlag = "F_HALL_TEMP_INTRO";
@@ -31,7 +34,7 @@ public class HallTempDirector : MonoBehaviour
     [Header("목표 문구")]
     [SerializeField] private string objRack = "횃불 걸이에서 횃불을 집자";
     [SerializeField] private string objBrazier = "화로에 횃불을 대고 불을 붙이자";
-    [SerializeField] private string objDoor = "북쪽 문으로 라의 신전에 들어가자";
+    [SerializeField] private string objDoor = "라의 문으로 태양의 신전에 들어가자";
 
     [Header("신전에서 돌아왔을 때 (순서대로)")]
     [SerializeField] private HallRoute[] routes = HallRoute.Defaults();
@@ -55,6 +58,7 @@ public class HallTempDirector : MonoBehaviour
     private IEnumerator Start()
     {
         yield return null;
+        ApplyRoute(); // [수정] 연출 전에 문을 정해 둠 (돌아온 연출이 열린 문을 비춤)
         HallRoute back = PendingReturn();
         if (back != null) yield return ReturnFrom(back);
         else if (!HasFlag(introFlag)) yield return Intro();
@@ -64,7 +68,6 @@ public class HallTempDirector : MonoBehaviour
             yield return ScreenFader.FadeIn(0.8f);
         }
 
-        ApplyRoute();
         EnableDoorAutoEnter();
         Subscribe();
         started = true;
@@ -296,6 +299,11 @@ public class HallTempDirector : MonoBehaviour
     // [추가] 북쪽 문은 E 없이 닿기만 하면 들어감
     private void EnableDoorAutoEnter()
     {
+        if (Board() != null)
+        {
+            Board().SetAutoEnter(true);
+            return;
+        }
         if (door == null) return;
         SceneDoor sceneDoor = door.GetComponent<SceneDoor>();
         if (sceneDoor != null) sceneDoor.SetAutoEnter(true);
@@ -305,6 +313,12 @@ public class HallTempDirector : MonoBehaviour
     private void ApplyRoute()
     {
         HallRoute r = LatestCleared();
+        if (Board() != null)
+        {
+            Transform open = Board().Apply(r, IsCleared);
+            if (open != null) door = open;
+            return;
+        }
         if (r == null || door == null) return;
         SceneDoor sceneDoor = door.GetComponent<SceneDoor>();
         if (sceneDoor != null)
@@ -314,6 +328,24 @@ public class HallTempDirector : MonoBehaviour
             Debug.Log($"[HallTempDirector] 북쪽 문 -> {r.nextScene} (횃불 {(r.needTorch ? "필요" : "필요 없음")})");
         }
         else Debug.LogWarning("[HallTempDirector] 북쪽 문에 SceneDoor가 없어서 다음 신전으로 못 바꿈");
+    }
+
+    // [추가] 신전 문 여러 개 (중앙 홀 타일맵). 없으면 null
+    private HallDoorBoard Board()
+    {
+        if (doorBoard == null) doorBoard = GetComponent<HallDoorBoard>();
+        return doorBoard;
+    }
+
+    // [추가] 이 신의 신전을 끝냈는지 (HallDoorBoard가 잠긴 문 대사를 고를 때 씀)
+    private bool IsCleared(string god)
+    {
+        if (routes == null) return false;
+        foreach (HallRoute r in routes)
+        {
+            if (r != null && r.god == god && HasFlag(r.clearFlag)) return true;
+        }
+        return false;
     }
 
     // ================= 목표 =================

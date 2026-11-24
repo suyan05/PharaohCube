@@ -41,6 +41,7 @@ public static class SceneFlow
     // 씬 이름으로 이동 (이름이 비었거나 Scene List에 없으면 다음 번호 씬으로)
     public static void LoadByNameOrNext(string sceneName)
     {
+        sceneName = HallScenes.Resolve(sceneName); // [추가] 예전 임시 홀 이름 -> 진짜 중앙 홀
         if (!string.IsNullOrEmpty(sceneName) && Application.CanStreamedLevelBeLoaded(sceneName))
         {
             Debug.Log($"[SceneFlow] '{sceneName}' 씬으로 이동");

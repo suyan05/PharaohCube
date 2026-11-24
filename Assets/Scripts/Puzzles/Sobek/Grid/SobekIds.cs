@@ -44,5 +44,5 @@ public static class SobekIds
     // 착시 퍼즐 씬 (허브 섬 게이트 -> 여기, Tools/Sobek/5가 만듦)
     public const string SubScene1 = "Sobek_S1", SubScene2 = "Sobek_S2", SubScene3 = "Sobek_S3", SubScene4 = "Sobek_S4";
     public const string AnubisScene = "Puzzle_Test_Anubis_Tutorial";
-    public const string CentralHallScene = "CentralRoom_Temp"; // 기획서: 신전을 깨면 중앙 홀로 돌아감 (지금 빌드 목록의 중앙 홀 [확인 필요])
+    public const string CentralHallScene = HallScenes.Main; // 기획서: 신전을 깨면 중앙 홀로 돌아감 ([수정] 진짜 중앙 홀 CentralRoom_Tilemap)
 }

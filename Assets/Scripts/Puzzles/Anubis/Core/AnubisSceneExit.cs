@@ -145,6 +145,7 @@ public class AnubisSceneFader : MonoBehaviour
 
     public static void Begin(string sceneName, string message, TMP_FontAsset font, float fadeOut, float hold, float fadeIn)
     {
+        sceneName = HallScenes.Resolve(sceneName); // [추가] 예전 임시 홀 이름 -> 진짜 중앙 홀
         var go = new GameObject("AnubisSceneFader");
         DontDestroyOnLoad(go); // 씬이 바뀌어도 검은 화면 유지
         var fader = go.AddComponent<AnubisSceneFader>();
