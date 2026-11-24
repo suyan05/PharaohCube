@@ -6,9 +6,11 @@ using UnityEngine;
 // - 회랑(HorusHiddenGallery)이 열려야 둥지가 보이므로, 우자트 부적으로 벽을 연 뒤에만 갈 수 있음
 // - 임시 도형(갈색 원)이던 둥지를 도트 그림(HO_Nest)으로 바꿈
 // - HiddenVaultSpawner가 씬이 열릴 때 OBJ_HG1_Nest에 자동으로 붙임
+// - [추가] 끝까지 보면 히든 아이템 '호루스의 축복'(ITEM_HORUS_BLESSING) -> 아누비스 저울에서 무게 합계가 보임
 public class HorusNestVault : MonoBehaviour, IInteractable
 {
     private const string Art = "Horus/PixelFx/HO_Nest";
+    public const string BlessingItem = "ITEM_HORUS_BLESSING";
     private bool busy;
 
     private void Awake()
@@ -56,7 +58,17 @@ public class HorusNestVault : MonoBehaviour, IInteractable
         }
         yield return CineShots.Crane(nest + Vector3.down * 1.2f, nest + Vector3.up * 0.4f, 5f, 2.8f, 1.6f); // 아래에서 둥지로 올라가며 다가감
         yield return HiddenVault.Play(HiddenVaultScenes.HorusWalk(), HiddenVaultScenes.HorusReveal(), HiddenVault.HorusFlag, HiddenVaultScenes.HorusAfter);
+        yield return GrantBlessing();
         Cine.End();
         busy = false;
+    }
+
+    // [추가] 히든 아이템 (한 번만). 이미 있으면 건너뜀
+    private static IEnumerator GrantBlessing()
+    {
+        if (ItemInventory.Instance == null || ItemInventory.Instance.Has(BlessingItem)) yield break;
+        bool closed = false;
+        ItemPopup.Grant(BlessingItem, () => closed = true);
+        while (!closed && !Cine.Skipping) yield return null;
     }
 }

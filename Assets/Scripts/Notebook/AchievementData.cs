@@ -74,7 +74,7 @@ public static class AchievementData
         AchievementDef frescoes = Any("ACH_THO_FRESCO", "토트", "부서진 것을 맞추는 자", "채색 벽화 조각", AchGrade.Papyrus, "무너진 벽화의 조각을 하나하나 맞추면 잊힌 이야기가 돌아온다.", "서고의 벽화를 모두 되살리자");
         frescoes.allFlags = new[] { "F_TH_FA_DONE", "F_TH_FB_DONE", "F_TH_FC_DONE" };
         l.Add(frescoes);
-        l.Add(Any("ACH_THO_BOOK", "토트", "토트의 책", "토트의 점토판", AchGrade.Bronze, "강 밑 여섯 겹 상자 속의 책. 읽은 자는 가장 소중한 것을 잃는다고 전한다.", "???", "F_TH_HIDDEN_VAULT"));
+        l.Add(Any("ACH_THO_BOOK", "토트", "토트의 책", "토트의 석판", AchGrade.Bronze, "강 밑 여섯 겹 상자 속의 책. 읽은 자는 가장 소중한 것을 잃는다고 전한다.", "???", "F_TH_HIDDEN_VAULT"));
         // [수정] 호루스 업적에 조건(플래그) 연결 + 벽화/숨은 둥지 업적 추가
         l.Add(Any("ACH_HOR_STAR", "호루스", "별을 잇는 자", "덴데라 천장 별자리판", AchGrade.Papyrus, "신전 천장에 새겨진 하늘 지도. 별은 신들의 길이었다.", "밤하늘의 방", "F_HO_CHART_4"));
         AchievementDef murals = Any("ACH_HOR_MURAL", "호루스", "찢긴 벽화의 기억", "채색 벽화 네 폭", AchGrade.Papyrus, "빼앗긴 왕좌, 갈대숲의 아이, 여든 해의 다툼, 왕관을 쓴 매. 한 신이 왕이 되기까지.", "신전 입구 복도의 벽");

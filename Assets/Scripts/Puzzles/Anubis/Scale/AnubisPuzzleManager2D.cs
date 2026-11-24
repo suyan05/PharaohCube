@@ -9,6 +9,9 @@ using UnityEngine.UI;
 // 아누비스의 심판 (메인 저울). 우측 깃털 7.0kg과 평형 맞추기
 // 좌측 접시에 망자의 심장(4kg) + 황금 단지(3kg), 정확히 2개
 // 패널 루트(Panel_MainScale)에 부착
+// [추가] 심판의 기회 3번: 1~2번째 실패는 유물만 진열대로 돌아감, 3번째 실패에 처벌(서브 퍼즐 초기화)
+//        토트의 석판이 있으면 3번째 실패 때 석판이 부서지며 처벌을 막고 기회를 다시 채움 (AnubisSecondChance)
+//        호루스의 축복이 있으면 왼쪽 접시 무게 합계가 보임
 public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
 {
     [Header("저울 컴포넌트 연결")]
@@ -39,6 +42,10 @@ public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
     [Tooltip("연결하면 다시 도전 시 씬을 다시 불러오지 않고 보상 회수 + 서브 퍼즐 재잠금")]
     [SerializeField] private AnubisJudgmentPenalty penalty;
 
+    [Header("심판의 기회 [추가]")]
+    [Tooltip("이 횟수만큼 틀리면 처벌 (서브 퍼즐 초기화)")]
+    [SerializeField, Range(1, 5)] private int maxChances = 3;
+
     [Header("닫기 [추가]")]
     [Tooltip("닫기 버튼. 비우면 패널 안의 'Btn_Close'를 자동으로 찾음")]
     [SerializeField] private Button btnClose;
@@ -57,6 +64,46 @@ public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
     private bool isGameOver = false;
 
     private float LeftWeight => leftPan != null ? leftPan.TotalWeight : 0f;
+
+    private int fails;          // [추가] 이번 판에서 틀린 횟수
+    private string lastWeightLine = "";
+    public int ChancesLeft => Mathf.Max(0, maxChances - fails);
+
+    // [추가] 깃털 무게 + 남은 기회 + (호루스의 축복) 왼쪽 접시 무게
+    private void Update()
+    {
+        if (weightText == null) return;
+        string line = AnubisSecondChance.WeightLine(targetFeatherWeight, LeftWeight, ChancesLeft, maxChances);
+        if (line == lastWeightLine) return;
+        lastWeightLine = line;
+        weightText.text = line;
+    }
+
+    // [추가] 틀렸을 때: 기회가 남았거나 토트의 석판이 있으면 처벌 없이 다시 (true)
+    private bool TrySpendChance()
+    {
+        fails++;
+        if (fails < maxChances)
+        {
+            StartCoroutine(SoftRetry(AnubisSecondChance.FailLine(ChancesLeft)));
+            return true;
+        }
+        if (!AnubisSecondChance.TryUseThothTablet()) return false;
+        fails = 0;
+        StartCoroutine(SoftRetry(AnubisSecondChance.TabletMessage));
+        return true;
+    }
+
+    // [추가] 처벌 없는 다시 하기: 잠깐 기운 채로 보여 주고 유물을 진열대로 돌림
+    private IEnumerator SoftRetry(string message)
+    {
+        AnubisToast.Show(message, 4f);
+        yield return new WaitForSeconds(1.2f);
+        foreach (var pan in GetComponentsInChildren<AnubisUIScalePan>(true)) ReturnItems(pan);
+        if (scaleBeam != null) scaleBeam.localRotation = Quaternion.identity;
+        if (btnJudgeLever != null) btnJudgeLever.interactable = true;
+        isJudging = false;
+    }
 
     private void Start()
     {
@@ -215,6 +262,11 @@ public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
                 }
             }
         }
+        else if (TrySpendChance())
+        {
+            OnPuzzleFailed?.Invoke();
+            yield break; // [추가] SoftRetry가 isJudging을 풀어 줌
+        }
         else
         {
             isGameOver = true;
@@ -252,6 +304,7 @@ public class AnubisPuzzleManager2D : MonoBehaviour, IAnubisRetryable
     public void ResetForRetry()
     {
         StopAllCoroutines();
+        fails = 0; // [추가] 처벌 뒤에는 기회를 다시 3번
         isCleared = false;
         isJudging = false;
         isGameOver = false;

@@ -43,9 +43,8 @@ MonoBehaviour:
     icon: {fileID: 0}
     hidden: 0
   - id: ITEM_RA_EMBER
-    displayName: "\uB77C\uC758 \uBD88\uC528"
-    description: "\uD574\uAC00 \uC9C4 \uB4A4\uC5D0\uB3C4 \uAEBC\uC9C0\uC9C0 \uC54A\uB294
-      \uBD88. \uD683\uBD88\uC744 \uC5BB\uC73C\uBA74 \uD568\uAED8 \uD0C0\uC624\uB978\uB2E4"
+    displayName: "\uAEBC\uC9C0\uC9C0 \uC54A\uB294 \uBD88\uAF43"
+    description: "\uB77C\uC758 \uBD88\uC528. \uD574\uAC00 \uC9C4 \uB4A4\uC5D0\uB3C4 \uAEBC\uC9C0\uC9C0 \uC54A\uB294\uB2E4. \uD683\uBD88\uC774 \uB2E4\uC2DC\uB294 \uAEBC\uC9C0\uC9C0 \uC54A\uB294\uB2E4"
     icon: {fileID: 21300000, guid: a1cafedf6896d9048be4e6b4b4172aac, type: 3}
     hidden: 1
   - id: ITEM_SISTRUM
@@ -97,8 +96,7 @@ MonoBehaviour:
     hidden: 0
   - id: ITEM_BASTET_VESSEL
     displayName: "\uBC14\uC2A4\uD14C\uD2B8\uC758 \uADF8\uB987"
-    description: "\uBD88\uC744 \uB2F4\uB294 \uACE0\uC591\uC774 \uADC0 \uADF8\uB987.
-      \uD683\uBD88\uC774 \uB450 \uBC30 \uBC1D\uACE0 \uB450 \uBC30 \uC624\uB798 \uD0C4\uB2E4"
+    description: "\uBD88\uC744 \uB2F4\uB294 \uACE0\uC591\uC774 \uADC0 \uADF8\uB987. \uD683\uBD88\uC774 \uB450 \uBC30 \uBC1D\uACE0 \uB450 \uBC30 \uC624\uB798 \uD0C4\uB2E4"
     icon: {fileID: 5149893154953138914, guid: 6f14f7c37f700e74a86bd7a076af113a, type: 3}
     hidden: 1
   - id: ITEM_SOBEK_AMULET_ROTATE
@@ -244,9 +242,17 @@ MonoBehaviour:
     icon: {fileID: 21300000, guid: abd24fca0daa4509a60ca477a62d1bd1, type: 3}
     hidden: 0
   - id: ITEM_THOTH_TABLET
-    displayName: "\uD1A0\uD2B8\uC758 \uC810\uD1A0\uD310"
-    description: "\uD1A0\uD2B8\uC758 \uCC45 \uCCAB \uC904\uC744 \uC62E\uACA8 \uC801\uC740
-      \uC791\uC740 \uC810\uD1A0\uD310. \uC77D\uC9C0 \uB9D0\uACE0 \uAE30\uC5B5\uB9CC
-      \uD558\uB77C."
+    displayName: "\uD1A0\uD2B8\uC758 \uC11D\uD310"
+    description: "\uD1A0\uD2B8\uC758 \uCC45 \uCCAB \uC904\uC774 \uC0C8\uACA8\uC9C4 \uC11D\uD310. \uC2EC\uD310\uC758 \uC800\uC6B8\uC774 \uC138 \uBC88 \uAE30\uC6B8\uC5B4\uB3C4, \uB2E8 \uD55C \uBC88 \uAE30\uB85D\uC744 \uACE0\uCCD0 \uC4F8 \uC218 \uC788\uB2E4"
     icon: {fileID: 21300000, guid: 8442afea6c8d4619b2a63d31fbce765e, type: 3}
     hidden: 1
+  - id: ITEM_HORUS_BLESSING
+    displayName: "\uD638\uB8E8\uC2A4\uC758 \uCD95\uBCF5"
+    description: "\uB9E4\uC758 \uB465\uC9C0\uC5D0\uC11C \uBC1B\uC740 \uB208\uBD80\uC2E0 \uAE43\uD138. \uC2EC\uD310\uC758 \uC800\uC6B8 \uC55E\uC5D0\uC11C \uC811\uC2DC\uC5D0 \uC62C\uB9B0 \uBB34\uAC8C\uB97C \uAFF0\uB6AB\uC5B4 \uBCF8\uB2E4"
+    icon: {fileID: 0}
+    hidden: 1
+  - id: PLATE_ANUBIS
+    displayName: "\uC790\uCE7C \uD615\uD310"
+    description: "\uD050\uBE0C\uC758 \uC5EC\uC12F \uBC88\uC9F8 \uBA74\uC5D0 \uC7A5\uCC29\uD558\uB77C"
+    icon: {fileID: 0}
+    hidden: 0
