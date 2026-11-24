@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad32f327eca5e4428888f903173880b, type: 3}
+  m_Name: GodIllustrations
+  m_EditorClassIdentifier: Assembly-CSharp::GodIllustration
+  sprites:
+  - {fileID: 4524913410433130931, guid: dab0ed348970d2442aecf3e0dcbb26a0, type: 3}
+  - {fileID: -4401819410366401690, guid: 3e35071847d570441b989f6c4d3d33bf, type: 3}
+  - {fileID: -2909773197796118627, guid: 41b33a4902429c44fa2db3e7ad9217ba, type: 3}
+  - {fileID: -5237746922409818941, guid: b733d2299370b894688634d3cd4985a4, type: 3}
+  - {fileID: -5700976550161359322, guid: 19fb597d5e313dd4d91aa71f94784642, type: 3}
+  - {fileID: 4264317810600858832, guid: e41c3c14142f0e6429e2159d301d6835, type: 3}
