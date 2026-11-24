@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 // 메뉴: PharaohCube -> Hall -> 신 일러스트 연결
 // - Assets/image/Illustration/{Ra, Bastet, Thoth, Horus, Sobek, Anubis}.png 의 첫 스프라이트
 //   -> Assets/Resources/GodIllustrations.asset (없으면 만듦)
-// - 그림이 스프라이트로 안 가져와져 있으면 Sprite로 바꿔서 다시 가져옴
+// - 그림이 스프라이트로 안 가져와져 있거나 여러 조각으로 잘려 있으면 한 장짜리 Sprite로 다시 가져옴
 // - 임시 일러스트를 진짜 그림으로 바꾸면: 같은 이름으로 덮어쓰고 이 메뉴만 다시 누르면 됨
 public static class GodIllustrationLinker
 {
@@ -56,12 +56,13 @@ public static class GodIllustrationLinker
             log.AppendLine($"- 없음: {path}");
             return null;
         }
-        if (importer.textureType != TextureImporterType.Sprite)
+        // [수정] 여러 조각(Multiple)으로 잘려 있으면 그림 일부(라의 지팡이 끝)가 잘린 채 보였음 -> 한 장(Single)으로
+        if (importer.textureType != TextureImporterType.Sprite || importer.spriteImportMode != SpriteImportMode.Single)
         {
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
             importer.SaveAndReimport();
-            log.AppendLine($"- {path}: Sprite로 다시 가져옴");
+            log.AppendLine($"- {path}: 한 장짜리 Sprite로 다시 가져옴");
         }
         foreach (Object o in AssetDatabase.LoadAllAssetsAtPath(path))
         {

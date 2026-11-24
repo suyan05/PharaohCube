@@ -80,6 +80,7 @@ public class GodIllustration : ScriptableObject
         pic.sprite = art;
         pic.preserveAspect = true;
         pic.color = new Color(1f, 1f, 1f, 0f);
+        HolyFx.Attach(root, pic, new Color(1f, 0.85f, 0.5f)); // [추가] 후광, 빛기둥, 비네트 (그림 페이드를 따라감)
         Font font = PuzzleUITheme.GetTitleFont() ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         title = UIBuild.Text(root, "Title", font, 44, new Vector2(0f, -470f), new Vector2(1600f, 70f), new Color(0.95f, 0.8f, 0.45f, 0f));
         title.alignment = TextAnchor.MiddleCenter;

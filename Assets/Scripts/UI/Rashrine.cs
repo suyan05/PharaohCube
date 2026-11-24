@@ -8,6 +8,8 @@ using UnityEngine;
 //   (3) 밤 진행 중          : 밤 힌트 대사 (처음 한 번 듣기 전까지 "!" 표시)
 //   (4) 밤 P5 클리어 후     : "!" 표시 -> 마무리 대사 -> 끝나면 태양 형판 지급 (한 번만, 북쪽 문 열림)
 //       [수정] 이제 (4)는 RaFinale(라 일러스트 엔딩)이 자동으로 함. 엔딩이 없거나 이미 끝난 뒤에만 예전 대사
+// [추가] 서브 스토리 (RaStoryLines): 라의 세 얼굴(케프리, 라, 아툼) / 해가 지면 죽어 아우프가 됨 / 새벽의 케프리
+//        밤으로 넘어가기 전에 벽화 컷(RaMuralScenes.NightFalls)
 public class RaShrine : MonoBehaviour, IInteractable
 {
     private const string MessageTag = "[Door] ";
@@ -87,11 +89,21 @@ public class RaShrine : MonoBehaviour, IInteractable
             if (dialogue == null) Debug.LogError($"[{name}] 씬에 RaDialogue가 없음 -> RaCanvas 아래 Dialogue_Overlay에 RaDialogue 붙이기");
 
             if (newBubble != null) bubbleBasePos = newBubble.transform.localPosition;
+            AddStory();
         }
         catch (Exception e)
         {
             Debug.LogError($"[{name}] 라의 성소 초기화 오류: {e}");
         }
+    }
+
+    // [추가] 씬에 저장된 대사 앞뒤에 서브 스토리를 붙임
+    private void AddStory()
+    {
+        beforeTrialLines = RaStoryLines.Merge(RaStoryLines.Day, beforeTrialLines);
+        trialPassedLines = RaStoryLines.Merge(trialPassedLines, RaStoryLines.BeforeNight);
+        nightLines = RaStoryLines.Merge(RaStoryLines.Night, nightLines);
+        nightClearedLines = RaStoryLines.Merge(RaStoryLines.Dawn, nightClearedLines);
     }
 
     private void Update()
@@ -186,7 +198,14 @@ public class RaShrine : MonoBehaviour, IInteractable
             return;
         }
         if (RaPhaseState.IsNight) return;
+        Cine.Run(NightStoryThenNight(gm)); // [추가] 벽화 컷을 먼저 보고 밤으로
+    }
 
+    private System.Collections.IEnumerator NightStoryThenNight(GameManager gm)
+    {
+        Cine.Begin(true);
+        yield return MuralStage.Play(RaMuralScenes.NightFalls());
+        Cine.End();
         if (cameraFollow != null) cameraFollow.Shake(shakeDuration, shakeStrength);
         if (!string.IsNullOrEmpty(nightMessage)) Debug.Log(MessageTag + nightMessage);
 

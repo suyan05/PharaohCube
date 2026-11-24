@@ -75,7 +75,7 @@ public class RaFinaleCut : MonoBehaviour
         bool hasArt = raArt != null;
         BuildSun(stage, !hasArt);
         // 일러스트 배경이 투명이면 뒤에서 도는 빛줄기가 보임 (꽉 찬 그림이면 그림이 다 덮음)
-        if (hasArt) UIBuild.Image(stage, "Illustration", Vector2.zero, new Vector2(1920f, 1080f), raArt, Color.white).preserveAspect = true;
+        if (hasArt) AddIllustration(raArt);
         else RaFinaleShapes.Placeholder(stage, bodyFont);
 
         BuildTitle(lines);
@@ -83,6 +83,14 @@ public class RaFinaleCut : MonoBehaviour
         flash = UIBuild.Stretch(root, "Flash").gameObject.AddComponent<Image>();
         flash.color = new Color(1f, 0.95f, 0.82f, 0f);
         flash.raycastTarget = false;
+    }
+
+    // [추가] 일러스트 + 신성한 보정 (후광, 테두리 오라, 빛기둥, 비네트)
+    private void AddIllustration(Sprite raArt)
+    {
+        Image img = UIBuild.Image(stage, "Illustration", new Vector2(0f, -20f), new Vector2(1920f, 1080f), raArt, Color.white);
+        img.preserveAspect = true;
+        HolyFx.Attach(stage, img, new Color(1f, 0.78f, 0.35f));
     }
 
     // 해 원반은 임시 그림일 때만 (일러스트에는 아트가 그린 해가 있음)
@@ -102,10 +110,25 @@ public class RaFinaleCut : MonoBehaviour
         RectTransform t = UIBuild.Stretch(root, "Title");
         titleGroup = t.gameObject.AddComponent<CanvasGroup>();
         titleGroup.alpha = 0f;
-        Text title = UIBuild.Text(t, "Name", titleFont, 46, new Vector2(0f, 470f), new Vector2(1200f, 60f), Gold);
+        // [수정] 라의 머리 위 해와 겹쳐 안 보이던 제목 -> 왼쪽 빈 곳, 어두운 띠 + 테두리 + 그림자
+        Image band = UIBuild.Image(t, "Band", new Vector2(-640f, 250f), new Vector2(620f, 170f), FxSprites.Soft, Color.white);
+        band.color = new Color(0f, 0f, 0f, 0.55f);
+        Text title = UIBuild.Text(t, "Name", titleFont, 64, new Vector2(-640f, 270f), new Vector2(620f, 80f), Gold);
         title.text = lines != null ? lines.title : "";
-        Text sub = UIBuild.Text(t, "Sub", bodyFont, 24, new Vector2(0f, 420f), new Vector2(1200f, 36f), new Color(1f, 0.92f, 0.75f, 0.85f));
+        Text sub = UIBuild.Text(t, "Sub", bodyFont, 30, new Vector2(-640f, 205f), new Vector2(620f, 44f), new Color(1f, 0.93f, 0.78f, 1f));
         sub.text = lines != null ? lines.subtitle : "";
+        Readable(title, 3f);
+        Readable(sub, 2f);
+    }
+
+    private static void Readable(Text text, float px)
+    {
+        Outline line = text.gameObject.AddComponent<Outline>();
+        line.effectColor = new Color(0.18f, 0.08f, 0.02f, 0.95f);
+        line.effectDistance = new Vector2(px, -px);
+        Shadow glow = text.gameObject.AddComponent<Shadow>();
+        glow.effectColor = new Color(1f, 0.6f, 0.15f, 0.45f);
+        glow.effectDistance = new Vector2(0f, -px * 2f);
     }
 
     // 왼쪽 큐브 + 오른쪽 여섯 면 칸 (바스테트 엔딩과 같은 배치)
