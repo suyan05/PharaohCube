@@ -21,7 +21,7 @@ public static class ThothItemSetup
         { ThothIds.MoonFrag(2), "달 조각 (반달)", "달 모양 금 조각. 어딘가의 달 모양 홈에 꼭 맞을 것 같다.", "World/TH_MoonFrag_2", "0" },
         { ThothIds.MoonFrag(3), "달 조각 (보름달)", "달 모양 금 조각. 어딘가의 달 모양 홈에 꼭 맞을 것 같다.", "World/TH_MoonFrag_3", "0" },
         { ThothIds.Plate, "지혜의 형판", "토트의 지혜가 새겨진 형판. 큐브의 세 번째 면에 끼울 수 있다.", "UI/UI_Template", "0" },
-        { ThothIds.Tablet, "토트의 점토판", "토트의 책 첫 줄을 옮겨 적은 작은 점토판. 읽지 말고 기억만 하라.", "UI/UI_Notes", "1" }
+        { ThothIds.Tablet, "토트의 석판", "토트의 책 첫 줄이 새겨진 석판. 심판의 저울이 세 번 기울어도, 단 한 번 기록을 고쳐 쓸 수 있다", "UI/UI_Notes", "1" }
     };
 
     public static int Apply()

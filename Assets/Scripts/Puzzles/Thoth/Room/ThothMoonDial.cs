@@ -28,6 +28,7 @@ public class ThothMoonDial : ThothPanel, IInteractable
     private Image plate, needle;
     private Text message;
     private int needleStep;
+    private int wrongTries; // [추가] 3번 틀린 뒤에야 몇 개가 맞는지 알려 줌
     private bool solving, busy;
 
     protected override bool CanClose => !solving;
@@ -52,7 +53,8 @@ public class ThothMoonDial : ThothPanel, IInteractable
         try
         {
             if (busy || IsOpen || ThothState.Busy) return;
-            if (ThothState.Has(ThothIds.DialDone)) Cine.Run(Talk(ThothLines.DialAgain));
+            if (ThothState.Has(ThothIds.DialDone) && !ThothState.HasItem(ThothIds.MoonFrag(2))) Cine.Run(TakeHiddenFrag());
+            else if (ThothState.Has(ThothIds.DialDone)) Cine.Run(Talk(ThothLines.DialAgain));
             else if (!ThothState.Has(ThothIds.DeskDone)) Cine.Run(Talk(ThothLines.DialLocked));
             else OpenPanel();
         }
@@ -67,6 +69,17 @@ public class ThothMoonDial : ThothPanel, IInteractable
         busy = true;
         Cine.Begin(false);
         yield return Cine.Say(lines);
+        Cine.End();
+        busy = false;
+    }
+
+    // [추가] 숨은 달 조각(2): 다 맞춘 뒤 다시 들여다본 사람만 찾음 (안내 없음)
+    private IEnumerator TakeHiddenFrag()
+    {
+        busy = true;
+        Cine.Begin(false);
+        yield return Cine.Say(ThothLines.FragDial);
+        yield return ThothFrescoWall.GrantPopup(ThothIds.MoonFrag(2));
         Cine.End();
         busy = false;
     }
@@ -196,7 +209,7 @@ public class ThothMoonDial : ThothPanel, IInteractable
             else if (holes[i] == Answer[i]) right++;
         }
         if (empty > 0) Fail(ThothLines.DialNotFull);
-        else if (right < 7) Fail(ThothLines.DialWrong(right));
+        else if (right < 7) Fail(++wrongTries >= 3 ? ThothLines.DialWrong(right) : ThothLines.DialWrongVague); // [수정] 난이도
         else if (needleStep != NeedleAnswer) Fail(ThothLines.DialNeedle);
         else StartCoroutine(Solve());
     }

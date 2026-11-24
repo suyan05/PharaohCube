@@ -8,14 +8,16 @@ using UnityEngine.UI;
 // - 벽화 B를 되살리기 전: "무슨 밤인지 모르겠다"
 // - 그 뒤 E: 책상 화면. 위에 벽화 '달과의 내기', 아래 파피루스 기록 3장 -> 벽화와 다른 기록을 클릭
 //   맞으면 그 장은 붉은 테(지움), 나머지는 금 테 + F_TH_DESK_DONE -> 달 시계가 깨어남
+// - [수정] 난이도: 열 때마다 기록 순서가 섞임 + 틀리면 기록이 흐려지며 창이 닫힘 (찍어서 풀기 어렵게)
 public class ThothDesk : ThothPanel, IInteractable
 {
     private const int DrawerPiece = 3;
     private const float PanelY = -130f;
-    private static readonly int[] Order = { 0, 2, 1 };   // 화면 왼쪽부터 보여줄 기록 번호 (거짓 기록이 가운데)
+    private readonly int[] order = { 0, 2, 1 };   // 화면 왼쪽부터 보여줄 기록 번호 ([수정] 열 때마다 섞음)
     private static readonly float[] SlotX = { -305f, -76f, 159f };
 
     private readonly Image[] papers = new Image[3];
+    private readonly Text[] paperTexts = new Text[3];
     private Text message;
     private bool solving, busy, shaking;
 
@@ -78,11 +80,10 @@ public class ThothDesk : ThothPanel, IInteractable
 
     private Image BuildPaper(int slot)
     {
-        int record = Order[slot];
         Vector2 pos = new Vector2(SlotX[slot], PanelY - 9f);
         Button b = ThothUI.ButtonPic(root, "Record" + slot, "UI/UI_Papyrus_A", pos, new Vector2(207f, 288f), () => Pick(slot));
-        Text t = UIBuild.Text((RectTransform)b.transform, "Text", font, 23, Vector2.zero, new Vector2(170f, 250f), ThothUI.Ink);
-        t.text = ThothLines.Records[record];
+        paperTexts[slot] = UIBuild.Text((RectTransform)b.transform, "Text", font, 23, Vector2.zero, new Vector2(170f, 250f), ThothUI.Ink);
+        paperTexts[slot].text = ThothLines.Records[order[slot]];
         return (Image)b.targetGraphic;
     }
 
@@ -90,7 +91,19 @@ public class ThothDesk : ThothPanel, IInteractable
     {
         solving = false;
         message.text = ThothLines.DeskHelp;
+        Shuffle();
         for (int i = 0; i < 3; i++) SetPaper(i, "UI/UI_Papyrus_A");
+    }
+
+    // [추가] 열 때마다 기록 순서 섞기
+    private void Shuffle()
+    {
+        for (int i = order.Length - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (order[i], order[j]) = (order[j], order[i]);
+        }
+        for (int i = 0; i < 3; i++) if (paperTexts[i] != null) paperTexts[i].text = ThothLines.Records[order[i]];
     }
 
     private void SetPaper(int slot, string art)
@@ -103,14 +116,14 @@ public class ThothDesk : ThothPanel, IInteractable
     private void Pick(int slot)
     {
         if (solving) return;
-        if (Order[slot] == ThothLines.FalseRecord)
+        if (order[slot] == ThothLines.FalseRecord)
         {
             StartCoroutine(Solve(slot));
             return;
         }
         GameAudio.Play("sfx_th_wrong", 0.7f);
         message.text = ThothLines.DeskWrong;
-        StartCoroutine(Shake(slot));
+        StartCoroutine(WrongThenClose(slot));
     }
 
     private IEnumerator Shake(int slot)
@@ -128,6 +141,16 @@ public class ThothDesk : ThothPanel, IInteractable
         rt.anchoredPosition = home;
         foreach (Image p in papers) p.color = Color.white;
         shaking = false;
+    }
+
+    // [추가] 틀리면 흔들린 뒤 기록이 흐려지며 창이 닫힘 -> 다시 열면 순서가 섞여 있음
+    private IEnumerator WrongThenClose(int slot)
+    {
+        solving = true;
+        yield return Shake(slot);
+        yield return new WaitForSecondsRealtime(0.9f);
+        solving = false;
+        ClosePanel();
     }
 
     private IEnumerator Solve(int slot)

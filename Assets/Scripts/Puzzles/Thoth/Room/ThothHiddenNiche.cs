@@ -4,7 +4,9 @@ using UnityEngine;
 
 // 숨은 방 입구: 동쪽 서고 벽의 달 모양 홈 세 개 (thoth_Hidden Mural01)
 // 달 조각 3개 (복도 책장 / 달 시계 / 동쪽 먼지 구석)를 모두 가지면 E -> 벽이 열리고
-// 옆모습 통로를 걸어가 '토트의 책' 벽화 (HiddenVault 공통 흐름) -> 점토판(ITEM_THOTH_TABLET)
+// 옆모습 통로를 걸어가 '토트의 책' 벽화 (HiddenVault 공통 흐름) -> 토트의 석판(ITEM_THOTH_TABLET)
+// [수정] 진짜 숨김: 세 조각을 다 모으기 전에는 홈도 안 보이고 E 안내도 없음 (평범한 벽)
+//        석판은 아누비스 심판에서 한 번 실패를 되돌림 (AnubisSecondChance)
 public class ThothHiddenNiche : MonoBehaviour, IInteractable
 {
     [SerializeField] private SpriteRenderer[] sockets = new SpriteRenderer[3]; // 홈에 끼운 조각 표시 (빌더가 채움)
@@ -16,17 +18,19 @@ public class ThothHiddenNiche : MonoBehaviour, IInteractable
         for (int i = 0; i < sockets.Length; i++)
         {
             if (sockets[i] == null) continue;
-            bool on = ThothState.Has(ThothIds.Vault) || ThothState.HasItem(ThothIds.MoonFrag(i + 1));
+            bool on = ThothState.Has(ThothIds.Vault) || (Ready && ThothState.HasItem(ThothIds.MoonFrag(i + 1)));
             sockets[i].enabled = on;
             if (on && !ThothState.Has(ThothIds.Vault)) sockets[i].color = new Color(1f, 1f, 1f, 0.35f); // 가졌지만 아직 안 끼움
             else if (on) sockets[i].color = Color.white;
         }
     }
 
+    private static bool Ready => ThothState.MoonFragCount() >= 3;
+
     public string GetPrompt()
     {
         if (ThothState.Has(ThothIds.Vault)) return "E: 열린 벽 살펴보기";
-        return ThothState.MoonFragCount() >= 3 ? "E: 달 조각 세 개 끼우기" : "E: 벽의 홈 살펴보기";
+        return Ready ? "E: 달 모양 홈 살펴보기" : null; // 조각이 모자라면 그냥 벽
     }
 
     public void Interact(GameObject who)
@@ -35,8 +39,7 @@ public class ThothHiddenNiche : MonoBehaviour, IInteractable
         {
             if (busy || ThothState.Busy) return;
             if (ThothState.Has(ThothIds.Vault)) Cine.Run(Talk(ThothLines.NicheSeen));
-            else if (ThothState.MoonFragCount() < 3) Cine.Run(Talk(ThothLines.NicheLow(ThothState.MoonFragCount())));
-            else Cine.Run(Open());
+            else if (Ready) Cine.Run(Open());
         }
         catch (Exception e)
         {

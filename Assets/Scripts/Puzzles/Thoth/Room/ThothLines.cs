@@ -62,7 +62,7 @@ public static class ThothLines
         "내기를 한 밤,\n달은 둥근 보름달이었다."
     };
     public const int FalseRecord = 2;
-    public const string DeskWrong = "이 기록은 벽화와 맞아. 벽화를 다시 떠올려 보자.";
+    public const string DeskWrong = "이 기록은 벽화와 맞아... 잉크가 번지며 기록이 흐려진다.";
 
     public static DialogueLine[] DeskDrawer => ThothState.Lines(Me, "책상 서랍에 벽화 조각이 하나 끼어 있었어.");
     public static DialogueLine[] DeskNeedB => ThothState.Lines(
@@ -77,6 +77,7 @@ public static class ThothLines
     public const string DialTitle = "달의 시계";
     public const string DialHelp = "달을 누르면 위에서부터 시계 방향으로 차례로 끼워져. 끼운 달을 누르면 빠져.   < > 바늘   E: 닫기";
     public static string DialWrong(int right) => $"달 그림 {right}/7개가 제자리에 있다.";
+    public const string DialWrongVague = "달의 차례가 어긋났다. 비석의 글을 다시 떠올려 보자.";
     public const string DialNeedle = "달의 차례는 맞았어. 바늘은 '내기의 밤'의 달을 가리켜야 해.";
     public const string DialNotFull = "아직 빈 구멍이 있다.";
     public static DialogueLine[] DialLocked => ThothState.Lines(
@@ -85,7 +86,7 @@ public static class ThothLines
     public static DialogueLine[] DialAgain => ThothState.Lines(Me, "달 시계가 내기의 밤을 가리키고 있다.");
     public static DialogueLine[] DialReveal => ThothState.Lines(
         Khepri, "달빛이 숨은 벽감을 열었어!",
-        Me, "빛 속에 조각이 떨어져 있어. 시계 가운데서도 뭔가 굴러 나왔고.");
+        Me, "빛 속에 조각이 떨어져 있어.");
 
     // ================= 비석, 따오기, 서가 =================
     public static DialogueLine[] SteleLines => ThothState.Lines(
@@ -110,19 +111,21 @@ public static class ThothLines
         Thoth, "부서진 것을 맞추는 자여. 나는 토트, 신들의 서기관이다.",
         Thoth, "글은 잊힌 것을 기억하게 하고, 달은 잃어버린 날을 돌려준다.",
         Thoth, "네가 되살린 이야기만큼, 이 지혜를 가져가라.",
-        Thoth, "그리고 이것은 내가 고친 호루스의 눈. 하늘의 신전에 이 눈을 기다리는 자리가 있다.");
+        Thoth, "오늘 밤 아펩이 별을 삼키며, 내가 이어 붙였던 하늘의 눈을 다시 부쉈다.",
+        Thoth, "나는 서고를 떠날 수 없다. 이 우자트 부적을 가져가라. 매의 신전에 부적을 기다리는 자리가 있다.",
+        Thoth, "눈을 잇는 순서는 벽화에 남겨 두었다. 기억하는 자만이 다시 이을 수 있다.");
     public static DialogueLine[] FinaleAfter => ThothState.Lines(
         Me, "세 번째 형판... 이제 중앙 홀로 돌아가자.");
 
     // ================= 숨은 방 =================
     public static DialogueLine[] FragShelf => ThothState.Lines(Me, "책장 위에 달 모양 금 조각이 있어.");
     public static DialogueLine[] FragDust => ThothState.Lines(Me, "먼지 밑에서 달 모양 금 조각이 나왔어.");
-    public static DialogueLine[] FragDial => ThothState.Lines(Me, "시계 가운데서 달 모양 금 조각이 굴러 나왔어.");
-    public static DialogueLine[] NicheLow(int n) => ThothState.Lines(
-        Me, $"벽에 달 모양 홈이 세 개 파여 있어. (달 조각 {n}/3)",
-        Me, "초승달, 반달, 보름달... 모양에 맞는 조각을 찾아야 해.");
+    public static DialogueLine[] FragDial => ThothState.Lines(
+        Me, "달 시계 가운데 판이 덜컹거려... 밑에 뭔가 끼어 있어.",
+        Me, "달 모양 금 조각이다.");
     public static DialogueLine[] NicheOpen => ThothState.Lines(Me, "세 조각을 끼우니... 벽이 안쪽으로 열린다!");
     public static DialogueLine[] NicheSeen => ThothState.Lines(Me, "토트의 책이 잠든 물길로 이어진 벽. 읽지 말고 기억만 하자.");
     public static DialogueLine[] VaultAfter => ThothState.Lines(
-        Me, "돌아 나오는 길에 작은 점토판을 주웠어. 책의 첫 줄만 옮겨 적혀 있다.");
+        Me, "돌아 나오는 길에 작은 석판을 주웠어. 책의 첫 줄이 새겨져 있다.",
+        Me, "...심판의 날, 이 글이 한 번은 나를 지켜 줄 것 같아.");
 }

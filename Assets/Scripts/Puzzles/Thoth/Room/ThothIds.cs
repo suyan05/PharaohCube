@@ -4,11 +4,11 @@ using UnityEngine;
 
 // 토트의 방 (달의 서고) 이름표: 씬, 플래그, 아이템
 // 진행: 벽화 A(서쪽) -> 벽화 B(동쪽) -> 서기관 책상(거짓 기록) -> 달 시계 -> 벽화 C(북쪽 벽감) -> 글자판 주문 -> 지혜의 문
-// 숨은 방: 달 조각 3개 (복도 책장 / 달 시계 보상 / 동쪽 먼지 구석) -> 동쪽 벽의 홈 -> '토트의 책'
+// 숨은 방: 달 조각 3개 (복도 책장 / 다 맞춘 달 시계를 다시 보기 / 동쪽 먼지 구석) -> 동쪽 벽의 홈(조각 3개 전엔 안 보임) -> '토트의 책'
 public static class ThothIds
 {
     public const string Scene = "Puzzle_Thoth_Tilemap";
-    public const string HallScene = "CentralRoom_Temp";
+    public const string HallScene = HallScenes.Main; // [수정] 진짜 중앙 홀
 
     // ================= 플래그 =================
     public const string Intro = "F_TH_INTRO";

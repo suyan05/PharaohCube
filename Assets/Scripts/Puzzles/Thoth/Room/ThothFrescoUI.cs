@@ -13,7 +13,7 @@ using UnityEngine.UI;
 // - 맞춘 조각은 플래그로 기억 (나갔다 와도 그대로)
 public class ThothFrescoUI : ThothPanel
 {
-    private const float SnapDistance = 40f;
+    private const float SnapDistance = 28f; // [수정] 난이도: 40 -> 28 (더 정확히 놓아야 붙음)
     private const float TrayScale = 0.55f;
     private static readonly Vector2 BoardPos = new Vector2(-250f, 30f);
     private static readonly Vector2 TrayPos = new Vector2(610f, 30f);

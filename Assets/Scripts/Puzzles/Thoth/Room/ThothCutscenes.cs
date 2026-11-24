@@ -47,8 +47,7 @@ public static class ThothCutscenes
         CineCamera.Focus(d.Skylight.position);
         yield return Cine.Wait(0.6f);
         yield return Cine.Say(ThothLines.DialReveal);
-        yield return Cine.Say(ThothLines.FragDial);
-        yield return ThothFrescoWall.GrantPopup(ThothIds.MoonFrag(2));
+        // [수정] 달 조각(2)은 여기서 주지 않음 -> 다 맞춘 달 시계를 다시 들여다봐야 나옴 (숨은 방을 진짜 숨김)
         CineCamera.Release();
         Cine.End();
     }
@@ -103,7 +102,8 @@ public static class ThothCutscenes
         Image black = UIBuild.Stretch(root, "Black").gameObject.AddComponent<Image>();
         black.color = new Color(0f, 0f, 0f, 0f);
         Image art = UIBuild.Stretch(root, "Art").gameObject.AddComponent<Image>();
-        art.sprite = ThothState.Art("UI/UI_Illust");
+        Sprite god = GodIllustration.Get(2); // [수정] 공용 신 일러스트 (Illustration/Thoth.png) 우선
+        art.sprite = god != null ? god : ThothState.Art("UI/UI_Illust");
         art.preserveAspect = true;
         art.color = new Color(1f, 1f, 1f, 0f);
         GameAudio.Play("sfx_dream_shimmer", 0.8f, 0.6f);

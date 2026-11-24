@@ -38,6 +38,8 @@ public class ThothPickup : MonoBehaviour, IInteractable
     private Collider2D col;
 
     private bool IsPiece => !string.IsNullOrEmpty(fresco) && piece >= 0;
+    // [추가] 숨은 방 달 조각: 반짝임 없음 + 평범한 안내 (진짜 숨겨진 물건처럼)
+    private bool IsSecret => !IsPiece && !string.IsNullOrEmpty(itemId) && itemId.StartsWith("ITEM_TH_MOON_");
     private string TakenFlag => IsPiece ? ThothIds.Piece(fresco, piece) : "F_TH_GOT_" + itemId;
     private bool Taken => ThothState.Has(TakenFlag) || (!IsPiece && ThothState.HasItem(itemId));
     private bool Unlocked => string.IsNullOrEmpty(requireFlag) || ThothState.Has(requireFlag);
@@ -63,13 +65,14 @@ public class ThothPickup : MonoBehaviour, IInteractable
         if (art != null) art.enabled = visible;
         if (col != null) col.enabled = visible;
         if (glint == null) return;
-        glint.enabled = visible && !Taken && Unlocked;
+        glint.enabled = visible && !Taken && Unlocked && !IsSecret;
         if (glint.enabled) glint.color = new Color(1f, 0.9f, 0.55f, 0.35f + Mathf.Sin(Time.time * 3f + transform.position.x) * 0.25f);
     }
 
     public string GetPrompt()
     {
         if (Taken || !Unlocked) return "E: 살펴보기";
+        if (IsSecret) return hold ? "E 길게: 살펴보기" : "E: 살펴보기";
         return hold ? "E 길게: " + prompt.Replace("E: ", "") : prompt;
     }
 
