@@ -20,14 +20,14 @@ public class HallTempLines
     public DialogueLine[] voice =
     {
         new DialogueLine(Voice, "다음 신전에는 빛이 들지 않는다."),
-        new DialogueLine(Voice, "라가 내어준 이 불을 가져가라.")
+        new DialogueLine(Voice, "태양의 문장에 남은 라의 불을 가져가라.")
     };
 
     public DialogueLine[] needTorch = { new DialogueLine(Me, "불을 옮겨 담을 게 필요해. 저 걸이에 횃불이 있다.") };
 
     public DialogueLine[] gotTorch = { new DialogueLine(Me, "됐다. 이 불이면 어두운 곳도 갈 수 있겠어.") };
 
-    public DialogueLine[] toDoor = { new DialogueLine(Me, "북쪽 문 너머가 첫 번째 신전... 태양의 신, 라.") };
+    public DialogueLine[] toDoor = { new DialogueLine(Me, "남쪽, 태양 문장 너머가 첫 번째 신전... 태양의 신, 라.") }; // [수정] 중앙 홀 타일맵: 라의 문은 남쪽
 
     // 신전을 끝내고 돌아왔을 때 (신전마다 다른 대사는 HallTempDirector의 Routes 칸)
     public DialogueLine[] returnArrive = { new DialogueLine(Me, "돌아왔다... 큐브가 나를 부르는 것 같아.") };

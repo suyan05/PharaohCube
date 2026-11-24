@@ -61,6 +61,8 @@ public static class CentralRoomTilemapSetup
             HallTempDirector director = AddSystems(log);
             HallDoorBoard board = director != null ? director.GetComponent<HallDoorBoard>() : null;
             if (board != null) LinkDoors(director, board, log);
+            PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+            CentralRoomTilemapDecor.Build(player != null ? player.transform : null, log);
             EditorSceneManager.MarkAllScenesDirty();
             EditorSceneManager.SaveOpenScenes();
             CentralRoomTilemapBuildList.Apply(log);
@@ -211,6 +213,10 @@ public static class CentralRoomTilemapSetup
         so.FindProperty("returnPoint").vector2Value = ArrivePoint;
         so.FindProperty("returnWalkPoint").vector2Value = CubeFront;
         so.FindProperty("objDoor").stringValue = "남쪽 라의 문으로 태양의 신전에 들어가자";
+        Transform sun = FindComp<Transform>("Ra"); // 남쪽 바닥의 태양 문장 -> 라의 불이 여기서 나옴
+        so.FindProperty("fireSource").objectReferenceValue = sun;
+        SetLine(so, "lines.voice", 1, "???", "태양의 문장에 남은 라의 불을 가져가라.");
+        SetLine(so, "lines.toDoor", 0, "나", "남쪽, 태양 문장 너머가 첫 번째 신전... 태양의 신, 라.");
         so.ApplyModifiedPropertiesWithoutUndo();
         log.AppendLine($"- 진행: 큐브 {(cube != null ? "O" : "X")}, 화로 {(brazier != null ? "O" : "X")}, 횃불 걸이 {(FindComp<Inspectable>("TorchRack") != null ? "O" : "X")}");
     }
@@ -245,6 +251,7 @@ public static class CentralRoomTilemapSetup
         for (int i = 0; i < Doors.Length; i++)
         {
             SceneDoor door = MakeDoor(root, Doors[i]);
+            CentralRoomTilemapDecor.AddDoorGlow(door, i);
             entries[i] = new HallDoorBoard.Entry { god = Doors[i].god, door = door };
         }
         board.EditorSetup(entries);
@@ -282,6 +289,17 @@ public static class CentralRoomTilemapSetup
     private static string[] GodNames() => HallCubeInsert.GodNames;
 
     // ================= 도우미 =================
+    // 씬에 저장된 대사 한 줄 바꾸기 (HallTempLines 기본값을 바꿔도 이미 만든 씬에는 안 들어가서)
+    private static void SetLine(SerializedObject so, string path, int index, string speaker, string text)
+    {
+        SerializedProperty arr = so.FindProperty(path);
+        if (arr == null || !arr.isArray) return;
+        if (arr.arraySize <= index) arr.arraySize = index + 1;
+        SerializedProperty line = arr.GetArrayElementAtIndex(index);
+        line.FindPropertyRelative("speaker").stringValue = speaker;
+        line.FindPropertyRelative("text").stringValue = text;
+    }
+
     private static Tilemap FindTilemap(string name)
     {
         foreach (Tilemap t in Object.FindObjectsByType<Tilemap>(FindObjectsSortMode.None))

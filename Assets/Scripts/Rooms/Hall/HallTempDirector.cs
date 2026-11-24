@@ -27,6 +27,8 @@ public class HallTempDirector : MonoBehaviour
     [SerializeField] private HallCubeInsert cubeInsert;
     [Tooltip("[추가] 중앙 홀(타일맵)의 신전 문 여러 개. 비우면 같은 오브젝트에서 찾고, 없으면 예전처럼 북쪽 문(door) 하나만 씀")]
     [SerializeField] private HallDoorBoard doorBoard;
+    [Tooltip("[추가] 라의 불이 나오는 곳 (중앙 홀 타일맵: 남쪽 태양 문장). 비우면 예전처럼 큐브에서 나옴")]
+    [SerializeField] private Transform fireSource;
 
     [Header("플래그")]
     [SerializeField] private string introFlag = "F_HALL_TEMP_INTRO";
@@ -123,7 +125,9 @@ public class HallTempDirector : MonoBehaviour
             yield return cube.Pulse(3f, 1.2f);
         }
         yield return EmoteBalloonUI.Show(player, "!", 0.6f);
-        if (cube != null && brazier != null) yield return LightStream(cube.transform.position + Vector3.up * 1.2f, brazier.transform.position + Vector3.up * 0.8f);
+        if (fireSource != null) yield return SunFlare(fireSource.position);
+        Vector3 from = fireSource != null ? fireSource.position : (cube != null ? cube.transform.position + Vector3.up * 1.2f : Vector3.zero);
+        if ((fireSource != null || cube != null) && brazier != null) yield return LightStream(from, brazier.transform.position + Vector3.up * 0.8f);
         if (brazier != null)
         {
             CineCamera.Shake(0.4f, 0.06f);
@@ -147,6 +151,25 @@ public class HallTempDirector : MonoBehaviour
         }
         if (orb != null) Destroy(orb);
         CineCamera.Focus(to);
+    }
+
+    // [추가] 큐브의 빛에 응답해 바닥의 태양 문장이 타오름 -> 거기서 라의 불이 화로로 날아감
+    private IEnumerator SunFlare(Vector3 at)
+    {
+        CineCamera.Focus(at);
+        yield return Cine.Wait(0.6f);
+        GameObject orb = CreateOrb(at);
+        GameAudio.Play("sfx_dream_shimmer", 0.7f, 1.2f);
+        Light2D light = orb.GetComponent<Light2D>();
+        for (float t = 0f; t < 1.2f && !Cine.Skipping && !Cine.Hurry; t += Time.deltaTime)
+        {
+            float u = t / 1.2f;
+            orb.transform.localScale = Vector3.one * Mathf.Lerp(0.4f, 2.6f, u);
+            if (light != null) light.pointLightOuterRadius = Mathf.Lerp(1f, 6f, u);
+            CineFX.Sparkle(FxSprites.Dots, at, 1);
+            yield return null;
+        }
+        Destroy(orb);
     }
 
     private static GameObject CreateOrb(Vector3 at)

@@ -35,6 +35,7 @@ public class HallDoorBoard : MonoBehaviour
         {
             Entry open = FindOpen(latest);
             foreach (Entry e in doors) Lock(e, open, cleared);
+            foreach (Entry e in doors) SetGlow(e, e == open);
             if (open == null) return null;
             Unlock(open, latest);
             return open.door.transform;
@@ -76,6 +77,14 @@ public class HallDoorBoard : MonoBehaviour
         open.door.Retarget(latest.nextPrompt, latest.nextScene);
         if (!latest.needTorch) open.door.SetRequiredItem("");
         Debug.Log($"[HallDoorBoard] {open.god}의 문 -> {latest.nextScene}");
+    }
+
+    // [추가] 열린 문만 그 신의 색으로 은은하게 빛남 (문 아래 'Glow' 자식, 메뉴가 만듦)
+    private static void SetGlow(Entry e, bool on)
+    {
+        if (e == null || e.door == null) return;
+        Transform glow = e.door.transform.Find("Glow");
+        if (glow != null && glow.gameObject.activeSelf != on) glow.gameObject.SetActive(on);
     }
 
     private Entry Find(Predicate<Entry> match)
