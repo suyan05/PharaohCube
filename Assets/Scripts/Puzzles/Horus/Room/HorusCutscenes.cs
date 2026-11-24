@@ -381,6 +381,7 @@ public static class HorusCutscenes
         yield return SkyReturns(d);
         yield return MuralStage.Play(HorusMuralScenes.For(HorusMuralScenes.EndingKey));
         yield return FinaleLines(d);
+        yield return GodIllustration.Play(3); // [추가] 형판을 받기 직전 호루스 일러스트 (Illustration/Horus.png)
         yield return PlateToPlayer(plate);
         yield return Cine.Say(Khepri, "하늘이 우리 편이다.");
         yield return DoorOpens();

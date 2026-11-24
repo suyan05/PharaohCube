@@ -280,7 +280,7 @@ public class ConstellationChartPuzzle : PuzzleBase
     // ================= 안내선 기억형 (3단계부터) =================
     // 단계에 들어올 때 / 성도판을 열 때 / 별 조각을 끼울 때 -> memoryGuideSeconds 동안만 흐린 선 표시
     // 선을 긋기 시작하면 바로 숨김. 다시 보고 싶으면 성도판을 닫았다 열면 됨
-    private bool IsMemoryStage => memoryGuideFromStage > 0 && memoryGuideSeconds > 0f && stageIndex + 1 >= memoryGuideFromStage;
+    private bool IsMemoryStage => memoryGuideSeconds > 0f && stageIndex + 1 >= Mathf.Min(memoryGuideFromStage <= 0 ? 99 : memoryGuideFromStage, HorusDifficulty.H2MemoryFromStage); // [수정] 난이도 표: 2단계부터
 
     private void ShowGuideForStage()
     {
@@ -293,7 +293,7 @@ public class ConstellationChartPuzzle : PuzzleBase
 
     private IEnumerator MemoryGuideRoutine()
     {
-        yield return new WaitForSeconds(memoryGuideSeconds);
+        yield return new WaitForSeconds(HorusDifficulty.Shorter(memoryGuideSeconds, HorusDifficulty.H2MemorySeconds)); // [수정] 난이도 표
         memoryRoutine = null;
         if (guide != null) guide.HideGuide();
         ShowCard(false);

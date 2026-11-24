@@ -3,7 +3,7 @@ using UnityEngine;
 // 호루스의 방 벽화 컷신 대본 (이집트 벽화 인형극)
 // [수정] 최종 스토리(B안)에는 이시스가 나오지 않음 -> 회상은 호루스가 자기 기억으로 들려줌 (이시스 장면 데이터는 남겨 둠, 안 부름)
 // - (안 씀) 입구 이시스 석상: IsisKey   오시리스의 왕좌 -> 갈대숲의 이시스와 아기 호루스
-// - 성좌 2 (H3 우자트 차례): Eye()   호루스와 세트의 싸움, 눈이 여섯 조각 -> 토트가 큰 조각부터 이어 붙임
+// - 성좌 2 (H3 우자트 차례): Eye()   [수정] 옛 싸움은 짧게 -> 오늘 밤 아펩이 하늘의 눈을 다시 부숨 (잇는 순서는 토트의 방 벽화에서 배움)
 // - 성좌 3 (H4 돌배 차례): Race()   돌배 경주, 세트의 돌배가 가라앉음 -> 퍼즐 힌트 (세트 배를 강에 가라앉혀 다리로)
 // - H5 클리어 (엔딩): Ending()   신들의 재판 -> 왕이 된 호루스 + 서쪽 벽 복선
 // 움직임 값: 벽화 픽셀 기준 (오른쪽 +x, 아래 +y), 회전은 도(+ = 반시계), 시간은 장면 진행도 0~1
@@ -79,27 +79,25 @@ public static class HorusMuralScenes
             s.Layer(EyeParts[i]);
             s.Move(EyeParts[i], MuralPose.Rest, new MuralPose(fly[i].x, fly[i].y, 40f * (i % 2 == 0 ? 1f : -1f), 0.55f), 0.45f, 0.8f);
         }
-        return s.Say(Horus, "왕좌를 두고 나는 세트와 오래도록 싸웠다.")
-                .Say(Horus, "싸움 끝에 세트는 나의 왼눈을 뽑아 여섯 조각으로 찢어 버렸다.");
+        return s.Say(Horus, "아주 먼 옛날, 세트가 찢은 나의 왼눈을 토트가 이어 주었다.")
+                .Say(Horus, "그런데 오늘 밤, 아펩이 별을 삼키며 하늘의 내 눈을 다시 여섯 조각으로 부숴 버렸다.");
     }
 
-    // 토트가 큰 몫부터 차례로 이어 붙임 (H3 규칙 힌트). 마지막 눈물 조각은 마법으로 천천히 채워짐
+    // [수정] 하늘에 흩어진 눈 조각 (H3). 토트가 잇는 장면은 토트의 방에서만 -> 여기서는 순서를 보여 주지 않음 (난이도)
     private static MuralShot EyeThoth()
     {
         MuralShot s = new MuralShot("EyeB", "EyeB", 9f)
             .Camera(1f, 1.08f, Vector2.zero, new Vector2(60f, -10f))
             .Layer("thoth");
-        Vector2[] from = { new Vector2(-300f, -120f), new Vector2(260f, -160f), new Vector2(300f, 100f), new Vector2(-260f, 130f), new Vector2(120f, 200f), new Vector2(0f, -220f) };
+        Vector2[] to = { new Vector2(-300f, -120f), new Vector2(260f, -160f), new Vector2(300f, 100f), new Vector2(-260f, 130f), new Vector2(120f, 200f), new Vector2(0f, -220f) };
         for (int i = 0; i < EyeParts.Length; i++)
         {
-            float t0 = 0.08f + i * 0.13f;
-            float t1 = i == EyeParts.Length - 1 ? 0.98f : t0 + 0.12f;
             s.Layer(EyeParts[i]);
-            s.Move(EyeParts[i], new MuralPose(from[i].x, from[i].y, 30f, 0f), MuralPose.Rest, t0, t1);
+            s.Move(EyeParts[i], MuralPose.Rest, new MuralPose(to[i].x, to[i].y, 30f, 0.8f), 0.1f, 0.6f); // 한꺼번에 흩어짐 (순서 힌트 없음)
         }
-        return s.Say(Horus, "지혜의 신 토트가 흩어진 조각을 주워 모았다. 가장 큰 몫부터, 차례로.")
-                .Say(Horus, "마지막 한 조각은 끝내 찾지 못해, 토트가 마법으로 채웠지.")
-                .Say(Horus, "...그 눈을 다시 이어다오. 큰 조각부터다.");
+        return s.Say(Horus, "토트는 서고를 지키느라 이곳에 올 수 없다.")
+                .Say(Horus, "너는 그의 서고를 지나왔다. 토트가 어떤 순서로 눈을 이었는지 기억하느냐?")
+                .Say(Horus, "...이번엔 네 손으로 이어다오. 순서를 어기면 조각이 모두 튕겨 나간다.");
     }
 
     // ================= 성좌 3: 돌배 경주 =================

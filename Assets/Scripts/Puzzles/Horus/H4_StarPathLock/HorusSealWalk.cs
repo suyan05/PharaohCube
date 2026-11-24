@@ -41,6 +41,7 @@ public class HorusSealWalk : PuzzleBase, IInteractable
     [SerializeField] private float sweepPeriod = 7f;
     [SerializeField] private float gazeHalfAngle = 15f;
     [SerializeField] private float gazeRange = 7.5f;
+    private float GazeRange => HorusDifficulty.Later(gazeRange, HorusDifficulty.H4SealGazeRange); // [추가] 난이도 표: 조금 더 멀리 봄
 
     private static readonly Color Gold = new Color(1f, 0.82f, 0.38f, 1f);
     private static readonly Color Red = new Color(1f, 0.25f, 0.2f, 1f);
@@ -130,7 +131,7 @@ public class HorusSealWalk : PuzzleBase, IInteractable
         gaze = go.GetComponent<Light2D>();
         gaze.lightType = Light2D.LightType.Point;
         gaze.color = new Color(1f, 0.3f, 0.25f);
-        gaze.pointLightOuterRadius = gazeRange;
+        gaze.pointLightOuterRadius = GazeRange;
         gaze.pointLightInnerRadius = 0.5f;
         gaze.pointLightInnerAngle = gazeHalfAngle * 2f;
         gaze.pointLightOuterAngle = gazeHalfAngle * 2f + 12f;
@@ -235,14 +236,14 @@ public class HorusSealWalk : PuzzleBase, IInteractable
         eyeGlow.color = new Color(Red.r, Red.g, Red.b, Mathf.MoveTowards(eyeGlow.color.a, target * 0.85f, Time.deltaTime));
         if (!awake || Paused) return;
         sweepTime += Time.deltaTime;
-        float angle = 180f + sweepDegrees * Mathf.Sin(sweepTime / sweepPeriod * Mathf.PI * 2f);
+        float angle = 180f + sweepDegrees * Mathf.Sin(sweepTime / Mathf.Min(sweepPeriod, HorusDifficulty.H4SealSweepPeriod) * Mathf.PI * 2f); // [수정] 난이도 표: 조금 더 빨리
         gaze.transform.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
     private bool SeenBySet(Vector3 p)
     {
         Vector2 v = p - gaze.transform.position;
-        if (v.magnitude > gazeRange) return false;
+        if (v.magnitude > GazeRange) return false;
         return Vector2.Angle(gaze.transform.up, v) <= gazeHalfAngle;
     }
 
@@ -345,7 +346,7 @@ public class HorusSealWalk : PuzzleBase, IInteractable
         yield return ScreenTintUI.Flash(new Color(1f, 0.2f, 0.15f, 0.3f), 0.03f, 0.05f, 0.35f);
         ClearPath();
         busy = false;
-        if (failCount > 0 && failCount % failsForHint == 0) StartCoroutine(MuralHint());
+        if (failCount > 0 && failCount % HorusDifficulty.Later(failsForHint, HorusDifficulty.H4SealFailsForHint) == 0) StartCoroutine(MuralHint()); // [수정] 난이도 표
     }
 
     private void ClearPath()

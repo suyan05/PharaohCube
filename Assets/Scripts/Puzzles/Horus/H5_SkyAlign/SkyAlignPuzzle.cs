@@ -28,6 +28,8 @@ public class SkyAlignPuzzle : PuzzleBase
     [Header("힌트 (기획서 9.7)")]
     [SerializeField] private int failsForTrapHint = 3;
     [SerializeField] private int failsForNextHint = 5;
+    private int TrapHintAt => HorusDifficulty.Later(failsForTrapHint, HorusDifficulty.H5FailsForTrapHint); // [추가] 난이도 표
+    private int NextHintAt => HorusDifficulty.Later(failsForNextHint, HorusDifficulty.H5FailsForNextHint); // [추가] 난이도 표
 
     [Header("제단 별 (기획서 6.4: 1 메스케티우 ~ 6 매)")]
     [SerializeField] private List<SkyStar> stars = DefaultStars();
@@ -149,14 +151,14 @@ public class SkyAlignPuzzle : PuzzleBase
         input.Clear();
         WrongFlash = false;
         busy = false;
-        TrapHint = failCount >= failsForTrapHint;
+        TrapHint = failCount >= TrapHintAt;
         UpdateNextHint();
         OnStateChanged?.Invoke();
     }
 
     private void UpdateNextHint()
     {
-        bool show = failCount >= failsForNextHint && input.Count < answer.Count;
+        bool show = failCount >= NextHintAt && input.Count < answer.Count;
         NextHintStar = show ? answer[input.Count] : -1;
     }
 
@@ -172,8 +174,8 @@ public class SkyAlignPuzzle : PuzzleBase
         bool touchedTrap = false;
         foreach (int i in input) if (stars[i].isTrap) touchedTrap = true;
         if (touchedTrap) return "붉은 별에 손이 닿자 하늘이 흔들린다. 이 별은 따르면 안 된다.";
-        if (failCount >= failsForNextHint) return "별들이 흩어졌다... 다음에 이을 별이 희미하게 빛난다.";
-        if (failCount >= failsForTrapHint) return "별들이 흩어졌다... 붉은 별이 떨고 있다.";
+        if (failCount >= NextHintAt) return "별들이 흩어졌다... 다음에 이을 별이 희미하게 빛난다.";
+        if (failCount >= TrapHintAt) return "별들이 흩어졌다... 붉은 별이 떨고 있다.";
         return "별들이 흩어졌다. 순서가 맞지 않는다. 왼쪽 카드와 오른쪽 단서를 엮어 보자.";
     }
 

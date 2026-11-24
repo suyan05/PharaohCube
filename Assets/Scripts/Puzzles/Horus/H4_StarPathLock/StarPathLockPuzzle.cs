@@ -182,7 +182,7 @@ public class StarPathLockPuzzle : PuzzleBase
         drawer.ClearAll();
         drawer.SetInputEnabled(true);
         busy = false;
-        if (failCount > 0 && failCount % failsForHint == 0) StartCoroutine(MuralHint());
+        if (failCount > 0 && failCount % HorusDifficulty.Later(failsForHint, HorusDifficulty.H4FailsForHint) == 0) StartCoroutine(MuralHint()); // [수정] 난이도 표
     }
 
     private IEnumerator MuralHint()
@@ -190,7 +190,7 @@ public class StarPathLockPuzzle : PuzzleBase
         HintCut = 0;
         Message("벽화의 첫 장면이 빛난다 - 매는 어느 쪽에서 떠올랐을까?");
         OnStateChanged?.Invoke();
-        yield return new WaitForSeconds(hintDuration);
+        yield return new WaitForSeconds(HorusDifficulty.Shorter(hintDuration, HorusDifficulty.H4HintSeconds)); // [수정] 난이도 표
         HintCut = -1;
         OnStateChanged?.Invoke();
     }

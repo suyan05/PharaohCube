@@ -63,7 +63,7 @@ public class WedjatRestorePuzzle : PuzzleBase
     {
         if (!timerRunning || HintActive || IsCleared || !IsUnlocked) return;
         hintTimer += Time.deltaTime;
-        if (hintTimer < hintDelay) return;
+        if (hintTimer < HorusDifficulty.Later(hintDelay, HorusDifficulty.H3HintDelay)) return; // [수정] 난이도 표: 60초
         HintActive = true;
         Message("어긋난 조각의 테두리가 붉게 빛난다...");
         OnStateChanged?.Invoke();
@@ -171,10 +171,12 @@ public class WedjatRestorePuzzle : PuzzleBase
             rotation[i] = ((pieces[i].startRotation % 4) + 4) % 4;
         }
         scatterCount++;
-        Message(scatterCount >= 2
-            ? "조각이 다시 튕겨 나갔다... 토트는 '가장 큰 몫'부터 이었다. 감각마다 몫이 다르다고 했지."
-            : "조각을 끼우자 눈 전체가 흩어졌다! 이을 순서가 있는 것 같다.");
-        Debug.Log("[노트 7] 토트는 찢긴 눈을 가장 큰 몫부터 작은 몫의 순서로 이었다.");
+        // [수정] 난이도: 규칙은 토트의 방 벽화에서 배움. 여기서는 3번 흩어진 뒤에야 알려 줌 (노트도 그때)
+        bool tell = scatterCount >= HorusDifficulty.H3ScattersForRule;
+        Message(tell
+            ? "조각이 다시 튕겨 나갔다... 토트의 서고 벽화: 큰 것에서 작은 것으로. 감각마다 몫이 다르다고 했지."
+            : "조각을 끼우자 눈 전체가 흩어졌다! 토트는 어떤 순서로 이었더라...");
+        if (tell) Debug.Log("[노트 7] 토트는 찢긴 눈을 가장 큰 몫부터 작은 몫의 순서로 이었다.");
         OnStateChanged?.Invoke();
     }
 
@@ -221,7 +223,7 @@ public class WedjatRestorePuzzle : PuzzleBase
             return "은빛 실이 조각 사이를 잇자 눈의 윤곽이 드러났다!";
         }
         if (HintActive) return "어긋난 조각의 테두리가 붉게 빛난다...";
-        return "조각을 모양이 같은 자리로 끌어다 놓자. 클릭하면 90도 회전한다. (잇는 순서가 있다 - 비석의 글을 떠올리자)";
+        return "조각을 모양이 같은 자리로 끌어다 놓자. 클릭하면 90도 회전한다. (잇는 순서가 있다 - 토트의 벽화와 이 방 비석을 떠올리자)";
     }
 
     private void Complete()

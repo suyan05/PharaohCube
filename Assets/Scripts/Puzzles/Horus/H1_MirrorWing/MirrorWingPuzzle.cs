@@ -213,14 +213,14 @@ public class MirrorWingPuzzle : PuzzleBase
         pendingWrong.Clear();
         drawer.SetInputEnabled(true);
         busy = false;
-        if (failCount > 0 && failCount % failsForHint == 0) StartCoroutine(AxisHintRoutine());
+        if (failCount > 0 && failCount % HorusDifficulty.Later(failsForHint, HorusDifficulty.H1FailsForHint) == 0) StartCoroutine(AxisHintRoutine()); // [수정] 난이도 표
     }
 
     private IEnumerator AxisHintRoutine()
     {
         guide.ShowLayer(AxisLayer, StarGraph.BuildEdgeSet(axisEdges), axisColor, 14f);
         Message("대칭축이 빛난다 - 이 선을 기준으로 왼쪽 날개를 뒤집어 보자.");
-        yield return new WaitForSeconds(hintDuration);
+        yield return new WaitForSeconds(HorusDifficulty.Shorter(hintDuration, HorusDifficulty.H1HintSeconds)); // [수정] 난이도 표
         guide.HideLayer(AxisLayer);
     }
 
