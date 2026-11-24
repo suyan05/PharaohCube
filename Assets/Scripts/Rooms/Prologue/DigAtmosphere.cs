@@ -79,8 +79,10 @@ public class DigAtmosphere : MonoBehaviour
     // ================= 바닥 장식 =================
     private void PlaceDecor()
     {
-        Decal("Grid", 20.4f, 5.6f, false);
-        Decal("Grid", 23.6f, 3.9f, true);
+        // [수정] 발굴 격자 2개를 로프 안(x 18.5~25.5, y 2~7)에 나란히, 위아래 여백 1칸씩
+        Decal("Grid", GridA.x, GridA.y, false);
+        Decal("Grid", GridB.x, GridB.y, true);
+        AlignSandPiles();
         Decal("Column", 10.8f, 10.5f, false);
         Decal("Column", 16.9f, 1.6f, true);
         Decal("Bones", 8.6f, 2.0f, false);
@@ -92,6 +94,30 @@ public class DigAtmosphere : MonoBehaviour
         var rng = new System.Random(47); // 발굴 47일째
         for (int i = 0; i < 9; i++) Scatter("Ripple", rng);
         for (int i = 0; i < 7; i++) Scatter(i % 2 == 0 ? "Pebbles_A" : "Pebbles_B", rng);
+    }
+
+    // [추가] 모래 더미 3개를 격자 칸 한가운데로 (예전: 하나는 격자 밖, 하나는 격자 테두리에 걸림)
+    // 격자 1칸 = 1유닛, 더미 그림은 발밑 기준이라 칸 가운데보다 조금 아래에 둠
+    private static readonly Vector2 GridA = new Vector2(20.5f, 4.5f);
+    private static readonly Vector2 GridB = new Vector2(23.7f, 4.5f);
+    private static readonly string[] PileNames = { "PRO_OBJ_SAND_01", "PRO_OBJ_SAND_02", "PRO_OBJ_SAND_03" };
+    private static readonly Vector2[] PileCells =
+    {
+        GridA + new Vector2(-1f, 1f),   // 왼쪽 격자 왼쪽 위 칸
+        GridA + new Vector2(1f, -1f),   // 왼쪽 격자 오른쪽 아래 칸
+        GridB + new Vector2(1f, 0f)     // 오른쪽 격자 오른쪽 가운데 칸
+    };
+    private const float PileFootOffset = 0.32f;
+
+    private static void AlignSandPiles()
+    {
+        for (int i = 0; i < PileNames.Length; i++)
+        {
+            GameObject pile = GameObject.Find(PileNames[i]);
+            if (pile == null) continue;
+            Vector2 c = PileCells[i];
+            pile.transform.position = new Vector3(c.x, c.y - PileFootOffset, pile.transform.position.z);
+        }
     }
 
     private void Scatter(string art, System.Random rng)
