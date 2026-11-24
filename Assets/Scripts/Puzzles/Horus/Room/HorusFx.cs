@@ -40,7 +40,7 @@ public static class HorusFx
         SpriteRenderer sr = Spawn("FlyingFalcon", falcon, from, size, color, order);
         Vector3 baseScale = sr.transform.localScale;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = Mathf.SmoothStep(0f, 1f, t / seconds);
@@ -74,7 +74,7 @@ public static class HorusFx
     {
         SpriteRenderer glow = RaGlowFx.Glow(null, pos, size, color, Layer, Above - 1);
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float a = Mathf.Sin(Mathf.Clamp01(t / seconds) * Mathf.PI);
@@ -91,7 +91,7 @@ public static class HorusFx
         SpriteRenderer sr = Spawn("Emote", bubble, who.position + Vector3.up * 1.6f, 0.55f, Color.white, Above);
         Vector3 full = sr.transform.localScale;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float pop = t < 0.15f ? Mathf.Lerp(0f, 1.25f, t / 0.15f) : Mathf.Lerp(1.25f, 1f, (t - 0.15f) / 0.1f);
@@ -110,7 +110,7 @@ public static class HorusFx
         float from = global.intensity;
         Color fromColor = global.color;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = t / seconds;
@@ -138,7 +138,7 @@ public static class HorusFx
         Vector3 start = t.position;
         Vector3 full = t.localScale;
         float time = 0f;
-        while (time < seconds && target != null && !Cine.Skipping)
+        while (time < seconds && target != null && !Cine.Skipping && !Cine.Hurry)
         {
             time += Time.deltaTime;
             float k = Mathf.SmoothStep(0f, 1f, time / seconds);
@@ -155,7 +155,7 @@ public static class HorusFx
         Vector3 start = sr.transform.position;
         Vector3 full = sr.transform.localScale;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = Mathf.SmoothStep(0f, 1f, t / seconds);

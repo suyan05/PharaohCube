@@ -241,7 +241,7 @@ public static class HorusCutscenes
     {
         if (v == null) yield break;
         float from = v.weight, t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             v.weight = Mathf.Lerp(from, to, t / seconds);

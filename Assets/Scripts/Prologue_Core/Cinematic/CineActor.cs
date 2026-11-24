@@ -100,7 +100,7 @@ public static class CineActor
     public static IEnumerator Fade(Transform actor, float from, float to, float seconds)
     {
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             SetAlpha(actor, Mathf.Lerp(from, to, t / seconds));
@@ -115,7 +115,7 @@ public static class CineActor
 
         Vector3 origin = target.localPosition;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             target.localPosition = origin + (Vector3)(UnityEngine.Random.insideUnitCircle * strength);
@@ -153,7 +153,7 @@ public static class CineActor
 
         Vector3 origin = visual.localPosition;
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float p = Mathf.Clamp01(t / seconds);

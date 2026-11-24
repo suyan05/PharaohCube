@@ -36,7 +36,7 @@ public static class ThothCutscenes
         CineCamera.Zoom(5f, 0.8f);
         GameAudio.Play("sfx_dream_shimmer", 0.7f, 1f);
         yield return Cine.Wait(0.6f);
-        for (float t = 0f; t < 1.6f && !Cine.Skipping; t += Time.deltaTime)
+        for (float t = 0f; t < 1.6f && !Cine.Skipping && !Cine.Hurry; t += Time.deltaTime)
         {
             d.SetBeam(t / 1.6f);
             yield return null;
@@ -62,7 +62,7 @@ public static class ThothCutscenes
         CineCamera.Shake(1.2f, 0.1f);
         SpriteRenderer sr = d.Slab.GetComponentInChildren<SpriteRenderer>();
         Vector3 from = d.Slab.position;
-        for (float t = 0f; t < 1.4f && !Cine.Skipping; t += Time.deltaTime)
+        for (float t = 0f; t < 1.4f && !Cine.Skipping && !Cine.Hurry; t += Time.deltaTime)
         {
             float u = t / 1.4f;
             d.Slab.position = from + Vector3.up * (u * 1.6f);
@@ -115,7 +115,7 @@ public static class ThothCutscenes
 
     private static IEnumerator FadeIllust(Image black, Image art, float from, float to, float seconds)
     {
-        for (float t = 0f; t < seconds && !Cine.Skipping; t += Time.deltaTime)
+        for (float t = 0f; t < seconds && !Cine.Skipping && !Cine.Hurry; t += Time.deltaTime)
         {
             float a = Mathf.Lerp(from, to, t / seconds);
             black.color = new Color(0f, 0f, 0f, a * 0.9f);

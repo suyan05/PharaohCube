@@ -154,7 +154,7 @@ public class HorusIsisGhost : MonoBehaviour
         Vector3 scale = d.transform.localScale;
         d.transform.localScale = new Vector3(scale.x, scale.y * 2.2f, 1f); // 길쭉한 물방울
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             d.transform.position = Vector3.Lerp(land + Vector3.up * 3f, land, (t / seconds) * (t / seconds));
@@ -189,7 +189,7 @@ public class HorusIsisGhost : MonoBehaviour
         var list = new SpriteRenderer[count];
         for (int i = 0; i < count; i++) list[i] = HorusFx.Spawn("Feather", feather, center, 0.28f, Color.white, HorusFx.Above);
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = Mathf.SmoothStep(0f, 1f, t / seconds);
@@ -216,7 +216,7 @@ public class HorusIsisGhost : MonoBehaviour
         GameAudio.Play("sfx_dream_shimmer", 0.8f, 0.85f);
         StartCoroutine(HorusFx.Pulse(transform.position + Vector3.up * 3.1f, 1.2f, ThroneGold, 2.2f)); // 머리 위 왕좌 상징이 빛남
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = Mathf.SmoothStep(0f, 1f, t / seconds);
@@ -237,7 +237,7 @@ public class HorusIsisGhost : MonoBehaviour
         CineCamera.Shake(0.35f, 0.04f);
         StartCoroutine(ScreenTintUI.Flash(new Color(0.75f, 0.88f, 1f, 0.45f), 0.04f, 0.08f, 0.6f));
         float t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             float k = t / seconds;
@@ -298,7 +298,7 @@ public class HorusIsisGhost : MonoBehaviour
     private IEnumerator FoldAround(float seconds)
     {
         float from = wingAngle, t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             wingAngle = Mathf.Lerp(from, -110f, Mathf.SmoothStep(0f, 1f, t / seconds));
@@ -310,7 +310,7 @@ public class HorusIsisGhost : MonoBehaviour
     private IEnumerator FadeOut(float seconds)
     {
         float from = alpha, t = 0f;
-        while (t < seconds && !Cine.Skipping)
+        while (t < seconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             ApplyAlpha(Mathf.Lerp(from, 0f, t / seconds));

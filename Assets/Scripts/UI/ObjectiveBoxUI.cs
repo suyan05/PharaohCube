@@ -66,8 +66,13 @@ public class ObjectiveBoxUI : MonoBehaviour
         Image box = BuildBox(root);
         BuildIcon(box.rectTransform);
 
-        label = UIBuild.Text(box.rectTransform, "Label", font, 28, new Vector2(40f, 0f), new Vector2(520f, 72f), Hex("#4A3423"));
+        // [수정] 두 줄이 되면 위아래 테두리에 겹치던 것 -> 테두리 안쪽 칸에 맞추고, 길면 글자를 줄임
+        label = UIBuild.Text(box.rectTransform, "Label", font, 26, new Vector2(46f, 0f), new Vector2(500f, 56f), Hex("#4A3423"));
         label.alignment = TextAnchor.MiddleLeft;
+        label.lineSpacing = 0.95f;
+        label.resizeTextForBestFit = true;
+        label.resizeTextMinSize = 18;
+        label.resizeTextMaxSize = 26;
         canvasGo.SetActive(false);
     }
 

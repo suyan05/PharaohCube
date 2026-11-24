@@ -101,7 +101,7 @@ public class MuralStage : MonoBehaviour
         shotOver = false;
         Coroutine anim = StartCoroutine(Animate(shot));
         yield return Lines(shot);
-        while (!animDone && !Cine.Skipping) yield return null;
+        while (!animDone && !Cine.Skipping && !NextPressed()) yield return null; // [수정] 마지막 대사 뒤 E -> 남은 움직임을 기다리지 않고 다음 장면
         yield return Cine.Wait(0.4f);
         shotOver = true;
         if (anim != null) StopCoroutine(anim);
@@ -314,7 +314,7 @@ public class MuralStage : MonoBehaviour
     private IEnumerator FadeBlack(float from, float to)
     {
         float t = 0f;
-        while (t < FadeSeconds && !Cine.Skipping)
+        while (t < FadeSeconds && !Cine.Skipping && !Cine.Hurry)
         {
             t += Time.deltaTime;
             SetBlack(Mathf.Lerp(from, to, t / FadeSeconds));

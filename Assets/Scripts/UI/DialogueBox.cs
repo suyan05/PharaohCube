@@ -210,9 +210,10 @@ public class DialogueBox : MonoBehaviour
         portraitImage.sprite = sprite;
 
         float left = has ? PortraitSize.x + 60f : 60f;
-        bodyText.rectTransform.anchoredPosition = BoxPos + new Vector2(left * 0.5f, -20f);
-        bodyText.rectTransform.sizeDelta = new Vector2(BoxSize.x - left - 80f, BoxSize.y - 90f);
-        speakerText.rectTransform.anchoredPosition = BoxPos + new Vector2(-BoxSize.x * 0.5f + left + 200f, 78f);
+        // [수정] 이름이 파피루스 위쪽 테두리에 걸리던 것 -> 테두리 안쪽, 본문과 같은 왼쪽 줄에 맞춤
+        bodyText.rectTransform.anchoredPosition = BoxPos + new Vector2(left * 0.5f, -32f);
+        bodyText.rectTransform.sizeDelta = new Vector2(BoxSize.x - left - 80f, BoxSize.y - 114f);
+        speakerText.rectTransform.anchoredPosition = BoxPos + new Vector2(-BoxSize.x * 0.5f + left + 40f + 200f, 50f);
     }
 
     private void TypeText()
@@ -371,7 +372,7 @@ public class DialogueBox : MonoBehaviour
         Vector2 portraitPos = BoxPos + new Vector2(-BoxSize.x * 0.5f + 30f + PortraitSize.x * 0.5f, 0f);
         portraitImage = UIBuild.Image(root, "Portrait", portraitPos, PortraitSize, null, Color.white);
 
-        speakerText = UIBuild.Text(root, "Speaker", font, 30, Vector2.zero, new Vector2(400f, 44f), Hex("#E07A3F"));
+        speakerText = UIBuild.Text(root, "Speaker", font, 28, Vector2.zero, new Vector2(400f, 40f), Hex("#C0602A"));
         speakerText.alignment = TextAnchor.MiddleLeft;
         speakerText.fontStyle = FontStyle.Bold;
 
