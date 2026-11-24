@@ -70,10 +70,12 @@ public class RaFinaleCut : MonoBehaviour
         bg.color = new Color(0.07f, 0.03f, 0.02f, 1f); // 뒤쪽 클릭 막기 (raycastTarget 기본 켜짐)
 
         stage = UIBuild.Stretch(root, "Stage");
-        bool hasArt = art != null && art.raIllustration != null;
+        // [수정] RaFinaleArt에 그림이 없으면 공용 신 일러스트(Assets/image/Illustration/Ra.png)를 씀
+        Sprite raArt = art != null && art.raIllustration != null ? art.raIllustration : GodIllustration.Get(RaFinaleArt.RaFace);
+        bool hasArt = raArt != null;
         BuildSun(stage, !hasArt);
         // 일러스트 배경이 투명이면 뒤에서 도는 빛줄기가 보임 (꽉 찬 그림이면 그림이 다 덮음)
-        if (hasArt) UIBuild.Image(stage, "Illustration", Vector2.zero, new Vector2(1920f, 1080f), art.raIllustration, Color.white);
+        if (hasArt) UIBuild.Image(stage, "Illustration", Vector2.zero, new Vector2(1920f, 1080f), raArt, Color.white).preserveAspect = true;
         else RaFinaleShapes.Placeholder(stage, bodyFont);
 
         BuildTitle(lines);

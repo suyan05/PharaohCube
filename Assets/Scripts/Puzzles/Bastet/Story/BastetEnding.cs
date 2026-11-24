@@ -61,7 +61,7 @@ public class BastetEnding : MonoBehaviour
     [Tooltip("켜면 형판만 받고 중앙 홀 씬으로 이동 (큐브 끼우기는 중앙 홀에서)")]
     [SerializeField] private bool cubeInHall = false;
     [Tooltip("돌아갈 중앙 홀 씬 이름 (Scene List에 있어야 함)")]
-    [SerializeField] private string hallSceneName = "CentralRoom_Temp";
+    [SerializeField] private string hallSceneName = HallScenes.Main; // [수정] 진짜 중앙 홀
     [TextArea(1, 2)] [SerializeField] private string hallMessage = "형판을 들고 중앙 홀로 돌아갑니다...";
 
     [Header("시간 (초)")]
@@ -151,6 +151,9 @@ public class BastetEnding : MonoBehaviour
             yield return Fade(black, 0f, 1f, fadeTime);
             cut.alpha = 0f;
         }
+
+        // [추가] 형판 직전: 그 신의 일러스트 (바스테트 1 / 소베크 4, Assets/image/Illustration). 없으면 건너뜀
+        yield return GodIllustration.Play(bastetSlot);
 
         // 2) 형판 공개
         platePage.alpha = 1f;
