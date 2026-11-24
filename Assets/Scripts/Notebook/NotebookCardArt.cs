@@ -32,10 +32,22 @@ public static class NotebookCardArt
         { "ACH_SOB_MURAL", "SOBEK_MURALS" }, { "ACH_SOB_VAULT", "SOBEK_CROC_MUMMY" }, { "ACH_SOB_TOOTH", "SOBEK_TOOTH" }
     };
 
+    // [추가] 카드 그림이 따로 없던 업적 5장 -> 게임 안의 벽화 그림을 정사각형으로 잘라서 씀 (Resources 경로, 가로 중심 0~1)
+    private static readonly Dictionary<string, (string path, float focusX)> Murals = new Dictionary<string, (string, float)>
+    {
+        { "ACH_RA_VAULT", ("Horus/Mural/MU_VaultRa_bg", 0.5f) },     // 열두 문의 벽화 (라의 숨은 방)
+        { "ACH_THO_FRESCO", ("Thoth/Fresco/ThFA_full", 0.5f) },      // 채색 벽화 조각 (글자를 만든 토트)
+        { "ACH_THO_BOOK", ("Horus/Mural/MU_VaultTh_bg", 0.5f) },     // 토트의 석판 (토트의 책)
+        { "ACH_HOR_MURAL", ("Horus/Mural/MU_Wall4_bg", 0.5f) },      // 채색 벽화 네 폭 (왕관을 쓴 매)
+        { "ACH_HOR_NEST", ("Horus/Mural/MU_VaultHo_bg", 0.5f) }      // 푸른 매 깃털 (매의 둥지)
+    };
+
     public static Sprite Of(string achievementId)
     {
-        if (string.IsNullOrEmpty(achievementId) || !Files.TryGetValue(achievementId, out string file)) return null;
+        if (string.IsNullOrEmpty(achievementId)) return null;
         if (cache.TryGetValue(achievementId, out Sprite s)) return s;
+        if (Murals.TryGetValue(achievementId, out var mural)) return Cached(achievementId, MuralCrop(mural.path, mural.focusX));
+        if (!Files.TryGetValue(achievementId, out string file)) return null;
         try
         {
             // [수정] 임포트 설정(Sprite 한 장 / Multiple 조각 / Default)에 상관없이 찾도록 세 가지 방법으로 시도
@@ -62,5 +74,34 @@ public static class NotebookCardArt
     }
 
     // [추가] 그림이 연결된 업적인지 (점검 메뉴용)
-    public static bool HasEntry(string achievementId) => !string.IsNullOrEmpty(achievementId) && Files.ContainsKey(achievementId);
+    public static bool HasEntry(string achievementId) => !string.IsNullOrEmpty(achievementId) && (Files.ContainsKey(achievementId) || Murals.ContainsKey(achievementId));
+
+    private static Sprite Cached(string id, Sprite s)
+    {
+        if (s != null) cache[id] = s;
+        return s;
+    }
+
+    // 넓은 벽화에서 가운데 정사각형만 잘라 카드 그림으로
+    private static Sprite MuralCrop(string path, float focusX)
+    {
+        try
+        {
+            Texture2D tex = Resources.Load<Texture2D>(path);
+            if (tex == null)
+            {
+                Debug.LogWarning($"[수첩 카드] 벽화 그림 없음: Resources/{path}");
+                return null;
+            }
+            int side = Mathf.Min(tex.width, tex.height);
+            float x = Mathf.Clamp(tex.width * focusX - side * 0.5f, 0f, tex.width - side);
+            float y = (tex.height - side) * 0.5f;
+            return Sprite.Create(tex, new Rect(x, y, side, side), new Vector2(0.5f, 0.5f), 100f);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[수첩 카드] 벽화 자르기 오류 ({path}): {e.Message}");
+            return null;
+        }
+    }
 }
