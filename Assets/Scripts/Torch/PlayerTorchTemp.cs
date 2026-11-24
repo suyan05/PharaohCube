@@ -47,6 +47,20 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     [Tooltip("방향 바꿀 때 도는 속도 (도/초)")]
     [SerializeField] private float turnSpeed = 540f;
 
+    // [추가] 손전등 같던 좁은 원뿔 -> 앞쪽으로 퍼지는 반원 + 일렁임 + 걸음에 맞춰 흔들림 (손에 든 횃불처럼)
+    private const float HalfDiscOuter = 180f;   // 반원
+    private const float HalfDiscInner = 110f;
+    private const float HalfDiscLength = 1.3f;  // 앞으로 뻗는 길이 = 반경 x 이 값 (예전 1.8)
+    private const float FlickerSpeed = 7f;      // 일렁이는 빠르기
+    private const float FlickerAmount = 0.22f;  // 밝기 흔들림 (0.22 = +-11%)
+    private const float FlickerRadius = 0.08f;  // 크기 흔들림
+    private const float SwayLag = 0.07f;        // 걸을 때 빛이 몸 뒤로 끌리는 정도
+    private const float BobAmount = 0.06f;      // 걸음마다 위아래로 출렁
+    private const float BobSpeed = 11f;
+    private Vector2 sway;
+    private Vector2 swayVel;
+    private float bobPhase;
+
     [Header("배율")]
     [SerializeField] private float litMul = 1.0f;
     [SerializeField] private float litEmberMul = 1.3f;
@@ -155,7 +169,28 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
         }
 
         UpdateFacing();
+        UpdateSway();
         ApplyLight(false);
+    }
+
+    // [추가] 걸으면 빛이 살짝 뒤로 끌리고 걸음마다 출렁임, 멈추면 천천히 손 위치로 돌아옴
+    private void UpdateSway()
+    {
+        Vector2 v = body != null ? body.linearVelocity : Vector2.zero;
+        bool moving = v.sqrMagnitude > 0.04f;
+        if (moving) bobPhase += Time.deltaTime * BobSpeed;
+        Vector2 target = -v * SwayLag + new Vector2(0f, moving ? Mathf.Sin(bobPhase) * BobAmount : 0f);
+        sway = Vector2.SmoothDamp(sway, target, ref swayVel, 0.12f);
+        if (torchLight != null) torchLight.transform.localPosition = sway;
+        if (glowLight != null) glowLight.transform.localPosition = sway * 0.6f;
+    }
+
+    // [추가] 불꽃 일렁임 (두 개의 펄린 노이즈를 섞어서 규칙적이지 않게). 1 근처 값
+    private float Flicker(float seed)
+    {
+        float a = Mathf.PerlinNoise(Time.time * FlickerSpeed, seed);
+        float b = Mathf.PerlinNoise(Time.time * FlickerSpeed * 2.3f, seed + 7.1f);
+        return (a * 0.65f + b * 0.35f) - 0.5f;
     }
 
     // [추가] 움직이는 방향을 바라봄 (멈추면 마지막 방향 유지)
@@ -176,7 +211,7 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
         torchLight.pointLightOuterRadius = currentRadius;
         torchLight.pointLightInnerRadius = currentRadius * 0.35f;
         torchLight.color = lit ? flameColor : emberColor;
-        torchLight.intensity = intensity;
+        torchLight.intensity = intensity * (1f + Flicker(0.3f) * FlickerAmount * 2f);
         if (coneLight) ApplyCone();
     }
 
@@ -185,15 +220,17 @@ public class PlayerTorchTemp : MonoBehaviour, ITorchLight
     {
         // Light 2D의 원뿔은 오브젝트 위쪽(+Y)을 향함 -> 바라보는 각도에서 90도 빼서 돌림
         torchLight.transform.localRotation = Quaternion.Euler(0f, 0f, facingAngle - 90f);
-        torchLight.pointLightOuterAngle = lit ? coneOuterAngle : 360f;
-        torchLight.pointLightInnerAngle = lit ? coneInnerAngle : 360f;
-        torchLight.pointLightOuterRadius = lit ? currentRadius * coneLengthMul : currentRadius;
-        torchLight.pointLightInnerRadius = currentRadius * 0.2f;
+        // [수정] 원뿔(80도) -> 반원(180도). 씬에 저장된 예전 각도보다 넓은 쪽을 씀
+        float shake = 1f + Flicker(3.7f) * FlickerRadius * 2f;
+        torchLight.pointLightOuterAngle = lit ? Mathf.Max(coneOuterAngle, HalfDiscOuter) : 360f;
+        torchLight.pointLightInnerAngle = lit ? Mathf.Max(coneInnerAngle, HalfDiscInner) : 360f;
+        torchLight.pointLightOuterRadius = (lit ? currentRadius * Mathf.Min(coneLengthMul, HalfDiscLength) : currentRadius) * shake;
+        torchLight.pointLightInnerRadius = currentRadius * 0.25f;
         if (glowLight == null) return;
         glowLight.pointLightOuterRadius = glowRadius * (lit ? 1f : 0.6f);
         glowLight.pointLightInnerRadius = glowRadius * 0.2f;
         glowLight.color = lit ? flameColor : emberColor;
-        glowLight.intensity = lit ? intensity * 0.55f : 0f;
+        glowLight.intensity = lit ? intensity * 0.6f * (1f + Flicker(9.1f) * FlickerAmount * 2f) : 0f;
     }
 
     private float TargetMul()

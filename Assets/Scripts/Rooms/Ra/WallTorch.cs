@@ -227,6 +227,14 @@ public class WallTorch : MonoBehaviour, IInteractable
         SetVisual(true, litIntensity);
     }
 
+    // [추가] 그림 바꾸기 (테스트용 막대+네모 횃불 -> 다른 방과 같은 청동 횃대, RaPixelFlame이 부름)
+    public void UseSprites(Sprite off, Sprite on)
+    {
+        if (off != null) offSprite = off;
+        if (on != null) onSprite = on;
+        SetVisual(lit, lit ? litIntensity : 0f);
+    }
+
     private void SetVisual(bool on, float intensity)
     {
         if (target != null)
